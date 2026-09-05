@@ -1,0 +1,259 @@
+{
+  "schemaVersion": "1.0",
+  "authoritativeStore": "PostgreSQL",
+  "projection": "Neo4j",
+  "nodeTypes": [
+    "AgentInstance",
+    "AgentManifest",
+    "Approval",
+    "AuthorityBaseline",
+    "Capability",
+    "Claim",
+    "Company",
+    "ConstraintCandidate",
+    "ControlContext",
+    "DataClass",
+    "DelegationGrant",
+    "Department",
+    "Diagnosis",
+    "Duty",
+    "Engagement",
+    "Evidence",
+    "FrameworkArtifact",
+    "Goal",
+    "Intervention",
+    "Metric",
+    "OutcomeReview",
+    "Person",
+    "Queue",
+    "Resource",
+    "RoleAssignment",
+    "Stage",
+    "System",
+    "ValueFlow",
+    "WorkUnit",
+    "Workflow"
+  ],
+  "requiredNodeProperties": [
+    "tenantId",
+    "companyId",
+    "id",
+    "sourceVersion",
+    "validation",
+    "projectedAt"
+  ],
+  "requiredRelationshipProperties": [
+    "id",
+    "tenantId",
+    "companyId",
+    "sourceRecordId",
+    "sourceVersion",
+    "validation",
+    "validFrom",
+    "validTo"
+  ],
+  "relationships": [
+    {
+      "type": "HOLDS_ROLE",
+      "from": "Person",
+      "to": "RoleAssignment"
+    },
+    {
+      "type": "REPORTS_TO",
+      "from": "RoleAssignment",
+      "to": "RoleAssignment"
+    },
+    {
+      "type": "BELONGS_TO",
+      "from": "RoleAssignment",
+      "to": "Department"
+    },
+    {
+      "type": "ACCOUNTABLE_FOR",
+      "from": "Person",
+      "to": "Duty"
+    },
+    {
+      "type": "ACCOUNTABLE_FOR",
+      "from": "Person",
+      "to": "WorkUnit"
+    },
+    {
+      "type": "PERFORMS",
+      "from": "Person",
+      "to": "WorkUnit"
+    },
+    {
+      "type": "CONTAINS",
+      "from": "Duty",
+      "to": "WorkUnit"
+    },
+    {
+      "type": "CONTAINS",
+      "from": "Workflow",
+      "to": "WorkUnit"
+    },
+    {
+      "type": "HANDS_OFF_TO",
+      "from": "WorkUnit",
+      "to": "WorkUnit"
+    },
+    {
+      "type": "USES_SYSTEM",
+      "from": "WorkUnit",
+      "to": "System"
+    },
+    {
+      "type": "REQUIRES_CAPABILITY",
+      "from": "WorkUnit",
+      "to": "Capability"
+    },
+    {
+      "type": "EXPOSES",
+      "from": "System",
+      "to": "Capability"
+    },
+    {
+      "type": "TOUCHES",
+      "from": "Capability",
+      "to": "DataClass"
+    },
+    {
+      "type": "SUPPORTED_BY",
+      "from": "Claim",
+      "to": "Evidence"
+    },
+    {
+      "type": "DESCRIBES",
+      "from": "Claim",
+      "to": "WorkUnit"
+    },
+    {
+      "type": "CONTRADICTS",
+      "from": "Claim",
+      "to": "Claim"
+    },
+    {
+      "type": "TARGETS_GOAL",
+      "from": "Diagnosis",
+      "to": "Goal"
+    },
+    {
+      "type": "CONTAINS",
+      "from": "ValueFlow",
+      "to": "Stage"
+    },
+    {
+      "type": "USES_RESOURCE",
+      "from": "Stage",
+      "to": "Resource"
+    },
+    {
+      "type": "HAS_QUEUE",
+      "from": "Stage",
+      "to": "Queue"
+    },
+    {
+      "type": "LOCATED_AT",
+      "from": "ConstraintCandidate",
+      "to": "Stage"
+    },
+    {
+      "type": "INVESTIGATES",
+      "from": "Diagnosis",
+      "to": "ConstraintCandidate"
+    },
+    {
+      "type": "SUPPORTED_BY",
+      "from": "Diagnosis",
+      "to": "Evidence"
+    },
+    {
+      "type": "MEASURED_BY",
+      "from": "Diagnosis",
+      "to": "Metric"
+    },
+    {
+      "type": "PROPOSES_CHANGE_TO",
+      "from": "Intervention",
+      "to": "WorkUnit"
+    },
+    {
+      "type": "ADDRESSES",
+      "from": "Intervention",
+      "to": "Diagnosis"
+    },
+    {
+      "type": "ASSESSES",
+      "from": "OutcomeReview",
+      "to": "Intervention"
+    },
+    {
+      "type": "MEASURED_BY",
+      "from": "OutcomeReview",
+      "to": "Metric"
+    },
+    {
+      "type": "BOUND_TO",
+      "from": "AgentManifest",
+      "to": "WorkUnit"
+    },
+    {
+      "type": "AUTHORIZED_UNDER",
+      "from": "DelegationGrant",
+      "to": "ControlContext"
+    },
+    {
+      "type": "AUTHORIZED_UNDER",
+      "from": "DelegationGrant",
+      "to": "AuthorityBaseline"
+    },
+    {
+      "type": "GRANTS_TO",
+      "from": "DelegationGrant",
+      "to": "AgentManifest"
+    },
+    {
+      "type": "INSTANTIATES",
+      "from": "AgentInstance",
+      "to": "AgentManifest"
+    },
+    {
+      "type": "GOVERNED_BY",
+      "from": "AgentInstance",
+      "to": "DelegationGrant"
+    },
+    {
+      "type": "ATTESTS",
+      "from": "Approval",
+      "to": "DelegationGrant"
+    },
+    {
+      "type": "SUPPORTED_BY",
+      "from": "FrameworkArtifact",
+      "to": "Evidence"
+    },
+    {
+      "type": "DEPENDS_ON",
+      "from": "FrameworkArtifact",
+      "to": "FrameworkArtifact"
+    },
+    {
+      "type": "OBSERVED_AS",
+      "from": "AgentInstance",
+      "to": "OutcomeReview"
+    }
+  ],
+  "queryDefaults": {
+    "depth": 2,
+    "maxDepth": 4,
+    "nodeBudget": 150
+  },
+  "rules": [
+    "No inference edge grants authority.",
+    "Do not infer reporting relationships from department membership.",
+    "Every projection change has a canonical source record.",
+    "All node, edge and count reads must be access-controlled.",
+    "Graph and vector indexes are never live authorization authorities."
+  ]
+}

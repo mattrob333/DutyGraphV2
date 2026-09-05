@@ -1,0 +1,636 @@
+{
+  "version": "0.1.0",
+  "notice": "Local implementation coverage only. No full production acceptance is claimed.",
+  "requirements": [
+    {
+      "id": "FOUND-001",
+      "title": "Audit and pin existing code",
+      "targetRelease": "M0",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "FOUND-002",
+      "title": "Architecture and contract freeze",
+      "targetRelease": "M0",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "FOUND-003",
+      "title": "Threat model and data handling approval",
+      "targetRelease": "M0",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "FOUND-004",
+      "title": "Reproducible delivery pipeline",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "TEN-001",
+      "title": "Tenant and company isolation",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "TEN-002",
+      "title": "Identity versus person mapping",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "TEN-003",
+      "title": "Privileged role separation",
+      "targetRelease": "R1",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "TEN-004",
+      "title": "Secure participant enrollment",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "TEN-005",
+      "title": "UI persona is not permission",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "DISC-001",
+      "title": "Bounded engagement scope",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "DISC-002",
+      "title": "Roster import and reconciliation",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "DISC-003",
+      "title": "Unified executive discovery",
+      "targetRelease": "R1",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "DISC-004",
+      "title": "Raw capture instructions",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "DISC-005",
+      "title": "Recording and alternatives",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "DISC-006",
+      "title": "Resumable asset handling",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "DISC-007",
+      "title": "Immutable request exchange",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "DISC-008",
+      "title": "Delivery and reminder controls",
+      "targetRelease": "R1",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "DISC-009",
+      "title": "Safe legacy import",
+      "targetRelease": "R1",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "EVID-001",
+      "title": "Private evidence asset lifecycle",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "EVID-002",
+      "title": "Transcript lineage",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "EVID-003",
+      "title": "Grounded candidate extraction",
+      "targetRelease": "R1",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "EVID-004",
+      "title": "Failure and fallback honesty",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "EVID-005",
+      "title": "Reviewable changesets",
+      "targetRelease": "R1",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "EVID-006",
+      "title": "Contradictions and identity ambiguity",
+      "targetRelease": "R1",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "EVID-007",
+      "title": "Source origin and retraction",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "WORK-001",
+      "title": "Versioned task card",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "WORK-002",
+      "title": "Exact-version confirmation",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "WORK-003",
+      "title": "Material-change policy",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "WORK-004",
+      "title": "Duty and reporting claims are independent",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "WORK-005",
+      "title": "Workflow-definition contracts",
+      "targetRelease": "R2",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "WORK-006",
+      "title": "Durable workflow instances",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "DATA-001",
+      "title": "Scoped relational integrity",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "DATA-002",
+      "title": "Transactional outbox",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "DATA-003",
+      "title": "Canonical artifact hashing",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "GRAPH-001",
+      "title": "Rebuildable Neo4j projection",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "GRAPH-002",
+      "title": "Scoped bounded graph queries",
+      "targetRelease": "R2",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "GRAPH-003",
+      "title": "Projection freshness and repair",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "GRAPH-004",
+      "title": "Graph camera and inspectors",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "STRAT-001",
+      "title": "Canonical sixteen-framework DAG",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "STRAT-002",
+      "title": "Snapshot-bound framework runs",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "STRAT-003",
+      "title": "Budgeted targeted freshness",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "STRAT-004",
+      "title": "Operational model compiler",
+      "targetRelease": "R2",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "STRAT-005",
+      "title": "Candidate and falsification engine",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "STRAT-006",
+      "title": "Reviewed diagnosis and abstention",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "MET-001",
+      "title": "Measurement architecture",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "MET-002",
+      "title": "Intervention contracts",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "MET-003",
+      "title": "Outcome evaluation",
+      "targetRelease": "R2",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "GOV-001",
+      "title": "Human Manifest and Authority Baseline",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "GOV-002",
+      "title": "Derived agent proposals",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "GOV-003",
+      "title": "Export-first portable package",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "GOV-004",
+      "title": "Versioned Control Context",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "GOV-005",
+      "title": "Authority and owner ceiling",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "GOV-006",
+      "title": "Authenticated stage approvals",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "GOV-007",
+      "title": "Partial approval and invalidation",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "GOV-008",
+      "title": "Signet and auditable issuance",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "GOV-009",
+      "title": "Combined violation and drift view",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "RUN-001",
+      "title": "Adapter conformance",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "RUN-002",
+      "title": "Action preflight and bound approval",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "RUN-003",
+      "title": "Idempotent side effects and reconciliation",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "RUN-004",
+      "title": "No alternate enforcement bypass",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "RUN-005",
+      "title": "Owner lifecycle and suspension",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "RUN-006",
+      "title": "Reviewed ownership transfer",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "RUN-007",
+      "title": "Delegation-aware agent chaining",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "INT-001",
+      "title": "Verified meeting ingestion",
+      "targetRelease": "R2",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "INT-002",
+      "title": "Identity/effective-access adapter",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "INT-003",
+      "title": "Customer policy and request adapters",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "INT-004",
+      "title": "One precise Oracle integration",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "INT-005",
+      "title": "Connector health and coverage",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "REV-001",
+      "title": "Weekly evidence-based agenda",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "REV-002",
+      "title": "Meetings create proposals not permissions",
+      "targetRelease": "R2",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "REV-003",
+      "title": "Approved brief publication",
+      "targetRelease": "R2",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "FEED-001",
+      "title": "Scoped context snapshots and deltas",
+      "targetRelease": "R2",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "EXP-001",
+      "title": "Export generation and access",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "EXP-002",
+      "title": "On-demand audit packet",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "UX-001",
+      "title": "Graphite visual baseline",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "UX-002",
+      "title": "Accessible capture and workspace",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "UX-003",
+      "title": "Honest empty and failure states",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "SEC-001",
+      "title": "Untrusted source isolation",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "SEC-002",
+      "title": "Provider and secret controls",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "SEC-003",
+      "title": "Retention/deletion and legal hold",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "SEC-004",
+      "title": "Tamper-evidence and audit limitations",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "OPS-001",
+      "title": "Durable jobs and budgets",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "OPS-002",
+      "title": "Measured performance",
+      "targetRelease": "R2",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "OPS-003",
+      "title": "Recovery and stop runbooks",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "QA-001",
+      "title": "Production regression suite",
+      "targetRelease": "R1",
+      "localStatus": "Local subset",
+      "productionAccepted": false
+    },
+    {
+      "id": "QA-002",
+      "title": "Blind diagnostic evaluation",
+      "targetRelease": "R2",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "QA-003",
+      "title": "Security release-blocking tests",
+      "targetRelease": "R3",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "ENT-001",
+      "title": "Enterprise identity and tenancy",
+      "targetRelease": "R4",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "ENT-002",
+      "title": "Permission-safe portfolio reporting",
+      "targetRelease": "R4",
+      "localStatus": "Open",
+      "productionAccepted": false
+    },
+    {
+      "id": "ENT-003",
+      "title": "Additional adapter coverage",
+      "targetRelease": "R4",
+      "localStatus": "Open",
+      "productionAccepted": false
+    }
+  ]
+}

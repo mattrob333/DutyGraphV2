@@ -1,0 +1,50 @@
+{
+  "name": "dutygraph-v2",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "dev": "tsx server/index.ts",
+    "build": "tsc --noEmit && vite build",
+    "start": "tsx server/index.ts --production",
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "setup": "node scripts/setup.mjs",
+    "db:migrate": "tsx server/migrate.ts",
+    "verify": "npm run build && npm test",
+    "contracts": "tsx scripts/contracts.ts"
+  },
+  "dependencies": {
+    "@fontsource/dm-sans": "5.3.0",
+    "cookie-parser": "1.4.7",
+    "dotenv": "17.4.2",
+    "express": "5.2.1",
+    "express-rate-limit": "8.7.0",
+    "helmet": "8.3.0",
+    "json-canonicalize": "3.0.0",
+    "jszip": "3.10.1",
+    "lucide-react": "1.41.0",
+    "papaparse": "5.7.0",
+    "pg": "8.23.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "1.4.10",
+    "@types/express": "5.0.6",
+    "@types/node": "26.4.1",
+    "@types/papaparse": "5.5.2",
+    "@types/pg": "8.23.1",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "@vitejs/plugin-react": "6.1.1",
+    "prettier": "3.9.6",
+    "tsx": "4.23.13",
+    "typescript": "7.0.2",
+    "vite": "8.2.2"
+  }
+}

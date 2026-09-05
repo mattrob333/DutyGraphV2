@@ -1,0 +1,1524 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Duty Graph local pilot — implemented record transport",
+    "version": "0.1.0",
+    "description": "Generated from runtime Zod request schemas. Covers the generic record creation/edit transport only. This is not the complete 92-route target API contract."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4317"
+    }
+  ],
+  "paths": {
+    "/api/v1/companies/{companyId}/records": {
+      "post": {
+        "operationId": "createRecord",
+        "security": [
+          {
+            "cookieSession": [],
+            "csrf": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "companyId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 128
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "data"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "person"
+                      },
+                      "data": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "email": {
+                            "type": "string",
+                            "format": "email",
+                            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+                          },
+                          "role": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "team": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "managerId": {
+                            "default": "",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              {
+                                "type": "string",
+                                "const": ""
+                              }
+                            ]
+                          },
+                          "externalId": {
+                            "default": "",
+                            "type": "string",
+                            "maxLength": 20000
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "email",
+                          "role",
+                          "team"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "data"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "evidence"
+                      },
+                      "data": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "Employee account",
+                              "Leadership account",
+                              "Customer account",
+                              "Policy document",
+                              "System configuration",
+                              "Execution record",
+                              "Public research",
+                              "Other document"
+                            ]
+                          },
+                          "text": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "personId": {
+                            "default": "",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              {
+                                "type": "string",
+                                "const": ""
+                              }
+                            ]
+                          },
+                          "locator": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "originId": {
+                            "default": "",
+                            "type": "string",
+                            "maxLength": 20000
+                          },
+                          "classification": {
+                            "default": "Known",
+                            "type": "string",
+                            "enum": [
+                              "Known",
+                              "Inferred",
+                              "Assumed",
+                              "Missing"
+                            ]
+                          },
+                          "bucket": {
+                            "default": "org",
+                            "type": "string",
+                            "enum": [
+                              "biz",
+                              "leadership",
+                              "calls",
+                              "org"
+                            ]
+                          },
+                          "assetId": {
+                            "default": "",
+                            "anyOf": [
+                              {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                              },
+                              {
+                                "type": "string",
+                                "const": ""
+                              }
+                            ]
+                          },
+                          "sourceDate": {
+                            "default": "",
+                            "type": "string",
+                            "maxLength": 20000
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "type",
+                          "text",
+                          "locator"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "data"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "task"
+                      },
+                      "data": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "duty": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "ownerId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "performerId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "purpose": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "trigger": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "inputs": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "instructions": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "output": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "systems": {
+                            "default": [],
+                            "maxItems": 80,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "maxLength": 1000
+                            }
+                          },
+                          "allowed": {
+                            "default": [],
+                            "maxItems": 80,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "maxLength": 1000
+                            }
+                          },
+                          "denied": {
+                            "default": [],
+                            "maxItems": 80,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "maxLength": 1000
+                            }
+                          },
+                          "humanGate": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "evidenceIds": {
+                            "default": [],
+                            "maxItems": 150,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            }
+                          },
+                          "mode": {
+                            "default": "ai_draft",
+                            "type": "string",
+                            "enum": [
+                              "human_only",
+                              "ai_assist",
+                              "ai_draft",
+                              "ai_recommend",
+                              "ai_execute_with_approval",
+                              "ai_execute_bounded",
+                              "prohibited"
+                            ]
+                          },
+                          "classification": {
+                            "default": "Inferred",
+                            "type": "string",
+                            "enum": [
+                              "Known",
+                              "Inferred",
+                              "Assumed",
+                              "Missing"
+                            ]
+                          },
+                          "conflict": {
+                            "default": false,
+                            "type": "boolean"
+                          },
+                          "stopConditions": {
+                            "default": "",
+                            "type": "string",
+                            "maxLength": 20000
+                          },
+                          "reviewDue": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                          },
+                          "reason": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "duty",
+                          "ownerId",
+                          "performerId",
+                          "purpose",
+                          "trigger",
+                          "inputs",
+                          "instructions",
+                          "output",
+                          "humanGate",
+                          "reviewDue",
+                          "reason"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "data"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "request"
+                      },
+                      "data": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "personId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "type": {
+                            "type": "string",
+                            "enum": [
+                              "work",
+                              "leadership",
+                              "confirmation"
+                            ]
+                          },
+                          "questions": {
+                            "minItems": 1,
+                            "maxItems": 10,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 200
+                            }
+                          },
+                          "taskIds": {
+                            "default": [],
+                            "maxItems": 150,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            }
+                          },
+                          "dueDate": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                          },
+                          "notice": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "personId",
+                          "type",
+                          "questions",
+                          "dueDate",
+                          "notice"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "data"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "candidate"
+                      },
+                      "data": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "flow": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "pressure": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "alternative": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "counterfactual": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "discriminator": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "evidenceIds": {
+                            "default": [],
+                            "maxItems": 150,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            }
+                          },
+                          "disconfirmingEvidenceIds": {
+                            "default": [],
+                            "maxItems": 150,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            }
+                          },
+                          "ownerId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "throughputUnit": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "flow",
+                          "pressure",
+                          "alternative",
+                          "counterfactual",
+                          "discriminator",
+                          "ownerId",
+                          "throughputUnit"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "data"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "metric"
+                      },
+                      "data": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "question": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "formula": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "unit": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "population": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "source": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "ownerId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "baseline": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "target": {
+                            "type": [
+                              "number",
+                              "null"
+                            ]
+                          },
+                          "missingReason": {
+                            "default": "",
+                            "type": "string",
+                            "maxLength": 20000
+                          },
+                          "window": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "guardrail": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "question",
+                          "formula",
+                          "unit",
+                          "population",
+                          "source",
+                          "ownerId",
+                          "baseline",
+                          "target",
+                          "window",
+                          "guardrail"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "data"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "intervention"
+                      },
+                      "data": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "candidateId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "ownerId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "metricId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "change": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "prediction": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "stopConditions": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "reviewDate": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "candidateId",
+                          "ownerId",
+                          "metricId",
+                          "change",
+                          "prediction",
+                          "stopConditions",
+                          "reviewDate"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "data"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "agent"
+                      },
+                      "data": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "ownerId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "taskIds": {
+                            "minItems": 1,
+                            "maxItems": 50,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                            }
+                          },
+                          "purpose": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "ownerId",
+                          "taskIds",
+                          "purpose"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "required": [
+                      "kind",
+                      "data"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "kind": {
+                        "const": "review"
+                      },
+                      "data": {
+                        "$schema": "https://json-schema.org/draft/2020-12/schema",
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 200
+                          },
+                          "ownerId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "decision": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "nextAction": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 20000
+                          },
+                          "dueDate": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                          }
+                        },
+                        "required": [
+                          "title",
+                          "ownerId",
+                          "decision",
+                          "nextAction",
+                          "dueDate"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created immutable content version, audit event, and outbox event."
+          },
+          "401": {
+            "description": "Unauthenticated"
+          },
+          "403": {
+            "description": "Actor or CSRF rejected"
+          },
+          "404": {
+            "description": "Company inaccessible"
+          },
+          "409": {
+            "description": "Command conflict"
+          },
+          "422": {
+            "description": "Shape or semantic validation failed"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "dg_session"
+      },
+      "csrf": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-CSRF-Token"
+      }
+    },
+    "schemas": {
+      "person": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "role": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "team": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "managerId": {
+            "default": "",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ]
+          },
+          "externalId": {
+            "default": "",
+            "type": "string",
+            "maxLength": 20000
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "role",
+          "team"
+        ],
+        "additionalProperties": false
+      },
+      "evidence": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "Employee account",
+              "Leadership account",
+              "Customer account",
+              "Policy document",
+              "System configuration",
+              "Execution record",
+              "Public research",
+              "Other document"
+            ]
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "personId": {
+            "default": "",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ]
+          },
+          "locator": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "originId": {
+            "default": "",
+            "type": "string",
+            "maxLength": 20000
+          },
+          "classification": {
+            "default": "Known",
+            "type": "string",
+            "enum": [
+              "Known",
+              "Inferred",
+              "Assumed",
+              "Missing"
+            ]
+          },
+          "bucket": {
+            "default": "org",
+            "type": "string",
+            "enum": [
+              "biz",
+              "leadership",
+              "calls",
+              "org"
+            ]
+          },
+          "assetId": {
+            "default": "",
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              {
+                "type": "string",
+                "const": ""
+              }
+            ]
+          },
+          "sourceDate": {
+            "default": "",
+            "type": "string",
+            "maxLength": 20000
+          }
+        },
+        "required": [
+          "title",
+          "type",
+          "text",
+          "locator"
+        ],
+        "additionalProperties": false
+      },
+      "task": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "duty": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "performerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "trigger": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "inputs": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "instructions": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "output": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "systems": {
+            "default": [],
+            "maxItems": 80,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 1000
+            }
+          },
+          "allowed": {
+            "default": [],
+            "maxItems": 80,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 1000
+            }
+          },
+          "denied": {
+            "default": [],
+            "maxItems": 80,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 1000
+            }
+          },
+          "humanGate": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "evidenceIds": {
+            "default": [],
+            "maxItems": 150,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          "mode": {
+            "default": "ai_draft",
+            "type": "string",
+            "enum": [
+              "human_only",
+              "ai_assist",
+              "ai_draft",
+              "ai_recommend",
+              "ai_execute_with_approval",
+              "ai_execute_bounded",
+              "prohibited"
+            ]
+          },
+          "classification": {
+            "default": "Inferred",
+            "type": "string",
+            "enum": [
+              "Known",
+              "Inferred",
+              "Assumed",
+              "Missing"
+            ]
+          },
+          "conflict": {
+            "default": false,
+            "type": "boolean"
+          },
+          "stopConditions": {
+            "default": "",
+            "type": "string",
+            "maxLength": 20000
+          },
+          "reviewDue": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "title",
+          "duty",
+          "ownerId",
+          "performerId",
+          "purpose",
+          "trigger",
+          "inputs",
+          "instructions",
+          "output",
+          "humanGate",
+          "reviewDue",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "request": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "personId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "work",
+              "leadership",
+              "confirmation"
+            ]
+          },
+          "questions": {
+            "minItems": 1,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            }
+          },
+          "taskIds": {
+            "default": [],
+            "maxItems": 150,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          },
+          "notice": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          }
+        },
+        "required": [
+          "title",
+          "personId",
+          "type",
+          "questions",
+          "dueDate",
+          "notice"
+        ],
+        "additionalProperties": false
+      },
+      "candidate": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "flow": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "pressure": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "alternative": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "counterfactual": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "discriminator": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "evidenceIds": {
+            "default": [],
+            "maxItems": 150,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          "disconfirmingEvidenceIds": {
+            "default": [],
+            "maxItems": 150,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "throughputUnit": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "title",
+          "flow",
+          "pressure",
+          "alternative",
+          "counterfactual",
+          "discriminator",
+          "ownerId",
+          "throughputUnit"
+        ],
+        "additionalProperties": false
+      },
+      "metric": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "question": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "formula": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "unit": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "population": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "baseline": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "target": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "missingReason": {
+            "default": "",
+            "type": "string",
+            "maxLength": 20000
+          },
+          "window": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "guardrail": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          }
+        },
+        "required": [
+          "title",
+          "question",
+          "formula",
+          "unit",
+          "population",
+          "source",
+          "ownerId",
+          "baseline",
+          "target",
+          "window",
+          "guardrail"
+        ],
+        "additionalProperties": false
+      },
+      "intervention": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "candidateId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "metricId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "change": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "prediction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "stopConditions": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "reviewDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          }
+        },
+        "required": [
+          "title",
+          "candidateId",
+          "ownerId",
+          "metricId",
+          "change",
+          "prediction",
+          "stopConditions",
+          "reviewDate"
+        ],
+        "additionalProperties": false
+      },
+      "agent": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "taskIds": {
+            "minItems": 1,
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
+          },
+          "purpose": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          }
+        },
+        "required": [
+          "title",
+          "ownerId",
+          "taskIds",
+          "purpose"
+        ],
+        "additionalProperties": false
+      },
+      "review": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "ownerId": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "decision": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "nextAction": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+          }
+        },
+        "required": [
+          "title",
+          "ownerId",
+          "decision",
+          "nextAction",
+          "dueDate"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+}

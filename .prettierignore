@@ -1,0 +1,6 @@
+reference/
+contracts/
+package-lock.json
+node_modules/
+dist/
+work/

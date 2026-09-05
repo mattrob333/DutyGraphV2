@@ -1,0 +1,234 @@
+{
+  "schemaVersion": "1.0",
+  "sourceFile": "mattrob333/Liveframeworks/lib/frameworks.js",
+  "sourceBlobSha": "d2ddacc805d0cea591e52c2f7a32a2c6b0075b6a",
+  "notice": "Configuration snapshot. Reconcile against pinned repo in M0. Listed metadata tools are not executable implementations.",
+  "order": [
+    "bmc",
+    "industrymap",
+    "fiveforces",
+    "pestle",
+    "swot",
+    "vrio",
+    "ansoff",
+    "threehorizons",
+    "blueocean",
+    "jtbd",
+    "vpc",
+    "kano",
+    "sevens",
+    "bsc",
+    "toc",
+    "raci"
+  ],
+  "intakeBuckets": [
+    "biz",
+    "leadership",
+    "calls",
+    "org"
+  ],
+  "frameworks": [
+    {
+      "key": "bmc",
+      "name": "Business Model Canvas",
+      "feeds": [
+        "industrymap",
+        "fiveforces",
+        "pestle",
+        "swot",
+        "vrio",
+        "jtbd",
+        "vpc",
+        "sevens",
+        "bsc"
+      ],
+      "upstream": []
+    },
+    {
+      "key": "industrymap",
+      "name": "Industry Map",
+      "feeds": [
+        "fiveforces",
+        "pestle",
+        "vrio",
+        "blueocean",
+        "threehorizons"
+      ],
+      "upstream": [
+        "bmc"
+      ]
+    },
+    {
+      "key": "fiveforces",
+      "name": "Porter’s Five Forces",
+      "feeds": [
+        "swot",
+        "ansoff",
+        "blueocean"
+      ],
+      "upstream": [
+        "bmc",
+        "industrymap"
+      ]
+    },
+    {
+      "key": "pestle",
+      "name": "PESTLE",
+      "feeds": [
+        "swot",
+        "threehorizons"
+      ],
+      "upstream": [
+        "bmc",
+        "industrymap"
+      ]
+    },
+    {
+      "key": "swot",
+      "name": "SWOT / TOWS",
+      "feeds": [
+        "ansoff",
+        "toc"
+      ],
+      "upstream": [
+        "bmc",
+        "fiveforces",
+        "pestle"
+      ]
+    },
+    {
+      "key": "vrio",
+      "name": "VRIO",
+      "feeds": [
+        "ansoff",
+        "blueocean",
+        "toc"
+      ],
+      "upstream": [
+        "bmc",
+        "industrymap"
+      ]
+    },
+    {
+      "key": "ansoff",
+      "name": "Ansoff Matrix",
+      "feeds": [
+        "threehorizons",
+        "toc"
+      ],
+      "upstream": [
+        "fiveforces",
+        "swot",
+        "vrio"
+      ]
+    },
+    {
+      "key": "threehorizons",
+      "name": "Three Horizons",
+      "feeds": [
+        "bsc",
+        "toc"
+      ],
+      "upstream": [
+        "industrymap",
+        "pestle",
+        "ansoff"
+      ]
+    },
+    {
+      "key": "blueocean",
+      "name": "Blue Ocean / ERRC",
+      "feeds": [
+        "kano",
+        "toc"
+      ],
+      "upstream": [
+        "industrymap",
+        "fiveforces",
+        "vrio"
+      ]
+    },
+    {
+      "key": "jtbd",
+      "name": "Jobs To Be Done",
+      "feeds": [
+        "vpc"
+      ],
+      "upstream": [
+        "bmc"
+      ]
+    },
+    {
+      "key": "vpc",
+      "name": "Value Proposition Canvas",
+      "feeds": [
+        "kano"
+      ],
+      "upstream": [
+        "bmc",
+        "jtbd"
+      ]
+    },
+    {
+      "key": "kano",
+      "name": "Kano Model",
+      "feeds": [
+        "bsc",
+        "toc"
+      ],
+      "upstream": [
+        "blueocean",
+        "vpc"
+      ]
+    },
+    {
+      "key": "sevens",
+      "name": "McKinsey 7S",
+      "feeds": [
+        "toc",
+        "raci"
+      ],
+      "upstream": [
+        "bmc"
+      ]
+    },
+    {
+      "key": "bsc",
+      "name": "Balanced Scorecard / OKRs",
+      "feeds": [
+        "toc"
+      ],
+      "upstream": [
+        "bmc",
+        "threehorizons",
+        "kano"
+      ]
+    },
+    {
+      "key": "toc",
+      "name": "Theory of Constraints",
+      "feeds": [
+        "raci"
+      ],
+      "upstream": [
+        "swot",
+        "vrio",
+        "ansoff",
+        "threehorizons",
+        "blueocean",
+        "kano",
+        "sevens",
+        "bsc"
+      ]
+    },
+    {
+      "key": "raci",
+      "name": "RACI + Capability Layer",
+      "feeds": [],
+      "upstream": [
+        "sevens",
+        "toc"
+      ]
+    }
+  ]
+}
