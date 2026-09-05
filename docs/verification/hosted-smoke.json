@@ -1,0 +1,43 @@
+{
+  "release": "0.3.0",
+  "time": "2026-09-05T22:40:39.359Z",
+  "checks": [
+    "health and cloud database",
+    "shared demo disabled",
+    "anonymous access denied",
+    "cron auth enforced",
+    "canonical-origin signup and secure cookie",
+    "private sample repeatability",
+    "key storage status and provider config defaults",
+    "graph API",
+    "AI missing-key gate",
+    "email missing-key gate",
+    "canonical private invite URL",
+    "participant enrollment",
+    "assigned questions",
+    "typed answer return to advisor",
+    "participant advisor-access denial",
+    "encrypted hosted provider key save/decrypt/remove without a provider call",
+    "authenticated maintenance projection and retention"
+  ],
+  "providerCalls": 0,
+  "realEmailsSent": 0,
+  "testedRuntimeCommit": "ad5af2e0a69b2f86c630c3d04eb15a8e4d6f7012",
+  "deployment": "dpl_5JDqSzpVv3LLFQFCSAyieRgij21R",
+  "productionUrl": "https://dutygraph-v2.vercel.app",
+  "githubCi": "https://github.com/mattrob333/DutyGraphV2/actions/runs/33996580804",
+  "automatedTests": 85,
+  "browserChecks": [
+    "sign in with isolated fictional QA account",
+    "Settings opens OpenAI model and Resend sender/key fields",
+    "private Cobalt sample graph renders with labeled routes",
+    "Discovery displays public research and AI source selection"
+  ],
+  "limits": [
+    "No live OpenAI or Exa calls",
+    "No real email sent",
+    "No inbox delivery or transcription acceptance",
+    "Neo4j not connected",
+    "No production recovery or load acceptance"
+  ]
+}

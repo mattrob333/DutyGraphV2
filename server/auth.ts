@@ -115,7 +115,7 @@ export async function registerAccount(input: z.infer<typeof registerSchema>) {
 export function defaultSettings() {
   return {
     notice:
-      "Responses are visible to the assigned advisor and the participant. Use synthetic information in this local pilot. Sources support work review and do not grant authority. Server audio retention: 30 days. Device drafts remain until you submit or discard them.",
+      "Responses are visible to the assigned advisor and the participant. Share only information approved for this engagement. Sources support work review and do not grant authority. Server audio retention: 30 days. Device drafts remain until you submit or discard them.",
     retentionDays: 30,
     reviewCadence: "Weekly",
     modules: ["discover", "diagnose", "govern"],

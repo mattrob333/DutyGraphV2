@@ -86,7 +86,7 @@ export function Help({ go }: { go: (page: string) => void }) {
             />
           )}
           <p className="subtle">
-            Release 0.2 · Local advisor pilot
+            Release 0.3 · Hosted advisor pilot
             <br />
             Examples use fictional people and measurements.
           </p>

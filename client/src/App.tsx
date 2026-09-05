@@ -1823,7 +1823,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <div className="sidebar-footer">
           <div className="local-status">
             <i className="dot sage" />
-            Local advisor pilot<span>v0.2</span>
+            Advisor pilot<span>v0.3</span>
           </div>
           <button className="account" onClick={() => go("settings")}>
             <span className="avatar">
