@@ -1,6 +1,6 @@
-# Release 0.2 - advisor workflow and delivery pack
+# Release 0.3 - hosted advisor pilot
 
-This release completes a usable local, human-led advisor journey and its training/handoff materials. It does **not** complete the full 90-requirement production target in the supplied handoff. External research/model services, enterprise authority and live execution remain unimplemented or unconfigured; independent production acceptance remains open.
+This release adds a Vercel/Neon hosted pilot, private sample workspaces, encrypted account key settings, OpenAI discovery drafts and Resend invitation sending to the human-led advisor journey and training materials. It does **not** complete the full 90-requirement production target in the supplied handoff. Provider adapters need credentials and live acceptance; enterprise authority and live execution remain unimplemented; independent production acceptance remains open.
 
 ## Delivered behavior
 
@@ -39,7 +39,7 @@ The original Cobalt sample remains unchanged by the training journey. Northstar 
 | Independent release assurance | Full accessibility/browser matrix, physical microphone tests, security review/penetration test, blind diagnostic evaluation and owner acceptance |
 | Enterprise expansion | SSO/SCIM, deployment/isolation choices, permission-safe portfolio reporting and additional adapters |
 
-The Exa adapter requires its documented key and enablement flag. Other integration workstreams do not become functional through environment variables. The app fails closed for live runtime preflight. INTEGRATIONS.md records implementation, credential needs and live acceptance boundaries.
+Hosted Exa, OpenAI and Resend use Workspace settings. See guide/00-hosted-quickstart.md for the current provider workflow; the 0.2 delivery pack remains a historical local release. Neo4j is not connected. The app fails closed for live runtime preflight. INTEGRATIONS.md records implementation, credential needs and live acceptance boundaries.
 
 ## Requirement traceability
 

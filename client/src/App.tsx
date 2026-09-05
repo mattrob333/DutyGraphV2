@@ -43,7 +43,9 @@ import {
 import { RecordForm } from "./forms.tsx";
 import { Graph } from "./Graph.tsx";
 import { Engagement } from "./Engagement.tsx";
+import { AiWorkbench } from "./AiWorkbench.tsx";
 import { BusinessResearch } from "./BusinessResearch.tsx";
+import { ProviderSettings } from "./ProviderSettings.tsx";
 import { ClientReports } from "./ClientReports.tsx";
 const Help = lazy(() =>
   import("./Help.tsx").then((module) => ({ default: module.Help })),
@@ -261,7 +263,7 @@ function Login({ onLogin }: { onLogin: (result: any) => void }) {
           </div>
         )}
         <p className="subtle">
-          Local development pilot · customer integrations are not configured.
+          Advisor pilot · connect your API keys in Workspace settings.
         </p>
       </div>
     </div>
@@ -908,24 +910,34 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           )}
         </div>
         {tab === "research" ? (
-          <BusinessResearch
-            key={company.id}
-            company={company}
-            create={() =>
-              setModal({
-                type: "form",
-                kind: "evidence",
-                preset: {
-                  type: "Public research",
-                  classification: "Inferred",
-                  bucket: "biz",
-                },
-              })
-            }
-            open={open}
-            kickoff={() => setTab("plan")}
-            refresh={refresh}
-          />
+          <>
+            <BusinessResearch
+              key={company.id}
+              company={company}
+              create={() =>
+                setModal({
+                  type: "form",
+                  kind: "evidence",
+                  preset: {
+                    type: "Public research",
+                    classification: "Inferred",
+                    bucket: "biz",
+                  },
+                })
+              }
+              open={open}
+              kickoff={() => setTab("plan")}
+              refresh={refresh}
+            />
+            <AiWorkbench
+              key={company.id + "ai"}
+              company={company.id}
+              records={records}
+              create={(preset) =>
+                setModal({ type: "form", kind: "task", preset })
+              }
+            />
+          </>
         ) : tab === "plan" ? (
           <Engagement
             company={company}
@@ -941,7 +953,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               <span>
                 Participants receive a focused page with five prompts, voice or
                 typed capture, and their exact task versions. Private links are
-                shared manually; email delivery is not configured.
+                shared manually or emailed through your configured Resend
+                account.
               </span>
             </div>
             {pending.length > 0 && (
@@ -1551,7 +1564,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           <div>
             <Network />
             <strong>Derived graph</strong>
-            <span>Local PostgreSQL projection</span>
+            <span>PostgreSQL projection</span>
             <Badge tone={data.projection.pending ? "amber" : "sage"}>
               {data.projection.pending
                 ? data.projection.pending + " events pending"
@@ -1576,19 +1589,19 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               ],
               [
                 "Audio storage",
-                "Chunked local database storage with checksums; unscanned",
-                "Local pilot",
+                "Chunked database storage with checksums; unscanned",
+                "Pilot",
               ],
               ["Neo4j", "Dedicated graph projection adapter", "Not configured"],
               [
                 "Email",
-                "Transactional invitation delivery and reminders",
-                "Not configured",
+                "Resend invitation sending; delivery tracking and reminders pending",
+                "Configure in Settings",
               ],
               [
-                "Transcription & AI",
-                "Approved provider, data policy, and credentials",
-                "Not configured",
+                "OpenAI discovery drafts",
+                "Meeting briefs, task suggestions and hypotheses; transcription pending",
+                "Configure in Settings",
               ],
               [
                 "Fireflies",
@@ -1681,6 +1694,26 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             setToast("Workspace settings saved.");
           }}
         />
+        <Panel
+          title="Explore a fictional company"
+          subtitle="Load a private Cobalt sample workspace in your account. It contains fictional people and work; it does not contact anyone."
+        >
+          <Button
+            onClick={async () => {
+              try {
+                const sample = await api("/v1/sample-company", "POST", {});
+                await loadCompanies();
+                setCompanyId(sample.id);
+                go("graph");
+              } catch (e) {
+                setToast((e as Error).message);
+              }
+            }}
+          >
+            Open my sample company
+          </Button>
+        </Panel>
+        <ProviderSettings key={companyId} company={companyId} />
         <Panel title="Your authenticated account">
           <dl className="details">
             <dt>Name</dt>
@@ -1691,8 +1724,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             <dd>Advisor</dd>
             <dt>Identity assurance</dt>
             <dd>
-              Local password session. Enterprise identity and step-up signing
-              are not configured.
+              Password session. Enterprise identity and step-up signing are not
+              configured.
             </dd>
           </dl>
           <Button onClick={logout}>
@@ -1867,8 +1900,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <footer className="app-footer">
           <span>
             <ShieldCheck size={12} />
-            {company?.sandbox ? "Synthetic example" : "Local pilot"} · Saved in
-            PostgreSQL ·{" "}
+            {company?.sandbox ? "Synthetic example" : "Advisor pilot"} · Saved
+            in PostgreSQL ·{" "}
             {company ? "Revision " + company.revision : "Connecting"}
           </span>
           <span>Evidence first. People authorize.</span>

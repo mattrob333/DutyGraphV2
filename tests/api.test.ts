@@ -10,7 +10,9 @@ import { projectTenant } from "../server/projection.ts";
 import { purgeExpiredAudio } from "../server/retention.ts";
 import JSZip from "jszip";
 import { normalizeResearch } from "../server/research.ts";
-let researchCalls = 0;
+let researchCalls = 0,
+  aiCalls = 0;
+const emailMessages: any[] = [];
 let server: Server, base: string;
 type Client = { cookie: string; csrf: string; user: any; company: string };
 async function request(
@@ -61,6 +63,59 @@ async function register(): Promise<Client> {
   return client;
 }
 const prefix = (c: Client) => "/api/v1/companies/" + c.company;
+test("provider keys are encrypted, password-gated, tenant-scoped and never returned", async () => {
+  const c = await register(),
+    other = await register(),
+    key = "synthetic-provider-key-not-a-real-secret";
+  const path = prefix(c) + "/providers/exa",
+    body = { key, password: "Synthetic test password 124!", enabled: true };
+  assert.equal(
+    (await request(c, path, "PUT", { ...body, password: "wrong password" }))
+      .status,
+    403,
+  );
+  assert.equal((await request(c, path, "PUT", body)).status, 200);
+  const status = await request(c, prefix(c) + "/providers");
+  assert.equal(
+    status.data.providers.find((p: any) => p.provider === "exa").configured,
+    true,
+  );
+  assert.ok(!JSON.stringify(status.data).includes(key));
+  const rows = await tx(
+    c.user.tenant_id,
+    async (db) =>
+      (await db.query("SELECT encrypted_key FROM provider_settings")).rows,
+  );
+  assert.equal(rows.length, 1);
+  assert.ok(!rows[0].encrypted_key.includes(key));
+  assert.equal(
+    await tx(
+      other.user.tenant_id,
+      async (db) =>
+        (await db.query("SELECT * FROM provider_settings")).rowCount,
+    ),
+    0,
+  );
+  assert.equal((await request(other, path, "PUT", body)).status, 404);
+  await pool.query(
+    "UPDATE users SET role='participant',company_id=$2 WHERE id=$1",
+    [other.user.id, other.company],
+  );
+  assert.equal(
+    (await request(other, prefix(other) + "/providers")).status,
+    403,
+  );
+  assert.equal(
+    (await request(c, path, "DELETE", { password: body.password })).status,
+    200,
+  );
+  assert.equal(
+    (await request(c, prefix(c) + "/providers")).data.providers.find(
+      (p: any) => p.provider === "exa",
+    ).configured,
+    false,
+  );
+});
 async function create(c: Client, kind: string, data: any) {
   const r = await request(c, prefix(c) + "/records", "POST", { kind, data });
   assert.equal(r.status, 201, JSON.stringify(r.data));
@@ -692,6 +747,32 @@ async function invite(c: Client, f: any, type = "confirmation") {
 before(async () => {
   const app = createApp({
     authRequestsPerWindow: 1000,
+    emailProvider: async (message, key, id) => {
+      emailMessages.push({ message, id });
+      if (message.subject.includes("UnknownEmail"))
+        throw new Error("private diagnostic");
+      return { id: "synthetic-resend-id" };
+    },
+    aiProvider: async (input) => {
+      aiCalls++;
+      return {
+        draft: {
+          summary: "Synthetic draft",
+          claims: [
+            {
+              text: "Source suggests a preparation task.",
+              basis: "Inferred",
+              sourceIds: [input.sources[0].id],
+            },
+          ],
+          questions: ["Who approves the supplier?"],
+          tasks: [],
+          hypotheses: [],
+        },
+        responseId: "synthetic-openai-id",
+        usage: { input_tokens: 10, output_tokens: 10 },
+      };
+    },
     researchProvider: async (query) => {
       researchCalls++;
       if (query.startsWith("FailureTest"))
@@ -1285,4 +1366,154 @@ test("failed research never auto-retries and persistent account budgets cap new 
   );
   assert.equal((await request(c, prefix(c) + "/research")).data.used, 10);
   assert.equal(researchCalls, start + 10);
+});
+
+async function saveProvider(c: Client, provider: string) {
+  return request(c, prefix(c) + "/providers/" + provider, "PUT", {
+    key: "synthetic-key-never-a-live-credential",
+    password: "Synthetic test password 124!",
+    enabled: true,
+    ...(provider === "resend" ? { from: "advisor@test.invalid" } : {}),
+  });
+}
+test("private sample is isolated, repeatable and does not send email", async () => {
+  const a = await register(),
+    b = await register(),
+    before = emailMessages.length;
+  const first = await request(a, "/api/v1/sample-company", "POST", {}),
+    again = await request(a, "/api/v1/sample-company", "POST", {});
+  assert.equal(first.status, 200, JSON.stringify(first.data));
+  assert.equal(first.data.id, again.data.id);
+  assert.equal(
+    (await request(b, "/api/v1/companies/" + first.data.id + "/workspace"))
+      .status,
+    404,
+  );
+  const workspace = await request(
+    a,
+    "/api/v1/companies/" + first.data.id + "/workspace",
+  );
+  assert.equal(workspace.status, 200);
+  assert.ok(workspace.data.records.length >= 25);
+  assert.equal(emailMessages.length, before);
+});
+test("Resend invitation calls once, keeps tokens out of receipts and opens participant page", async () => {
+  const c = await register(),
+    f = await fixture(c),
+    other = await register();
+  const r = await create(c, "request", {
+    title: "Work questions",
+    personId: f.p.id,
+    type: "work",
+    questions: ["What do you do?"],
+    taskIds: [],
+    dueDate: "2099-01-01",
+    notice: "Synthetic test only.",
+  });
+  const path = prefix(c) + "/requests/" + r.id + "/email",
+    body = { expectedVersion: r.version, confirmSend: true },
+    id = randomUUID();
+  assert.equal((await request(c, path, "POST", body)).status, 503);
+  await saveProvider(c, "resend");
+  assert.equal((await request(other, path, "POST", body)).status, 404);
+  const before = emailMessages.length;
+  const sent = await request(c, path, "POST", body, { "Idempotency-Key": id });
+  assert.equal(sent.status, 200, JSON.stringify(sent.data));
+  assert.equal(sent.data.state, "accepted");
+  await request(c, path, "POST", body, { "Idempotency-Key": id });
+  assert.equal(emailMessages.length, before + 1);
+  const message = emailMessages.at(-1).message;
+  assert.deepEqual(message.to, [f.p.data.email]);
+  const token = message.text.match(/invite\/([a-f0-9]{64})/)[1];
+  assert.equal((await request(null, "/api/invitations/" + token)).status, 200);
+  const jobs = await request(c, prefix(c) + "/requests/" + r.id + "/emails");
+  assert.ok(!JSON.stringify(jobs.data).includes(token));
+  const stored = await tx(
+    c.user.tenant_id,
+    async (db) =>
+      (await db.query("SELECT input,result FROM provider_jobs")).rows,
+  );
+  assert.ok(!JSON.stringify(stored).includes(token));
+  const enroll = await request(
+    null,
+    "/api/invitations/" + token + "/enroll",
+    "POST",
+    { password: "Synthetic participant password 123!", acknowledged: true },
+  );
+  assert.equal(enroll.status, 200);
+  const participant = {
+    cookie: enroll.cookie,
+    csrf: enroll.data.csrf,
+    user: enroll.data.user,
+    company: c.company,
+  };
+  assert.equal(
+    (await request(participant, prefix(c) + "/providers")).status,
+    403,
+  );
+  assert.equal(
+    (await request(participant, "/api/v1/participant/requests")).data.requests
+      .length,
+    1,
+  );
+});
+test("ambiguous email failures remain unknown and are not retried", async () => {
+  const c = await register(),
+    f = await fixture(c);
+  await saveProvider(c, "resend");
+  await tx(c.user.tenant_id, async (db) => {
+    await db.query(
+      "UPDATE companies SET name='UnknownEmail fixture' WHERE id=$1",
+      [c.company],
+    );
+  });
+  const r = await create(c, "request", {
+    title: "Questions",
+    personId: f.p.id,
+    type: "work",
+    questions: ["What do you do?"],
+    taskIds: [],
+    dueDate: "2099-01-01",
+    notice: "Synthetic test only.",
+  });
+  const path = prefix(c) + "/requests/" + r.id + "/email",
+    body = { expectedVersion: r.version, confirmSend: true },
+    headers = { "Idempotency-Key": randomUUID() },
+    before = emailMessages.length;
+  const response = await request(c, path, "POST", body, headers);
+  assert.equal(response.data.state, "unknown");
+  assert.ok(!response.data.message.includes("private diagnostic"));
+  await request(c, path, "POST", body, headers);
+  assert.equal(emailMessages.length, before + 1);
+});
+test("AI drafts bind sources, require consent, isolate tenants and do not create authoritative records", async () => {
+  const c = await register(),
+    other = await register(),
+    f = await fixture(c),
+    path = prefix(c) + "/ai",
+    body = { mode: "brief", sourceIds: [f.e.id], consent: true };
+  assert.equal((await request(c, path, "POST", body)).status, 503);
+  await saveProvider(c, "openai");
+  assert.equal(
+    (await request(c, path, "POST", { ...body, consent: false })).status,
+    422,
+  );
+  assert.equal((await request(other, path, "POST", body)).status, 404);
+  const before = aiCalls,
+    headers = { "Idempotency-Key": randomUUID() };
+  const result = await request(c, path, "POST", body, headers);
+  assert.equal(result.status, 200, JSON.stringify(result.data));
+  await request(c, path, "POST", body, headers);
+  assert.equal(aiCalls, before + 1);
+  const jobs = (await request(c, path)).data.jobs;
+  assert.equal(jobs[0].state, "complete");
+  assert.equal(jobs[0].stale, false);
+  assert.equal(jobs[0].input.sources[0].text, undefined);
+  await tx(c.user.tenant_id, async (db) => {
+    await db.query("UPDATE records SET state='retracted' WHERE id=$1", [
+      f.e.id,
+    ]);
+  });
+  assert.equal((await request(c, path)).data.jobs[0].stale, true);
+  assert.equal((await request(c, path, "POST", body)).status, 422);
 });

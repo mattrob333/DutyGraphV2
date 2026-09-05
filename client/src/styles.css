@@ -1846,8 +1846,16 @@ tbody tr:last-child td {
 .responsibility-port {
   fill: var(--blue);
 }
-.org-unassigned { padding: 20px; border: 1px solid var(--amber); border-radius: 10px; margin-bottom: 20px; }
-.org-unassigned p { margin: 8px 0 14px; font-size: 12px; }
+.org-unassigned {
+  padding: 20px;
+  border: 1px solid var(--amber);
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+.org-unassigned p {
+  margin: 8px 0 14px;
+  font-size: 12px;
+}
 .responsibility-register {
   margin: 24px 0;
 }
@@ -3745,4 +3753,20 @@ tbody tr:last-child td {
     width: 240px;
     min-height: 110px;
   }
+}
+.provider-setting {
+  border-top: 1px solid var(--line);
+  padding: 20px 0;
+}
+.provider-setting summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-weight: 600;
+}
+.provider-setting form {
+  max-width: 620px;
+  display: grid;
+  gap: 14px;
 }

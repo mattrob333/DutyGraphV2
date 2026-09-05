@@ -12,6 +12,7 @@ import {
   getRecord,
 } from "./db.ts";
 import { createOrEdit } from "./records.ts";
+import { providerConfig } from "./providers.ts";
 import {
   publicWebUrl,
   researchInput,
@@ -130,9 +131,6 @@ export async function exaSearch(
 export function researchRouter(providerOverride?: ResearchProvider) {
   const router = express.Router({ mergeParams: true });
   router.use(advisor);
-  const configured = () =>
-    !!providerOverride ||
-    (process.env.ENABLE_EXA_RESEARCH === "true" && !!process.env.EXA_API_KEY);
   const user = (req: express.Request) => (req as AuthRequest).actor;
   const company = (req: express.Request) =>
     z.uuid().parse(req.params.companyId);
@@ -166,7 +164,9 @@ export function researchRouter(providerOverride?: ResearchProvider) {
         );
         return {
           provider: "Exa",
-          configured: configured(),
+          configured:
+            !!providerOverride ||
+            (await providerConfig(user(req).tenant_id, "exa", db)).configured,
           limit: 10,
           used,
           runs,
@@ -178,11 +178,12 @@ export function researchRouter(providerOverride?: ResearchProvider) {
     const input = researchInput.parse(req.body),
       actor = user(req),
       companyId = company(req);
-    if (!configured())
+    const provider = await providerConfig(actor.tenant_id, "exa");
+    if (!providerOverride && !provider.configured)
       fail(
         503,
         "RESEARCH_UNCONFIGURED",
-        "Exa is not configured. An operator must set EXA_API_KEY and ENABLE_EXA_RESEARCH=true. You can add public sources manually.",
+        "Add and enable your Exa API key in Workspace settings. You can also add public sources manually.",
       );
     const query = `${input.publicName} company products services customers leadership locations`,
       domain = input.website ? new URL(input.website).hostname : "";
@@ -225,8 +226,7 @@ export function researchRouter(providerOverride?: ResearchProvider) {
     if (claimed) {
       try {
         const result = await (
-          providerOverride ||
-          ((q, d) => exaSearch(q, d, process.env.EXA_API_KEY!))
+          providerOverride || ((q, d) => exaSearch(q, d, provider.key))
         )(query, domain);
         await tx(actor.tenant_id, async (db) => {
           await db.query(

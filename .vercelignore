@@ -1,0 +1,7 @@
+work
+.env*
+.agents
+node_modules
+.git
+tests
+reference

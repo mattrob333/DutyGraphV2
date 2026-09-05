@@ -12,6 +12,7 @@ import type { RecordRow } from "../../shared/domain.ts";
 import { Button, Field, ErrorBox, State, Badge, Row, date } from "./ui.tsx";
 import { api, downloadExport, downloadFile } from "./api.ts";
 import { fieldSets } from "./forms.tsx";
+import { EmailInvitation } from "./EmailInvitation.tsx";
 import { WorkflowDetail } from "./WorkflowDetail.tsx";
 export function Detail({
   record: r,
@@ -533,7 +534,7 @@ export function Detail({
             <dt>Due</dt>
             <dd>{r.data.dueDate}</dd>
             <dt>Channel</dt>
-            <dd>Private link, shared manually. No email is sent.</dd>
+            <dd>Private participant link; send by email or share manually.</dd>
           </dl>
           <ol>
             {r.data.questions.map((q: string, i: number) => (
@@ -577,6 +578,14 @@ export function Detail({
                 : "Create private participant link"}
             </Button>
           )}
+          <EmailInvitation
+            company={company}
+            record={r}
+            recipient={
+              records.find((p) => p.id === r.data.personId)?.data.email || ""
+            }
+            refresh={refresh}
+          />
           {link && (
             <div className="link-result">
               <strong>Private invitation · expires in 7 days</strong>

@@ -2,7 +2,7 @@
   "openapi": "3.1.1",
   "info": {
     "title": "Duty Graph local pilot — implemented record transport",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Generated from runtime Zod request schemas. Covers the generic record creation/edit transport only. This is not the complete 92-route target API contract."
   },
   "servers": [

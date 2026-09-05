@@ -1,12 +1,12 @@
 # Implemented API reference
 
-Release 0.2. This inventory is generated from server route declarations. It describes 41 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
+Release 0.3. This inventory is generated from server route declarations. It describes 50 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
 
 ## Transport and authentication
 
-The browser and API share one loopback origin. API sessions use the HttpOnly dg_session cookie. Sign-in/register/enrollment return a session-bound CSRF token; authenticated changes require X-CSRF-Token. Commands also require a unique Idempotency-Key of at most 128 characters. Reusing a key with identical actor/path/content returns the saved result; changed content conflicts. Invitation bearer URLs are redacted from saved receipts.
+The browser and API share one origin (localhost or the production Vercel URL). API sessions use the HttpOnly dg_session cookie. Sign-in/register/enrollment return a session-bound CSRF token; authenticated changes require X-CSRF-Token. Commands also require a unique Idempotency-Key of at most 128 characters. Reusing a key with identical actor/path/content returns the saved result; changed content conflicts. Invitation bearer URLs are redacted from saved receipts.
 
-Authentication and invitation entry points have a production-default limit of 40 requests per 15 minutes per process/IP. The local service is not a distributed abuse-protection system. Business routes enforce the server actor and tenant context; no request may select a different tenant or role. Advisor routes manage companies within that tenant. Participant routes and assets enforce the assigned person/company/request.
+Authentication and invitation entry points have a production-default limit of 40 requests per 15 minutes per IP. Hosted limits use a PostgreSQL counter shared by function instances; local limits are per process. Provider-key settings share this limiter. Business routes enforce the server actor and tenant context; no request may select a different tenant or role. Advisor routes manage companies within that tenant. Participant routes and assets enforce the assigned person/company/request.
 
 Use expectedVersion for record edits/actions and case progress. Reports/framework saves and graph rebuild use expectedRevision for the company snapshot. Review current data after a 409; do not blindly retry old content with a new key.
 
@@ -23,9 +23,12 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | GET | /api/health | server/app.ts |
 | GET | /api/invitations/{token} | server/app.ts |
 | POST | /api/invitations/{token}/enroll | server/app.ts |
+| GET | /api/maintenance | server/app.ts |
 | GET | /api/v1/companies | server/app.ts |
 | POST | /api/v1/companies | server/app.ts |
 | PATCH | /api/v1/companies/{companyId} | server/app.ts |
+| GET | /api/v1/companies/{companyId}/ai | server/ai.ts |
+| POST | /api/v1/companies/{companyId}/ai | server/ai.ts |
 | POST | /api/v1/companies/{companyId}/assets | server/assets.ts |
 | PUT | /api/v1/companies/{companyId}/assets/{assetId}/chunks/{index} | server/assets.ts |
 | GET | /api/v1/companies/{companyId}/assets/{assetId}/content | server/assets.ts |
@@ -36,6 +39,9 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | POST | /api/v1/companies/{companyId}/frameworks/{key}/manual | server/app.ts |
 | GET | /api/v1/companies/{companyId}/graph | server/app.ts |
 | POST | /api/v1/companies/{companyId}/graph/rebuild | server/app.ts |
+| GET | /api/v1/companies/{companyId}/providers | server/providers.ts |
+| DELETE | /api/v1/companies/{companyId}/providers/{provider} | server/providers.ts |
+| PUT | /api/v1/companies/{companyId}/providers/{provider} | server/providers.ts |
 | POST | /api/v1/companies/{companyId}/records | server/app.ts |
 | PATCH | /api/v1/companies/{companyId}/records/{recordId} | server/app.ts |
 | POST | /api/v1/companies/{companyId}/records/{recordId}/actions | server/app.ts |
@@ -43,6 +49,8 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | POST | /api/v1/companies/{companyId}/reports | server/reports.ts |
 | GET | /api/v1/companies/{companyId}/reports/{reportId}/{format} | server/reports.ts |
 | POST | /api/v1/companies/{companyId}/reports/{reportId}/review | server/reports.ts |
+| POST | /api/v1/companies/{companyId}/requests/{recordId}/email | server/invitations.ts |
+| GET | /api/v1/companies/{companyId}/requests/{recordId}/emails | server/invitations.ts |
 | POST | /api/v1/companies/{companyId}/requests/{recordId}/issue | server/app.ts |
 | GET | /api/v1/companies/{companyId}/research | server/research.ts |
 | POST | /api/v1/companies/{companyId}/research | server/research.ts |
@@ -55,6 +63,7 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | GET | /api/v1/companies/{companyId}/workspace | server/app.ts |
 | GET | /api/v1/participant/requests | server/app.ts |
 | POST | /api/v1/participant/requests/{recordId}/submit | server/app.ts |
+| POST | /api/v1/sample-company | server/app.ts |
 
 ## Record payloads
 
@@ -75,4 +84,4 @@ The route inventory is complete for the current declarations, but full response/
 
 Errors carry a code, readable message, retryable flag and requestId where handled by the application. Typical statuses: 400 invalid command metadata; 401 missing/expired session; 403 actor/origin/CSRF rejection; 404 inaccessible scope; 409 version, binding or transition conflict; 410 expired request/audio; 422 semantic validation; 429 auth throttling; 503 unconfigured runtime. See tests/api.test.ts for executable examples.
 
-The health route checks a live database query and reports local service/version/runtime coverage. It does not prove external provider health, signing or customer-system access. Generated client reports are audience-reviewed local downloads; no route sends email or executes a customer business action.
+The health route checks a live database query and reports service/version/runtime coverage. It does not prove external provider health, signing or customer-system access. Generated client reports are audience-reviewed local downloads; the explicit request email endpoint sends through the configured Resend account. No route executes a customer business action.

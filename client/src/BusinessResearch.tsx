@@ -243,9 +243,9 @@ export function BusinessResearch({
             )}
             {status && !status.configured && (
               <p className="subtle">
-                An operator must configure the project’s Exa API key and enable
-                research. Manual source capture is available now.
-                Model-generated analysis is not configured.
+                Add your Exa API key in Workspace settings. You can also add
+                public sources manually. OpenAI drafting is available below once
+                its key is configured.
               </p>
             )}
           </form>

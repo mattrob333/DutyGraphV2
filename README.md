@@ -2,7 +2,7 @@
 
 A PostgreSQL-backed advisor workspace that turns evidence into reviewed work descriptions, human confirmations, testable explanations and client deliverables. React/TypeScript preserves the supplied graphite interface; Express enforces record scope and guarded transitions.
 
-**Release 0.2 supports the local human-led advisor journey.** It is not the complete production authority/execution system. The optional Exa source-collection adapter is implemented and tested with a simulated provider; it needs a project key, operator enablement and live acceptance. Firecrawl, model/transcription providers, email, enterprise identity, Neo4j, customer-policy systems and governed runtime are not wired in. See the [release status](docs/RELEASE-STATUS.md) and [integration decisions](docs/INTEGRATIONS.md).
+**Release 0.3 is a hosted advisor pilot.** Open [Duty Graph](https://dutygraph-v2.vercel.app), create an account and load your private fictional sample from Workspace settings. Exa research, OpenAI discovery drafts and Resend invitations are wired to encrypted per-account key settings. Provider adapters have simulated-response tests; live provider acceptance requires your keys. Neo4j, transcription, enterprise identity and governed customer-system execution remain unfinished. See the [hosted walkthrough](docs/guide/00-hosted-quickstart.md), [release status](docs/RELEASE-STATUS.md) and [integration decisions](docs/INTEGRATIONS.md).
 
 ## Run locally
 

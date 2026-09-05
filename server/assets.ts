@@ -1,3 +1,5 @@
+import { Readable } from "node:stream";
+import { audioRange } from "./audio-range.ts";
 import { Router } from "express";
 import { z } from "zod";
 import { randomUUID, createHash } from "node:crypto";
@@ -255,7 +257,28 @@ export function assetsRouter() {
     });
     res.setHeader("Content-Type", result.a.mime);
     res.setHeader("Content-Security-Policy", "default-src 'none'; sandbox");
-    res.send(result.bytes);
+    res.setHeader("Accept-Ranges", "bytes");
+    const range = audioRange(req.header("Range"), result.bytes.length);
+    if (range === false) {
+      res.setHeader("Content-Range", `bytes */${result.bytes.length}`);
+      return res.status(416).end();
+    }
+    if (range) {
+      res.status(206);
+      res.setHeader(
+        "Content-Range",
+        `bytes ${range.start}-${range.end}/${result.bytes.length}`,
+      );
+      res.setHeader("Content-Length", range.end - range.start + 1);
+      return res.end(result.bytes.subarray(range.start, range.end + 1));
+    }
+    // Stream full downloads; browser playback uses bounded byte ranges.
+    Readable.from(
+      (function* () {
+        for (let i = 0; i < result.bytes.length; i += 262144)
+          yield result.bytes.subarray(i, i + 262144);
+      })(),
+    ).pipe(res);
   });
   return router;
 }

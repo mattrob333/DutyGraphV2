@@ -1,5 +1,5 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "notice": "Implemented route inventory extracted from server declarations. OpenAPI currently provides closed generic-record creation schemas; it is not a full production target contract.",
   "routes": [
     {
@@ -49,6 +49,11 @@
     },
     {
       "method": "GET",
+      "path": "/api/maintenance",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
       "path": "/api/v1/companies",
       "source": "server/app.ts"
     },
@@ -61,6 +66,16 @@
       "method": "PATCH",
       "path": "/api/v1/companies/{companyId}",
       "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/ai",
+      "source": "server/ai.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/ai",
+      "source": "server/ai.ts"
     },
     {
       "method": "POST",
@@ -113,6 +128,21 @@
       "source": "server/app.ts"
     },
     {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/providers",
+      "source": "server/providers.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/companies/{companyId}/providers/{provider}",
+      "source": "server/providers.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/companies/{companyId}/providers/{provider}",
+      "source": "server/providers.ts"
+    },
+    {
       "method": "POST",
       "path": "/api/v1/companies/{companyId}/records",
       "source": "server/app.ts"
@@ -146,6 +176,16 @@
       "method": "POST",
       "path": "/api/v1/companies/{companyId}/reports/{reportId}/review",
       "source": "server/reports.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/requests/{recordId}/email",
+      "source": "server/invitations.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/requests/{recordId}/emails",
+      "source": "server/invitations.ts"
     },
     {
       "method": "POST",
@@ -205,6 +245,11 @@
     {
       "method": "POST",
       "path": "/api/v1/participant/requests/{recordId}/submit",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/sample-company",
       "source": "server/app.ts"
     }
   ]

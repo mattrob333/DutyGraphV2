@@ -1,4 +1,10 @@
-import { existsSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  writeFileSync,
+  readFileSync,
+  appendFileSync,
+} from "node:fs";
+import dotenv from "dotenv";
 import { randomBytes } from "node:crypto";
 import { spawnSync } from "node:child_process";
 if (!existsSync(".env")) {
@@ -10,6 +16,11 @@ if (!existsSync(".env")) {
   );
   console.log("Created local database credentials in ignored .env.");
 }
+if (!dotenv.parse(readFileSync(".env")).PROVIDER_ENCRYPTION_KEY)
+  appendFileSync(
+    ".env",
+    `\nPROVIDER_ENCRYPTION_KEY=${randomBytes(32).toString("hex")}\n`,
+  );
 const result = spawnSync(
   "docker",
   [

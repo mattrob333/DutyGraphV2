@@ -31,7 +31,7 @@ import {
   defaultSettings,
   type AuthRequest,
 } from "./auth.ts";
-import { demoUser } from "./seed.ts";
+import { demoUser, seedRecords } from "./seed.ts";
 import { createOrEdit, refreshTask } from "./records.ts";
 import { confirmationStatus, diagnosisReadiness } from "../shared/domain.ts";
 import { previewRoster } from "./roster.ts";
@@ -42,6 +42,14 @@ import { reportsRouter } from "./reports.ts";
 import { workflowsRouter, checkWorkflow } from "./workflows.ts";
 import { caseStatus, expireSteps } from "../shared/workflow.ts";
 import { researchRouter, type ResearchProvider } from "./research.ts";
+import {
+  invitationsRouter,
+  issueInvitation,
+  type EmailProvider,
+} from "./invitations.ts";
+import { aiRouter, type AiProvider } from "./ai.ts";
+import { providersRouter } from "./providers.ts";
+import { hostedAuthLimit, maintenance } from "./hosted.ts";
 export const registry = JSON.parse(
   await readFile(
     new URL("../contracts/framework-registry.json", import.meta.url),
@@ -69,29 +77,35 @@ const run = (req: express.Request, fn: any) =>
 export function createApp({
   authRequestsPerWindow = 40,
   researchProvider,
+  emailProvider,
+  aiProvider,
 }: {
   authRequestsPerWindow?: number;
   researchProvider?: ResearchProvider;
+  emailProvider?: EmailProvider;
+  aiProvider?: AiProvider;
 } = {}) {
   const app = express();
+  if (process.env.VERCEL) app.set("trust proxy", 1);
   app.disable("x-powered-by");
   app.use(
     helmet({
-      contentSecurityPolicy: process.argv.includes("--production")
-        ? {
-            directives: {
-              defaultSrc: ["'self'"],
-              scriptSrc: ["'self'"],
-              styleSrc: ["'self'", "'unsafe-inline'"],
-              fontSrc: ["'self'"],
-              imgSrc: ["'self'", "data:", "blob:"],
-              mediaSrc: ["'self'", "blob:"],
-              connectSrc: ["'self'"],
-              frameAncestors: ["'none'"],
-              upgradeInsecureRequests: null,
-            },
-          }
-        : false,
+      contentSecurityPolicy:
+        process.argv.includes("--production") || !!process.env.VERCEL
+          ? {
+              directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'"],
+                styleSrc: ["'self'", "'unsafe-inline'"],
+                fontSrc: ["'self'"],
+                imgSrc: ["'self'", "data:", "blob:"],
+                mediaSrc: ["'self'", "blob:"],
+                connectSrc: ["'self'"],
+                frameAncestors: ["'none'"],
+                upgradeInsecureRequests: null,
+              },
+            }
+          : false,
       crossOriginEmbedderPolicy: false,
     }),
   );
@@ -111,28 +125,32 @@ export function createApp({
   });
   app.use(express.json({ limit: "3mb" }));
   app.use(cookieParser());
-  const authLimit = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: authRequestsPerWindow,
-    standardHeaders: "draft-8",
-    legacyHeaders: false,
-    handler: (_req, res) =>
-      res.status(429).json({
-        code: "RATE_LIMITED",
-        message: "Too many authentication attempts. Wait before trying again.",
-        retryable: true,
-      }),
-  });
+  const authLimit = process.env.VERCEL
+    ? hostedAuthLimit
+    : rateLimit({
+        windowMs: 15 * 60 * 1000,
+        limit: authRequestsPerWindow,
+        standardHeaders: "draft-8",
+        legacyHeaders: false,
+        handler: (_req, res) =>
+          res.status(429).json({
+            code: "RATE_LIMITED",
+            message:
+              "Too many authentication attempts. Wait before trying again.",
+            retryable: true,
+          }),
+      });
   app.get("/api/health", async (_req, res) => {
     await pool.query("SELECT 1");
     res.json({
       status: "ok",
       service: "Duty Graph",
-      version: "0.2.0",
+      version: "0.3.0",
       database: "PostgreSQL",
       runtime: "unconfigured",
     });
   });
+  app.get("/api/maintenance", maintenance);
   app.get("/api/auth/options", (_req, res) =>
     res.json({ demo: process.env.ENABLE_DEMO === "true" }),
   );
@@ -292,6 +310,33 @@ export function createApp({
   });
   app.use("/api/v1", authenticate);
   const api = express.Router();
+  api.post("/sample-company", advisor, async (req, res) =>
+    res.json(
+      await run(req, async (db: import("pg").PoolClient) => {
+        const u = actor(req),
+          existing = (
+            await db.query(
+              "SELECT id FROM companies WHERE sandbox=true ORDER BY created_at LIMIT 1",
+            )
+          ).rows[0];
+        if (existing) return existing;
+        const id = randomUUID();
+        await db.query(
+          "INSERT INTO companies(id,tenant_id,name,scope,goal,settings,sandbox) VALUES($1,$2,$3,$4,$5,$6,true)",
+          [
+            id,
+            u.tenant_id,
+            "Cobalt Industrial Supply",
+            "Supplier onboarding",
+            "Explore this fictional example before creating a real engagement.",
+            defaultSettings(),
+          ],
+        );
+        await seedRecords(db, u, id);
+        return { id };
+      }),
+    ),
+  );
   api.get("/companies", async (req, res) =>
     res.json(
       await tx(
@@ -916,53 +961,16 @@ export function createApp({
         await run(req, async (db: any) => {
           const c = await companyCheck(db, actor(req), param(req, "companyId")),
             r = await getRecord(db, c.id, param(req, "recordId"), true);
-          expected(req, r);
-          if (r.kind !== "request" || !["draft", "sent"].includes(r.state))
-            fail(
-              409,
-              "INVALID_TRANSITION",
-              "Only an open request can receive a new invitation.",
-            );
-          for (const s of r.data.taskSnapshots || []) {
-            const current = await getRecord(db, c.id, s.id);
-            if (current.version !== s.version || current.state === "stale")
-              fail(
-                409,
-                "STALE_REQUEST",
-                "A task changed. Create a new request for its current version.",
-              );
-          }
-          const p = await getRecord(db, c.id, r.data.personId);
-          const token = randomBytes(32).toString("hex");
-          await db.query(
-            "UPDATE invitations SET revoked_at=now() WHERE request_id=$1 AND used_at IS NULL",
-            [r.id],
-          );
-          await db.query(
-            "INSERT INTO invitations(token_hash,tenant_id,company_id,person_id,email,name,expires_at,request_id) VALUES($1,$2,$3,$4,$5,$6,now()+interval '7 days',$7)",
-            [
-              tokenHash(token),
-              actor(req).tenant_id,
-              c.id,
-              p.id,
-              p.data.email,
-              p.title,
-              r.id,
-            ],
-          );
-          await setState(
+          const invite = await issueInvitation(
             db,
             actor(req),
             c.id,
             r,
-            "sent",
-            "request.manual_link_issued",
+            req.body.expectedVersion,
+            "manual_link",
           );
           return {
-            url:
-              (process.env.APP_ORIGIN || "http://localhost:4317") +
-              "/invite/" +
-              token,
+            url: invite.url,
             delivery: "manual_link",
             emailSent: false,
             expiresInDays: 7,
@@ -1374,6 +1382,9 @@ export function createApp({
   );
   api.use("/companies/:companyId/reports", reportsRouter());
   api.use("/companies/:companyId/research", researchRouter(researchProvider));
+  api.use("/companies/:companyId/providers", authLimit, providersRouter());
+  api.use("/companies/:companyId/requests", invitationsRouter(emailProvider));
+  api.use("/companies/:companyId/ai", aiRouter(aiProvider));
   api.post("/companies/:companyId/graph/rebuild", advisor, async (req, res) =>
     res.json(
       await run(req, async (db: any) => {

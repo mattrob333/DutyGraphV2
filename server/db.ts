@@ -3,10 +3,20 @@ import pg from "pg";
 import { createHash, randomUUID } from "node:crypto";
 import { canonicalize } from "json-canonicalize";
 import type { RecordRow, User } from "../shared/domain.ts";
+import { attachDatabasePool } from "@vercel/functions";
 export const pool = new pg.Pool({
-  connectionString: process.env.DATABASE_URL,
-  max: 12,
+  connectionString: process.env.VERCEL
+    ? process.env.APP_DATABASE_URL
+    : process.env.DATABASE_URL,
+  max: process.env.VERCEL ? 3 : 12,
+  idleTimeoutMillis: 5000,
+  connectionTimeoutMillis: 10000,
 });
+if (process.env.VERCEL) {
+  if (!process.env.APP_DATABASE_URL)
+    throw new Error("Hosted application database is not configured.");
+  attachDatabasePool(pool);
+}
 export const hash = (data: unknown) =>
   createHash("sha256").update(canonicalize(data)).digest("hex");
 export const tokenHash = (data: string) =>
