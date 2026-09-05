@@ -1,9 +1,14 @@
+import {
+  aiModelIds,
+  defaultAiModel,
+  reasoningLevels,
+} from "../shared/ai-models.ts";
 import { Router } from "express";
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 import { z } from "zod";
 import type pg from "pg";
-import { advisor, passwordMatches, type AuthRequest } from "./auth.ts";
-import { tx, command, pool, companyCheck, audit, fail } from "./db.ts";
+import { advisor, type AuthRequest } from "./auth.ts";
+import { tx, command, companyCheck, audit, fail } from "./db.ts";
 export const providerNames = ["openai", "exa", "resend"] as const;
 export type ProviderName = (typeof providerNames)[number];
 function encryptionKey() {
@@ -73,7 +78,7 @@ export async function providerConfig(
     configured: !!localKey && enabled,
     source: "none",
     key: enabled ? localKey : "",
-    config: { model: "gpt-5-mini", from: process.env.RESEND_FROM || "" },
+    config: { model: defaultAiModel, from: process.env.RESEND_FROM || "" },
   };
 }
 export function providersRouter() {
@@ -122,9 +127,9 @@ export function providersRouter() {
           .min(12)
           .max(512)
           .regex(/^[\x21-\x7e]+$/),
-        password: z.string().min(1).max(128),
         enabled: z.boolean(),
-        model: z.enum(["gpt-5-mini", "gpt-4.1-mini"]).default("gpt-5-mini"),
+        model: z.enum(aiModelIds).default(defaultAiModel),
+        reasoning: z.enum(reasoningLevels).default("medium"),
         from: z.union([z.email(), z.literal("")]).default(""),
       })
       .strict()
@@ -134,15 +139,6 @@ export function providersRouter() {
         422,
         "SENDER_REQUIRED",
         "Enter an email address on a domain verified in Resend.",
-      );
-    const auth = (
-      await pool.query("SELECT password_hash FROM users WHERE id=$1", [u.id])
-    ).rows[0];
-    if (!passwordMatches(d.password, auth.password_hash))
-      fail(
-        403,
-        "REAUTH_REQUIRED",
-        "Your current password is required to change provider keys.",
       );
     const encrypted = sealSecret(d.key, `${u.tenant_id}:${provider}`);
     res.json(
@@ -154,7 +150,7 @@ export function providersRouter() {
           await companyCheck(db, u, company);
           const config =
             provider === "openai"
-              ? { model: d.model }
+              ? { model: d.model, reasoning: d.reasoning }
               : provider === "resend"
                 ? { from: d.from }
                 : {};
@@ -177,19 +173,9 @@ export function providersRouter() {
       company = z
         .uuid()
         .parse((req.params as Record<string, string>).companyId);
-    const d = z
-      .object({ password: z.string().min(1).max(128) })
+    z.object({})
       .strict()
-      .parse(req.body);
-    const auth = (
-      await pool.query("SELECT password_hash FROM users WHERE id=$1", [u.id])
-    ).rows[0];
-    if (!passwordMatches(d.password, auth.password_hash))
-      fail(
-        403,
-        "REAUTH_REQUIRED",
-        "Your current password is required to remove provider keys.",
-      );
+      .parse(req.body || {});
     res.json(
       await command(
         u,

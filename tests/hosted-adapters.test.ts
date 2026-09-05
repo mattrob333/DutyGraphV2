@@ -146,3 +146,37 @@ test("audio ranges are bounded for hosted playback and reject invalid offsets", 
   assert.equal(audioRange("bytes=0-2,4-6", 100), false);
   assert.equal(audioRange(undefined, 100), null);
 });
+
+test("current models reach Responses with selected reasoning, sufficient output budget and strict drafts", async () => {
+  for (const model of [
+    "gpt-6-astra",
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna",
+  ]) {
+    await openAiDraft(
+      { ...input, reasoning: "high" },
+      "synthetic-key",
+      model,
+      async (url, options) => {
+        const body = JSON.parse(String(options?.body));
+        assert.equal(body.model, model);
+        assert.equal(body.reasoning.effort, "high");
+        assert.equal(body.max_output_tokens, 12000);
+        assert.equal(body.text.format.strict, true);
+        assert.equal(body.store, false);
+        return new Response(
+          JSON.stringify({
+            id: "synthetic-response",
+            status: "completed",
+            output: [
+              {
+                content: [{ type: "output_text", text: JSON.stringify(draft) }],
+              },
+            ],
+          }),
+        );
+      },
+    );
+  }
+});

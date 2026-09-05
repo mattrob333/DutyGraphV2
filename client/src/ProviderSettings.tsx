@@ -1,3 +1,8 @@
+import {
+  aiModels,
+  defaultAiModel,
+  type ReasoningEffort,
+} from "../../shared/ai-models.ts";
 import { useEffect, useState, useRef } from "react";
 import { api } from "./api.ts";
 import { Badge, Button, ErrorBox, Field, Panel } from "./ui.tsx";
@@ -62,6 +67,13 @@ function ProviderForm({
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
     [message, setMessage] = useState("");
+  const [model, setModel] = useState(value.config.model || defaultAiModel);
+  const [enabled, setEnabled] = useState(
+    value.source === "account" ? !!value.configured : true,
+  );
+  const [reasoning, setReasoning] = useState<ReasoningEffort>(
+    value.config.reasoning || "medium",
+  );
   const [title, description] =
     descriptions[value.provider as keyof typeof descriptions];
   async function save(e: React.FormEvent<HTMLFormElement>) {
@@ -74,9 +86,9 @@ function ProviderForm({
     try {
       await api(`/v1/companies/${company}/providers/${value.provider}`, "PUT", {
         key: values.get("key"),
-        password: values.get("password"),
-        enabled: values.get("enabled") === "on",
-        model: values.get("model") || "gpt-5-mini",
+        enabled,
+        model,
+        reasoning,
         from: values.get("from") || "",
       });
       form.reset();
@@ -120,15 +132,46 @@ function ProviderForm({
           />
         </Field>
         {value.provider === "openai" && (
-          <Field label="AI model">
-            <select
-              name="model"
-              defaultValue={value.config.model || "gpt-5-mini"}
-            >
-              <option value="gpt-5-mini">GPT-5 mini</option>
-              <option value="gpt-4.1-mini">GPT-4.1 mini</option>
-            </select>
-          </Field>
+          <>
+            <Field label="AI model">
+              <select
+                name="model"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+              >
+                {aiModels.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <p className="subtle">
+              {aiModels.find((m) => m.id === model)?.description} This choice
+              applies to all AI discovery drafts. Exa collects public sources;
+              this model analyzes the selected evidence. Model access depends on
+              your OpenAI project.
+            </p>
+            {model !== "gpt-4.1-mini" && (
+              <Field label="Reasoning effort">
+                <select
+                  name="reasoning"
+                  value={reasoning}
+                  onChange={(e) =>
+                    setReasoning(e.target.value as ReasoningEffort)
+                  }
+                >
+                  <option value="low">Low — faster</option>
+                  <option value="medium">Medium — balanced reasoning</option>
+                  <option value="high">High — more reasoning time</option>
+                </select>
+              </Field>
+            )}
+            <p className="subtle">
+              Higher capability and reasoning effort can increase response time
+              and provider charges.
+            </p>
+          </>
         )}
         {value.provider === "resend" && (
           <Field label="Verified sender email">
@@ -141,18 +184,14 @@ function ProviderForm({
             />
           </Field>
         )}
-        <Field label="Your current account password">
-          <input
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            required
-            maxLength={128}
-          />
-        </Field>
         <label className="check-line">
-          <input type="checkbox" name="enabled" defaultChecked /> Enable this
-          provider for my account
+          <input
+            type="checkbox"
+            name="enabled"
+            checked={enabled}
+            onChange={(e) => setEnabled(e.target.checked)}
+          />{" "}
+          Enable this provider for my account
         </label>
         <Button type="submit" primary disabled={busy || !ready}>
           {busy ? "Saving…" : `Save ${title} key`}
@@ -161,15 +200,14 @@ function ProviderForm({
           <Button
             disabled={busy}
             onClick={async () => {
-              const form = formRef.current!,
-                password = new FormData(form).get("password");
+              const form = formRef.current!;
               setBusy(true);
               setError("");
               try {
                 await api(
                   `/v1/companies/${company}/providers/${value.provider}`,
                   "DELETE",
-                  { password },
+                  {},
                 );
                 form.reset();
                 await reload();

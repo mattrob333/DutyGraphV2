@@ -63,15 +63,15 @@ async function register(): Promise<Client> {
   return client;
 }
 const prefix = (c: Client) => "/api/v1/companies/" + c.company;
-test("provider keys are encrypted, password-gated, tenant-scoped and never returned", async () => {
+test("provider keys save without passwords and remain encrypted, session-gated and tenant-scoped", async () => {
   const c = await register(),
     other = await register(),
     key = "synthetic-provider-key-not-a-real-secret";
   const path = prefix(c) + "/providers/exa",
-    body = { key, password: "Synthetic test password 124!", enabled: true };
+    body = { key, enabled: true };
+  assert.equal((await request(null, path, "PUT", body)).status, 401);
   assert.equal(
-    (await request(c, path, "PUT", { ...body, password: "wrong password" }))
-      .status,
+    (await request(c, path, "PUT", body, { "X-CSRF-Token": "wrong" })).status,
     403,
   );
   assert.equal((await request(c, path, "PUT", body)).status, 200);
@@ -105,10 +105,7 @@ test("provider keys are encrypted, password-gated, tenant-scoped and never retur
     (await request(other, prefix(other) + "/providers")).status,
     403,
   );
-  assert.equal(
-    (await request(c, path, "DELETE", { password: body.password })).status,
-    200,
-  );
+  assert.equal((await request(c, path, "DELETE", {})).status, 200);
   assert.equal(
     (await request(c, prefix(c) + "/providers")).data.providers.find(
       (p: any) => p.provider === "exa",
@@ -1372,7 +1369,6 @@ test("failed research never auto-retries and persistent account budgets cap new 
 async function saveProvider(c: Client, provider: string) {
   return request(c, prefix(c) + "/providers/" + provider, "PUT", {
     key: "synthetic-key-never-a-live-credential",
-    password: "Synthetic test password 124!",
     enabled: true,
     ...(provider === "resend" ? { from: "advisor@test.invalid" } : {}),
   });
@@ -1508,6 +1504,8 @@ test("AI drafts bind sources, require consent, isolate tenants and do not create
   assert.equal(aiCalls, before + 1);
   const jobs = (await request(c, path)).data.jobs;
   assert.equal(jobs[0].state, "complete");
+  assert.equal(jobs[0].input.model, "gpt-5.6-sol");
+  assert.equal(jobs[0].input.reasoning, "medium");
   assert.equal(jobs[0].stale, false);
   assert.equal(jobs[0].input.sources[0].text, undefined);
   await tx(c.user.tenant_id, async (db) => {
@@ -1536,4 +1534,45 @@ test("hosted rewrite metadata is omitted without weakening graph query validatio
       .status,
     422,
   );
+});
+
+test("all provider keys save and remove without account passwords; current models and effort roundtrip", async () => {
+  const c = await register();
+  for (const model of [
+    "gpt-6-astra",
+    "gpt-5.6-sol",
+    "gpt-5.6-terra",
+    "gpt-5.6-luna",
+  ]) {
+    const saved = await request(c, prefix(c) + "/providers/openai", "PUT", {
+      key: "synthetic-not-a-live-key",
+      enabled: true,
+      model,
+      reasoning: "high",
+    });
+    assert.equal(saved.status, 200, JSON.stringify(saved.data));
+    const p = (await request(c, prefix(c) + "/providers")).data.providers.find(
+      (p: any) => p.provider === "openai",
+    );
+    assert.equal(p.config.model, model);
+    assert.equal(p.config.reasoning, "high");
+  }
+  assert.equal(
+    (
+      await request(c, prefix(c) + "/providers/openai", "PUT", {
+        key: "synthetic-not-a-live-key",
+        enabled: true,
+        model: "invented-model",
+      })
+    ).status,
+    422,
+  );
+  for (const provider of ["openai", "exa", "resend"]) {
+    assert.equal((await saveProvider(c, provider)).status, 200);
+    assert.equal(
+      (await request(c, prefix(c) + "/providers/" + provider, "DELETE", {}))
+        .status,
+      200,
+    );
+  }
 });

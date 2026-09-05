@@ -11,12 +11,12 @@ Release 0.3 adds Vercel hosting, a private sample company, encrypted account API
 
 ## Connect your services
 
-Open Workspace settings → API keys & connections. Enter the provider key and your current Duty Graph password, then save. Keys are encrypted with AES-256-GCM on the server, bound to the account/provider, and never returned to the browser. They apply to all companies in your account. Saving does not make a provider call or verify that a key works. Hosted accounts never share an operator's paid key.
+Open Workspace settings → API keys & connections. Enter the provider key and save while signed in to your advisor account. No account password is requested. Keys are encrypted with AES-256-GCM on the server, bound to the account/provider, and never returned to the browser. They apply to all companies in your account. Saving does not make a provider call or verify that a key works. Hosted accounts never share an operator's paid key.
 
 | Service | What to enter | Where to try it |
 | --- | --- | --- |
 | Exa | Exa project API key | Discovery → Business research |
-| OpenAI | OpenAI project API key and supported model | AI discovery drafts beneath Business research |
+| OpenAI | OpenAI project API key, model and reasoning effort | AI discovery drafts beneath Business research |
 | Resend | Resend API key and an email address on a domain verified in Resend | Open a participant request → Send invitation email |
 
 Provider billing and account spending limits are managed with each provider. Removing a saved key stops subsequent calls using it; an already-started provider request may finish. The OpenAI connection used by the development assistant is separate from your application's credentials. Do not send API keys through chat or put them in repository files.
@@ -48,3 +48,9 @@ You can also generate a private link and share it yourself. Every replacement li
 Neo4j, Firecrawl, audio transcription, email delivery webhooks/reminders, password recovery, verified identity/SSO/MFA, full production retention/deletion, external authority integrations and governed customer-system execution remain open. The graph you see is a custom SVG view over PostgreSQL, not a Neo4j connection or React Flow component. Hosted operation and passing tests do not certify the full original production specification.
 
 Provider adapters have automated simulated-response tests. Actual AI quality, Exa results and email receipt require live acceptance with your configured accounts. No live paid AI/search calls or real invitation emails were made during this release verification.
+
+## Current model choices
+
+New OpenAI configurations default to GPT-5.6 Sol with medium reasoning. GPT-6 Astra, GPT-5.6 Terra and GPT-5.6 Luna are also available; legacy configurations remain selectable. The chosen model and reasoning effort apply to meeting briefs, task drafts and hypothesis drafts. Exa performs source collection separately. Modern model calls allow up to 12,000 output tokens including reasoning, with a 105-second provider timeout. High reasoning can take longer and cost more; no automatic model downgrade or retry occurs. Model access depends on your OpenAI project.
+
+API IDs and reasoning support were checked against the [official OpenAI model catalog](https://developers.openai.com/api/docs/models) on September 5, 2026. This update is verified with adapter contract tests, not a claim of live output quality from your key.
