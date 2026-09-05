@@ -140,7 +140,7 @@ function Login({ onLogin }: { onLogin: (result: any) => void }) {
         <div className="brand">
           <NetworkMark />
           <span>
-            Duty Graph<small>CONNECTED COMPANY WORKSPACE</small>
+            DutyGraph<small>CONNECTED COMPANY WORKSPACE</small>
           </span>
         </div>
         <div>
@@ -289,7 +289,7 @@ function Invitation({
       <div className="brand">
         <NetworkMark />
         <span>
-          Duty Graph<small>PRIVATE PARTICIPANT INVITATION</small>
+          DutyGraph<small>PRIVATE PARTICIPANT INVITATION</small>
         </span>
       </div>
       <Panel title={info ? "Welcome, " + info.name : "Your private invitation"}>
@@ -1773,7 +1773,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           <button className="brand" onClick={() => go("overview")}>
             <NetworkMark />
             <span>
-              Duty Graph<small>COMPANY WORKSPACE</small>
+              DutyGraph<small>COMPANY WORKSPACE</small>
             </span>
           </button>
           <label className="company-switch">

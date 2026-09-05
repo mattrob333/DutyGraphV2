@@ -391,20 +391,18 @@ button {
   margin: 0 8px 22px;
 }
 .brand-mark {
-  display: flex;
+  display: block;
   width: 41px;
   height: 41px;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--surface);
-  color: #c9cfc4;
+  flex-shrink: 0;
+  background-color: var(--ink);
+  -webkit-mask: url("/brand/dutygraph-symbol.svg") center / contain no-repeat;
+  mask: url("/brand/dutygraph-symbol.svg") center / contain no-repeat;
 }
 .brand > span:last-child {
   font-size: 22px;
   line-height: 1.2;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.8px;
 }
 .brand small {

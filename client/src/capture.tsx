@@ -394,7 +394,7 @@ export function Participant({
         <div className="brand">
           <NetworkMark />
           <span>
-            Duty Graph<small>YOUR WORK, IN YOUR WORDS</small>
+            DutyGraph<small>YOUR WORK, IN YOUR WORDS</small>
           </span>
         </div>
         <Button onClick={onLogout}>
@@ -628,21 +628,5 @@ export function Participant({
   );
 }
 export function NetworkMark() {
-  return (
-    <span className="brand-mark">
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.4"
-      >
-        <rect x="2" y="3" width="6" height="5" rx="1" />
-        <rect x="16" y="3" width="6" height="5" rx="1" />
-        <rect x="9" y="16" width="6" height="5" rx="1" />
-        <path d="M5 8v4h14V8M12 12v4" />
-      </svg>
-    </span>
-  );
+  return <span className="brand-mark" aria-hidden="true" />;
 }
