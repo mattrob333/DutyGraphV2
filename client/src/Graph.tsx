@@ -3,6 +3,13 @@ import { Expand, Focus, Minus, Plus, List, Network } from "lucide-react";
 import type { RecordRow } from "../../shared/domain.ts";
 import { api } from "./api.ts";
 import { Button, Badge, Empty, ErrorBox, State } from "./ui.tsx";
+import { OrgView } from "./OrgView.tsx";
+import {
+  layoutGraph,
+  wrapNodeTitle,
+  type GraphNode,
+  type GraphEdge,
+} from "./graph-layout.ts";
 export function Graph({
   company,
   revision,
@@ -14,7 +21,13 @@ export function Graph({
   records: RecordRow[];
   open: (r: RecordRow) => void;
 }) {
-  const [graph, setGraph] = useState<any>(null),
+  const [graph, setGraph] = useState<{
+      nodes: GraphNode[];
+      edges: GraphEdge[];
+      sourceRevision: number;
+      pending: boolean;
+      truncated: boolean;
+    } | null>(null),
     [error, setError] = useState(""),
     [view, setView] = useState("connected"),
     [list, setList] = useState(false),
@@ -23,6 +36,7 @@ export function Graph({
   const [camera, setCamera] = useState({ x: 0, y: 0, w: 1120, h: 650 });
   const svg = useRef<SVGSVGElement>(null);
   const drag = useRef<any>(null);
+  const viewport = useRef({ width: 1120, height: 650 });
   useEffect(() => {
     let active = true;
     api(`/v1/companies/${company}/graph`)
@@ -36,61 +50,51 @@ export function Graph({
       active = false;
     };
   }, [company, revision]);
-  const layout = useMemo(() => {
-    const nodes = (graph?.nodes || []).filter((n: any) =>
-      view === "work"
-        ? ["task", "person"].includes(n.kind)
-        : view === "org"
-          ? n.kind === "person"
-          : ["task", "person", "evidence", "candidate", "agent"].includes(
-              n.kind,
-            ),
+  const layout = useMemo(
+    () => layoutGraph(graph?.nodes || [], graph?.edges || [], view),
+    [graph, view],
+  );
+  const frame = (readable = false) => {
+    const { width, height } = viewport.current;
+    const scale = Math.max(
+      readable ? 0.8 : 0,
+      Math.min(width / layout.width, height / layout.height),
     );
-    const columns =
-      view === "connected"
-        ? ["evidence", "person", "task", "candidate", "agent"]
-        : view === "work"
-          ? ["person", "task"]
-          : ["person"];
-    const result = nodes.map((n: any) => {
-      const group = nodes.filter((a: any) => a.kind === n.kind),
-        i = group.findIndex((a: any) => a.id === n.id);
-      const col = columns.indexOf(n.kind);
-      const x =
-        view === "org"
-          ? 55 + (i % 4) * 270
-          : view === "work"
-            ? n.kind === "person"
-              ? 60
-              : 450 + (i % 2) * 290
-            : 30 + col * 230;
-      const y =
-        view === "org"
-          ? 80 + Math.floor(i / 4) * 155
-          : view === "work"
-            ? 50 + Math.floor(i / (n.kind === "task" ? 2 : 1)) * 105
-            : 55 + i * 103;
-      return { ...n, x, y, w: view === "org" ? 225 : 200, h: 72 };
-    });
-    const allowed = new Set(result.map((n: any) => n.id));
+    const w = width / scale,
+      h = height / scale;
     return {
-      nodes: result,
-      edges: (graph?.edges || []).filter(
-        (e: any) => allowed.has(e.source) && allowed.has(e.target),
-      ),
-      width: Math.max(1120, ...result.map((n: any) => n.x + n.w + 35)),
-      height: Math.max(650, ...result.map((n: any) => n.y + n.h + 40)),
+      x: w >= layout.width ? (layout.width - w) / 2 : 0,
+      y: h >= layout.height ? (layout.height - h) / 2 : 0,
+      w,
+      h,
     };
-  }, [graph, view]);
-  const fit = () =>
-    setCamera({ x: 0, y: 0, w: layout.width, h: layout.height });
+  };
+  const fit = () => setCamera(frame());
   useEffect(() => {
-    fit();
-  }, [view, layout.width, layout.height]);
+    const el = svg.current;
+    if (!el) return;
+    let initial = true;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      if (!width || !height) return;
+      const previous = viewport.current;
+      viewport.current = { width, height };
+      if (initial) {
+        setCamera(frame(true));
+        initial = false;
+      } else
+        setCamera((c) => {
+          const scale = previous.width / c.w;
+          return { ...c, w: width / scale, h: height / scale };
+        });
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [view, layout.width, layout.height, list, expanded, !!graph]);
   const zoom = (factor: number, px = 0.5, py = 0.5) =>
     setCamera((c) => {
       const w = Math.min(layout.width * 3, Math.max(300, c.w * factor)),
-        h = (w * layout.height) / layout.width;
+        h = (w * viewport.current.height) / viewport.current.width;
       return { x: c.x + (c.w - w) * px, y: c.y + (c.h - h) * py, w, h };
     });
   useEffect(() => {
@@ -108,10 +112,27 @@ export function Graph({
     };
     el.addEventListener("wheel", wheel, { passive: false });
     return () => el.removeEventListener("wheel", wheel);
-  }, [layout.width, layout.height, list]);
+  }, [layout.width, layout.height, list, view, !!graph]);
   const current = records.find((r) => r.id === selected);
   const away =
-    Math.abs(camera.w - layout.width) > 1 || camera.x !== 0 || camera.y !== 0;
+    camera.w < layout.width ||
+    camera.h < layout.height ||
+    camera.x > 0 ||
+    camera.y > 0;
+  const neighborhood = new Set(
+    selected
+      ? [
+          selected,
+          ...layout.edges
+            .filter((e) => e.source === selected || e.target === selected)
+            .flatMap((e) => [e.source, e.target]),
+        ]
+      : [],
+  );
+  const registerNodes =
+    view === "org"
+      ? layout.nodes.filter((n) => n.kind === "person")
+      : layout.nodes;
   if (error) return <ErrorBox error={error} />;
   if (!graph) return <div className="loading">Loading the company graph…</div>;
   if (!layout.nodes.length)
@@ -133,7 +154,10 @@ export function Graph({
             <button
               key={id}
               className={view === id ? "active" : ""}
-              onClick={() => setView(id)}
+              onClick={() => {
+                setView(id);
+                setSelected(null);
+              }}
             >
               {label}
             </button>
@@ -162,7 +186,7 @@ export function Graph({
               </tr>
             </thead>
             <tbody>
-              {layout.nodes.map((n: any) => (
+              {registerNodes.map((n) => (
                 <tr key={n.id}>
                   <td>
                     <button
@@ -182,16 +206,21 @@ export function Graph({
             </tbody>
           </table>
         </div>
+      ) : view === "org" ? (
+        <OrgView
+          records={records}
+          selected={selected}
+          select={setSelected}
+          open={open}
+        />
       ) : (
         <div className="graph-shell">
           <div className="graph-canvas">
             <div className="graph-caption">
               <span className="eyebrow">
-                {view === "org"
-                  ? "People in scope"
-                  : view === "work"
-                    ? "Accountability & meaningful work"
-                    : "One record. Connected evidence."}
+                {view === "work"
+                  ? "Accountability & meaningful work"
+                  : "One record. Connected evidence."}
               </span>
               <Badge>Revision {graph.sourceRevision}</Badge>
             </div>
@@ -275,13 +304,27 @@ export function Graph({
                 </pattern>
                 <marker
                   id="arrow"
-                  markerWidth="7"
-                  markerHeight="7"
-                  refX="6"
-                  refY="3"
+                  markerWidth="12"
+                  markerHeight="12"
+                  markerUnits="userSpaceOnUse"
+                  viewBox="0 0 8 8"
+                  refX="8"
+                  refY="4"
                   orient="auto"
                 >
-                  <path d="M0,0 L6,3 L0,6" className="arrow-head" />
+                  <path d="M0,0 L8,4 L0,8 Z" className="arrow-head" />
+                </marker>
+                <marker
+                  id="arrow-highlight"
+                  markerWidth="12"
+                  markerHeight="12"
+                  markerUnits="userSpaceOnUse"
+                  viewBox="0 0 8 8"
+                  refX="8"
+                  refY="4"
+                  orient="auto"
+                >
+                  <path d="M0,0 L8,4 L0,8 Z" className="arrow-head highlight" />
                 </marker>
               </defs>
               <rect
@@ -291,47 +334,56 @@ export function Graph({
                 height={camera.h}
                 fill="url(#dots)"
               />
-              {layout.edges.map((e: any, i: number) => {
-                const a = layout.nodes.find((n: any) => n.id === e.source),
-                  b = layout.nodes.find((n: any) => n.id === e.target);
-                const right = a.x < b.x;
-                const ax = a.x + (right ? a.w : 0),
-                  bx = b.x + (right ? 0 : b.w),
-                  ay = a.y + a.h / 2,
-                  by = b.y + b.h / 2;
-                const middle = (ax + bx) / 2;
-                return (
-                  <path
-                    key={i}
-                    d={`M${ax},${ay} C${middle},${ay} ${middle},${by} ${bx},${by}`}
-                    className={
-                      "graph-edge " +
-                      (selected &&
-                      (e.source === selected || e.target === selected)
-                        ? "highlight"
-                        : "")
-                    }
-                    markerEnd="url(#arrow)"
-                  />
-                );
-              })}
-              {layout.nodes.map((n: any) => {
-                const words = n.title.split(" ");
-                let lines: string[] = [""];
-                for (const word of words) {
-                  if ((lines[lines.length - 1] + " " + word).length > 25)
-                    lines.push(word);
-                  else
-                    lines[lines.length - 1] +=
-                      (lines[lines.length - 1] ? " " : "") + word;
-                }
+              {layout.columns.map((col) => (
+                <text
+                  key={col.kind}
+                  x={col.x}
+                  y={col.y}
+                  className="graph-column-label"
+                >
+                  {
+                    (
+                      {
+                        person: "PEOPLE",
+                        task: "TASKS",
+                        evidence: "EVIDENCE",
+                        candidate: "HYPOTHESES",
+                        agent: "AGENT PROPOSALS",
+                      } as Record<string, string>
+                    )[col.kind]
+                  }
+                </text>
+              ))}
+              {[...layout.edges]
+                .sort(
+                  (a, b) =>
+                    Number(b.source !== selected && b.target !== selected) -
+                    Number(a.source !== selected && a.target !== selected),
+                )
+                .map((e, i) => {
+                  const highlight =
+                    selected &&
+                    (e.source === selected || e.target === selected);
+                  return (
+                    <path
+                      key={i}
+                      d={e.path}
+                      className={`graph-edge ${highlight ? "highlight" : selected ? "muted" : ""}`}
+                      markerEnd={`url(#${highlight ? "arrow-highlight" : "arrow"})`}
+                    >
+                      <title>{e.label}</title>
+                    </path>
+                  );
+                })}
+              {layout.nodes.map((n) => {
+                const lines = wrapNodeTitle(n.title);
                 return (
                   <g
                     key={n.id}
                     data-node={n.id}
                     role="button"
                     tabIndex={0}
-                    aria-label={`${n.kind}: ${n.title}, ${n.state}. Open record.`}
+                    aria-label={`${n.kind}: ${n.title}, ${n.state}. Inspect connections.`}
                     onClick={() => setSelected(n.id)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
@@ -342,19 +394,21 @@ export function Graph({
                     className={
                       "graph-node " +
                       n.kind +
-                      (selected === n.id ? " selected" : "")
+                      (selected === n.id ? " selected" : "") +
+                      (selected && !neighborhood.has(n.id) ? " muted" : "")
                     }
                     transform={`translate(${n.x},${n.y})`}
                   >
+                    <title>{n.title}</title>
                     <rect width={n.w} height={n.h} rx="9" />
-                    <text x="13" y="18" className="node-kind">
+                    <text x="16" y="23" className="node-kind">
                       {n.kind.toUpperCase()} · V{n.version}
                     </text>
-                    {lines.slice(0, 2).map((line, i) => (
+                    {lines.map((line, i) => (
                       <text
                         key={i}
-                        x="13"
-                        y={39 + i * 16}
+                        x="16"
+                        y={47 + i * 20}
                         className="node-title"
                       >
                         {line}
@@ -375,7 +429,8 @@ export function Graph({
                 <Focus size={16} />
                 Fit
               </Button>
-              <span>Ctrl + scroll to zoom</span>
+              <Button onClick={() => setCamera(frame(true))}>Readable</Button>
+              <span>Drag to pan · Ctrl + scroll to zoom</span>
             </div>
             {away && (
               <svg
@@ -383,7 +438,7 @@ export function Graph({
                 viewBox={`0 0 ${layout.width} ${layout.height}`}
                 aria-label="Graph minimap"
               >
-                {layout.nodes.map((n: any) => (
+                {layout.nodes.map((n) => (
                   <rect
                     key={n.id}
                     x={n.x}
@@ -453,14 +508,18 @@ export function Graph({
         </div>
       )}
       <div className="graph-foot">
-        <div className="legend">
-          <span className="dot blue" />
-          Evidence <span className="dot sage" />
-          People & work <span className="dot amber" />
-          Hypotheses
-        </div>
+        {view === "org" ? (
+          <span>Teams organize people. Duties connect them to work.</span>
+        ) : (
+          <div className="legend">
+            <span className="dot blue" />
+            Evidence <span className="dot sage" />
+            People & work <span className="dot amber" />
+            Hypotheses
+          </div>
+        )}
         <span>
-          {layout.nodes.length} records ·{" "}
+          {registerNodes.length} records ·{" "}
           {graph.pending
             ? "Projection catching up; current records shown"
             : "Current authoritative records"}

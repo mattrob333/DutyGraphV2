@@ -1748,21 +1748,41 @@ tbody tr:last-child td {
 }
 .graph-edge {
   fill: none;
-  stroke: #606570;
-  stroke-width: 1.1;
-  opacity: 0.5;
+  stroke: #8794a4;
+  stroke-width: 1.5;
+  opacity: 0.78;
+  vector-effect: non-scaling-stroke;
 }
 .graph-edge.highlight {
   stroke: var(--blue);
-  stroke-width: 2;
+  stroke-width: 2.5;
   opacity: 1;
 }
+.graph-edge.muted {
+  opacity: 0.12;
+}
 .arrow-head {
-  fill: none;
-  stroke: #606570;
+  fill: #8794a4;
+}
+.arrow-head.highlight {
+  fill: var(--blue);
+}
+.graph-column-label {
+  fill: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.7px;
 }
 .graph-node {
   cursor: pointer;
+  transition: opacity 120ms;
+}
+.graph-node.muted {
+  opacity: 0.4;
+}
+.graph-node.muted:hover,
+.graph-node.muted:focus {
+  opacity: 1;
 }
 .graph-node rect {
   fill: var(--node);
@@ -1770,13 +1790,14 @@ tbody tr:last-child td {
   stroke-width: 1;
 }
 .graph-node .node-kind {
-  fill: var(--faint);
-  font-size: 8px;
+  fill: var(--muted);
+  font-size: 10px;
   letter-spacing: 1px;
 }
 .graph-node .node-title {
   fill: var(--ink);
-  font-size: 11px;
+  font-size: 15px;
+  font-weight: 500;
 }
 .graph-node.evidence rect {
   stroke: color-mix(in srgb, var(--blue) 60%, var(--line));
@@ -1909,6 +1930,232 @@ tbody tr:last-child td {
 }
 .graph-expanded .graph-inspector {
   max-height: calc(100vh - 135px);
+}
+.org-workspace {
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.org-intro {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: center;
+  padding: 25px 28px 18px;
+}
+.org-intro h2 {
+  font-size: 21px;
+  margin: 0 0 8px;
+}
+.org-intro p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+.org-intro .tabs {
+  flex-shrink: 0;
+}
+.org-scope-note {
+  margin: 0 28px 24px;
+  padding: 12px 16px;
+  border-left: 2px solid var(--blue);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.org-body {
+  display: flex;
+  border-top: 1px solid var(--line);
+}
+.org-content {
+  min-width: 0;
+  flex: 1;
+  padding: 28px;
+  overflow: auto;
+}
+.org-teams {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+.org-team {
+  min-width: 0;
+  border-top: 2px solid var(--sage);
+  padding-top: 16px;
+}
+.org-team header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.org-team h3 {
+  font-size: 16px;
+  margin: 0;
+}
+.org-team > p {
+  margin: 8px 0 17px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.org-members {
+  display: grid;
+  gap: 12px;
+}
+.org-person {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  text-align: left;
+  background: var(--node);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 17px;
+  color: var(--ink);
+}
+.org-person:hover {
+  border-color: var(--blue);
+}
+.org-person.selected {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px var(--blue);
+}
+.org-person-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+.org-person-heading strong {
+  font-size: 15px;
+}
+.org-avatar {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--sage);
+  font-size: 10px;
+}
+.org-role {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 3px 0 16px;
+}
+.org-work-summary {
+  font-size: 12px;
+  color: var(--blue);
+}
+.org-duty-preview {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 7px;
+}
+.org-inspector.graph-inspector {
+  width: 320px;
+  max-height: 800px;
+}
+.org-duty h4 {
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 16px 0 3px;
+}
+.org-duty .badge {
+  align-self: flex-start;
+  margin-top: 8px;
+}
+.org-tree,
+.org-tree ul {
+  list-style: none;
+  padding-left: 28px;
+}
+.org-tree {
+  margin: 24px 0;
+  padding-left: 0;
+}
+.org-tree li {
+  position: relative;
+  padding: 0 0 22px;
+}
+.org-tree ul {
+  margin-top: 18px;
+  border-left: 1px solid var(--blue);
+}
+.org-tree ul > li::before {
+  content: "";
+  position: absolute;
+  left: -28px;
+  top: 38px;
+  width: 28px;
+  border-top: 1px solid var(--blue);
+}
+.org-tree .org-person {
+  max-width: 320px;
+}
+.org-unlinked h3 {
+  font-size: 15px;
+}
+.org-unlinked-people {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.graph-expanded .org-workspace {
+  max-height: calc(100vh - 130px);
+  overflow: auto;
+}
+@media (max-width: 1000px) {
+  .org-intro {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .org-inspector.graph-inspector {
+    width: 280px;
+  }
+}
+@media (max-width: 760px) {
+  .org-body {
+    flex-direction: column;
+  }
+  .org-intro,
+  .org-content {
+    padding: 20px;
+  }
+  .org-scope-note {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+  .org-inspector.graph-inspector {
+    width: 100%;
+    max-height: none;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    order: -1;
+  }
+  .graph-expanded .org-inspector.graph-inspector {
+    display: block;
+  }
+  .org-tree ul {
+    padding-left: 18px;
+  }
+  .org-tree ul > li::before {
+    left: -18px;
+    width: 18px;
+  }
+  .camera-controls {
+    gap: 4px;
+  }
+  .camera-controls .btn {
+    padding: 7px;
+  }
 }
 .login-page {
   min-height: 100vh;
