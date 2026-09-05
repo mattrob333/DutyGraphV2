@@ -1,4 +1,5 @@
 import express from "express";
+import { allowedOrigins } from "./origins.ts";
 import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
@@ -126,7 +127,7 @@ export function createApp({
     if (
       !["GET", "HEAD", "OPTIONS"].includes(req.method) &&
       origin &&
-      origin !== process.env.APP_ORIGIN
+      !allowedOrigins().has(origin)
     )
       return next(
         new AppError(403, "ORIGIN_DENIED", "Request origin is not allowed."),
