@@ -37,6 +37,11 @@ import { confirmationStatus, diagnosisReadiness } from "../shared/domain.ts";
 import { previewRoster } from "./roster.ts";
 import { createExport, exportZip } from "./exports.ts";
 import { linksFor } from "./projection.ts";
+import { readGraph } from "./graph-query.ts";
+import { reportsRouter } from "./reports.ts";
+import { workflowsRouter, checkWorkflow } from "./workflows.ts";
+import { caseStatus, expireSteps } from "../shared/workflow.ts";
+import { researchRouter, type ResearchProvider } from "./research.ts";
 export const registry = JSON.parse(
   await readFile(
     new URL("../contracts/framework-registry.json", import.meta.url),
@@ -61,7 +66,13 @@ const run = (req: express.Request, fn: any) =>
     { path: req.originalUrl, method: req.method, body: req.body },
     fn,
   );
-export function createApp() {
+export function createApp({
+  authRequestsPerWindow = 40,
+  researchProvider,
+}: {
+  authRequestsPerWindow?: number;
+  researchProvider?: ResearchProvider;
+} = {}) {
   const app = express();
   app.disable("x-powered-by");
   app.use(
@@ -102,16 +113,22 @@ export function createApp() {
   app.use(cookieParser());
   const authLimit = rateLimit({
     windowMs: 15 * 60 * 1000,
-    limit: 40,
+    limit: authRequestsPerWindow,
     standardHeaders: "draft-8",
     legacyHeaders: false,
+    handler: (_req, res) =>
+      res.status(429).json({
+        code: "RATE_LIMITED",
+        message: "Too many authentication attempts. Wait before trying again.",
+        retryable: true,
+      }),
   });
   app.get("/api/health", async (_req, res) => {
     await pool.query("SELECT 1");
     res.json({
       status: "ok",
       service: "Duty Graph",
-      version: "0.1.0",
+      version: "0.2.0",
       database: "PostgreSQL",
       runtime: "unconfigured",
     });
@@ -336,11 +353,14 @@ export function createApp() {
             c.id,
           ])
         ).rows;
-        for (const r of records)
+        for (const r of records) {
           if (r.kind === "task") {
             r.state = confirmationStatus(r, cs);
             r.confirmations = cs.filter((v) => v.record_id === r.id);
           }
+          if (r.kind === "case" && !["complete", "cancelled"].includes(r.state))
+            r.state = caseStatus(expireSteps(r.data.steps, Date.now()));
+        }
         const events = (
           await db.query(
             "SELECT * FROM audit_events WHERE company_id=$1 ORDER BY sequence DESC LIMIT 50",
@@ -490,7 +510,82 @@ export function createApp() {
             .strict()
             .parse(req.body);
           expected(req, r);
+          if (
+            d.action === "review" &&
+            ["engagement", "duty", "handoff", "outcome", "workflow"].includes(
+              r.kind,
+            )
+          ) {
+            if (!d.note.trim())
+              fail(422, "REASON_REQUIRED", "Record your review rationale.");
+            if (r.kind === "workflow")
+              await checkWorkflow(db, c.id, { ...r, state: "reviewed" });
+            if (
+              ["duty", "handoff"].includes(r.kind) &&
+              !r.data.evidenceIds.length
+            )
+              fail(
+                422,
+                "EVIDENCE_REQUIRED",
+                "Attach accepted evidence before reviewing this work claim.",
+              );
+            if (r.kind === "duty" && !r.data.ownerId)
+              fail(
+                422,
+                "OWNER_REQUIRED",
+                "Resolve duty accountability before reviewing this claim.",
+              );
+            for (const binding of [
+              ...(r.data.sourceBindings || []),
+              ...(r.data.taskBindings || []),
+            ]) {
+              const source = await getRecord(db, c.id, binding.id);
+              if (
+                source.version !== binding.version ||
+                source.hash !== binding.hash ||
+                ["stale", "retracted"].includes(source.state)
+              )
+                fail(
+                  409,
+                  "STALE_BINDING",
+                  "A linked record changed. Revise this record before review.",
+                );
+            }
+            if (r.kind === "outcome" && r.data.result === "falsified") {
+              const candidate = await getRecord(
+                db,
+                c.id,
+                r.data.predictionSnapshot.candidateId,
+                true,
+              );
+              await setState(
+                db,
+                user,
+                c.id,
+                candidate,
+                "review_required",
+                "outcome.prediction_falsified",
+              );
+            }
+            await setState(db, user, c.id, r, "reviewed", r.kind + ".reviewed");
+            await audit(db, user, c.id, r.kind + ".review_rationale", r.id, {
+              note: d.note,
+              version: r.version,
+              hash: r.hash,
+            });
+            return { ok: true };
+          }
           if (d.action === "review" && r.kind === "task") {
+            if (
+              !r.data.ownerId ||
+              !r.data.performerId ||
+              !r.data.evidenceIds.length
+            )
+              fail(
+                422,
+                "WORK_INCOMPLETE",
+                "Resolve the accountable owner, performer and supporting evidence before requesting confirmation.",
+              );
             if (r.data.conflict)
               fail(
                 422,
@@ -1116,48 +1211,7 @@ export function createApp() {
     res.json(
       await tx(actor(req).tenant_id, async (db) => {
         const c = await companyCheck(db, actor(req), param(req, "companyId"));
-        const limit = Math.min(
-          150,
-          Math.max(1, Number(req.query.limit) || 150),
-        );
-        const all = (
-          await db.query(
-            "SELECT * FROM records WHERE company_id=$1 AND kind IN ('person','task','evidence','candidate','agent','metric','intervention') ORDER BY created_at LIMIT $2",
-            [c.id, limit + 1],
-          )
-        ).rows;
-        const nodes = all.slice(0, limit);
-        const ids = new Set(nodes.map((r) => r.id));
-        const pending = (
-          await db.query(
-            "SELECT count(*)::int n FROM outbox WHERE company_id=$1 AND processed_at IS NULL",
-            [c.id],
-          )
-        ).rows[0].n;
-        return {
-          nodes: nodes.map((r) => ({
-            id: r.id,
-            title: r.title,
-            kind: r.kind,
-            state: r.state,
-            version: r.version,
-          })),
-          edges: nodes.flatMap((r) =>
-            linksFor(r)
-              .filter((l) => ids.has(l.target))
-              .map((l) => ({
-                source: l.inbound ? l.target : r.id,
-                target: l.inbound ? r.id : l.target,
-                relationship: l.relationship,
-                validation: "Descriptive claim",
-              })),
-          ),
-          truncated: all.length > limit,
-          sourceRevision: c.revision,
-          pending,
-          engine: "Authoritative PostgreSQL fallback",
-          projectionState: pending ? "catching_up" : "current",
-        };
+        return readGraph(db, c, req.query);
       }),
     ),
   );
@@ -1311,15 +1365,83 @@ export function createApp() {
     },
   );
   api.post("/companies/:companyId/runtime/preflight", advisor, (_req, res) =>
-    res
-      .status(503)
-      .json({
-        code: "RUNTIME_UNCONFIGURED",
-        decision: "blocked",
-        message:
-          "No verified runtime, authority source, or target-system adapter is configured.",
-      }),
+    res.status(503).json({
+      code: "RUNTIME_UNCONFIGURED",
+      decision: "blocked",
+      message:
+        "No verified runtime, authority source, or target-system adapter is configured.",
+    }),
   );
+  api.use("/companies/:companyId/reports", reportsRouter());
+  api.use("/companies/:companyId/research", researchRouter(researchProvider));
+  api.post("/companies/:companyId/graph/rebuild", advisor, async (req, res) =>
+    res.json(
+      await run(req, async (db: any) => {
+        const c = await companyCheck(db, actor(req), param(req, "companyId"));
+        const d = z
+          .object({ expectedRevision: z.number().int() })
+          .strict()
+          .parse(req.body);
+        const locked = (
+          await db.query(
+            "SELECT revision FROM companies WHERE id=$1 FOR UPDATE",
+            [c.id],
+          )
+        ).rows[0];
+        if (locked.revision !== d.expectedRevision)
+          fail(
+            409,
+            "VERSION_CONFLICT",
+            "Refresh the workspace before rebuilding the derived projection.",
+          );
+        const records = (
+          await db.query("SELECT * FROM records WHERE company_id=$1", [c.id])
+        ).rows;
+        await db.query("DELETE FROM projection_nodes WHERE company_id=$1", [
+          c.id,
+        ]);
+        for (const r of records)
+          await db.query(
+            "INSERT INTO projection_nodes(tenant_id,company_id,record_id,version,kind,title,state,links) VALUES($1,$2,$3,$4,$5,$6,$7,$8)",
+            [
+              actor(req).tenant_id,
+              c.id,
+              r.id,
+              r.version,
+              r.kind,
+              r.title,
+              r.state,
+              JSON.stringify(linksFor(r)),
+            ],
+          );
+        const count = (
+          await db.query(
+            "SELECT count(*)::int n FROM projection_nodes WHERE company_id=$1",
+            [c.id],
+          )
+        ).rows[0].n;
+        if (count !== records.length)
+          fail(
+            500,
+            "PROJECTION_MISMATCH",
+            "The rebuilt projection failed its count check.",
+          );
+        await audit(db, actor(req), c.id, "graph.projection_rebuilt", null, {
+          sourceRevision: c.revision,
+          nodes: count,
+          source: "authoritative records",
+          sideEffectsReplayed: false,
+        });
+        return {
+          status: "rebuilt",
+          nodes: count,
+          sourceRevision: c.revision,
+          sideEffectsReplayed: false,
+        };
+      }),
+    ),
+  );
+  api.use("/companies/:companyId/workflows", workflowsRouter());
   app.use("/api/v1", api);
   return app;
 }
@@ -1356,26 +1478,24 @@ export function errorHandler(
       "requestId:",
       res.getHeader("X-Request-Id"),
     );
-  res
-    .status(status)
-    .json({
-      code:
-        error instanceof AppError
-          ? error.code
-          : error instanceof ZodError
-            ? "VALIDATION_ERROR"
-            : status === 409
-              ? "CONFLICT"
-              : "SERVICE_ERROR",
-      message,
-      requestId: res.getHeader("X-Request-Id"),
-      retryable: status >= 500,
-      fieldErrors:
-        error instanceof ZodError
-          ? error.issues.map((i) => ({
-              path: i.path.join("."),
-              message: i.message,
-            }))
-          : undefined,
-    });
+  res.status(status).json({
+    code:
+      error instanceof AppError
+        ? error.code
+        : error instanceof ZodError
+          ? "VALIDATION_ERROR"
+          : status === 409
+            ? "CONFLICT"
+            : "SERVICE_ERROR",
+    message,
+    requestId: res.getHeader("X-Request-Id"),
+    retryable: status >= 500,
+    fieldErrors:
+      error instanceof ZodError
+        ? error.issues.map((i) => ({
+            path: i.path.join("."),
+            message: i.message,
+          }))
+        : undefined,
+  });
 }

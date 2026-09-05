@@ -1,5 +1,6 @@
 node_modules/
 dist/
+client/public/handbook/
 .env
 .env.*
 !.env.example

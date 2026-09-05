@@ -1,0 +1,43 @@
+{
+  "measuredAt": "2026-09-05T21:26:37.881Z",
+  "environment": "Loopback Node 24 and dedicated PostgreSQL 17 on developer workstation",
+  "fixtureRecords": 1000,
+  "implementation": "Authoritative PostgreSQL graph fallback; no Neo4j or network provider",
+  "results": {
+    "graph": {
+      "requests": 120,
+      "concurrency": 8,
+      "failures": 0,
+      "p50Ms": 86.6,
+      "p95Ms": 130.5,
+      "p99Ms": 133.2,
+      "maximumMs": 133.2,
+      "responseBytes": 63888
+    },
+    "focusedGraph": {
+      "requests": 120,
+      "concurrency": 8,
+      "failures": 0,
+      "p50Ms": 91.8,
+      "p95Ms": 121.3,
+      "p99Ms": 124,
+      "maximumMs": 124.2,
+      "responseBytes": 109355
+    },
+    "workspace": {
+      "requests": 120,
+      "concurrency": 8,
+      "failures": 0,
+      "p50Ms": 151.2,
+      "p95Ms": 178.7,
+      "p99Ms": 183.3,
+      "maximumMs": 187.6,
+      "responseBytes": 1294540
+    }
+  },
+  "interpretation": "Bounded local read workload only. Not a production capacity, availability or multi-tenant isolation certification. No external side effects.",
+  "regressionBudgets": {
+    "graphP95Ms": 1000,
+    "workspaceP95Ms": 1500
+  }
+}

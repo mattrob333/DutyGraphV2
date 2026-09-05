@@ -9,6 +9,8 @@ import { pool, tx, command, putRecord } from "../server/db.ts";
 import { projectTenant } from "../server/projection.ts";
 import { purgeExpiredAudio } from "../server/retention.ts";
 import JSZip from "jszip";
+import { normalizeResearch } from "../server/research.ts";
+let researchCalls = 0;
 let server: Server, base: string;
 type Client = { cookie: string; csrf: string; user: any; company: string };
 async function request(
@@ -64,6 +66,200 @@ async function create(c: Client, kind: string, data: any) {
   assert.equal(r.status, 201, JSON.stringify(r.data));
   return r.data;
 }
+test("an unresolved task saves as proposed but cannot advance to confirmation", async () => {
+  const c = await register(),
+    f = await fixture(c);
+  const incomplete = await create(c, "task", {
+    ...f.data,
+    title: "Unresolved draft",
+    ownerId: "",
+    performerId: "",
+    evidenceIds: [],
+  });
+  assert.equal(incomplete.state, "proposed");
+  const review = await action(c, incomplete, "review");
+  assert.equal(review.status, 422);
+  assert.equal(review.data.code, "WORK_INCOMPLETE");
+});
+test("duty review is independent and a changed task invalidates its pinned work", async () => {
+  const c = await register(),
+    f = await fixture(c);
+  const duty = await create(c, "duty", {
+    title: "Supplier intake duty",
+    ownerId: f.p.id,
+    purpose: "Keep intake complete",
+    scope: "Draft preparation",
+    taskIds: [f.task.id],
+    evidenceIds: [f.e.id],
+    reviewDue: "2099-01-01",
+    reason: "Record standing accountability",
+  });
+  assert.equal(
+    (await action(c, duty, "review", { note: "Reviewed scope and source" }))
+      .status,
+    200,
+  );
+  let workspace = (await request(c, prefix(c) + "/workspace")).data;
+  assert.equal(
+    workspace.records.find((r: any) => r.id === duty.id).state,
+    "reviewed",
+  );
+  assert.notEqual(
+    workspace.records.find((r: any) => r.id === f.task.id).state,
+    "confirmed",
+  );
+  assert.equal(
+    (
+      await request(c, prefix(c) + "/records/" + f.task.id, "PATCH", {
+        expectedVersion: f.task.version,
+        data: { ...f.data, output: "New required output" },
+      })
+    ).status,
+    200,
+  );
+  workspace = (await request(c, prefix(c) + "/workspace")).data;
+  assert.equal(
+    workspace.records.find((r: any) => r.id === duty.id).state,
+    "stale",
+  );
+  assert.equal(
+    (await action(c, duty, "review", { note: "Attempt old review" })).status,
+    409,
+  );
+});
+test("handoff contracts pin both tasks and reject foreign-company references", async () => {
+  const c = await register(),
+    f = await fixture(c),
+    target = await create(c, "task", {
+      ...f.data,
+      title: "Receive complete packet",
+    });
+  const data = {
+    title: "Packet to review",
+    sourceTaskId: f.task.id,
+    targetTaskId: target.id,
+    condition: "Packet complete",
+    outputMapping: "Draft with required fields",
+    requiredInput: "Complete packet",
+    acceptanceCheck: "Receiver checks required fields",
+    exceptionOwnerId: f.p.id,
+    timeoutHours: 24,
+    maxRetries: 1,
+    failureAction: "Escalate to owner",
+    evidenceIds: [f.e.id],
+    reason: "Make boundary explicit",
+  };
+  const handoff = await create(c, "handoff", data);
+  assert.equal(handoff.data.taskBindings.length, 2);
+  assert.equal(
+    (
+      await action(c, handoff, "review", {
+        note: "Reviewed the input and output contract",
+      })
+    ).status,
+    200,
+  );
+  const foreign = await register(),
+    foreignFixture = await fixture(foreign);
+  const denied = await request(c, prefix(c) + "/records", "POST", {
+    kind: "handoff",
+    data: { ...data, targetTaskId: foreignFixture.task.id },
+  });
+  assert.equal(denied.status, 404);
+});
+test("outcome reviews freeze predictions, require measurements and reopen falsified candidates", async () => {
+  const c = await register(),
+    f = await fixture(c);
+  const candidate = await create(c, "candidate", {
+    title: "Intake boundary hypothesis",
+    flow: "Supplier intake",
+    pressure: "Unmeasured waiting",
+    alternative: "Missing packet inputs",
+    counterfactual: "Approval could remain limiting",
+    discriminator: "Measure each queue",
+    evidenceIds: [f.e.id],
+    disconfirmingEvidenceIds: [],
+    ownerId: f.p.id,
+    throughputUnit: "Approved suppliers per week",
+  });
+  const metric = await create(c, "metric", {
+    title: "Waiting hours",
+    question: "Does waiting fall?",
+    formula: "Elapsed hours from complete receipt to review",
+    unit: "hours",
+    population: "Complete packets",
+    source: "Timestamp log",
+    ownerId: f.p.id,
+    baseline: null,
+    target: null,
+    missingReason: "Collect a baseline",
+    window: "Two weeks",
+    guardrail: "No increase in rejected packets",
+  });
+  const intervention = await create(c, "intervention", {
+    title: "Clarify receiver check",
+    candidateId: candidate.id,
+    ownerId: f.p.id,
+    metricId: metric.id,
+    change: "Add a receiving checklist",
+    prediction: "Waiting falls after complete packets arrive",
+    stopConditions: "Stop if controls weaken",
+    reviewDate: "2099-01-01",
+  });
+  const data = {
+    title: "First outcome review",
+    interventionId: intervention.id,
+    ownerId: f.p.id,
+    result: "supported",
+    observationWindow: "First two weeks",
+    coverage: "All five complete packets",
+    confounders: "Small sample and changing demand",
+    interpretation: "Evaluate the predicted reduction",
+    nextAction: "Collect a longer series",
+    evidenceIds: [f.e.id],
+    reason: "Compare observed result",
+  };
+  const noMeasurement = await request(c, prefix(c) + "/records", "POST", {
+    kind: "outcome",
+    data,
+  });
+  assert.equal(noMeasurement.status, 422);
+  assert.equal(noMeasurement.data.code, "MEASUREMENTS_REQUIRED");
+  assert.equal(
+    (
+      await action(c, metric, "observe", {
+        value: 42,
+        observedAt: new Date().toISOString(),
+        note: "Synthetic timestamp log, row 1",
+      })
+    ).status,
+    200,
+  );
+  const outcome = await create(c, "outcome", { ...data, result: "falsified" });
+  assert.equal(
+    outcome.data.predictionSnapshot.prediction,
+    intervention.data.prediction,
+  );
+  assert.equal(outcome.data.measurementSnapshot.observations[0].value, 42);
+  assert.equal(
+    (
+      await action(c, outcome, "review", {
+        note: "The measured observation contradicts the original prediction",
+      })
+    ).status,
+    200,
+  );
+  const workspace = (await request(c, prefix(c) + "/workspace")).data;
+  assert.equal(
+    workspace.records.find((r: any) => r.id === candidate.id).state,
+    "review_required",
+  );
+  assert.equal(
+    workspace.records.find((r: any) => r.id === intervention.id).data
+      .prediction,
+    intervention.data.prediction,
+  );
+});
 async function action(c: Client, r: any, name: string, extra: any = {}) {
   return request(c, prefix(c) + "/records/" + r.id + "/actions", "POST", {
     expectedVersion: r.version,
@@ -71,6 +267,353 @@ async function action(c: Client, r: any, name: string, extra: any = {}) {
     ...extra,
   });
 }
+test("graph queries enforce bounded filters and rebuild without replaying source commands", async () => {
+  const c = await register(),
+    f = await fixture(c),
+    other = await register();
+  const graph = await request(
+    c,
+    prefix(c) + `/graph?focus=${f.p.id}&depth=1&limit=2`,
+  );
+  assert.equal(graph.status, 200, JSON.stringify(graph.data));
+  assert.ok(graph.data.nodes.length <= 2);
+  assert.ok(graph.data.nodes.some((n: any) => n.id === f.p.id));
+  assert.equal((await request(other, prefix(c) + "/graph")).status, 404);
+  assert.equal((await request(c, prefix(c) + "/graph?depth=5")).status, 422);
+  assert.equal(
+    (await request(c, prefix(c) + "/graph?cypher=MATCH")).status,
+    422,
+  );
+  const revision = (await request(c, prefix(c) + "/workspace")).data.company
+    .revision;
+  const before = await tx(
+    c.user.tenant_id,
+    async (db) =>
+      (
+        await db.query(
+          "SELECT count(*)::int n FROM outbox WHERE company_id=$1",
+          [c.company],
+        )
+      ).rows[0].n,
+  );
+  const rebuilt = await request(c, prefix(c) + "/graph/rebuild", "POST", {
+    expectedRevision: revision,
+  });
+  assert.equal(rebuilt.status, 200);
+  assert.equal(rebuilt.data.sideEffectsReplayed, false);
+  const after = await tx(
+    c.user.tenant_id,
+    async (db) =>
+      (
+        await db.query(
+          "SELECT count(*)::int n FROM outbox WHERE company_id=$1",
+          [c.company],
+        )
+      ).rows[0].n,
+  );
+  assert.equal(before, after);
+});
+test("case deadlines reject completion, enforce retry ceilings and permit explicit closure", async () => {
+  const c = await register(),
+    f = await fixture(c);
+  const flow = await create(c, "workflow", {
+    title: "One human checkpoint",
+    purpose: "Review a single packet",
+    ownerId: f.p.id,
+    taskIds: [f.task.id],
+    handoffIds: [],
+    joinPolicy: "all",
+    timeoutHours: 1,
+    maxAttempts: 1,
+    reason: "Bound the human step",
+  });
+  assert.equal(
+    (
+      await action(c, flow, "review", {
+        note: "Current task and owner reviewed",
+      })
+    ).status,
+    200,
+  );
+  const started = (
+    await request(c, prefix(c) + `/workflows/${flow.id}/cases`, "POST", {
+      expectedVersion: flow.version,
+      title: "Expired checkpoint test",
+      inputReference: "Synthetic packet reference",
+    })
+  ).data;
+  const expired = await tx(c.user.tenant_id, (db) =>
+    putRecord(
+      db,
+      c.user,
+      c.company,
+      "case",
+      started.title,
+      {
+        ...started.data,
+        steps: started.data.steps.map((s: any) => ({
+          ...s,
+          dueAt: "2000-01-01T00:00:00Z",
+        })),
+      },
+      "in_progress",
+      started,
+      "Synthetic deadline fixture",
+    ),
+  );
+  const path = prefix(c) + `/workflows/cases/${started.id}/actions`,
+    body = {
+      expectedVersion: expired.version,
+      stepId: f.task.id,
+      note: "Deadline requires explicit review",
+    };
+  const complete = await request(c, path, "POST", {
+    ...body,
+    action: "complete",
+  });
+  assert.equal(complete.status, 409);
+  assert.equal(complete.data.code, "STEP_TIMEOUT");
+  const retry = await request(c, path, "POST", { ...body, action: "retry" });
+  assert.equal(retry.status, 409);
+  assert.equal(retry.data.code, "RETRY_LIMIT");
+  const closed = await request(c, path, "POST", { ...body, action: "cancel" });
+  assert.equal(closed.status, 200);
+  assert.equal(closed.data.state, "cancelled");
+});
+test("a durable workflow case gates steps, stores observations and rejects duplicate completion", async () => {
+  const c = await register(),
+    f = await fixture(c);
+  let target = await create(c, "task", {
+    ...f.data,
+    title: "Check the prepared draft",
+  });
+  target = (await action(c, target, "review")).data;
+  const h = await create(c, "handoff", {
+    title: "Draft to receiving check",
+    sourceTaskId: f.task.id,
+    targetTaskId: target.id,
+    condition: "Draft has all fields",
+    outputMapping: "Prepared draft",
+    requiredInput: "Prepared draft",
+    acceptanceCheck: "Receiver checks each field",
+    exceptionOwnerId: f.p.id,
+    timeoutHours: 24,
+    maxRetries: 1,
+    failureAction: "Escalate",
+    evidenceIds: [f.e.id],
+    reason: "Define receiving boundary",
+  });
+  assert.equal(
+    (await action(c, h, "review", { note: "Reviewed receiving check" })).status,
+    200,
+  );
+  const flow = await create(c, "workflow", {
+    title: "Supplier draft workflow",
+    purpose: "Track a manual prepared draft",
+    ownerId: f.p.id,
+    taskIds: [f.task.id, target.id],
+    handoffIds: [h.id],
+    joinPolicy: "all",
+    timeoutHours: 24,
+    maxAttempts: 2,
+    reason: "Define a reviewed manual case",
+  });
+  const start = () =>
+    request(c, prefix(c) + `/workflows/${flow.id}/cases`, "POST", {
+      expectedVersion: flow.version,
+      title: "Synthetic packet 001",
+      inputReference: "Synthetic packet source 001",
+    });
+  assert.equal((await start()).status, 409);
+  assert.equal(
+    (
+      await action(c, flow, "review", {
+        note: "Reviewed the current steps and handoff",
+      })
+    ).status,
+    200,
+  );
+  const started = await start();
+  assert.equal(started.status, 201, JSON.stringify(started.data));
+  const run = started.data;
+  const route = prefix(c) + `/workflows/cases/${run.id}/actions`;
+  assert.equal(
+    (
+      await request(c, route, "POST", {
+        expectedVersion: run.version,
+        stepId: target.id,
+        action: "complete",
+        note: "Trying out of order",
+      })
+    ).status,
+    409,
+  );
+  const body = {
+    expectedVersion: run.version,
+    stepId: f.task.id,
+    action: "complete",
+    note: "Human completed draft, receipt synthetic-001",
+    routeIds: [h.id],
+  };
+  const key = randomUUID(),
+    completed = await request(c, route, "POST", body, {
+      "Idempotency-Key": key,
+    });
+  assert.equal(completed.status, 200, JSON.stringify(completed.data));
+  const duplicate = await request(c, route, "POST", body, {
+    "Idempotency-Key": key,
+  });
+  assert.equal(duplicate.data.version, completed.data.version);
+  const restored = (
+    await request(c, prefix(c) + "/workspace")
+  ).data.records.find((r: any) => r.id === run.id);
+  assert.equal(restored.data.steps[1].state, "ready");
+  assert.equal(restored.data.events.length, 1);
+  assert.equal((await request(c, route, "POST", body)).status, 409);
+  const finished = await request(c, route, "POST", {
+    expectedVersion: restored.version,
+    stepId: target.id,
+    action: "complete",
+    note: "Human receiving check passed, receipt synthetic-002",
+  });
+  assert.equal(finished.status, 200);
+  assert.equal(finished.data.state, "complete");
+  assert.equal(finished.data.data.executionMode, "human_observation_only");
+});
+test("authentication throttle returns a structured error without weakening production defaults", async () => {
+  const app = createApp({ authRequestsPerWindow: 2 });
+  app.use(errorHandler);
+  const limited = app.listen(0, "127.0.0.1");
+  await new Promise<void>((resolve) => limited.once("listening", resolve));
+  try {
+    const url = `http://127.0.0.1:${(limited.address() as any).port}/api/auth/login`;
+    const login = () =>
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: "missing@test.invalid",
+          password: "Not a valid password",
+        }),
+      });
+    assert.equal((await login()).status, 401);
+    assert.equal((await login()).status, 401);
+    const denied = await login();
+    assert.equal(denied.status, 429);
+    assert.equal((await denied.json()).code, "RATE_LIMITED");
+  } finally {
+    await new Promise<void>((resolve, reject) =>
+      limited.close((e) => (e ? reject(e) : resolve())),
+    );
+  }
+});
+test("client report approval binds audience and content; ZIP excludes private source text", async () => {
+  const c = await register(),
+    f = await fixture(c);
+  const workspace = (await request(c, prefix(c) + "/workspace")).data;
+  const report = await request(c, prefix(c) + "/reports", "POST", {
+    title: "Client executive review",
+    kind: "executive",
+    audience: ["Named executive sponsor"],
+    purpose: "Review the agreed supplier scope",
+    summary:
+      "A synthetic review of the current draft work record. Further confirmation is required.",
+    decisions: "Assign a receiver for the complete packet.",
+    nextSteps: "Named owner reviews the task this week.",
+    limitations: "One synthetic source, no measured impact or authority grant.",
+    recordIds: [f.task.id],
+    expectedRevision: workspace.company.revision,
+  });
+  assert.equal(report.status, 201, JSON.stringify(report.data));
+  const path = prefix(c) + "/reports/" + report.data.id;
+  assert.equal((await request(c, path + "/download")).status, 409);
+  const forged = await request(c, path + "/review", "POST", {
+    expectedVersion: report.data.version,
+    contentHash: "wrong",
+    decision: "approve",
+    note: "Reviewed exact audience",
+  });
+  assert.equal(forged.status, 409);
+  assert.equal(
+    (
+      await request(c, path + "/review", "POST", {
+        expectedVersion: report.data.version,
+        contentHash: report.data.hash,
+        decision: "approve",
+        note: "Reviewed exact audience and the printable client preview",
+      })
+    ).status,
+    200,
+  );
+  const downloaded = await request(c, path + "/download");
+  assert.equal(downloaded.status, 200, JSON.stringify(downloaded.data));
+  const zip = await JSZip.loadAsync(downloaded.data);
+  assert.ok(zip.file("client-report.html"));
+  const json = await zip.file("report.json")!.async("string");
+  assert.ok(!json.includes(f.e.data.text));
+  assert.ok(!json.includes(f.p.data.email));
+  assert.ok(json.includes("Named executive sponsor"));
+  const checks = JSON.parse(await zip.file("checksums.json")!.async("string"));
+  for (const [name, digest] of Object.entries(checks.files))
+    assert.equal(
+      createHash("sha256")
+        .update(await zip.file(name)!.async("nodebuffer"))
+        .digest("hex"),
+      digest,
+    );
+  assert.equal(
+    (
+      await request(c, path + "/review", "POST", {
+        expectedVersion: report.data.version,
+        contentHash: report.data.hash,
+        decision: "withdraw",
+        note: "Audience no longer needs this report",
+      })
+    ).status,
+    200,
+  );
+  assert.equal((await request(c, path + "/download")).status, 409);
+});
+test("a report cannot export raw evidence or survive selected-source retraction", async () => {
+  const c = await register(),
+    f = await fixture(c);
+  const build = async (recordIds: string[]) =>
+    request(c, prefix(c) + "/reports", "POST", {
+      title: "Evidence scope review",
+      kind: "audit",
+      audience: ["Client review group"],
+      purpose: "Review a selected task",
+      summary:
+        "The selected task is a proposal with one accepted supporting source.",
+      decisions: "",
+      nextSteps: "Confirm the current task with its owner.",
+      limitations: "No external activity logs collected.",
+      recordIds,
+      expectedRevision: (await request(c, prefix(c) + "/workspace")).data
+        .company.revision,
+    });
+  assert.equal((await build([f.e.id])).status, 422);
+  const report = (await build([f.task.id])).data;
+  const path = prefix(c) + "/reports/" + report.id;
+  const other = await register();
+  assert.equal((await request(other, path + "/preview")).status, 404);
+  assert.equal(
+    (
+      await action(c, f.e, "retract", {
+        note: "The source is no longer reliable",
+      })
+    ).status,
+    200,
+  );
+  const approval = await request(c, path + "/review", "POST", {
+    expectedVersion: report.version,
+    contentHash: report.hash,
+    decision: "approve",
+    note: "Attempt to publish old sources",
+  });
+  assert.equal(approval.status, 409);
+  assert.equal(approval.data.code, "REPORT_STALE");
+});
 async function fixture(c: Client) {
   const p = await create(c, "person", {
     name: "Synthetic Participant",
@@ -147,7 +690,24 @@ async function invite(c: Client, f: any, type = "confirmation") {
   return { req, participant, token };
 }
 before(async () => {
-  const app = createApp();
+  const app = createApp({
+    authRequestsPerWindow: 1000,
+    researchProvider: async (query) => {
+      researchCalls++;
+      if (query.startsWith("FailureTest"))
+        throw new Error("synthetic private provider diagnostic");
+      return normalizeResearch({
+        requestId: "synthetic-provider-request",
+        results: [
+          {
+            title: "Example public company",
+            url: "https://example.com/about",
+            text: "A synthetic public statement about products. It does not establish internal ownership.",
+          },
+        ],
+      });
+    },
+  });
   app.use("/api/v1/companies/:companyId/assets", assetsRouter());
   app.use(errorHandler);
   server = app.listen(0, "127.0.0.1");
@@ -630,4 +1190,99 @@ test("export checksums match actual archive file bytes and omit original source 
   }
   const manifest = JSON.parse(await zip.file("manifest.json")!.async("string"));
   assert.ok(manifest.evidence.every((e: any) => e.text === undefined));
+});
+
+test("research commands reserve before provider calls, replay safely and import only unreviewed evidence", async () => {
+  const c = await register(),
+    other = await register(),
+    start = researchCalls,
+    key = randomUUID();
+  const data = {
+    publicName: "Example Public Company",
+    website: "https://example.com",
+    acknowledgePublicQuery: true,
+  };
+  const first = await request(c, prefix(c) + "/research", "POST", data, {
+    "Idempotency-Key": key,
+  });
+  assert.equal(first.status, 200, JSON.stringify(first.data));
+  assert.equal(first.data.state, "complete");
+  const replay = await request(c, prefix(c) + "/research", "POST", data, {
+    "Idempotency-Key": key,
+  });
+  assert.equal(replay.data.id, first.data.id);
+  assert.equal(researchCalls, start + 1);
+  assert.equal(
+    (
+      await request(
+        c,
+        prefix(c) + "/research",
+        "POST",
+        { ...data, publicName: "Changed" },
+        { "Idempotency-Key": key },
+      )
+    ).status,
+    409,
+  );
+  const route = prefix(c) + "/research/" + first.data.id + "/sources/0/import";
+  assert.equal((await request(other, route, "POST", {})).status, 404);
+  const imported = await request(c, route, "POST", {}),
+    again = await request(c, route, "POST", {});
+  assert.equal(imported.status, 200, JSON.stringify(imported.data));
+  assert.equal(imported.data.id, again.data.id);
+  assert.equal(imported.data.state, "pending_review");
+  assert.equal(imported.data.data.type, "Public research");
+  assert.equal(imported.data.data.originId, "https://example.com/about");
+  const foreign = await tx(other.user.tenant_id, (db) =>
+    db.query("SELECT id FROM research_runs WHERE id=$1", [first.data.id]),
+  );
+  assert.equal(foreign.rowCount, 0);
+  const f = await fixture(c),
+    enrolled = await invite(c, f);
+  assert.equal(
+    (await request(enrolled.participant, prefix(c) + "/research")).status,
+    403,
+  );
+});
+test("failed research never auto-retries and persistent account budgets cap new requests", async () => {
+  const c = await register(),
+    key = randomUUID(),
+    data = {
+      publicName: "FailureTest Company",
+      website: "",
+      acknowledgePublicQuery: true,
+    },
+    start = researchCalls;
+  const failed = await request(c, prefix(c) + "/research", "POST", data, {
+    "Idempotency-Key": key,
+  });
+  assert.equal(failed.data.state, "failed");
+  assert.ok(
+    !JSON.stringify(failed.data).includes("private provider diagnostic"),
+  );
+  await request(c, prefix(c) + "/research", "POST", data, {
+    "Idempotency-Key": key,
+  });
+  assert.equal(researchCalls, start + 1);
+  for (let i = 1; i < 10; i++)
+    assert.equal(
+      (
+        await request(c, prefix(c) + "/research", "POST", {
+          ...data,
+          publicName: "Budget test " + i,
+        })
+      ).status,
+      200,
+    );
+  assert.equal(
+    (
+      await request(c, prefix(c) + "/research", "POST", {
+        ...data,
+        publicName: "Over budget",
+      })
+    ).status,
+    429,
+  );
+  assert.equal((await request(c, prefix(c) + "/research")).data.used, 10);
+  assert.equal(researchCalls, start + 10);
 });

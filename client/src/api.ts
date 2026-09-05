@@ -39,7 +39,13 @@ export async function api<T = any>(
   return result;
 }
 export async function downloadExport(company: string, id: string) {
-  const r = await fetch(`/api/v1/companies/${company}/exports/${id}/download`);
+  return downloadFile(
+    `/api/v1/companies/${company}/exports/${id}/download`,
+    "DutyGraph-" + id.slice(0, 8) + ".zip",
+  );
+}
+export async function downloadFile(path: string, filename: string) {
+  const r = await fetch(path);
   if (!r.ok) {
     const d = await r.json();
     throw new Error(d.message);
@@ -47,7 +53,7 @@ export async function downloadExport(company: string, id: string) {
   const url = URL.createObjectURL(await r.blob());
   const a = document.createElement("a");
   a.href = url;
-  a.download = "DutyGraph-" + id.slice(0, 8) + ".zip";
+  a.download = filename;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }

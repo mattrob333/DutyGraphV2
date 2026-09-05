@@ -1,0 +1,211 @@
+{
+  "version": "0.2.0",
+  "notice": "Implemented route inventory extracted from server declarations. OpenAPI currently provides closed generic-record creation schemas; it is not a full production target contract.",
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/api/auth/demo",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/login",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/logout",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/me",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/auth/options",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/auth/register",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/health",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/invitations/{token}",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/invitations/{token}/enroll",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/companies/{companyId}",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/assets",
+      "source": "server/assets.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/companies/{companyId}/assets/{assetId}/chunks/{index}",
+      "source": "server/assets.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/assets/{assetId}/content",
+      "source": "server/assets.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/assets/{assetId}/finalize",
+      "source": "server/assets.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/assets/{assetId}/status",
+      "source": "server/assets.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/exports",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/exports/{recordId}/download",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/frameworks/{key}/manual",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/graph",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/graph/rebuild",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/records",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/companies/{companyId}/records/{recordId}",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/records/{recordId}/actions",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/records/{recordId}/history",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/reports",
+      "source": "server/reports.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/reports/{reportId}/{format}",
+      "source": "server/reports.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/reports/{reportId}/review",
+      "source": "server/reports.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/requests/{recordId}/issue",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/research",
+      "source": "server/research.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/research",
+      "source": "server/research.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/research/{runId}/sources/{index}/import",
+      "source": "server/research.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/roster/apply",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/roster/preview",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/runtime/preflight",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/workflows/{workflowId}/cases",
+      "source": "server/workflows.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/workflows/cases/{caseId}/actions",
+      "source": "server/workflows.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/workspace",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/participant/requests",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/participant/requests/{recordId}/submit",
+      "source": "server/app.ts"
+    }
+  ]
+}

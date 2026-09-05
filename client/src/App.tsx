@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState, lazy, Suspense, type ReactNode } from "react";
 import {
   ArrowRight,
   LayoutGrid,
@@ -24,6 +24,7 @@ import {
   Download,
   AlertTriangle,
   RefreshCw,
+  BookOpen,
 } from "lucide-react";
 import { api, setCsrf, downloadExport } from "./api.ts";
 import {
@@ -41,6 +42,12 @@ import {
 } from "./ui.tsx";
 import { RecordForm } from "./forms.tsx";
 import { Graph } from "./Graph.tsx";
+import { Engagement } from "./Engagement.tsx";
+import { BusinessResearch } from "./BusinessResearch.tsx";
+import { ClientReports } from "./ClientReports.tsx";
+const Help = lazy(() =>
+  import("./Help.tsx").then((module) => ({ default: module.Help })),
+);
 import { Detail } from "./Detail.tsx";
 import { Participant, NetworkMark } from "./capture.tsx";
 import type { Company, RecordRow, User } from "../../shared/domain.ts";
@@ -54,6 +61,7 @@ const nav = [
   },
   { id: "graph", name: "Company graph", icon: Network, group: "" },
   { id: "tasks", name: "Task cards", icon: Layers, group: "" },
+  { id: "workflows", name: "Workflows & cases", icon: Network, group: "" },
   {
     id: "strategy",
     name: "Strategy",
@@ -80,10 +88,16 @@ const nav = [
     group: "WORKSPACE",
   },
   { id: "settings", name: "Workspace settings", icon: Settings, group: "" },
+  { id: "help", name: "Help & training", icon: BookOpen, group: "" },
 ];
 type ModalState =
   | { type: "record"; id: string }
-  | { type: "form"; kind: string; id?: string }
+  | {
+      type: "form";
+      kind: string;
+      id?: string;
+      preset?: Record<string, unknown>;
+    }
   | { type: "search" }
   | { type: "roster" }
   | { type: "company" }
@@ -377,7 +391,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
     [data, setData] = useState<any>(null),
     [error, setError] = useState(""),
     [page, setPage] = useState(window.location.hash.slice(1) || "overview"),
-    [tab, setTab] = useState("requests"),
+    [tab, setTab] = useState("research"),
     [strategyTab, setStrategyTab] = useState("frameworks"),
     [modal, setModal] = useState<ModalState>(null),
     [mobile, setMobile] = useState(false),
@@ -833,6 +847,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
     );
   else if (page === "discovery") {
     const tabs = [
+      ["research", "Business research"],
+      ["plan", "Engagement & kickoff"],
       ["requests", "Requests & responses"],
       ["people", "People in scope"],
       ["evidence", "Evidence library"],
@@ -848,20 +864,24 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               primary
               onClick={() =>
                 create(
-                  tab === "people"
-                    ? "person"
-                    : tab === "evidence"
-                      ? "evidence"
-                      : "request",
+                  tab === "plan"
+                    ? "engagement"
+                    : tab === "people"
+                      ? "person"
+                      : tab === "evidence" || tab === "research"
+                        ? "evidence"
+                        : "request",
                 )
               }
             >
               <Plus size={16} />{" "}
-              {tab === "people"
-                ? "Add participant"
-                : tab === "evidence"
-                  ? "Add source"
-                  : "Prepare request"}
+              {tab === "plan"
+                ? "Create engagement plan"
+                : tab === "people"
+                  ? "Add participant"
+                  : tab === "evidence" || tab === "research"
+                    ? "Add source"
+                    : "Prepare request"}
             </Button>
           }
         />
@@ -887,7 +907,34 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             </Button>
           )}
         </div>
-        {tab === "requests" ? (
+        {tab === "research" ? (
+          <BusinessResearch
+            key={company.id}
+            company={company}
+            create={() =>
+              setModal({
+                type: "form",
+                kind: "evidence",
+                preset: {
+                  type: "Public research",
+                  classification: "Inferred",
+                  bucket: "biz",
+                },
+              })
+            }
+            open={open}
+            kickoff={() => setTab("plan")}
+            refresh={refresh}
+          />
+        ) : tab === "plan" ? (
+          <Engagement
+            company={company}
+            records={records}
+            create={create}
+            open={open}
+            refresh={refresh}
+          />
+        ) : tab === "requests" ? (
           <>
             <div className="notice blue">
               <Mic size={20} />
@@ -1027,6 +1074,55 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             }
           />
         )}
+        <div className="two-col work-model-panels">
+          <Panel
+            title="Standing duties"
+            subtitle="Record duty accountability separately from individual task confirmations."
+            action={<Button onClick={() => create("duty")}>Add duty</Button>}
+          >
+            {rows(items("duty"))}
+          </Panel>
+          <Panel
+            title="Handoff contracts"
+            subtitle="Define the condition, input, output, receiving check and exception owner between two tasks."
+            action={
+              <Button onClick={() => create("handoff")}>Add handoff</Button>
+            }
+          >
+            {rows(items("handoff"))}
+          </Panel>
+        </div>
+      </>
+    );
+  else if (page === "workflows")
+    body = (
+      <>
+        <Heading
+          eyebrow="COORDINATE THE WORK"
+          title="Clear handoffs. Visible checkpoints."
+          description="Review a workflow, then track each case through human steps, conditional handoffs and explicit escalation."
+          actions={
+            <Button primary onClick={() => create("workflow")}>
+              Create workflow
+            </Button>
+          }
+        />
+        <Panel
+          title="Workflow definitions"
+          subtitle="Each definition pins task and handoff versions. Paths must be connected and acyclic."
+        >
+          {rows(items("workflow"))}
+        </Panel>
+        <Panel
+          title="Work cases"
+          subtitle="Checkpoints survive restarts. A timeout requires human review and never approves a step."
+        >
+          {rows(items("case"))}
+        </Panel>
+        <div className="notice">
+          Create the task cards and their handoff contracts in Task cards first.
+          Cases record human observations; external systems are not executed.
+        </div>
       </>
     );
   else if (page === "graph")
@@ -1038,6 +1134,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           description="Follow the work from its source to the people accountable for it. Relationships remain evidence-backed claims."
         />
         <Graph
+          key={companyId}
           company={companyId}
           revision={company.revision}
           records={records}
@@ -1059,18 +1156,22 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                 create(
                   strategyTab === "metrics"
                     ? "metric"
-                    : strategyTab === "interventions"
-                      ? "intervention"
-                      : "candidate",
+                    : strategyTab === "outcomes"
+                      ? "outcome"
+                      : strategyTab === "interventions"
+                        ? "intervention"
+                        : "candidate",
                 )
               }
             >
               <Plus size={16} />
               {strategyTab === "metrics"
                 ? "Define a measure"
-                : strategyTab === "interventions"
-                  ? "Propose intervention"
-                  : "Add constraint hypothesis"}
+                : strategyTab === "outcomes"
+                  ? "Review an outcome"
+                  : strategyTab === "interventions"
+                    ? "Propose intervention"
+                    : "Add constraint hypothesis"}
             </Button>
           }
         />
@@ -1080,6 +1181,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             ["constraints", "Constraint ledger"],
             ["metrics", "Measurements"],
             ["interventions", "Interventions"],
+            ["outcomes", "Outcome reviews"],
           ].map(([id, name]) => (
             <button
               className={strategyTab === id ? "active" : ""}
@@ -1171,6 +1273,13 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             subtitle="Pressure signals, independent sources, a global counterfactual, and a discriminating measurement."
           >
             {rows(items("candidate"))}
+          </Panel>
+        ) : strategyTab === "outcomes" ? (
+          <Panel
+            title="Did the predicted result happen?"
+            subtitle="Compare the frozen prediction with observed measurements, coverage and competing explanations."
+          >
+            {rows(items("outcome"))}
           </Panel>
         ) : strategyTab === "metrics" ? (
           <>
@@ -1320,6 +1429,17 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                 <State value={r.state} />
               </Row>
             ))}
+            {items("case")
+              .filter((r) => r.state === "needs_attention")
+              .map((r) => (
+                <Row
+                  key={r.id}
+                  title={"Case needs attention: " + r.title}
+                  onClick={() => open(r)}
+                >
+                  <State value={r.state} />
+                </Row>
+              ))}
             {items("metric")
               .filter((m) => m.data.baseline === null)
               .map((r) => (
@@ -1334,6 +1454,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               ))}
             {!pending.length &&
               !conflicts.length &&
+              !items("case").some((r) => r.state === "needs_attention") &&
               !items("metric").some((m) => m.data.baseline === null) && (
                 <Empty
                   title="No recorded exceptions"
@@ -1357,6 +1478,12 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           eyebrow="REVIEWABLE OUTPUTS"
           title="Share a record you can trace."
           description="Freeze exact versions, show what is excluded, and keep the audience explicit."
+        />
+        <ClientReports
+          company={company}
+          records={records}
+          open={open}
+          refresh={refresh}
         />
         <div className="export-options">
           <Panel
@@ -1393,8 +1520,9 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           {rows(items("export"))}
         </Panel>
         <div className="notice">
-          Exports are internal review artifacts. No external publication,
-          emailing, or customer-system action occurs here.
+          Client reports require review for their named audience. Workspace
+          snapshots and agent packages are internal review artifacts. Downloaded
+          packets are delivered manually.
         </div>
       </>
     );
@@ -1499,6 +1627,25 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           </div>
         </Panel>
         <Panel
+          title="Projection recovery"
+          subtitle="Rebuild the local derived graph from current company records. This does not replay business actions."
+        >
+          <Button
+            onClick={() =>
+              void run(
+                () =>
+                  api(`/v1/companies/${companyId}/graph/rebuild`, "POST", {
+                    expectedRevision: company.revision,
+                  }),
+                "Derived graph rebuilt and verified.",
+              )
+            }
+          >
+            <RefreshCw size={16} />
+            Rebuild derived graph
+          </Button>
+        </Panel>
+        <Panel
           title="Recent audit events"
           subtitle="Append-only application events. Content hashes are not cryptographic approval signatures."
         >
@@ -1554,6 +1701,12 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           </Button>
         </Panel>
       </>
+    );
+  else if (page === "help")
+    body = (
+      <Suspense fallback={<p>Opening the handbook…</p>}>
+        <Help go={go} />
+      </Suspense>
     );
   else
     body = (
@@ -1637,7 +1790,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <div className="sidebar-footer">
           <div className="local-status">
             <i className="dot sage" />
-            Local development pilot<span>v0.1</span>
+            Local advisor pilot<span>v0.2</span>
           </div>
           <button className="account" onClick={() => go("settings")}>
             <span className="avatar">
@@ -1778,6 +1931,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             record={recordModal}
             records={records}
             notice={company.settings.notice}
+            preset={modal.preset}
             onSave={async (values) => {
               const r = modal.id
                 ? await api(

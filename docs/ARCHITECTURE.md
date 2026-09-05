@@ -1,49 +1,68 @@
-# Architecture decisions for local release 0.1
+# Architecture and implementation decisions
 
-## Source of truth
+Release 0.2 is a single-origin React/TypeScript application backed by Express and PostgreSQL. The browser binds to localhost:4317; the dedicated PostgreSQL 17 Compose service binds to localhost:55437. The original visual reference remains separate in `reference/`. The commercial handoff and predecessor repositories are not bundled into the public source.
 
-PostgreSQL owns company records, immutable content versions, request snapshots, participant confirmations, audit events, command receipts, assets, and the transactional outbox. An application command holds the relevant row lock, checks expected content revision, and commits the record, version, audit entry, and event together. A failed command rolls back all four. Idempotency keys are scoped to actor and tenant; changed payloads conflict.
+## Authoritative data and command consistency
 
-`records` is a typed record envelope with indexed company/kind/state/version columns and Zod-validated JSON payloads. `record_versions` and `confirmations` have composite tenant/company foreign keys. Cross-company person, task, source, and metric references are checked within the same transaction. This is a deliberate local foundation, not a claim that the complete 18-object production domain schema has been implemented.
+PostgreSQL owns companies, typed records, immutable content versions, request snapshots, participant decisions, assets, audit events, command receipts and the transactional outbox. Runtime Zod schemas validate input; semantic references are checked against the same company within a transaction. Composite tenant/company keys and forced RLS enforce relational scope.
 
-SHA-256 hashes bind canonical JSON to the tenant, company, record ID, kind, title, version, and content. The canonicalizer is pinned in the lockfile. Prior versions and audit entries cannot be updated or deleted by the runtime role. A hash provides content integrity; no approval-signing claim is made.
+Content hashes cover canonical JSON plus tenant, company, record ID, kind, title and version. Prior content and audit rows cannot be updated or deleted by the runtime role. State transitions have append-only audit events but do not create new content versions; a hash therefore identifies content, not every later validation-state change.
 
-## Authentication and tenancy
+Commands serialize tenant writes using a transaction advisory lock before row locks. This deliberately favors consistent multi-record reviews and source invalidation over concurrent writes within one local tenant. Read queries remain concurrent. Different actors cannot race report review against a source edit through the normal command interface. Expected versions/revisions and actor-scoped idempotency receipts protect retries. Direct administrative writes bypass application guarantees and are outside the supported workflow.
 
-An account belongs to one tenant. Advisors can manage companies in their tenant. Participants are linked to exactly one person and company by a purpose-limited invitation. Password hashes use salted scrypt. Server-stored sessions use hashed bearer tokens, 12-hour expiry, HttpOnly/SameSite cookies, origin checks, and a session CSRF token.
+## Authentication and scope
 
-Every business table forces tenant RLS using a transaction-local tenant context. The runtime database role cannot bypass RLS and does not own tables. Authentication lookup tables intentionally sit outside business RLS; the server accesses them through fixed login/session/invitation queries. The browser never selects its tenant context or changes its role.
+Passwords use salted scrypt; server sessions store hashed bearer tokens, expire after 12 hours, and use HttpOnly/SameSite cookies, origin checks and CSRF tokens. Authentication endpoints are throttled. Advisors manage companies inside their tenant. Participants are linked to one company/person and only see assigned requests and projected task fields.
 
-Invitation GET does not consume access. Explicit enrollment consumes a hashed, expiring token. Re-issuance revokes prior unused links. Invitation URLs are returned once and redacted from command receipts. This is **link possession plus local password assurance**, not independent email verification or enterprise IAM. Privileged stage approvals and managed Signet keys are unavailable.
+The runtime role is neither superuser nor RLS-bypass and does not own the tables. Transaction-local tenant context is selected by the server actor. Authentication lookup tables are intentionally outside business RLS and are accessed through fixed server queries. Invitation tokens are hashed, time-limited and single-use; issued URLs are redacted from saved command receipts.
 
-## Work confirmation
+This is local password and link-possession assurance. Email verification, identity recovery, enterprise SSO/MFA, company membership administration and fine-grained source ACLs remain separate work.
 
-Creating or editing a task creates a new unconfirmed version. Advisor review creates a reviewed version; a request freezes exact task versions and hashes. Participant submission records its authenticated actor and response but does not mark work confirmed until the advisor reviews the original response. Current owner and performer confirmations are required. One person may satisfy both roles only when that same identity holds both recorded roles.
+## Work and observation model
 
-Late responses remain historical. Corrections reopen the current work claim for review. Source retraction invalidates dependent tasks, frameworks, and proposals. Task edits mark bound agent proposals stale. No task, source, meeting decision, or persona selection can create a runtime grant.
+A task can be saved with unresolved roles but cannot be reviewed without owner, performer and accepted sources. Current accepted participant decisions must match the exact version/hash. Edits require new review/confirmation; historical responses remain historical. Duty ownership, manager relationships and task confirmation are separate claims.
 
-## Graph
+Handoffs pin both tasks and define receiving conditions and failure handling. Workflow definitions pin tasks/handoffs and reject cycles, duplicate paths and disconnected steps. A case snapshots the reviewed definition, step states, attempts, deadlines, selected routes and observer notes. Branch joins distinguish all/any. Deadline evaluation uses persisted timestamps; it never auto-completes a step. Cases record human observations and do not perform external actions.
 
-An asynchronous worker materializes metadata and typed links into `projection_nodes`. Repeated events cannot duplicate nodes or overwrite newer records with older snapshots. Raw source text is absent from that projection. The current graph endpoint uses a permission-checked authoritative PostgreSQL fallback and exposes pending projection work. The UI limits the initial graph to 150 records and supplies a table alternative.
+## Graph projection and display
 
-Neo4j is **not connected**. Before scaling, replace the local projection adapter with the specified Neo4j generation/checkpoint model, bounded neighborhoods, and measured performance gates. No graph data is used to authorize runtime actions.
+The outbox worker materializes metadata and typed links into a local PostgreSQL projection. Replay is idempotent and does not copy source bodies. Bounded graph reads use authoritative records, with focus/depth/filter/node budgets and explicit lag/truncation metadata. Maximum output is 150 nodes, maximum depth four, maximum scanned graph records 5,000, and query statement timeout three seconds.
 
-## Audio
+The UI displays connected evidence/people/tasks/hypotheses/proposals, focused neighborhoods, a work view, an accessible register, and a separate team/reporting view. Cards have wider gutters, separate connection ports and routed arrows. Recorded managers alone determine the org chart. Graph reconstruction is company-scoped and atomic; it verifies node count and records an audit event. No business action is replayed.
 
-MediaRecorder requests microphone access only after notice acknowledgment and an explicit start. The UI offers pause/resume, finish, playback, discard, audio upload, and text alternatives. Browser IndexedDB keeps recoverable local clips. Uploads use 512 KB chunks with individual checksums, a manifest/status endpoint, and a complete checksum at finalization. Storage is scoped PostgreSQL bytea for the local pilot, not production object storage.
+Neo4j, generation-based distributed projection rebuild and large-scale graph evaluation are not implemented. The full workspace read also returns all current company records; pagination and larger-domain query planning are future scaling work.
 
-Assets are marked `stored_unscanned`; no malware scan or transcription is fabricated. Local audio playback is allowed within actor/company scope. Raw audio access expires after 30 days, regardless of worker lag, and the worker purges chunks. Local drafts remain on the participant's device until submission/discard; enterprise deletion/hold and derivative lifecycles need a dedicated implementation.
+## Evidence and capture
 
-## Strategy and exports
+Original evidence and requests are immutable. Retraction preserves history and propagates staleness through current dependencies. Participant text and audio preserve original provenance. Audio uploads use 512 KB chunks, checksums and final size/hash checks, with a 25 MB ceiling. Scoped local storage is PostgreSQL bytea, marked unscanned. Access expires after 30 days and the retention worker purges chunks; local browser drafts remain until submission/discard.
 
-The exact supplied registry controls sixteen frameworks and `biz`, `leadership`, `calls`, `org`. Framework artifacts are human-authored and source-bound. Required upstream analyses must be complete, and reviewed artifacts recheck source hashes. Changes mark downstream analyses stale. There is no model provider connection or synthetic fallback.
+There is no malware scanner, document parser, transcript provider, AI extraction queue or source-instruction execution path. Comprehensive erasure, derivatives, legal hold and production private object storage remain open. Engagement policy text does not change these technical mechanisms.
 
-Constraint review uses an explicit local readiness rule and manual test evidence. It is not a validated diagnostic engine or empirical proof. Measurements preserve null baselines and targets. Interventions and weekly decisions remain proposals/commitments.
+## Strategy and reports
 
-Internal exports freeze task content and report exclusions. Raw source text, audio, passwords, and tokens are omitted. Downloads recheck company access and source retraction. Generic agent packages include only currently qualifying task bindings, and clearly state that they grant no authority and deploy nothing.
+The preserved sixteen-framework registry determines dependencies and four source buckets. Human-authored analyses bind exact evidence and upstream versions. Changes invalidate downstream analysis. Structural diagnosis checks require independent origins, a tested alternative, a discriminator and a measured baseline; they are not an empirically validated causal engine.
 
-## Trust boundaries and unresolved threats
+Metrics append observations. Outcomes freeze the original intervention prediction and measurement snapshot, record coverage/confounders, and support inconclusive results. Reviewing a falsified result reopens the hypothesis.
 
-Text is rendered as React text, not executable HTML. There is no URL crawler, arbitrary Cypher endpoint, model tool runner, or execution bypass path. Production static assets receive a restrictive CSP and same-origin local fonts. Runtime preflight returns blocked when services are unconfigured.
+Client reports freeze selected allowlisted fields, intended audience, purpose, narrative and current source bindings. Advisor approval binds exact content and audience; download rechecks bindings. Raw source bodies, recordings and credentials are omitted. HTML escapes text and CSV neutralizes formula prefixes. Audit packets state the latest-500-application-event limit. Internal frozen exports have their own historical semantics and are not client-publication approvals.
 
-Outstanding security work includes independent review, identity recovery/MFA/SSO, explicit company membership and evidence ACLs beyond the local roles, admin lifecycle, private object storage/scanning, managed signing, authority adapters, runtime conformance, export retention, backup encryption, abuse/load controls, and production operating procedures. The app must stay a synthetic-data local pilot until these release gates are accepted.
+## Operations and packaging
+
+Versioned migrations have normalized checksums and an administrator-only ledger. An AES-256-GCM backup authenticates metadata and dump bytes; the restore drill creates a separate temporary database, restores it and compares record/version/audit fingerprints before removing that drill database. No off-host recovery or production RPO/RTO is claimed.
+
+CI installs from the lockfile, starts the dedicated database, applies migrations, regenerates contracts, builds and runs real unit/API/database tests, and audits dependencies. The documentation build uses the same authored sources for the in-app help center and portable HTML. The PDF builder is a separate optional ReportLab step. No external provider credentials are required for the local build.
+
+## Extension seams
+
+- Replace local participant assurance with a reviewed identity and membership model before real client rollout.
+- Add source ACLs and object-storage/scanning/retention services as an integrated lifecycle.
+- Implement provider-backed ingestion and reviewed changesets only after credentials, data policy, budgets and evaluation are accepted.
+- Add the production operational-model, authority/control-context and managed-signing domains before any runtime grant.
+- Integrate one exact customer action through a conformance-tested adapter, including unknown-effect reconciliation and revocation.
+- Add pagination, distributed worker coordination and production observability based on measured workloads.
+
+The API route catalog is generated from implemented declarations. OpenAPI has runtime-derived record input schemas; it does not yet close every non-record body/response contract in the larger production specification.
+
+## Public research boundary
+
+Discovery uses an optional Exa search/content adapter. A tenant-scoped research_runs table reserves each command before the external request, preserves its outcome and permits review/import of immutable source snapshots. The provider endpoint is fixed; no arbitrary URL is fetched by this server. Queries contain the explicit public name and optional domain, never workspace evidence. A retained snapshot imports as pending-review evidence with URL, date and digest. Ten requests per rolling 24 hours are enforced across each tenant account. Replay does not repeat a call; crashes can leave an unknown provider outcome without automatic retry. Model synthesis and background research cancellation remain open.

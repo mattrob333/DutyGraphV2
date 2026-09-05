@@ -1,44 +1,48 @@
-# Release 0.1 — working local foundation
+# Release 0.2 - advisor workflow and delivery pack
 
-The supplied handoff defines a 90-requirement production target across M0 and R1–R4. This repository implements a useful local discovery, review, and export slice. **The complete production target remains open.** No external credentials, customer systems, managed signing, or production deployment were supplied or configured.
+This release completes a usable local, human-led advisor journey and its training/handoff materials. It does **not** complete the full 90-requirement production target in the supplied handoff. External research/model services, enterprise authority and live execution remain unimplemented or unconfigured; independent production acceptance remains open.
 
-## What can be used now
+## Delivered behavior
 
-| Area           | Current behavior                                                                                                                                    |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Workspace      | Separate accounts/tenants, multiple bounded companies, server persistence, graphite/light UI                                                        |
-| Discovery      | People, CSV preview/quarantine, immutable requests, private enrollment links, original text/audio responses                                         |
-| Evidence       | Reviewed source acceptance, exact locators/origins, immutable originals, retraction and dependent staleness                                         |
-| Work           | Typed task cards, immutable versions, accountable owner/performer, authentic local participant responses, historical confirmations                  |
-| Data integrity | Forced tenant RLS, composite version keys, semantic company references, row locks, idempotency, transactional outbox                                |
-| Graph          | Data-driven connected/work/people views, camera controls, accessible register, local derived metadata projection with authoritative read fallback   |
-| Strategy       | Exact 16-framework registry, four buckets, human-authored analyses, source/upstream version binding, manual diagnosis tests, measures/interventions |
-| Governance     | Version-bound draft proposals, separate authority/deployment states, fail-closed unconfigured runtime                                               |
-| Weekly review  | Current exceptions and baseline gaps, human-owned decisions and commitments                                                                         |
-| Exports        | Frozen internal ZIP packets, current confirmed subset, exclusions, source metadata, instructions, setup requirements, checksums                     |
-| Operations     | Dedicated local database, generated secret configuration, atomic writes, raw-audio expiry/purge, verification workflow                              |
+| Area | Implemented in the local application |
+| --- | --- |
+| Scope and kickoff | Engagement plan, sponsor/roster coverage, bounded executive questions, preserved request plan |
+| Pre-meeting research | Optional Exa source collection, public query preview, bounded requests, durable replay prevention, source snapshots and unreviewed evidence import; no live key configured |
+| People and organization | CSV preview/quarantine, reported managers, teams, explicit duty claims and task responsibilities |
+| Evidence and capture | Immutable typed/audio originals, private local enrollment, resumable uploads, review/retraction and dependent staleness |
+| Work | Versioned tasks, unresolved proposals, exact owner/performer confirmation, conflict handling, duties and handoff contracts |
+| Graph | Focused semantic columns, labeled routes, actual handoff workflow diagrams, team-to-duty maps, recorded-manager chart, register, bounded API and repair |
+| Workflows | Reviewed acyclic definitions, pinned dependencies, manual cases, selected routes, all/any joins, deadlines, failures, retries and history |
+| Strategy | Human-authored framework DAG, testable hypotheses, measurements, preserved intervention predictions and reviewed outcomes |
+| Weekly review | Evidence/work exceptions, cases needing attention, owner/action/due-date commitments |
+| Client delivery | Frozen executive/weekly/audit reports, explicit audience approval, current binding checks, printable HTML and checksummed ZIPs |
+| Internal handoff | Workspace, confirmed-work and non-operative agent proposal packages with exclusions |
+| Operations | Forced tenant RLS, serialized multi-record commands, immutable history, outbox, versioned migration ledger, encrypted backup and separate-database restore drill |
+| Enablement | Searchable help, eight advisor guides, full manual, A-to-Z playbook, workshop/answers, actual synthetic examples, portable HTML/Markdown and PDF |
 
-## Open work by release
+## Verified boundaries
 
-| Release | Remaining acceptance work                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| M0      | Full clean-checkout execution audit of both predecessor repos; owner-reviewed architecture/threat model/data policy; complete closed 92-route API contract; customer dependencies and cost/SLO agreement                                                                                                                                                                                                                           |
-| R1      | Verified email/identity assurance and recovery; company/engagement memberships and fine-grained source ACLs; production private object storage and scanning; robust document parsing; real transcription/extraction jobs; email delivery/reminders; authenticated legacy import; complete task/duty schema and authority baseline compiler; durable job budgets; full retention/deletion/hold and accessibility/browser regression |
-| R2      | Neo4j adapter with generation rebuild/repair and bounded neighborhoods; actual provider-backed framework orchestration; operational-model compiler; independently evaluated constraint/falsification engine; reviewed outcome assessment; meeting integration; timezone scheduler; approved briefs and purpose-scoped feeds; performance evaluation                                                                                |
-| R3      | Exact customer identity/policy/request integrations; legitimate authority and owner ceiling reconciliation; authenticated approval stages and separation of duties; managed Signet keys; grant issuance; one tested runtime adapter; action-bound approvals; side-effect idempotency/reconciliation; owner lifecycle and kill switch; tamper evidence and recovery drills                                                          |
-| R4      | Enterprise SSO/SCIM, isolation/deployment options, permission-safe portfolio reporting, additional validated adapters and operational assurances                                                                                                                                                                                                                                                                                   |
+The verification record distinguishes pure tests, real API/database tests, the synthetic advisor journey, browser checks, dependency audit, local performance and backup/restore. Passing these does not certify production security, diagnostic accuracy or customer-system execution. See VERIFICATION.md and docs/verification for exact evidence.
 
-## Decisions applied for this local build
+The original Cobalt sample remains unchanged by the training journey. Northstar is a separate synthetic company whose scripted local participant confirmations are clearly labeled training. No real customer approval, email, permission grant or business action was created.
 
-- Use the new DutyGraphV2 repository, as requested. Preserve predecessor checkouts.
-- Keep the supplied graphite visual reference and canonical registry; document current LiveFrameworks drift.
-- Use PostgreSQL immediately. A local projection table is an interim adapter; Neo4j remains unconfigured.
-- Prefer manually reviewed evidence and human-authored strategy artifacts until approved providers are connected. No analysis fallback is represented as a real model result.
-- Use synthetic data and local password/invitation assurance. No live customer privilege approval is enabled.
-- Ship only generic, explicitly non-operative draft packages. No runtime deployment or external business action is enabled.
+## Remaining work before production
+
+| Workstream | Concrete remaining acceptance |
+| --- | --- |
+| Identity and data access | Verified enrollment/recovery, SSO/MFA where required, company memberships, evidence ACLs, administrator lifecycle |
+| Ingestion and analysis | Scanned private storage, document/transcript lineage, provider-backed jobs, reviewed changesets, budgets/cancellation and empirical evaluation |
+| External research | Exa project credential and live acceptance, provider spend limits, research retention/cancellation and wider source evaluation; Firecrawl optional |
+| Core production domains | Full operational-model compiler, authority baseline/control context, complete non-record API request/response contract |
+| Customer authority and runtime | Effective-access/policy adapters, authenticated staged approvals, managed Signet keys, exact target action, revocation, idempotent side effects and reconciliation |
+| Operations | Off-host key/backup custody, full recovery cutover, comprehensive deletion/hold, monitoring/SLOs, large-load and distributed-worker evaluation |
+| Independent release assurance | Full accessibility/browser matrix, physical microphone tests, security review/penetration test, blind diagnostic evaluation and owner acceptance |
+| Enterprise expansion | SSO/SCIM, deployment/isolation choices, permission-safe portfolio reporting and additional adapters |
+
+The Exa adapter requires its documented key and enablement flag. Other integration workstreams do not become functional through environment variables. The app fails closed for live runtime preflight. INTEGRATIONS.md records implementation, credential needs and live acceptance boundaries.
 
 ## Requirement traceability
 
-The accompanying `requirements-status.json` maps all 90 supplied IDs and titles to this local build. “Local subset” means code exists for part of the requirement and its scope is described above. It does **not** mean the full linked production acceptance scenario has passed. “Open” means the requirement has no completed implementation in this release. No production requirement is marked formally accepted without the specified independent/owner acceptance.
+requirements-status.json maps all 90 supplied requirement IDs to implementation evidence and remaining work. Local subset means part of a requirement has working code. Open means the complete behavior is not implemented. No requirement is marked formally production-accepted by this local development run.
 
-See `VERIFICATION.md` for the precise automated and browser evidence. The supplied commercial documents and customer-specific context remain outside this public repository.
+The source audit remains a bounded inspection of predecessor projects, not a claim that those repositories were fully executed or verified. The current source, lockfile and GitHub CI run identify this repository's release.

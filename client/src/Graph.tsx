@@ -2,14 +2,18 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Expand, Focus, Minus, Plus, List, Network } from "lucide-react";
 import type { RecordRow } from "../../shared/domain.ts";
 import { api } from "./api.ts";
-import { Button, Badge, Empty, ErrorBox, State } from "./ui.tsx";
+import { Button, Badge, Empty, ErrorBox, State, stateLabel } from "./ui.tsx";
 import { OrgView } from "./OrgView.tsx";
 import {
-  layoutGraph,
   wrapNodeTitle,
   type GraphNode,
   type GraphEdge,
 } from "./graph-layout.ts";
+import {
+  connectedScene,
+  workflowScene,
+  defaultGraphFocus,
+} from "./graph-scene.ts";
 export function Graph({
   company,
   revision,
@@ -25,21 +29,33 @@ export function Graph({
       nodes: GraphNode[];
       edges: GraphEdge[];
       sourceRevision: number;
-      pending: boolean;
+      pending: number;
       truncated: boolean;
+      scanTruncated: boolean;
     } | null>(null),
     [error, setError] = useState(""),
     [view, setView] = useState("connected"),
     [list, setList] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
     [expanded, setExpanded] = useState(false);
+  const [focus, setFocus] = useState("");
+  const [workflowId, setWorkflowId] = useState("");
+  const workflows = records.filter(
+    (r) => r.kind === "workflow" && r.state !== "withdrawn",
+  );
+  const activeFocus = focus || defaultGraphFocus(records);
+  const activeWorkflow = workflowId || workflows[0]?.id || "*";
+  const [retry, setRetry] = useState(0);
   const [camera, setCamera] = useState({ x: 0, y: 0, w: 1120, h: 650 });
   const svg = useRef<SVGSVGElement>(null);
   const drag = useRef<any>(null);
   const viewport = useRef({ width: 1120, height: 650 });
   useEffect(() => {
     let active = true;
-    api(`/v1/companies/${company}/graph`)
+    setError("");
+    api(
+      `/v1/companies/${company}/graph${focus ? `?focus=${focus}&depth=2` : ""}`,
+    )
       .then((r) => {
         if (active) setGraph(r);
       })
@@ -49,16 +65,21 @@ export function Graph({
     return () => {
       active = false;
     };
-  }, [company, revision]);
-  const layout = useMemo(
-    () => layoutGraph(graph?.nodes || [], graph?.edges || [], view),
-    [graph, view],
-  );
+  }, [company, revision, focus, retry]);
+  const layout = useMemo(() => {
+    const currentRecords = records.map((r) => {
+      const projected = graph?.nodes.find((n) => n.id === r.id);
+      return projected ? { ...r, state: projected.state } : r;
+    });
+    return view === "work"
+      ? workflowScene(currentRecords, activeWorkflow)
+      : connectedScene(currentRecords, activeFocus);
+  }, [graph, records, view, activeFocus, activeWorkflow]);
   const frame = (readable = false) => {
     const { width, height } = viewport.current;
     const scale = Math.max(
-      readable ? 0.8 : 0,
-      Math.min(width / layout.width, height / layout.height),
+      readable ? 0.55 : 0,
+      Math.min(1, width / layout.width, height / layout.height),
     );
     const w = width / scale,
       h = height / scale;
@@ -131,15 +152,56 @@ export function Graph({
   );
   const registerNodes =
     view === "org"
-      ? layout.nodes.filter((n) => n.kind === "person")
-      : layout.nodes;
-  if (error) return <ErrorBox error={error} />;
+      ? records.filter((n) => n.kind === "person")
+      : view === "work"
+        ? layout.nodes
+        : records.filter(
+            (r) =>
+              [
+                "person",
+                "task",
+                "evidence",
+                "candidate",
+                "duty",
+                "agent",
+                "intervention",
+                "metric",
+              ].includes(r.kind) &&
+              !["retracted", "withdrawn"].includes(r.state),
+          );
+  if (error)
+    return (
+      <>
+        <ErrorBox error={error} />
+        <Button
+          onClick={() => {
+            setFocus("");
+            setError("");
+            setRetry((n) => n + 1);
+          }}
+        >
+          Return to full graph
+        </Button>
+      </>
+    );
   if (!graph) return <div className="loading">Loading the company graph…</div>;
-  if (!layout.nodes.length)
+  if (!records.length)
     return (
       <Empty
         title="Your work graph starts with people and evidence"
         detail="Add a participant, accept an evidence source, and describe a task. The relationships will appear here."
+        action={
+          view !== "connected" || focus ? (
+            <Button
+              onClick={() => {
+                setView("connected");
+                setFocus("");
+              }}
+            >
+              Return to connected records
+            </Button>
+          ) : undefined
+        }
       />
     );
   return (
@@ -157,6 +219,7 @@ export function Graph({
               onClick={() => {
                 setView(id);
                 setSelected(null);
+                if (id === "org") setFocus("");
               }}
             >
               {label}
@@ -174,6 +237,60 @@ export function Graph({
           </Button>
         </div>
       </div>
+      {view !== "org" && (
+        <div className="graph-context">
+          <label>
+            {view === "work" ? "Workflow" : "Explore"}{" "}
+            <select
+              aria-label={
+                view === "work" ? "Select workflow" : "Focus on a record"
+              }
+              value={view === "work" ? activeWorkflow : activeFocus}
+              onChange={(e) => {
+                if (view === "work") setWorkflowId(e.target.value);
+                else setFocus(e.target.value);
+                setSelected(null);
+              }}
+            >
+              {view === "work" ? (
+                <>
+                  <option value="*">All recorded handoffs</option>
+                  {workflows.map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.title}
+                    </option>
+                  ))}
+                </>
+              ) : (
+                records
+                  .filter(
+                    (r) =>
+                      [
+                        "person",
+                        "task",
+                        "evidence",
+                        "candidate",
+                        "agent",
+                        "duty",
+                        "intervention",
+                        "metric",
+                      ].includes(r.kind) && r.state !== "retracted",
+                  )
+                  .map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.title}
+                    </option>
+                  ))
+              )}
+            </select>
+          </label>
+          <span>
+            {view === "work"
+              ? "Recorded task-to-task handoffs, with conditions on each connection."
+              : "A focused view of up to 10 records. The register contains all available records."}
+          </span>
+        </div>
+      )}
       {list ? (
         <div className="table-wrap">
           <table>
@@ -213,16 +330,28 @@ export function Graph({
           select={setSelected}
           open={open}
         />
+      ) : view === "work" && !layout.edges.length ? (
+        <Empty
+          title="No handoffs recorded for this work yet"
+          detail="A workflow needs explicit receiving conditions between tasks. Add handoff contracts in Task cards, then select them in a workflow. The task register is available now."
+          action={
+            <Button onClick={() => setList(true)}>View task register</Button>
+          }
+        />
       ) : (
         <div className="graph-shell">
           <div className="graph-canvas">
             <div className="graph-caption">
               <span className="eyebrow">
                 {view === "work"
-                  ? "Accountability & meaningful work"
-                  : "One record. Connected evidence."}
+                  ? "From one completed step to the next"
+                  : "Evidence. Work. Accountability."}
               </span>
-              <Badge>Revision {graph.sourceRevision}</Badge>
+              <Badge>
+                {graph.pending
+                  ? `Projection catching up · revision ${graph.sourceRevision}`
+                  : `Revision ${graph.sourceRevision}`}
+              </Badge>
             </div>
             <svg
               ref={svg}
@@ -266,7 +395,12 @@ export function Graph({
                   }));
               }}
               onPointerDown={(e) => {
-                if ((e.target as Element).closest("[data-node]")) return;
+                if (
+                  (e.target as Element).closest(
+                    "[data-node], .graph-edge-label",
+                  )
+                )
+                  return;
                 const bounds = e.currentTarget.getBoundingClientRect();
                 drag.current = { x: e.clientX, y: e.clientY, camera, bounds };
                 e.currentTarget.setPointerCapture(e.pointerId);
@@ -341,17 +475,7 @@ export function Graph({
                   y={col.y}
                   className="graph-column-label"
                 >
-                  {
-                    (
-                      {
-                        person: "PEOPLE",
-                        task: "TASKS",
-                        evidence: "EVIDENCE",
-                        candidate: "HYPOTHESES",
-                        agent: "AGENT PROPOSALS",
-                      } as Record<string, string>
-                    )[col.kind]
-                  }
+                  {col.kind}
                 </text>
               ))}
               {[...layout.edges]
@@ -365,14 +489,15 @@ export function Graph({
                     selected &&
                     (e.source === selected || e.target === selected);
                   return (
-                    <path
-                      key={i}
-                      d={e.path}
-                      className={`graph-edge ${highlight ? "highlight" : selected ? "muted" : ""}`}
-                      markerEnd={`url(#${highlight ? "arrow-highlight" : "arrow"})`}
-                    >
-                      <title>{e.label}</title>
-                    </path>
+                    <g key={e.id}>
+                      <path
+                        d={e.path}
+                        className={`graph-edge ${e.dashed ? "conditional" : ""} ${highlight ? "highlight" : selected ? "muted" : ""}`}
+                        markerEnd={`url(#${highlight ? "arrow-highlight" : "arrow"})`}
+                      >
+                        <title>{e.label}</title>
+                      </path>
+                    </g>
                   );
                 })}
               {layout.nodes.map((n) => {
@@ -404,16 +529,65 @@ export function Graph({
                     <text x="16" y="23" className="node-kind">
                       {n.kind.toUpperCase()} · V{n.version}
                     </text>
-                    {lines.map((line, i) => (
+                    {lines.slice(0, 2).map((line, i) => (
                       <text
                         key={i}
                         x="16"
                         y={47 + i * 20}
                         className="node-title"
                       >
-                        {line}
+                        {i === 1 && lines.length > 2
+                          ? line.slice(0, 25) + "…"
+                          : line}
                       </text>
                     ))}
+                    <text x="16" y="94" className="node-subtitle">
+                      {n.subtitle.length > 33
+                        ? n.subtitle.slice(0, 30) + "…"
+                        : n.subtitle}
+                    </text>
+                    <text
+                      x="16"
+                      y="113"
+                      className={`node-state ${n.state === "confirmed" ? "confirmed" : ""}`}
+                    >
+                      {stateLabel(n.state)}
+                    </text>
+                  </g>
+                );
+              })}
+              {layout.edges.map((e) => {
+                const muted =
+                  selected && e.source !== selected && e.target !== selected;
+                return (
+                  <g
+                    key={e.id}
+                    className={`graph-edge-label ${muted ? "muted" : ""} ${e.recordId ? "interactive" : ""}`}
+                    transform={`translate(${e.labelX},${e.labelY})`}
+                    role={e.recordId ? "button" : undefined}
+                    tabIndex={e.recordId ? 0 : undefined}
+                    aria-label={
+                      e.recordId ? `Open handoff: ${e.caption}` : undefined
+                    }
+                    onClick={() => {
+                      const r = records.find((r) => r.id === e.recordId);
+                      if (r) open(r);
+                    }}
+                    onKeyDown={(event) => {
+                      if (e.recordId && ["Enter", " "].includes(event.key)) {
+                        event.preventDefault();
+                        const r = records.find((r) => r.id === e.recordId);
+                        if (r) open(r);
+                      }
+                    }}
+                  >
+                    <title>{e.label}</title>
+                    <rect x="-53" y="-13" width="106" height="23" rx="4" />
+                    <text textAnchor="middle" y="2">
+                      {e.caption.length > 18
+                        ? e.caption.slice(0, 16) + "…"
+                        : e.caption}
+                    </text>
                   </g>
                 );
               })}
@@ -490,7 +664,20 @@ export function Graph({
                         onClick={() => setSelected(target.id)}
                       >
                         <small>
-                          {e.relationship.replaceAll("_", " ").toLowerCase()}
+                          {e.target === current.id
+                            ? (
+                                {
+                                  ACCOUNTABLE_FOR: "Accountable owner",
+                                  PERFORMS: "Performed by",
+                                  SUPPORTED_BY: "Evidence for",
+                                  REPORTS_TO: "Direct report",
+                                  BOUND_TO: "Proposed agent",
+                                  HANDS_OFF_TO: "Receives from",
+                                  CONTAINS: "Part of",
+                                } as Record<string, string>
+                              )[e.relationship] ||
+                              e.relationship.replaceAll("_", " ").toLowerCase()
+                            : e.relationship.replaceAll("_", " ").toLowerCase()}
                         </small>
                         {target.title}
                       </button>
@@ -500,6 +687,11 @@ export function Graph({
               <Button primary onClick={() => open(current)}>
                 Open full record
               </Button>
+              {!focus && (
+                <Button onClick={() => setFocus(current.id)}>
+                  Focus connections
+                </Button>
+              )}
               <button className="text-link" onClick={() => setSelected(null)}>
                 Close inspector
               </button>
@@ -519,20 +711,18 @@ export function Graph({
           </div>
         )}
         <span>
-          {registerNodes.length} records ·{" "}
+          {view === "connected" && !list
+            ? `${layout.nodes.length} of ${registerNodes.length} records in this view`
+            : `${registerNodes.length} records`}{" "}
+          ·{" "}
           {graph.pending
             ? "Projection catching up; current records shown"
             : "Current authoritative records"}
-          {graph.truncated ? " · First 150 records" : ""}
+          {graph.truncated ? " · Node budget reached; choose a focus" : ""}
+          {graph.scanTruncated ? " · Large workspace: partial scan" : ""}
         </span>
       </div>
-      {view === "work" && (
-        <p className="subtle">
-          This view shows task ownership and performance. Workflow handoff
-          contracts have not been defined; position does not imply an execution
-          order.
-        </p>
-      )}
+      {view !== "org" && !list && <p className="subtle">{layout.note}</p>}
     </div>
   );
 }

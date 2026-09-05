@@ -6,6 +6,7 @@ import {
   type User,
 } from "../shared/domain.ts";
 import { fail, getRecord, putRecord, setState } from "./db.ts";
+import { validateFlow } from "../shared/workflow.ts";
 export async function validateReferences(
   db: pg.PoolClient,
   company: string,
@@ -28,7 +29,13 @@ export async function validateReferences(
     if (manager?.data.email === d.email)
       fail(422, "REPORTING_CYCLE", "A person cannot report to themselves.");
   }
-  for (const key of ["ownerId", "performerId", "personId"])
+  for (const key of [
+    "ownerId",
+    "performerId",
+    "personId",
+    "sponsorId",
+    "exceptionOwnerId",
+  ])
     if (d[key]) await requireKind(d[key], "person");
   for (const id of [
     ...(d.evidenceIds || []),
@@ -42,13 +49,11 @@ export async function validateReferences(
         "Use an accepted, current evidence source.",
       );
   }
-  if (kind === "task" && !d.evidenceIds.length)
-    fail(
-      422,
-      "EVIDENCE_REQUIRED",
-      "A task needs at least one accepted source.",
-    );
   for (const id of d.taskIds || []) await requireKind(id, "task");
+  for (const id of d.handoffIds || []) await requireKind(id, "handoff");
+  for (const key of ["sourceTaskId", "targetTaskId"])
+    if (d[key]) await requireKind(d[key], "task");
+  if (d.interventionId) await requireKind(d.interventionId, "intervention");
   if (d.candidateId) await requireKind(d.candidateId, "candidate");
   if (d.metricId) await requireKind(d.metricId, "metric");
   if (d.assetId) {
@@ -78,6 +83,22 @@ export async function createOrEdit(
   await validateReferences(db, company, kind, d);
   if (existing && existing.kind !== kind)
     fail(422, "INVALID_KIND", "A record cannot change type.");
+  if (kind === "person") {
+    const duplicate = await db.query(
+      "SELECT id FROM records WHERE company_id=$1 AND kind='person' AND lower(data->>'email')=lower($2) AND id<>$3",
+      [
+        company,
+        d.email,
+        existing?.id || "00000000-0000-0000-0000-000000000000",
+      ],
+    );
+    if (duplicate.rowCount)
+      fail(
+        409,
+        "DUPLICATE_PERSON",
+        "A person with this email already exists in this workspace. Review that record rather than creating an alias.",
+      );
+  }
   if (existing && ["evidence", "request"].includes(kind))
     fail(
       409,
@@ -110,8 +131,95 @@ export async function createOrEdit(
       intervention: "proposed",
       agent: "draft",
       review: "open",
+      engagement: "draft",
+      duty: "proposed",
+      handoff: "proposed",
+      outcome: "proposed",
+      workflow: "proposed",
     } as any
   )[kind];
+  if (kind === "workflow") {
+    d.taskBindings = [];
+    d.handoffBindings = [];
+    d.links = [];
+    for (const id of d.taskIds) {
+      const r = await getRecord(db, company, id);
+      d.taskBindings.push({
+        id,
+        version: r.version,
+        hash: r.hash,
+        title: r.title,
+      });
+    }
+    for (const id of d.handoffIds) {
+      const r = await getRecord(db, company, id);
+      d.handoffBindings.push({ id, version: r.version, hash: r.hash });
+      d.links.push({
+        id,
+        from: r.data.sourceTaskId,
+        to: r.data.targetTaskId,
+        condition: r.data.condition,
+      });
+    }
+    const issues = validateFlow(d.taskIds, d.links);
+    if (issues.length) fail(422, "INVALID_WORKFLOW", issues.join(" "));
+  }
+  if (kind === "engagement") {
+    try {
+      new Intl.DateTimeFormat("en", { timeZone: d.timezone }).format();
+    } catch {
+      fail(
+        422,
+        "INVALID_TIMEZONE",
+        "Choose an IANA timezone, such as America/New_York.",
+      );
+    }
+  }
+  if (["duty", "handoff", "outcome"].includes(kind)) {
+    d.sourceBindings = [];
+    for (const id of d.evidenceIds) {
+      const source = await getRecord(db, company, id);
+      d.sourceBindings.push({ id, version: source.version, hash: source.hash });
+    }
+  }
+  if (kind === "duty" || kind === "handoff") {
+    d.taskBindings = [];
+    for (const id of kind === "duty"
+      ? d.taskIds
+      : [d.sourceTaskId, d.targetTaskId]) {
+      const task = await getRecord(db, company, id);
+      d.taskBindings.push({ id, version: task.version, hash: task.hash });
+    }
+  }
+  if (kind === "outcome") {
+    const intervention = await getRecord(db, company, d.interventionId);
+    const metric = await getRecord(db, company, intervention.data.metricId);
+    d.predictionSnapshot = {
+      id: intervention.id,
+      version: intervention.version,
+      hash: intervention.hash,
+      prediction: intervention.data.prediction,
+      candidateId: intervention.data.candidateId,
+    };
+    d.measurementSnapshot = {
+      id: metric.id,
+      version: metric.version,
+      hash: metric.hash,
+      baseline: metric.data.baseline,
+      target: metric.data.target,
+      unit: metric.data.unit,
+      observations: metric.data.observations || [],
+    };
+    if (
+      d.result !== "inconclusive" &&
+      !d.measurementSnapshot.observations.length
+    )
+      fail(
+        422,
+        "MEASUREMENTS_REQUIRED",
+        "Record measured observations before concluding that a prediction is supported or falsified. Otherwise choose inconclusive.",
+      );
+  }
   if (kind === "task") {
     d.reviewed = false;
   }
@@ -182,13 +290,17 @@ export async function createOrEdit(
     existing,
     d.reason || "Reviewed record change",
   );
-  if (existing && kind === "task") {
+  if (existing && ["task", "handoff"].includes(kind)) {
     const agents = await db.query(
-      "SELECT * FROM records WHERE company_id=$1 AND kind='agent'",
+      "SELECT * FROM records WHERE company_id=$1 AND kind IN ('agent','duty','handoff','workflow')",
       [company],
     );
     for (const agent of agents.rows)
-      if (agent.data.taskIds.includes(existing.id))
+      if (
+        agent.data.taskIds?.includes(existing.id) ||
+        agent.data.taskBindings?.some((b: any) => b.id === existing.id) ||
+        agent.data.handoffBindings?.some((b: any) => b.id === existing.id)
+      )
         await setState(
           db,
           user,

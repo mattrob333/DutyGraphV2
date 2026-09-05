@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { workSchemas } from "./work-model.ts";
+import { workflowSchema } from "./workflow.ts";
 export const evidenceLabels = [
   "Known",
   "Inferred",
@@ -11,6 +13,8 @@ const optional = z.string().max(20000).default("");
 const ids = z.array(z.string().uuid()).max(150).default([]);
 const lines = z.array(z.string().max(1000)).max(80).default([]);
 export const schemas = {
+  ...workSchemas,
+  workflow: workflowSchema,
   person: z
     .object({
       name: short,
@@ -48,8 +52,8 @@ export const schemas = {
     .object({
       title: short,
       duty: short,
-      ownerId: z.uuid(),
-      performerId: z.uuid(),
+      ownerId: z.union([z.uuid(), z.literal("")]).default(""),
+      performerId: z.union([z.uuid(), z.literal("")]).default(""),
       purpose: text,
       trigger: text,
       inputs: text,
@@ -84,6 +88,8 @@ export const schemas = {
       personId: z.uuid(),
       type: z.enum(["work", "leadership", "confirmation"]),
       questions: z.array(short).min(1).max(10),
+      questionPlanVersion: z.string().max(100).default("custom-v1"),
+      questionIds: z.array(z.string().max(100)).max(10).default([]),
       taskIds: ids,
       dueDate: z.iso.date(),
       notice: text,
@@ -149,7 +155,8 @@ export const schemas = {
     })
     .strict(),
 };
-export type Kind = keyof typeof schemas | "response" | "framework" | "export";
+export type Kind =
+  keyof typeof schemas | "response" | "framework" | "export" | "brief" | "case";
 export type RecordRow = {
   id: string;
   company_id: string;
@@ -192,6 +199,7 @@ export function confirmationStatus(
   now = Date.now(),
 ) {
   if (task.data.conflict) return "conflicting";
+  if (!task.data.ownerId || !task.data.performerId) return "proposed";
   if (
     task.state === "stale" ||
     new Date(task.data.reviewDue + "T23:59:59Z").getTime() < now

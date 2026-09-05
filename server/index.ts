@@ -9,12 +9,10 @@ import path from "node:path";
 const app = createApp();
 app.use("/api/v1/companies/:companyId/assets", assetsRouter());
 app.use("/api", (_req, res) =>
-  res
-    .status(404)
-    .json({
-      code: "NOT_IMPLEMENTED",
-      message: "This API route is not implemented in the local pilot.",
-    }),
+  res.status(404).json({
+    code: "NOT_IMPLEMENTED",
+    message: "This API route is not implemented in the local pilot.",
+  }),
 );
 if (process.argv.includes("--production")) {
   app.use(express.static(path.resolve("dist")));
@@ -55,9 +53,13 @@ const retention = setInterval(
     runRetention().catch(() => console.error("Audio retention job delayed.")),
   60000,
 );
-void runRetention();
-process.on("SIGTERM", () => {
+void runRetention().catch(() =>
+  console.error("Initial audio retention check delayed."),
+);
+const shutdown = () => {
   clearInterval(worker);
   clearInterval(retention);
   server.close(() => pool.end().then(() => process.exit(0)));
-});
+};
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

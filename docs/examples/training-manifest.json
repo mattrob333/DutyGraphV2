@@ -1,0 +1,276 @@
+{
+  "generatedAt": "2026-09-05T21:13:12.835Z",
+  "synthetic": true,
+  "companyId": "dbb45938-2ccf-43b1-a1bb-ae9802213efa",
+  "companyName": "Northstar Parts — Advisor Training 2026-09-05 21:13",
+  "recordCount": 36,
+  "assertions": {
+    "confirmedTasks": 3,
+    "rosterPeople": 4,
+    "completedCases": 1,
+    "casesNeedingAttention": 1,
+    "reviewedOutcome": "inconclusive",
+    "externalActions": 0
+  },
+  "packages": [
+    "executive-client-example.zip",
+    "weekly-client-example.zip",
+    "audit-client-example.zip",
+    "confirmed-internal-example.zip",
+    "agent-internal-example.zip"
+  ],
+  "records": [
+    {
+      "id": "c8298462-2188-4a4f-ae89-e8b171b2c6cd",
+      "kind": "person",
+      "title": "Alex Morgan",
+      "state": "reported",
+      "version": 1
+    },
+    {
+      "id": "28b0a8a3-1121-4de7-aeda-f8b219f3e1d5",
+      "kind": "person",
+      "title": "Jamie Park",
+      "state": "reported",
+      "version": 1
+    },
+    {
+      "id": "9c2228bd-b53d-447c-80c0-41a29639fec6",
+      "kind": "person",
+      "title": "Sam Rivera",
+      "state": "reported",
+      "version": 1
+    },
+    {
+      "id": "620e8fe1-87e8-4887-8f44-062bb153f441",
+      "kind": "person",
+      "title": "Robin Ellis",
+      "state": "reported",
+      "version": 1
+    },
+    {
+      "id": "6f675d4b-19ae-499f-9a33-aec70b146a78",
+      "kind": "engagement",
+      "title": "Northstar order-flow training engagement",
+      "state": "reviewed",
+      "version": 1
+    },
+    {
+      "id": "63b8a565-951d-4f7a-b7a5-af70ebbed509",
+      "kind": "request",
+      "title": "Northstar executive kickoff",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "af6e2dc2-6da0-4c7b-82e4-0275d76d53b9",
+      "kind": "response",
+      "title": "Northstar executive kickoff — response",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "f3a78fc8-5984-4651-8bc2-451b420c2666",
+      "kind": "evidence",
+      "title": "Northstar executive kickoff — participant response",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "bd996c74-54fc-43a9-964f-353f35dc99c2",
+      "kind": "evidence",
+      "title": "Training order checklist",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "8e222683-f678-4f7e-893d-534c5d237696",
+      "kind": "evidence",
+      "title": "Training queue observations",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "aa6c9162-e00f-4da5-99e0-4cfba672f672",
+      "kind": "task",
+      "title": "Check the incoming order",
+      "state": "confirmed",
+      "version": 2
+    },
+    {
+      "id": "5563fd51-12d2-44d2-9c14-b9cb3f78f6c7",
+      "kind": "task",
+      "title": "Record the credit-check result",
+      "state": "confirmed",
+      "version": 2
+    },
+    {
+      "id": "ecf8b304-e60a-4e07-981a-1a3c8183ed31",
+      "kind": "task",
+      "title": "Release the checked order",
+      "state": "confirmed",
+      "version": 2
+    },
+    {
+      "id": "6fb0ec93-f7c7-4655-825f-a30da9f97b24",
+      "kind": "request",
+      "title": "Jamie Park: confirm the described work",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "f6e54290-991c-41ad-b114-6157506d9872",
+      "kind": "response",
+      "title": "Jamie Park: confirm the described work — response",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "142bcbf2-5f17-4942-a498-c1ffd9bbe416",
+      "kind": "request",
+      "title": "Sam Rivera: confirm the described work",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "e2a1fb44-f9fe-468a-9149-ee913274d26c",
+      "kind": "response",
+      "title": "Sam Rivera: confirm the described work — response",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "0d791678-0a96-45b5-8278-d642e8e1309a",
+      "kind": "request",
+      "title": "Robin Ellis: confirm the described work",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "5d906875-3dbe-4026-b30d-2c23a2474ac8",
+      "kind": "response",
+      "title": "Robin Ellis: confirm the described work — response",
+      "state": "accepted",
+      "version": 1
+    },
+    {
+      "id": "3fb8c7fc-73c0-4305-904c-afb0a2ef8804",
+      "kind": "duty",
+      "title": "Prepare standard orders for fulfillment",
+      "state": "reviewed",
+      "version": 1
+    },
+    {
+      "id": "24702022-5f08-4615-9891-1bc4153938fa",
+      "kind": "handoff",
+      "title": "Intake to credit review",
+      "state": "reviewed",
+      "version": 1
+    },
+    {
+      "id": "b6a69656-f0cf-44fd-9816-ba585b20f12e",
+      "kind": "handoff",
+      "title": "Credit result to release",
+      "state": "reviewed",
+      "version": 1
+    },
+    {
+      "id": "cdbd0399-9334-4fdc-aca3-0fcfffd7d67b",
+      "kind": "workflow",
+      "title": "Standard order review and release",
+      "state": "reviewed",
+      "version": 1
+    },
+    {
+      "id": "9459c25a-7e21-48e9-978c-627911654588",
+      "kind": "case",
+      "title": "TRAIN-001: completed standard order",
+      "state": "complete",
+      "version": 4
+    },
+    {
+      "id": "0ac7dd98-76cc-4b50-875d-518a4b1e020d",
+      "kind": "case",
+      "title": "TRAIN-002: missing customer reference",
+      "state": "needs_attention",
+      "version": 2
+    },
+    {
+      "id": "17cf3014-9723-4440-a7c9-d4418dd487c9",
+      "kind": "metric",
+      "title": "Median order release duration",
+      "state": "defined",
+      "version": 2
+    },
+    {
+      "id": "a4c0be58-b6e0-48b4-b1dc-87bc77e3479c",
+      "kind": "candidate",
+      "title": "Incomplete intake may delay order release",
+      "state": "constraint_hypothesis",
+      "version": 1
+    },
+    {
+      "id": "bacbf17e-af66-4d34-958f-c82791f7831c",
+      "kind": "intervention",
+      "title": "Try a complete-intake checklist",
+      "state": "proposed",
+      "version": 1
+    },
+    {
+      "id": "af7973ea-460e-4165-960d-7980e7391cba",
+      "kind": "outcome",
+      "title": "Practice week outcome: inconclusive",
+      "state": "reviewed",
+      "version": 1
+    },
+    {
+      "id": "60d3762c-357a-4e01-8a7d-5f3f26a8d896",
+      "kind": "review",
+      "title": "Practice review: resolve TRAIN-002 and improve measurement",
+      "state": "open",
+      "version": 1
+    },
+    {
+      "id": "284ce006-984b-40c9-a36f-7c292d776b60",
+      "kind": "agent",
+      "title": "Order checklist drafting proposal",
+      "state": "draft",
+      "version": 1
+    },
+    {
+      "id": "c52085a5-347e-413d-868a-50f607c5c25c",
+      "kind": "brief",
+      "title": "Northstar Parts — executive training example",
+      "state": "approved",
+      "version": 1
+    },
+    {
+      "id": "a554c7fe-079e-450f-872d-88d635647887",
+      "kind": "brief",
+      "title": "Northstar Parts — weekly training example",
+      "state": "approved",
+      "version": 1
+    },
+    {
+      "id": "30328395-b849-440a-a502-07aa5bbf3c30",
+      "kind": "brief",
+      "title": "Northstar Parts — audit training example",
+      "state": "approved",
+      "version": 1
+    },
+    {
+      "id": "0d03327a-87e8-4997-83aa-64fd070fa94a",
+      "kind": "export",
+      "title": "Confirmed work packet · 2026-09-05",
+      "state": "ready",
+      "version": 1
+    },
+    {
+      "id": "e015cc1f-2b7e-4d4b-b2cd-1d1624c8f03d",
+      "kind": "export",
+      "title": "Draft agent package · 2026-09-05",
+      "state": "ready",
+      "version": 1
+    }
+  ]
+}

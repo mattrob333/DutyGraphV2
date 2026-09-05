@@ -1,6 +1,6 @@
 {
   "name": "dutygraph-v2",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -8,14 +8,20 @@
   },
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsx scripts/handbook.ts && tsc --noEmit && vite build",
     "start": "tsx server/index.ts --production",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "setup": "node scripts/setup.mjs",
     "db:migrate": "tsx server/migrate.ts",
     "verify": "npm run build && npm test",
-    "contracts": "tsx scripts/contracts.ts"
+    "contracts": "tsx scripts/contracts.ts",
+    "backup": "node scripts/backup.mjs create",
+    "restore:drill": "node scripts/backup.mjs drill",
+    "training": "tsx scripts/training.ts",
+    "handbook": "tsx scripts/handbook.ts",
+    "benchmark": "tsx scripts/benchmark.ts",
+    "package:release": "node scripts/package-release.mjs"
   },
   "dependencies": {
     "@fontsource/dm-sans": "5.3.0",

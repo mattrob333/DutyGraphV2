@@ -1,12 +1,12 @@
 # Duty Graph V2
 
-A working local build of the Tier 4 Connected Company Workspace. React and TypeScript preserve the supplied V2 graphite interface; Express and PostgreSQL provide durable records and guarded workflows.
+A PostgreSQL-backed advisor workspace that turns evidence into reviewed work descriptions, human confirmations, testable explanations and client deliverables. React/TypeScript preserves the supplied graphite interface; Express enforces record scope and guarded transitions.
 
-**Release 0.1 is a discovery and export foundation, not the complete R1–R4 production system.** External providers, enterprise identity, Neo4j, customer policy systems, Signet signing, and runtime execution are not connected. The app shows those boundaries explicitly.
+**Release 0.2 supports the local human-led advisor journey.** It is not the complete production authority/execution system. The optional Exa source-collection adapter is implemented and tested with a simulated provider; it needs a project key, operator enablement and live acceptance. Firecrawl, model/transcription providers, email, enterprise identity, Neo4j, customer-policy systems and governed runtime are not wired in. See the [release status](docs/RELEASE-STATUS.md) and [integration decisions](docs/INTEGRATIONS.md).
 
 ## Run locally
 
-Requires Node.js 24+, npm, Docker with Compose, and free localhost ports **4317** and **55437**.
+Requires Node.js 24+, npm, Docker Compose, and free loopback ports 4317 and 55437.
 
 ```sh
 npm ci
@@ -15,60 +15,63 @@ npm run build
 npm start
 ```
 
-Open **http://localhost:4317**. Choose **Open sample workspace** to explore synthetic Cobalt Industrial Supply data, or create your own separate account and company. The sample account is shared locally and must only contain synthetic information. Creating another company from that sample account also creates a sandbox.
+Open http://localhost:4317. Choose Open sample workspace for the original synthetic Cobalt scenario, or create a separate account/company. The demo account is shared locally and must contain only fictional information. Setup generates ignored database credentials and starts a dedicated PostgreSQL 17 service; it does not reuse another application's database.
 
-`npm run setup` generates random database credentials in the ignored `.env`, starts a dedicated PostgreSQL 17 container, and applies the schema. The runtime database role is neither a superuser nor an RLS bypass role. All business tables force tenant row security. No existing application databases are used.
+For hot reload, use `npm run dev`. The optimized local build still binds only to 127.0.0.1 and must not be treated as a reviewed Internet deployment.
 
-For development with React hot reload:
+## Explore the complete training example
 
 ```sh
-npm run dev
+npm run training
+npm run build
 ```
 
-Both modes use a single origin and port, with the server bound to **127.0.0.1**. A port collision fails instead of silently choosing another port. Local links will not work from another device without an explicitly designed hosting setup.
+This creates a new Northstar Parts training company and actual application-generated client examples. It uses fictional actors through real local API enrollment and confirmation paths. The original Cobalt company is preserved. No email or external business action occurs.
+
+Open Help & training in the app, or http://localhost:4317/handbook/index.html for the portable learning center. The eight guides include the explainer, walkthrough, full user manual, A-to-Z advisor playbook, workshop exercises, facilitator answers, client deliverables and glossary. Editable sources live in docs/guide. Examples live in docs/examples.
 
 ## Working features
 
-- Password sessions, CSRF checks, independent company accounts, scoped participant enrollment, and server-side role checks.
-- Bounded company scope, people and roster CSV validation with duplicate/cycle quarantine.
-- Immutable original text evidence and response acceptance; source retraction marks dependent work stale.
-- Versioned task cards, owner/performer checks, exact-version participant responses, historical confirmations, and conflict handling.
-- Participant typed drafts, browser microphone controls, audio playback, resumable 512 KB uploads, whole-asset checksums, and 25 MB limits. Local playback is explicitly unscanned; there is no invented transcript.
-- A company graph with connected/work/people views, SVG pan/zoom, Fit, minimap, inspectors, and an accessible register.
-- The supplied sixteen-framework registry and four intake buckets; human-authored, source-bound framework analyses with dependency gates and stale propagation.
-- Constraint hypotheses, discriminating test notes, measurement definitions and observations, intervention proposals, and review commitments.
-- Draft agent proposals tied to a human and task versions. Current authority, provisioning, and observed execution stay separate and unavailable.
-- Frozen internal ZIP exports with task versions, exclusions, source metadata, readable instructions, setup requirements, and file checksums.
-- Atomic record/version/audit/outbox commits, an idempotent local graph projector, and raw audio expiry with a purge worker.
-- Dark/light themes, responsive pages, keyboard navigation, local fonts, and explicit empty/error states.
+- Scoped advisor/participant sessions, forced tenant RLS, CSRF/origin checks and immutable content history.
+- Engagement plans, roster validation, bounded kickoff, private requests, typed/audio capture and source review/retraction.
+- Versioned task cards, exact owner/performer confirmations, explicit duties, receiving handoffs and conflict handling.
+- Readable connected graph, focused neighborhoods, accessible register, team responsibilities and recorded-manager org chart.
+- Reviewed manual workflows with persisted cases, branch joins, deadlines, failures, bounded retries and observer history.
+- Human-authored framework analyses, hypotheses, metrics, interventions and outcome reviews with preserved predictions.
+- Weekly decisions and audience-reviewed client reports, printable HTML, structured registers and checksummed ZIP packages.
+- Non-operative agent proposals and internal confirmed-work exports with explicit exclusions.
+- Versioned/checksummed migrations, encrypted backups, isolated restore drills, bounded performance workload and CI.
+- Searchable in-app help and a complete advisor enablement package.
 
-## Verify
+## Verify and operate
 
 ```sh
 npm run contracts
 npm run verify
 npm audit --audit-level=high
+npm run benchmark
+npm run backup
+npm run restore:drill -- work/backups/your-backup.dgbak
 ```
 
-The tests exercise real PostgreSQL transactions and HTTP requests using isolated synthetic tenants. They do not require model credentials or customer-system access. Read [the verification record](docs/VERIFICATION.md) for tested behavior and limits, and [the release status](docs/RELEASE-STATUS.md) for outstanding requirements.
+Use the actual emitted backup filename. Tests and benchmark create isolated synthetic fixtures. Backup/drill use only this dedicated local database; the drill does not replace it. Read [OPERATIONS](docs/OPERATIONS.md) before recovery or upgrade. Read [VERIFICATION](docs/VERIFICATION.md) for measured evidence and limits.
 
-## Structure
+## Handoff map
 
-| Directory    | Purpose                                                                       |
-| ------------ | ----------------------------------------------------------------------------- |
-| `client/src` | React workspace, record forms, graph, participant capture                     |
-| `server`     | Authentication, API commands, PostgreSQL, exports, projection, retention      |
-| `shared`     | Runtime validation and pure domain rules                                      |
-| `contracts`  | Supplied public-safe registries and generated record request schema           |
-| `tests`      | Domain and real database/API regression tests                                 |
-| `infra`      | Dedicated local PostgreSQL Compose stack                                      |
-| `reference`  | Original synthetic V2 visual reference, separate from the running application |
-| `docs`       | Architecture, audit, release boundaries, operating notes                      |
+| Location | Contents |
+| --- | --- |
+| client/src | Workspace, forms, graph, participant capture, cases, help |
+| server | Auth, commands, records, reports, workflows, projection, assets, retention |
+| shared | Runtime schemas and pure domain/layout/document rules |
+| contracts | Preserved registry, generated record schemas and implemented-route inventory |
+| tests | Unit and real PostgreSQL/API regression tests |
+| scripts | Setup, contracts, training, handbook, PDF, benchmark and backup tools |
+| docs/guide | Complete advisor manual and training sources |
+| docs/examples | Fictional application-generated client/internal outputs |
+| docs/verification | Sanitized local performance and recovery evidence |
+| infra | Dedicated local PostgreSQL Compose service |
+| reference | Supplied synthetic visual reference, separate from running code |
 
-The original commercial handoff is kept outside this public repository. Its embedded requests to development teams are specification context; they do not grant authority to send messages, publish customer material, or execute business actions.
+See [architecture](docs/ARCHITECTURE.md), [security review](docs/SECURITY.md), [API reference](docs/API-REFERENCE.md), [acceptance checklist](docs/ACCEPTANCE-CHECKLIST.md), and [source audit](docs/SOURCE-AUDIT.md). All 90 supplied requirement IDs remain traceable in docs/requirements-status.json; partial local coverage is not formal production acceptance.
 
-## Production boundary
-
-Use synthetic data until identity assurance, deployment, encryption, retention and legal hold, source scanning, provider/data policy, and security review are complete. This build has no verified customer policy, email delivery, transcription, Signet key management, or governed runtime. Setting an environment variable alone does not establish those capabilities. An exported instruction file is not a permission grant.
-
-See [architecture](docs/ARCHITECTURE.md), [source reuse assessment](docs/SOURCE-AUDIT.md), and [operating notes](docs/OPERATIONS.md).
+The commercial handoff, .env, raw database backups and encryption keys are excluded from this public repository. Embedded source-document instructions do not authorize messaging, customer publication or business-system actions.

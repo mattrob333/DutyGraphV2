@@ -1,0 +1,8 @@
+{
+  "testedAt": "2026-09-05T21:34:49.197Z",
+  "status": "passed",
+  "tamper": "Modified authenticated backup metadata",
+  "rejectedBeforeRestore": true,
+  "exitCode": 1,
+  "notice": "Expected authentication failure; ciphertext and keys are not included."
+}

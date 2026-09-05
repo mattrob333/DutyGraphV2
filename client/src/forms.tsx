@@ -15,6 +15,166 @@ type Def = {
   hint?: string;
 };
 export const fieldSets: Record<string, Def[]> = {
+  workflow: [
+    { key: "title", label: "Workflow name" },
+    { key: "purpose", label: "Purpose", type: "textarea" },
+    { key: "ownerId", label: "Accountable case owner", type: "person" },
+    { key: "taskIds", label: "Task steps", type: "tasks" },
+    {
+      key: "handoffIds",
+      label: "Connecting handoff contracts",
+      type: "handoffs",
+      hint: "Connect every selected task. Create and review handoff contracts first.",
+    },
+    {
+      key: "joinPolicy",
+      label: "When paths meet",
+      options: ["all", "any"],
+      hint: "All waits for every incoming path to finish or be explicitly skipped. Any starts when the first selected incoming path completes.",
+    },
+    {
+      key: "timeoutHours",
+      label: "Escalate a ready step after (hours)",
+      type: "number",
+    },
+    {
+      key: "maxAttempts",
+      label: "Maximum attempts per step, including the first",
+      type: "number",
+    },
+    { key: "reason", label: "Reason for this version" },
+  ],
+  engagement: [
+    { key: "title", label: "Engagement name" },
+    { key: "sponsorId", label: "Executive sponsor", type: "personOptional" },
+    {
+      key: "totalHeadcount",
+      label: "Total company headcount, if known",
+      type: "number",
+      required: false,
+      hint: "Participation coverage is measured against the roster, not total headcount.",
+    },
+    { key: "outcome", label: "Business outcome", type: "textarea" },
+    { key: "startDate", label: "Start date", type: "date" },
+    { key: "endDate", label: "End date", type: "date" },
+    { key: "systems", label: "Systems in scope (one per line)", type: "lines" },
+    { key: "locations", label: "Locations (one per line)", type: "lines" },
+    { key: "inScope", label: "Work and teams in scope", type: "textarea" },
+    { key: "outOfScope", label: "Explicit exclusions", type: "textarea" },
+    {
+      key: "sourcePolicy",
+      label: "Approved source types and collection boundaries",
+      type: "textarea",
+    },
+    {
+      key: "visibility",
+      label: "Who can see recordings, sources and summaries?",
+      type: "textarea",
+    },
+    {
+      key: "retentionDays",
+      label: "Agreed record retention (days)",
+      type: "number",
+      hint: "The application applies its configured asset retention separately; record the engagement agreement here.",
+    },
+    { key: "reviewCadence", label: "Review cadence" },
+    {
+      key: "timezone",
+      label: "Timezone",
+      hint: "Use an IANA name, such as America/New_York.",
+    },
+    {
+      key: "successCriteria",
+      label: "How will success be judged?",
+      type: "textarea",
+    },
+  ],
+  duty: [
+    { key: "title", label: "Standing duty" },
+    {
+      key: "ownerId",
+      label: "Proposed accountable owner",
+      type: "personOptional",
+    },
+    { key: "purpose", label: "Purpose", type: "textarea" },
+    { key: "scope", label: "Scope and boundaries", type: "textarea" },
+    { key: "taskIds", label: "Tasks supporting this duty", type: "tasks" },
+    {
+      key: "evidenceIds",
+      label: "Evidence for duty accountability",
+      type: "evidence",
+    },
+    { key: "reviewDue", label: "Review due", type: "date" },
+    { key: "reason", label: "Reason for this version" },
+  ],
+  handoff: [
+    { key: "title", label: "Handoff name" },
+    { key: "sourceTaskId", label: "From task", type: "task" },
+    { key: "targetTaskId", label: "To task", type: "task" },
+    { key: "condition", label: "Handoff happens when", type: "textarea" },
+    {
+      key: "outputMapping",
+      label: "Output being handed over",
+      type: "textarea",
+    },
+    {
+      key: "requiredInput",
+      label: "Input the next task requires",
+      type: "textarea",
+    },
+    {
+      key: "acceptanceCheck",
+      label: "How the receiving person checks completeness",
+      type: "textarea",
+    },
+    {
+      key: "exceptionOwnerId",
+      label: "Person accountable for exceptions",
+      type: "person",
+    },
+    { key: "timeoutHours", label: "Escalate after (hours)", type: "number" },
+    { key: "maxRetries", label: "Maximum retries", type: "number" },
+    {
+      key: "failureAction",
+      label: "What happens on rejection or timeout?",
+      type: "textarea",
+    },
+    { key: "evidenceIds", label: "Supporting evidence", type: "evidence" },
+    { key: "reason", label: "Reason for this version" },
+  ],
+  outcome: [
+    { key: "title", label: "Outcome review name" },
+    {
+      key: "interventionId",
+      label: "Intervention being evaluated",
+      type: "intervention",
+    },
+    { key: "ownerId", label: "Reviewer", type: "person" },
+    {
+      key: "result",
+      label: "What does the evidence support?",
+      options: ["inconclusive", "supported", "falsified"],
+    },
+    { key: "observationWindow", label: "Observation window" },
+    {
+      key: "coverage",
+      label: "Coverage and missing observations",
+      type: "textarea",
+    },
+    {
+      key: "confounders",
+      label: "Other factors that could explain the result",
+      type: "textarea",
+    },
+    {
+      key: "interpretation",
+      label: "Interpretation against the original prediction",
+      type: "textarea",
+    },
+    { key: "nextAction", label: "Next action", type: "textarea" },
+    { key: "evidenceIds", label: "Outcome evidence", type: "evidence" },
+    { key: "reason", label: "Reason for this version" },
+  ],
   person: [
     { key: "name", label: "Full name" },
     { key: "email", label: "Work email", type: "email" },
@@ -66,8 +226,17 @@ export const fieldSets: Record<string, Def[]> = {
   task: [
     { key: "title", label: "Task name" },
     { key: "duty", label: "Standing duty" },
-    { key: "ownerId", label: "Accountable human owner", type: "person" },
-    { key: "performerId", label: "Person doing this work", type: "person" },
+    {
+      key: "ownerId",
+      label: "Accountable human owner",
+      type: "personOptional",
+      hint: "Unresolved ownership can be saved as a proposal; it blocks confirmation and delegation.",
+    },
+    {
+      key: "performerId",
+      label: "Person doing this work",
+      type: "personOptional",
+    },
     { key: "purpose", label: "Purpose", type: "textarea" },
     { key: "trigger", label: "Starts when", type: "textarea" },
     { key: "inputs", label: "Required inputs", type: "textarea" },
@@ -255,12 +424,14 @@ export function RecordForm({
   record,
   records,
   notice,
+  preset,
   onSave,
 }: {
   kind: string;
   record?: RecordRow;
   records: RecordRow[];
   notice: string;
+  preset?: Record<string, unknown>;
   onSave: (data: any) => Promise<void>;
 }) {
   const defs = fieldSets[kind];
@@ -271,12 +442,26 @@ export function RecordForm({
         record?.data[d.key] ??
         (d.type === "checkbox"
           ? false
-          : ["evidence", "tasks", "lines"].includes(d.type || "")
+          : ["evidence", "tasks", "handoffs", "lines"].includes(d.type || "")
             ? []
             : d.options?.[0] || "");
       if (d.type === "lines") v[d.key] = (v[d.key] || []).join("\n");
     }
     if (!record) {
+      if (kind === "workflow") {
+        v.timeoutHours = 24;
+        v.maxAttempts = 2;
+      }
+      if (kind === "engagement") {
+        v.retentionDays = 30;
+        v.reviewCadence = "Weekly";
+        v.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        v.visibility = notice;
+      }
+      if (kind === "handoff") {
+        v.timeoutHours = 24;
+        v.maxRetries = 0;
+      }
       if (kind === "request") {
         v.questions = capturePrompts.join("\n");
         v.notice = notice;
@@ -289,7 +474,7 @@ export function RecordForm({
             .toISOString()
             .slice(0, 10);
     }
-    return v;
+    return record ? v : { ...v, ...preset };
   });
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false);
@@ -335,6 +520,8 @@ export function RecordForm({
             personOptional: "person",
             candidate: "candidate",
             metric: "metric",
+            task: "task",
+            intervention: "intervention",
           };
           const refKind = refKinds[f.type || ""];
           const options = refKind
@@ -355,18 +542,23 @@ export function RecordForm({
             <Field
               key={f.key}
               label={f.label}
-              wide={["textarea", "lines", "evidence", "tasks"].includes(
-                f.type || "",
-              )}
+              wide={[
+                "textarea",
+                "lines",
+                "evidence",
+                "tasks",
+                "handoffs",
+              ].includes(f.type || "")}
               hint={f.hint}
             >
-              {["evidence", "tasks"].includes(f.type || "") ? (
+              {["evidence", "tasks", "handoffs"].includes(f.type || "") ? (
                 <div className="check-list">
                   {records
                     .filter((r) =>
                       f.type === "evidence"
                         ? r.kind === "evidence" && r.state === "accepted"
-                        : r.kind === "task",
+                        : r.kind ===
+                          (f.type === "handoffs" ? "handoff" : "task"),
                     )
                     .map((r) => (
                       <label className="check" key={r.id}>
@@ -393,13 +585,15 @@ export function RecordForm({
                   {!records.some((r) =>
                     f.type === "evidence"
                       ? r.kind === "evidence" && r.state === "accepted"
-                      : r.kind === "task",
+                      : r.kind === (f.type === "handoffs" ? "handoff" : "task"),
                   ) && (
                     <small>
                       Add{" "}
                       {f.type === "evidence"
                         ? "and accept an evidence source"
-                        : "a task card"}{" "}
+                        : f.type === "handoffs"
+                          ? "a handoff contract"
+                          : "a task card"}{" "}
                       first.
                     </small>
                   )}

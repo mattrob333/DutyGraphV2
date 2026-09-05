@@ -17,8 +17,15 @@ jobs:
       - run: npm ci
       - run: npm run setup
       - run: npm run contracts
-      - run: git diff --exit-code -- contracts/openapi.json
+      - run: git diff --exit-code -- contracts/openapi.json contracts/routes.json docs/API-REFERENCE.md
       - run: npm run verify
       - run: npm audit --audit-level=high
+      - name: Verify a synthetic advisor journey
+        run: npm run training
+      - name: Rehearse encrypted backup recovery
+        run: |
+          npm run backup
+          backup=$(find work/backups -name '*.dgbak' -type f | sort | tail -1)
+          npm run restore:drill -- "$backup"
       - if: always()
         run: docker compose --env-file .env -f infra/compose.yaml down

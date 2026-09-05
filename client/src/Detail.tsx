@@ -10,7 +10,9 @@ import {
 } from "lucide-react";
 import type { RecordRow } from "../../shared/domain.ts";
 import { Button, Field, ErrorBox, State, Badge, Row, date } from "./ui.tsx";
-import { api, downloadExport } from "./api.ts";
+import { api, downloadExport, downloadFile } from "./api.ts";
+import { fieldSets } from "./forms.tsx";
+import { WorkflowDetail } from "./WorkflowDetail.tsx";
 export function Detail({
   record: r,
   company,
@@ -80,6 +82,8 @@ export function Detail({
     "request",
     "export",
     "framework",
+    "brief",
+    "case",
   ].includes(r.kind);
   return (
     <div className="detail">
@@ -96,6 +100,243 @@ export function Detail({
         </div>
       </div>
       <ErrorBox error={error} />
+      {r.kind === "brief" && (
+        <>
+          <dl className="details">
+            <dt>Audience</dt>
+            <dd>{r.data.packet.audience.join("; ")}</dd>
+            <dt>Purpose</dt>
+            <dd>{r.data.packet.purpose}</dd>
+            <dt>Frozen company revision</dt>
+            <dd>{r.data.packet.sourceRevision}</dd>
+            <dt>Selected records</dt>
+            <dd>{r.data.packet.records.length}</dd>
+          </dl>
+          <h3>Executive summary</h3>
+          <p className="preserve-lines">{r.data.packet.summary}</p>
+          <h3>Next steps</h3>
+          <p className="preserve-lines">{r.data.packet.nextSteps}</p>
+          <h3>Limitations</h3>
+          <p>{r.data.packet.limitations}</p>
+          {r.state !== "withdrawn" && (
+            <a
+              className="btn"
+              href={`/api/v1/companies/${company}/reports/${r.id}/preview`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Preview client document
+            </a>
+          )}
+          {r.state === "draft" && (
+            <>
+              <div className="notice">
+                Review the complete preview and the named audience. Approval
+                applies to this exact report; changing records or audience
+                requires a new draft.
+              </div>
+              <Field label="Publication review rationale">
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                />
+              </Field>
+              <Button
+                primary
+                disabled={busy || note.trim().length < 5}
+                onClick={() =>
+                  void call(async () => {
+                    await api(
+                      `/v1/companies/${company}/reports/${r.id}/review`,
+                      "POST",
+                      {
+                        expectedVersion: r.version,
+                        contentHash: r.hash,
+                        decision: "approve",
+                        note,
+                      },
+                    );
+                    notify("Report reviewed for the named audience.");
+                  })
+                }
+              >
+                Approve for manual delivery
+              </Button>
+            </>
+          )}
+          {r.state === "approved" && (
+            <>
+              <div className="notice">
+                Approved for {r.data.packet.audience.join("; ")}. Download the
+                packet and deliver it through your agreed client channel.
+              </div>
+              <Button
+                primary
+                disabled={busy}
+                onClick={() =>
+                  void call(() =>
+                    downloadFile(
+                      `/api/v1/companies/${company}/reports/${r.id}/download`,
+                      `DutyGraph-Client-${r.id.slice(0, 8)}.zip`,
+                    ),
+                  )
+                }
+              >
+                Download client packet
+              </Button>
+              <Field label="Reason to withdraw this report">
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                />
+              </Field>
+              <Button
+                disabled={busy || note.trim().length < 5}
+                onClick={() =>
+                  void call(async () => {
+                    await api(
+                      `/v1/companies/${company}/reports/${r.id}/review`,
+                      "POST",
+                      {
+                        expectedVersion: r.version,
+                        contentHash: r.hash,
+                        decision: "withdraw",
+                        note,
+                      },
+                    );
+                    notify(
+                      "Future downloads withdrawn. Copies already delivered remain outside the workspace.",
+                    );
+                  })
+                }
+              >
+                Withdraw future downloads
+              </Button>
+            </>
+          )}
+        </>
+      )}
+      {["workflow", "case"].includes(r.kind) && (
+        <WorkflowDetail
+          record={r}
+          company={company}
+          records={records}
+          open={open}
+          refresh={refresh}
+        />
+      )}
+      {["engagement", "duty", "handoff", "outcome", "workflow"].includes(
+        r.kind,
+      ) && (
+        <>
+          <dl className="details">
+            {fieldSets[r.kind]
+              .filter(
+                (f) =>
+                  ![
+                    "title",
+                    "reason",
+                    "taskIds",
+                    "evidenceIds",
+                    "handoffIds",
+                  ].includes(f.key),
+              )
+              .map((f) => {
+                const value = r.data[f.key];
+                const linkedRecord = f.key.endsWith("Id")
+                  ? records.find((x) => x.id === value)
+                  : null;
+                return (
+                  <div key={f.key}>
+                    <dt>{f.label}</dt>
+                    <dd>
+                      {linkedRecord ? (
+                        <button
+                          className="text-link"
+                          onClick={() => open(linkedRecord)}
+                        >
+                          {linkedRecord.title}
+                        </button>
+                      ) : Array.isArray(value) ? (
+                        value.join(", ") || "Not recorded"
+                      ) : value === null || value === "" ? (
+                        "Not recorded"
+                      ) : (
+                        String(value)
+                      )}
+                    </dd>
+                  </div>
+                );
+              })}
+          </dl>
+          {r.data.handoffIds && (
+            <>
+              <h3>Handoff contracts</h3>
+              {linked(r.data.handoffIds)}
+            </>
+          )}
+          {r.data.taskIds && (
+            <>
+              <h3>Supporting tasks</h3>
+              {linked(r.data.taskIds)}
+            </>
+          )}
+          {r.data.evidenceIds && (
+            <>
+              <h3>Supporting evidence</h3>
+              {linked(r.data.evidenceIds)}
+            </>
+          )}
+          {r.kind === "outcome" && (
+            <>
+              <h3>
+                Original prediction — version{" "}
+                {r.data.predictionSnapshot.version}
+              </h3>
+              <p>{r.data.predictionSnapshot.prediction}</p>
+              <p>
+                Measurement snapshot: baseline{" "}
+                {r.data.measurementSnapshot.baseline ?? "missing"} · target{" "}
+                {r.data.measurementSnapshot.target ?? "not set"} ·{" "}
+                {r.data.measurementSnapshot.observations.length} observations
+              </p>
+              <div className="notice">
+                A reviewed falsified prediction reopens the constraint
+                candidate. It does not rewrite the original intervention.
+              </div>
+            </>
+          )}
+          {r.kind === "duty" && (
+            <div className="notice">
+              Duty accountability is a separate claim. Reviewing this record
+              does not confirm its tasks or authorize an agent.
+            </div>
+          )}
+          {r.kind === "handoff" && (
+            <div className="notice">
+              This contract pins the linked task versions and describes the
+              receiving check and exception path.
+            </div>
+          )}
+          {r.state !== "reviewed" && (
+            <>
+              <Field label="Review rationale">
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value)}
+                />
+              </Field>
+              <Button
+                primary
+                disabled={busy || !note.trim()}
+                onClick={() => void action("review", { note })}
+              >
+                Record advisor review
+              </Button>
+            </>
+          )}
+        </>
+      )}
       {r.kind === "task" && (
         <>
           <div className="ownership">

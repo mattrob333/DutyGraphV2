@@ -185,6 +185,12 @@ export async function command<T>(
   if (!key || key.length > 128)
     fail(400, "IDEMPOTENCY_REQUIRED", "A bounded Idempotency-Key is required.");
   return tx(user.tenant_id, async (db) => {
+    // Commands can affect several related records and a company revision. Serialize
+    // tenant writes before taking row locks so reviews and source invalidation
+    // cannot race. Read queries remain concurrent in this bounded local service.
+    await db.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
+      "tenant-command:" + user.tenant_id,
+    ]);
     await db.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
       user.tenant_id + user.id + key,
     ]);

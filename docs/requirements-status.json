@@ -1,636 +1,1467 @@
 {
-  "version": "0.1.0",
-  "notice": "Local implementation coverage only. No full production acceptance is claimed.",
+  "version": "0.2.0",
+  "notice": "Implementation traceability for the local advisor release. All full production acceptance decisions remain open. See RELEASE-STATUS and VERIFICATION for evidence and limits.",
   "requirements": [
     {
       "id": "FOUND-001",
       "title": "Audit and pin existing code",
       "targetRelease": "M0",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Pinned source inspection, architecture, developer threat model and reproducible local CI.",
+      "evidence": [
+        "docs/SOURCE-AUDIT.md",
+        "docs/ARCHITECTURE.md",
+        ".github/workflows/verify.yml"
+      ],
+      "remaining": "Independent predecessor execution audit, owner acceptance, full non-record API contract and production data-policy approval.",
+      "acceptanceTestId": "AT-FOUND-001"
     },
     {
       "id": "FOUND-002",
       "title": "Architecture and contract freeze",
       "targetRelease": "M0",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Pinned source inspection, architecture, developer threat model and reproducible local CI.",
+      "evidence": [
+        "docs/SOURCE-AUDIT.md",
+        "docs/ARCHITECTURE.md",
+        ".github/workflows/verify.yml"
+      ],
+      "remaining": "Independent predecessor execution audit, owner acceptance, full non-record API contract and production data-policy approval.",
+      "acceptanceTestId": "AT-FOUND-002"
     },
     {
       "id": "FOUND-003",
       "title": "Threat model and data handling approval",
       "targetRelease": "M0",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Pinned source inspection, architecture, developer threat model and reproducible local CI.",
+      "evidence": [
+        "docs/SOURCE-AUDIT.md",
+        "docs/ARCHITECTURE.md",
+        ".github/workflows/verify.yml"
+      ],
+      "remaining": "Independent predecessor execution audit, owner acceptance, full non-record API contract and production data-policy approval.",
+      "acceptanceTestId": "AT-FOUND-003"
     },
     {
       "id": "FOUND-004",
       "title": "Reproducible delivery pipeline",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Pinned source inspection, architecture, developer threat model and reproducible local CI.",
+      "evidence": [
+        "docs/SOURCE-AUDIT.md",
+        "docs/ARCHITECTURE.md",
+        ".github/workflows/verify.yml"
+      ],
+      "remaining": "Independent predecessor execution audit, owner acceptance, full non-record API contract and production data-policy approval.",
+      "acceptanceTestId": "AT-FOUND-004"
     },
     {
       "id": "TEN-001",
       "title": "Tenant and company isolation",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Local sessions, actor/person mapping, tenant RLS, company references and scoped participant enrollment.",
+      "evidence": [
+        "server/auth.ts",
+        "server/db.ts",
+        "server/schema.sql",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Verified corporate identity, recovery, company memberships, fine-grained evidence access and privileged stage separation.",
+      "acceptanceTestId": "AT-TEN-001"
     },
     {
       "id": "TEN-002",
       "title": "Identity versus person mapping",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Local sessions, actor/person mapping, tenant RLS, company references and scoped participant enrollment.",
+      "evidence": [
+        "server/auth.ts",
+        "server/db.ts",
+        "server/schema.sql",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Verified corporate identity, recovery, company memberships, fine-grained evidence access and privileged stage separation.",
+      "acceptanceTestId": "AT-TEN-002"
     },
     {
       "id": "TEN-003",
       "title": "Privileged role separation",
       "targetRelease": "R1",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "server/auth.ts",
+        "server/db.ts",
+        "server/schema.sql",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Verified corporate identity, recovery, company memberships, fine-grained evidence access and privileged stage separation.",
+      "acceptanceTestId": "AT-TEN-003"
     },
     {
       "id": "TEN-004",
       "title": "Secure participant enrollment",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Local sessions, actor/person mapping, tenant RLS, company references and scoped participant enrollment.",
+      "evidence": [
+        "server/auth.ts",
+        "server/db.ts",
+        "server/schema.sql",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Verified corporate identity, recovery, company memberships, fine-grained evidence access and privileged stage separation.",
+      "acceptanceTestId": "AT-TEN-004"
     },
     {
       "id": "TEN-005",
       "title": "UI persona is not permission",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Local sessions, actor/person mapping, tenant RLS, company references and scoped participant enrollment.",
+      "evidence": [
+        "server/auth.ts",
+        "server/db.ts",
+        "server/schema.sql",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Verified corporate identity, recovery, company memberships, fine-grained evidence access and privileged stage separation.",
+      "acceptanceTestId": "AT-TEN-005"
     },
     {
       "id": "DISC-001",
       "title": "Bounded engagement scope",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Bounded scope/kickoff, unique roster coverage, CSV quarantine, immutable requests, typed/audio response and manual invitations.",
+      "evidence": [
+        "client/src/Engagement.tsx",
+        "client/src/capture.tsx",
+        "server/roster.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production identity/source policies, alias reconciliation, email delivery/reminders and authenticated legacy import.",
+      "acceptanceTestId": "AT-DISC-001"
     },
     {
       "id": "DISC-002",
       "title": "Roster import and reconciliation",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Bounded scope/kickoff, unique roster coverage, CSV quarantine, immutable requests, typed/audio response and manual invitations.",
+      "evidence": [
+        "client/src/Engagement.tsx",
+        "client/src/capture.tsx",
+        "server/roster.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production identity/source policies, alias reconciliation, email delivery/reminders and authenticated legacy import.",
+      "acceptanceTestId": "AT-DISC-002"
     },
     {
       "id": "DISC-003",
       "title": "Unified executive discovery",
       "targetRelease": "R1",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "Four/five-question executive kickoff with stable question IDs and source-preserving participant flow; no AI synthesis.",
+      "evidence": [
+        "client/src/Engagement.tsx",
+        "client/src/capture.tsx",
+        "server/roster.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production identity/source policies, alias reconciliation, email delivery/reminders and authenticated legacy import.",
+      "acceptanceTestId": "AT-DISC-003"
     },
     {
       "id": "DISC-004",
       "title": "Raw capture instructions",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Bounded scope/kickoff, unique roster coverage, CSV quarantine, immutable requests, typed/audio response and manual invitations.",
+      "evidence": [
+        "client/src/Engagement.tsx",
+        "client/src/capture.tsx",
+        "server/roster.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production identity/source policies, alias reconciliation, email delivery/reminders and authenticated legacy import.",
+      "acceptanceTestId": "AT-DISC-004"
     },
     {
       "id": "DISC-005",
       "title": "Recording and alternatives",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Bounded scope/kickoff, unique roster coverage, CSV quarantine, immutable requests, typed/audio response and manual invitations.",
+      "evidence": [
+        "client/src/Engagement.tsx",
+        "client/src/capture.tsx",
+        "server/roster.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production identity/source policies, alias reconciliation, email delivery/reminders and authenticated legacy import.",
+      "acceptanceTestId": "AT-DISC-005"
     },
     {
       "id": "DISC-006",
       "title": "Resumable asset handling",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Bounded scope/kickoff, unique roster coverage, CSV quarantine, immutable requests, typed/audio response and manual invitations.",
+      "evidence": [
+        "client/src/Engagement.tsx",
+        "client/src/capture.tsx",
+        "server/roster.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production identity/source policies, alias reconciliation, email delivery/reminders and authenticated legacy import.",
+      "acceptanceTestId": "AT-DISC-006"
     },
     {
       "id": "DISC-007",
       "title": "Immutable request exchange",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Bounded scope/kickoff, unique roster coverage, CSV quarantine, immutable requests, typed/audio response and manual invitations.",
+      "evidence": [
+        "client/src/Engagement.tsx",
+        "client/src/capture.tsx",
+        "server/roster.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production identity/source policies, alias reconciliation, email delivery/reminders and authenticated legacy import.",
+      "acceptanceTestId": "AT-DISC-007"
     },
     {
       "id": "DISC-008",
       "title": "Delivery and reminder controls",
       "targetRelease": "R1",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "client/src/Engagement.tsx",
+        "client/src/capture.tsx",
+        "server/roster.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production identity/source policies, alias reconciliation, email delivery/reminders and authenticated legacy import.",
+      "acceptanceTestId": "AT-DISC-008"
     },
     {
       "id": "DISC-009",
       "title": "Safe legacy import",
       "targetRelease": "R1",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "client/src/Engagement.tsx",
+        "client/src/capture.tsx",
+        "server/roster.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production identity/source policies, alias reconciliation, email delivery/reminders and authenticated legacy import.",
+      "acceptanceTestId": "AT-DISC-009"
     },
     {
       "id": "EVID-001",
       "title": "Private evidence asset lifecycle",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Original source/response preservation, checksum-verified local audio, source origins/retraction and dependent staleness.",
+      "evidence": [
+        "server/assets.ts",
+        "server/records.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Private scanned storage, transcription lineage, grounded extraction, reviewed changesets and production ambiguity handling.",
+      "acceptanceTestId": "AT-EVID-001"
     },
     {
       "id": "EVID-002",
       "title": "Transcript lineage",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Original audio/response lineage is retained; no transcript generation is implemented.",
+      "evidence": [
+        "server/assets.ts",
+        "server/records.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Private scanned storage, transcription lineage, grounded extraction, reviewed changesets and production ambiguity handling.",
+      "acceptanceTestId": "AT-EVID-002"
     },
     {
       "id": "EVID-003",
       "title": "Grounded candidate extraction",
       "targetRelease": "R1",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "server/assets.ts",
+        "server/records.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Private scanned storage, transcription lineage, grounded extraction, reviewed changesets and production ambiguity handling.",
+      "acceptanceTestId": "AT-EVID-003"
     },
     {
       "id": "EVID-004",
       "title": "Failure and fallback honesty",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Original source/response preservation, checksum-verified local audio, source origins/retraction and dependent staleness.",
+      "evidence": [
+        "server/assets.ts",
+        "server/records.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Private scanned storage, transcription lineage, grounded extraction, reviewed changesets and production ambiguity handling.",
+      "acceptanceTestId": "AT-EVID-004"
     },
     {
       "id": "EVID-005",
       "title": "Reviewable changesets",
       "targetRelease": "R1",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "server/assets.ts",
+        "server/records.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Private scanned storage, transcription lineage, grounded extraction, reviewed changesets and production ambiguity handling.",
+      "acceptanceTestId": "AT-EVID-005"
     },
     {
       "id": "EVID-006",
       "title": "Contradictions and identity ambiguity",
       "targetRelease": "R1",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "Manual task conflicts, rejected ambiguous duplicate identities and reporting-cycle checks; no automated entity-resolution engine.",
+      "evidence": [
+        "server/assets.ts",
+        "server/records.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Private scanned storage, transcription lineage, grounded extraction, reviewed changesets and production ambiguity handling.",
+      "acceptanceTestId": "AT-EVID-006"
     },
     {
       "id": "EVID-007",
       "title": "Source origin and retraction",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Original source/response preservation, checksum-verified local audio, source origins/retraction and dependent staleness.",
+      "evidence": [
+        "server/assets.ts",
+        "server/records.ts",
+        "server/app.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Private scanned storage, transcription lineage, grounded extraction, reviewed changesets and production ambiguity handling.",
+      "acceptanceTestId": "AT-EVID-007"
     },
     {
       "id": "WORK-001",
       "title": "Versioned task card",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Versioned work, exact participant confirmation, separate duty/reporting claims, handoff contracts and durable human-observed cases.",
+      "evidence": [
+        "shared/domain.ts",
+        "shared/work-model.ts",
+        "shared/workflow.ts",
+        "server/workflows.ts",
+        "tests/api.test.ts",
+        "tests/workflow.test.ts"
+      ],
+      "remaining": "Complete production work/authority domain, independent duty/reporting confirmation and live execution adapter semantics.",
+      "acceptanceTestId": "AT-WORK-001"
     },
     {
       "id": "WORK-002",
       "title": "Exact-version confirmation",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Versioned work, exact participant confirmation, separate duty/reporting claims, handoff contracts and durable human-observed cases.",
+      "evidence": [
+        "shared/domain.ts",
+        "shared/work-model.ts",
+        "shared/workflow.ts",
+        "server/workflows.ts",
+        "tests/api.test.ts",
+        "tests/workflow.test.ts"
+      ],
+      "remaining": "Complete production work/authority domain, independent duty/reporting confirmation and live execution adapter semantics.",
+      "acceptanceTestId": "AT-WORK-002"
     },
     {
       "id": "WORK-003",
       "title": "Material-change policy",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Versioned work, exact participant confirmation, separate duty/reporting claims, handoff contracts and durable human-observed cases.",
+      "evidence": [
+        "shared/domain.ts",
+        "shared/work-model.ts",
+        "shared/workflow.ts",
+        "server/workflows.ts",
+        "tests/api.test.ts",
+        "tests/workflow.test.ts"
+      ],
+      "remaining": "Complete production work/authority domain, independent duty/reporting confirmation and live execution adapter semantics.",
+      "acceptanceTestId": "AT-WORK-003"
     },
     {
       "id": "WORK-004",
       "title": "Duty and reporting claims are independent",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Versioned work, exact participant confirmation, separate duty/reporting claims, handoff contracts and durable human-observed cases.",
+      "evidence": [
+        "shared/domain.ts",
+        "shared/work-model.ts",
+        "shared/workflow.ts",
+        "server/workflows.ts",
+        "tests/api.test.ts",
+        "tests/workflow.test.ts"
+      ],
+      "remaining": "Complete production work/authority domain, independent duty/reporting confirmation and live execution adapter semantics.",
+      "acceptanceTestId": "AT-WORK-004"
     },
     {
       "id": "WORK-005",
       "title": "Workflow-definition contracts",
       "targetRelease": "R2",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "Reviewed acyclic task/handoff definitions with version/hash pins, receiving contracts and all/any join policy.",
+      "evidence": [
+        "shared/domain.ts",
+        "shared/work-model.ts",
+        "shared/workflow.ts",
+        "server/workflows.ts",
+        "tests/api.test.ts",
+        "tests/workflow.test.ts"
+      ],
+      "remaining": "Complete production work/authority domain, independent duty/reporting confirmation and live execution adapter semantics.",
+      "acceptanceTestId": "AT-WORK-005"
     },
     {
       "id": "WORK-006",
       "title": "Durable workflow instances",
       "targetRelease": "R3",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "Persisted human-observed cases with routes, failed/blocked/skipped states, deadlines, bounded attempts and restart-safe timestamps.",
+      "evidence": [
+        "shared/domain.ts",
+        "shared/work-model.ts",
+        "shared/workflow.ts",
+        "server/workflows.ts",
+        "tests/api.test.ts",
+        "tests/workflow.test.ts"
+      ],
+      "remaining": "Complete production work/authority domain, independent duty/reporting confirmation and live execution adapter semantics.",
+      "acceptanceTestId": "AT-WORK-006"
     },
     {
       "id": "DATA-001",
       "title": "Scoped relational integrity",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Scoped references, immutable versions, canonical content hashes and atomic record/audit/outbox commits.",
+      "evidence": [
+        "server/db.ts",
+        "server/schema.sql",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production-domain completeness and independent integrity/security acceptance.",
+      "acceptanceTestId": "AT-DATA-001"
     },
     {
       "id": "DATA-002",
       "title": "Transactional outbox",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Scoped references, immutable versions, canonical content hashes and atomic record/audit/outbox commits.",
+      "evidence": [
+        "server/db.ts",
+        "server/schema.sql",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production-domain completeness and independent integrity/security acceptance.",
+      "acceptanceTestId": "AT-DATA-002"
     },
     {
       "id": "DATA-003",
       "title": "Canonical artifact hashing",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Scoped references, immutable versions, canonical content hashes and atomic record/audit/outbox commits.",
+      "evidence": [
+        "server/db.ts",
+        "server/schema.sql",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Production-domain completeness and independent integrity/security acceptance.",
+      "acceptanceTestId": "AT-DATA-003"
     },
     {
       "id": "GRAPH-001",
       "title": "Rebuildable Neo4j projection",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Local projection/fallback, bounded filters/neighborhoods, lag metadata, atomic repair and readable camera/organization views. Focused semantic scenes, explicit handoff diagrams and team-to-duty maps keep connections readable.",
+      "evidence": [
+        "server/graph-query.ts",
+        "server/projection.ts",
+        "client/src/Graph.tsx",
+        "client/src/OrgView.tsx",
+        "tests/graph-query.test.ts",
+        "tests/graph.test.ts",
+        "client/src/graph-scene.ts",
+        "client/src/OrgResponsibilities.tsx",
+        "tests/graph-scene.test.ts"
+      ],
+      "remaining": "Neo4j adapter, distributed generation checkpoints, large-domain queries beyond bounded scan and production performance acceptance.",
+      "acceptanceTestId": "AT-GRAPH-001"
     },
     {
       "id": "GRAPH-002",
       "title": "Scoped bounded graph queries",
       "targetRelease": "R2",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "Allowlisted query parameters, depth <=4, nodes <=150, source scan <=5000, statement timeout and explicit truncation. Focused semantic scenes, explicit handoff diagrams and team-to-duty maps keep connections readable.",
+      "evidence": [
+        "server/graph-query.ts",
+        "server/projection.ts",
+        "client/src/Graph.tsx",
+        "client/src/OrgView.tsx",
+        "tests/graph-query.test.ts",
+        "tests/graph.test.ts",
+        "client/src/graph-scene.ts",
+        "client/src/OrgResponsibilities.tsx",
+        "tests/graph-scene.test.ts"
+      ],
+      "remaining": "Neo4j adapter, distributed generation checkpoints, large-domain queries beyond bounded scan and production performance acceptance.",
+      "acceptanceTestId": "AT-GRAPH-002"
     },
     {
       "id": "GRAPH-003",
       "title": "Projection freshness and repair",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Local projection/fallback, bounded filters/neighborhoods, lag metadata, atomic repair and readable camera/organization views. Focused semantic scenes, explicit handoff diagrams and team-to-duty maps keep connections readable.",
+      "evidence": [
+        "server/graph-query.ts",
+        "server/projection.ts",
+        "client/src/Graph.tsx",
+        "client/src/OrgView.tsx",
+        "tests/graph-query.test.ts",
+        "tests/graph.test.ts",
+        "client/src/graph-scene.ts",
+        "client/src/OrgResponsibilities.tsx",
+        "tests/graph-scene.test.ts"
+      ],
+      "remaining": "Neo4j adapter, distributed generation checkpoints, large-domain queries beyond bounded scan and production performance acceptance.",
+      "acceptanceTestId": "AT-GRAPH-003"
     },
     {
       "id": "GRAPH-004",
       "title": "Graph camera and inspectors",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Local projection/fallback, bounded filters/neighborhoods, lag metadata, atomic repair and readable camera/organization views. Focused semantic scenes, explicit handoff diagrams and team-to-duty maps keep connections readable.",
+      "evidence": [
+        "server/graph-query.ts",
+        "server/projection.ts",
+        "client/src/Graph.tsx",
+        "client/src/OrgView.tsx",
+        "tests/graph-query.test.ts",
+        "tests/graph.test.ts",
+        "client/src/graph-scene.ts",
+        "client/src/OrgResponsibilities.tsx",
+        "tests/graph-scene.test.ts"
+      ],
+      "remaining": "Neo4j adapter, distributed generation checkpoints, large-domain queries beyond bounded scan and production performance acceptance.",
+      "acceptanceTestId": "AT-GRAPH-004"
     },
     {
       "id": "STRAT-001",
       "title": "Canonical sixteen-framework DAG",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Preserved framework DAG, manually authored source/upstream bindings, invalidation and structural hypothesis readiness.",
+      "evidence": [
+        "server/app.ts",
+        "shared/domain.ts",
+        "contracts/framework-registry.json",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Provider jobs/budgets, operational-model compiler, independently evaluated diagnosis/falsification and blind validation.",
+      "acceptanceTestId": "AT-STRAT-001"
     },
     {
       "id": "STRAT-002",
       "title": "Snapshot-bound framework runs",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Preserved framework DAG, manually authored source/upstream bindings, invalidation and structural hypothesis readiness.",
+      "evidence": [
+        "server/app.ts",
+        "shared/domain.ts",
+        "contracts/framework-registry.json",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Provider jobs/budgets, operational-model compiler, independently evaluated diagnosis/falsification and blind validation.",
+      "acceptanceTestId": "AT-STRAT-002"
     },
     {
       "id": "STRAT-003",
       "title": "Budgeted targeted freshness",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Preserved framework DAG, manually authored source/upstream bindings, invalidation and structural hypothesis readiness.",
+      "evidence": [
+        "server/app.ts",
+        "shared/domain.ts",
+        "contracts/framework-registry.json",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Provider jobs/budgets, operational-model compiler, independently evaluated diagnosis/falsification and blind validation.",
+      "acceptanceTestId": "AT-STRAT-003"
     },
     {
       "id": "STRAT-004",
       "title": "Operational model compiler",
       "targetRelease": "R2",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "server/app.ts",
+        "shared/domain.ts",
+        "contracts/framework-registry.json",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Provider jobs/budgets, operational-model compiler, independently evaluated diagnosis/falsification and blind validation.",
+      "acceptanceTestId": "AT-STRAT-004"
     },
     {
       "id": "STRAT-005",
       "title": "Candidate and falsification engine",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Preserved framework DAG, manually authored source/upstream bindings, invalidation and structural hypothesis readiness.",
+      "evidence": [
+        "server/app.ts",
+        "shared/domain.ts",
+        "contracts/framework-registry.json",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Provider jobs/budgets, operational-model compiler, independently evaluated diagnosis/falsification and blind validation.",
+      "acceptanceTestId": "AT-STRAT-005"
     },
     {
       "id": "STRAT-006",
       "title": "Reviewed diagnosis and abstention",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Preserved framework DAG, manually authored source/upstream bindings, invalidation and structural hypothesis readiness.",
+      "evidence": [
+        "server/app.ts",
+        "shared/domain.ts",
+        "contracts/framework-registry.json",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Provider jobs/budgets, operational-model compiler, independently evaluated diagnosis/falsification and blind validation.",
+      "acceptanceTestId": "AT-STRAT-006"
     },
     {
       "id": "MET-001",
       "title": "Measurement architecture",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Defined measures, appended observations, preserved intervention predictions and reviewed outcome snapshots.",
+      "evidence": [
+        "shared/domain.ts",
+        "shared/work-model.ts",
+        "server/records.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Empirical validation, automated source ingestion and production measurement governance.",
+      "acceptanceTestId": "AT-MET-001"
     },
     {
       "id": "MET-002",
       "title": "Intervention contracts",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Defined measures, appended observations, preserved intervention predictions and reviewed outcome snapshots.",
+      "evidence": [
+        "shared/domain.ts",
+        "shared/work-model.ts",
+        "server/records.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Empirical validation, automated source ingestion and production measurement governance.",
+      "acceptanceTestId": "AT-MET-002"
     },
     {
       "id": "MET-003",
       "title": "Outcome evaluation",
       "targetRelease": "R2",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "Outcome freezes prediction/measurement snapshot, requires observations for supported/falsified and reopens falsified candidate on review.",
+      "evidence": [
+        "shared/domain.ts",
+        "shared/work-model.ts",
+        "server/records.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Empirical validation, automated source ingestion and production measurement governance.",
+      "acceptanceTestId": "AT-MET-003"
     },
     {
       "id": "GOV-001",
       "title": "Human Manifest and Authority Baseline",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Work descriptions and version-bound draft proposals/export packages. No operative authority is granted.",
+      "evidence": [
+        "server/records.ts",
+        "server/exports.ts",
+        "client/src/App.tsx",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
+      "acceptanceTestId": "AT-GOV-001"
     },
     {
       "id": "GOV-002",
       "title": "Derived agent proposals",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Work descriptions and version-bound draft proposals/export packages. No operative authority is granted.",
+      "evidence": [
+        "server/records.ts",
+        "server/exports.ts",
+        "client/src/App.tsx",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
+      "acceptanceTestId": "AT-GOV-002"
     },
     {
       "id": "GOV-003",
       "title": "Export-first portable package",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Work descriptions and version-bound draft proposals/export packages. No operative authority is granted.",
+      "evidence": [
+        "server/records.ts",
+        "server/exports.ts",
+        "client/src/App.tsx",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
+      "acceptanceTestId": "AT-GOV-003"
     },
     {
       "id": "GOV-004",
       "title": "Versioned Control Context",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "server/records.ts",
+        "server/exports.ts",
+        "client/src/App.tsx",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
+      "acceptanceTestId": "AT-GOV-004"
     },
     {
       "id": "GOV-005",
       "title": "Authority and owner ceiling",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "server/records.ts",
+        "server/exports.ts",
+        "client/src/App.tsx",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
+      "acceptanceTestId": "AT-GOV-005"
     },
     {
       "id": "GOV-006",
       "title": "Authenticated stage approvals",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "server/records.ts",
+        "server/exports.ts",
+        "client/src/App.tsx",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
+      "acceptanceTestId": "AT-GOV-006"
     },
     {
       "id": "GOV-007",
       "title": "Partial approval and invalidation",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "server/records.ts",
+        "server/exports.ts",
+        "client/src/App.tsx",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
+      "acceptanceTestId": "AT-GOV-007"
     },
     {
       "id": "GOV-008",
       "title": "Signet and auditable issuance",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "server/records.ts",
+        "server/exports.ts",
+        "client/src/App.tsx",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
+      "acceptanceTestId": "AT-GOV-008"
     },
     {
       "id": "GOV-009",
       "title": "Combined violation and drift view",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "server/records.ts",
+        "server/exports.ts",
+        "client/src/App.tsx",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
+      "acceptanceTestId": "AT-GOV-009"
     },
     {
       "id": "RUN-001",
       "title": "Adapter conformance",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Exact adapter, legitimate authority, action-bound approvals, side-effect idempotency/reconciliation, lifecycle/revocation and chaining.",
+      "acceptanceTestId": "AT-RUN-001"
     },
     {
       "id": "RUN-002",
       "title": "Action preflight and bound approval",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Exact adapter, legitimate authority, action-bound approvals, side-effect idempotency/reconciliation, lifecycle/revocation and chaining.",
+      "acceptanceTestId": "AT-RUN-002"
     },
     {
       "id": "RUN-003",
       "title": "Idempotent side effects and reconciliation",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Exact adapter, legitimate authority, action-bound approvals, side-effect idempotency/reconciliation, lifecycle/revocation and chaining.",
+      "acceptanceTestId": "AT-RUN-003"
     },
     {
       "id": "RUN-004",
       "title": "No alternate enforcement bypass",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Exact adapter, legitimate authority, action-bound approvals, side-effect idempotency/reconciliation, lifecycle/revocation and chaining.",
+      "acceptanceTestId": "AT-RUN-004"
     },
     {
       "id": "RUN-005",
       "title": "Owner lifecycle and suspension",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Exact adapter, legitimate authority, action-bound approvals, side-effect idempotency/reconciliation, lifecycle/revocation and chaining.",
+      "acceptanceTestId": "AT-RUN-005"
     },
     {
       "id": "RUN-006",
       "title": "Reviewed ownership transfer",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Exact adapter, legitimate authority, action-bound approvals, side-effect idempotency/reconciliation, lifecycle/revocation and chaining.",
+      "acceptanceTestId": "AT-RUN-006"
     },
     {
       "id": "RUN-007",
       "title": "Delegation-aware agent chaining",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Exact adapter, legitimate authority, action-bound approvals, side-effect idempotency/reconciliation, lifecycle/revocation and chaining.",
+      "acceptanceTestId": "AT-RUN-007"
     },
     {
       "id": "INT-001",
       "title": "Verified meeting ingestion",
       "targetRelease": "R2",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "client/src/App.tsx",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Credentials, customer-specific policy and resource scope, implemented adapters and live acceptance checks.",
+      "acceptanceTestId": "AT-INT-001"
     },
     {
       "id": "INT-002",
       "title": "Identity/effective-access adapter",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "client/src/App.tsx",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Credentials, customer-specific policy and resource scope, implemented adapters and live acceptance checks.",
+      "acceptanceTestId": "AT-INT-002"
     },
     {
       "id": "INT-003",
       "title": "Customer policy and request adapters",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "client/src/App.tsx",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Credentials, customer-specific policy and resource scope, implemented adapters and live acceptance checks.",
+      "acceptanceTestId": "AT-INT-003"
     },
     {
       "id": "INT-004",
       "title": "One precise Oracle integration",
       "targetRelease": "R3",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "client/src/App.tsx",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Credentials, customer-specific policy and resource scope, implemented adapters and live acceptance checks.",
+      "acceptanceTestId": "AT-INT-004"
     },
     {
       "id": "INT-005",
       "title": "Connector health and coverage",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Coverage states explicitly distinguish local services from absent external adapters.",
+      "evidence": [
+        "client/src/App.tsx",
+        "docs/INTEGRATIONS.md"
+      ],
+      "remaining": "Credentials, customer-specific policy and resource scope, implemented adapters and live acceptance checks.",
+      "acceptanceTestId": "AT-INT-005"
     },
     {
       "id": "REV-001",
       "title": "Weekly evidence-based agenda",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Derived review agenda, human-owned commitments and exact audience/content-approved local brief downloads.",
+      "evidence": [
+        "client/src/App.tsx",
+        "server/reports.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Meeting/provider ingestion, timezone scheduling and approved external distribution workflow.",
+      "acceptanceTestId": "AT-REV-001"
     },
     {
       "id": "REV-002",
       "title": "Meetings create proposals not permissions",
       "targetRelease": "R2",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Derived review agenda, human-owned commitments and exact audience/content-approved local brief downloads.",
+      "evidence": [
+        "client/src/App.tsx",
+        "server/reports.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Meeting/provider ingestion, timezone scheduling and approved external distribution workflow.",
+      "acceptanceTestId": "AT-REV-002"
     },
     {
       "id": "REV-003",
       "title": "Approved brief publication",
       "targetRelease": "R2",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "Exact content/audience approval before client brief download; manual delivery only.",
+      "evidence": [
+        "client/src/App.tsx",
+        "server/reports.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Meeting/provider ingestion, timezone scheduling and approved external distribution workflow.",
+      "acceptanceTestId": "AT-REV-003"
     },
     {
       "id": "FEED-001",
       "title": "Scoped context snapshots and deltas",
       "targetRelease": "R2",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md"
+      ],
+      "remaining": "Permission-scoped snapshots/deltas, consumer identity, expiry and disclosure controls.",
+      "acceptanceTestId": "AT-FEED-001"
     },
     {
       "id": "EXP-001",
       "title": "Export generation and access",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Frozen client/internal ZIPs, allowlisted fields, exclusions, checksums, current report bindings and bounded application-audit packet.",
+      "evidence": [
+        "server/reports.ts",
+        "server/exports.ts",
+        "tests/reports.test.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Fine-grained export access/retention, independent signatures, external execution evidence and production disclosure review.",
+      "acceptanceTestId": "AT-EXP-001"
     },
     {
       "id": "EXP-002",
       "title": "On-demand audit packet",
       "targetRelease": "R3",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "On-demand client audit packet of selected records and latest 500 company application events; external/signed evidence absent.",
+      "evidence": [
+        "server/reports.ts",
+        "server/exports.ts",
+        "tests/reports.test.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Fine-grained export access/retention, independent signatures, external execution evidence and production disclosure review.",
+      "acceptanceTestId": "AT-EXP-002"
     },
     {
       "id": "UX-001",
       "title": "Graphite visual baseline",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Graphite/light UI, keyboard/modal behavior, readable graphs, honest empty/error states and training documentation.",
+      "evidence": [
+        "client/src",
+        "docs/guide",
+        "tests/graph.test.ts",
+        "docs/VERIFICATION.md"
+      ],
+      "remaining": "Full assistive-technology/cross-browser certification, physical microphone and extended interruption testing.",
+      "acceptanceTestId": "AT-UX-001"
     },
     {
       "id": "UX-002",
       "title": "Accessible capture and workspace",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Graphite/light UI, keyboard/modal behavior, readable graphs, honest empty/error states and training documentation.",
+      "evidence": [
+        "client/src",
+        "docs/guide",
+        "tests/graph.test.ts",
+        "docs/VERIFICATION.md"
+      ],
+      "remaining": "Full assistive-technology/cross-browser certification, physical microphone and extended interruption testing.",
+      "acceptanceTestId": "AT-UX-002"
     },
     {
       "id": "UX-003",
       "title": "Honest empty and failure states",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Graphite/light UI, keyboard/modal behavior, readable graphs, honest empty/error states and training documentation.",
+      "evidence": [
+        "client/src",
+        "docs/guide",
+        "tests/graph.test.ts",
+        "docs/VERIFICATION.md"
+      ],
+      "remaining": "Full assistive-technology/cross-browser certification, physical microphone and extended interruption testing.",
+      "acceptanceTestId": "AT-UX-003"
     },
     {
       "id": "SEC-001",
       "title": "Untrusted source isolation",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Scoped access, untrusted text escaping, secret exclusions, local audio expiry, append-only runtime audit and documented limits.",
+      "evidence": [
+        "server/auth.ts",
+        "server/retention.ts",
+        "server/reports.ts",
+        "shared/handbook.ts",
+        "tests/api.test.ts",
+        "tests/reports.test.ts",
+        "docs/SECURITY.md"
+      ],
+      "remaining": "Independent security review, source scanning, complete deletion/legal hold, provider governance, managed secrets and trusted audit checkpoints.",
+      "acceptanceTestId": "AT-SEC-001"
     },
     {
       "id": "SEC-002",
       "title": "Provider and secret controls",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Scoped access, untrusted text escaping, secret exclusions, local audio expiry, append-only runtime audit and documented limits.",
+      "evidence": [
+        "server/auth.ts",
+        "server/retention.ts",
+        "server/reports.ts",
+        "shared/handbook.ts",
+        "tests/api.test.ts",
+        "tests/reports.test.ts",
+        "docs/SECURITY.md"
+      ],
+      "remaining": "Independent security review, source scanning, complete deletion/legal hold, provider governance, managed secrets and trusted audit checkpoints.",
+      "acceptanceTestId": "AT-SEC-002"
     },
     {
       "id": "SEC-003",
       "title": "Retention/deletion and legal hold",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Scoped access, untrusted text escaping, secret exclusions, local audio expiry, append-only runtime audit and documented limits.",
+      "evidence": [
+        "server/auth.ts",
+        "server/retention.ts",
+        "server/reports.ts",
+        "shared/handbook.ts",
+        "tests/api.test.ts",
+        "tests/reports.test.ts",
+        "docs/SECURITY.md"
+      ],
+      "remaining": "Independent security review, source scanning, complete deletion/legal hold, provider governance, managed secrets and trusted audit checkpoints.",
+      "acceptanceTestId": "AT-SEC-003"
     },
     {
       "id": "SEC-004",
       "title": "Tamper-evidence and audit limitations",
       "targetRelease": "R3",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "Runtime cannot rewrite audit/content history; content hashes and explicit limitations; no external tamper-evident checkpoint.",
+      "evidence": [
+        "server/auth.ts",
+        "server/retention.ts",
+        "server/reports.ts",
+        "shared/handbook.ts",
+        "tests/api.test.ts",
+        "tests/reports.test.ts",
+        "docs/SECURITY.md"
+      ],
+      "remaining": "Independent security review, source scanning, complete deletion/legal hold, provider governance, managed secrets and trusted audit checkpoints.",
+      "acceptanceTestId": "AT-SEC-004"
     },
     {
       "id": "OPS-001",
       "title": "Durable jobs and budgets",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Transactional outbox and restartable projection/retention workers only; no general AI job queue, budgets or cancellation.",
+      "evidence": [
+        "server/projection.ts",
+        "server/migrate.ts",
+        "scripts/backup.mjs",
+        "scripts/benchmark.ts",
+        "docs/verification"
+      ],
+      "remaining": "General provider job budgets/cancellation, distributed operations, off-host recovery/cutover, monitoring and agreed RPO/RTO/SLOs.",
+      "acceptanceTestId": "AT-OPS-001"
     },
     {
       "id": "OPS-002",
       "title": "Measured performance",
       "targetRelease": "R2",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "360 loopback reads at concurrency 8 against 1000 synthetic records, zero failures; graph p95 130.5 ms and workspace p95 178.7 ms.",
+      "evidence": [
+        "server/projection.ts",
+        "server/migrate.ts",
+        "scripts/backup.mjs",
+        "scripts/benchmark.ts",
+        "docs/verification"
+      ],
+      "remaining": "General provider job budgets/cancellation, distributed operations, off-host recovery/cutover, monitoring and agreed RPO/RTO/SLOs.",
+      "acceptanceTestId": "AT-OPS-002"
     },
     {
       "id": "OPS-003",
       "title": "Recovery and stop runbooks",
       "targetRelease": "R3",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "AES-256-GCM backup, authenticated separate-database restore/fingerprint drill, stop/upgrade/recovery runbook; no production cutover or off-host RPO/RTO claim.",
+      "evidence": [
+        "server/projection.ts",
+        "server/migrate.ts",
+        "scripts/backup.mjs",
+        "scripts/benchmark.ts",
+        "docs/verification"
+      ],
+      "remaining": "General provider job budgets/cancellation, distributed operations, off-host recovery/cutover, monitoring and agreed RPO/RTO/SLOs.",
+      "acceptanceTestId": "AT-OPS-003"
     },
     {
       "id": "QA-001",
       "title": "Production regression suite",
       "targetRelease": "R1",
       "localStatus": "Local subset",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Unit, real API/database, security-denial and synthetic advisor-journey checks block CI failures.",
+      "evidence": [
+        "tests",
+        ".github/workflows/verify.yml",
+        "docs/VERIFICATION.md"
+      ],
+      "remaining": "Full production regression/security audit, physical devices, independent browser/accessibility and blind diagnostic evaluation.",
+      "acceptanceTestId": "AT-QA-001"
     },
     {
       "id": "QA-002",
       "title": "Blind diagnostic evaluation",
       "targetRelease": "R2",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "tests",
+        ".github/workflows/verify.yml",
+        "docs/VERIFICATION.md"
+      ],
+      "remaining": "Full production regression/security audit, physical devices, independent browser/accessibility and blind diagnostic evaluation.",
+      "acceptanceTestId": "AT-QA-002"
     },
     {
       "id": "QA-003",
       "title": "Security release-blocking tests",
       "targetRelease": "R3",
-      "localStatus": "Open",
-      "productionAccepted": false
+      "localStatus": "Local subset",
+      "productionAccepted": false,
+      "implementation": "Role, RLS, CSRF, stale/replay, impersonation, source-retraction, corruption and report escaping regressions block CI; independent audit remains open.",
+      "evidence": [
+        "tests",
+        ".github/workflows/verify.yml",
+        "docs/VERIFICATION.md"
+      ],
+      "remaining": "Full production regression/security audit, physical devices, independent browser/accessibility and blind diagnostic evaluation.",
+      "acceptanceTestId": "AT-QA-003"
     },
     {
       "id": "ENT-001",
       "title": "Enterprise identity and tenancy",
       "targetRelease": "R4",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md"
+      ],
+      "remaining": "SSO/SCIM, deployment/isolation options, permission-safe portfolio reporting and additional validated adapters.",
+      "acceptanceTestId": "AT-ENT-001"
     },
     {
       "id": "ENT-002",
       "title": "Permission-safe portfolio reporting",
       "targetRelease": "R4",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md"
+      ],
+      "remaining": "SSO/SCIM, deployment/isolation options, permission-safe portfolio reporting and additional validated adapters.",
+      "acceptanceTestId": "AT-ENT-002"
     },
     {
       "id": "ENT-003",
       "title": "Additional adapter coverage",
       "targetRelease": "R4",
       "localStatus": "Open",
-      "productionAccepted": false
+      "productionAccepted": false,
+      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "evidence": [
+        "docs/RELEASE-STATUS.md"
+      ],
+      "remaining": "SSO/SCIM, deployment/isolation options, permission-safe portfolio reporting and additional validated adapters.",
+      "acceptanceTestId": "AT-ENT-003"
+    }
+  ],
+  "additionalReleaseWork": [
+    {
+      "area": "Pre-meeting public research",
+      "implementation": "Optional Exa adapter, durable reservations, bounded source snapshots and unreviewed evidence import.",
+      "evidence": [
+        "server/research.ts",
+        "shared/research.ts",
+        "client/src/BusinessResearch.tsx",
+        "tests/research.test.ts",
+        "tests/api.test.ts"
+      ],
+      "remaining": "Project credential, live provider acceptance, model synthesis, research deletion/cancellation and production policy."
     }
   ]
 }

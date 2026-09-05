@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { RecordRow } from "../../shared/domain.ts";
 import { Badge, Button, Empty, State } from "./ui.tsx";
+import { OrgResponsibilities } from "./OrgResponsibilities.tsx";
 
 export function OrgView({
   records,
@@ -13,9 +14,10 @@ export function OrgView({
   select: (id: string | null) => void;
   open: (record: RecordRow) => void;
 }) {
-  const [mode, setMode] = useState("teams");
+  const [mode, setMode] = useState("duties");
   const people = records.filter((r) => r.kind === "person");
   const tasks = records.filter((r) => r.kind === "task");
+  const dutyRecords = records.filter((r) => r.kind === "duty");
   const teams = [
     ...new Set(people.map((p) => p.data.team || "Team not recorded")),
   ];
@@ -111,6 +113,15 @@ export function OrgView({
         </div>
         <div className="tabs" aria-label="Organization view">
           <button
+            className={mode === "duties" ? "active" : ""}
+            onClick={() => {
+              setMode("duties");
+              select(null);
+            }}
+          >
+            Teams & duties
+          </button>
+          <button
             className={mode === "teams" ? "active" : ""}
             onClick={() => setMode("teams")}
           >
@@ -131,7 +142,9 @@ export function OrgView({
       </div>
       <div className="org-body">
         <div className="org-content">
-          {mode === "teams" ? (
+          {mode === "duties" ? (
+            <OrgResponsibilities records={records} open={open} />
+          ) : mode === "teams" ? (
             <div className="org-teams">
               {teams.map((team) => {
                 const members = people.filter(
@@ -219,6 +232,19 @@ export function OrgView({
                   : "Not recorded")}
             </p>
             <h3>Duties & task responsibilities</h3>
+            {dutyRecords
+              .filter((d) => d.data.ownerId === current.id)
+              .map((d) => (
+                <button
+                  className="inspector-link"
+                  key={d.id}
+                  onClick={() => open(d)}
+                >
+                  <small>Recorded duty ownership claim</small>
+                  {d.title}
+                  <State value={d.state} />
+                </button>
+              ))}
             {!work.length && (
               <p>No tasks have been linked to this person yet.</p>
             )}

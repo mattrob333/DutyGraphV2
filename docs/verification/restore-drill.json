@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "backupCreatedAt": "2026-09-05T21:58:10.102Z",
+  "restoredDatabase": "dutygraph_restore_1788645514238",
+  "elapsedMs": 1208,
+  "validation": {
+    "records": 2068,
+    "versions": 2389,
+    "audit_events": 3215,
+    "companies": 363,
+    "users": 432,
+    "record_digest": "b69f3db01104e20e5053f2407d98a2ea",
+    "research_runs": 11,
+    "research_digest": "b996d6a811ac8624f85259d30ff8ff40"
+  },
+  "originalDatabase": "unchanged",
+  "notice": "Local drill only; no production RPO/RTO or off-host recovery claim."
+}
