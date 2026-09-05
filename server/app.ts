@@ -79,14 +79,24 @@ export function createApp({
   researchProvider,
   emailProvider,
   aiProvider,
+  hostedRouting = !!process.env.VERCEL,
 }: {
   authRequestsPerWindow?: number;
   researchProvider?: ResearchProvider;
   emailProvider?: EmailProvider;
   aiProvider?: AiProvider;
+  hostedRouting?: boolean;
 } = {}) {
   const app = express();
   if (process.env.VERCEL) app.set("trust proxy", 1);
+  if (hostedRouting)
+    app.use((req, _res, next) => {
+      // Vercel adds the catch-all rewrite parameter to the query. It is routing
+      // metadata, not a user graph filter; retain every actual query parameter.
+      const { path: _routePath, ...query } = req.query;
+      Object.defineProperty(req, "query", { value: query, configurable: true });
+      next();
+    });
   app.disable("x-powered-by");
   app.use(
     helmet({

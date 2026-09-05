@@ -747,6 +747,7 @@ async function invite(c: Client, f: any, type = "confirmation") {
 before(async () => {
   const app = createApp({
     authRequestsPerWindow: 1000,
+    hostedRouting: true,
     emailProvider: async (message, key, id) => {
       emailMessages.push({ message, id });
       if (message.subject.includes("UnknownEmail"))
@@ -1516,4 +1517,23 @@ test("AI drafts bind sources, require consent, isolate tenants and do not create
   });
   assert.equal((await request(c, path)).data.jobs[0].stale, true);
   assert.equal((await request(c, path, "POST", body)).status, 422);
+});
+
+test("hosted rewrite metadata is omitted without weakening graph query validation", async () => {
+  const c = await register();
+  await fixture(c);
+  const good = await request(
+    c,
+    prefix(c) + "/graph?path=v1%2Fcompanies%2Fexample%2Fgraph&limit=1",
+  );
+  assert.equal(good.status, 200, JSON.stringify(good.data));
+  assert.equal(
+    (await request(c, prefix(c) + "/graph?path=internal&limit=99999")).status,
+    422,
+  );
+  assert.equal(
+    (await request(c, prefix(c) + "/graph?path=internal&arbitrary=true"))
+      .status,
+    422,
+  );
 });
