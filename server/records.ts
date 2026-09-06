@@ -80,6 +80,12 @@ export async function createOrEdit(
   if (!(kind in schemas))
     fail(422, "INVALID_KIND", "This record type cannot be edited directly.");
   const d: any = schemas[kind as keyof typeof schemas].parse(input);
+  // Internal fixture identity survives normal edits, including title changes.
+  // It is copied only from the existing server record, never accepted as input.
+  if (existing?.data.sampleKey) {
+    d.sampleKey = existing.data.sampleKey;
+    d.sampleVersion = existing.data.sampleVersion;
+  }
   await validateReferences(db, company, kind, d);
   if (existing && existing.kind !== kind)
     fail(422, "INVALID_KIND", "A record cannot change type.");

@@ -1723,6 +1723,30 @@ tbody tr:last-child td {
   font-size: 11px;
   color: var(--muted);
 }
+.workflow-graph-intro {
+  margin: 12px 0 18px;
+  max-width: 1000px;
+}
+.workflow-graph-intro h2 {
+  font-size: 22px;
+  margin: 0 0 6px;
+}
+.workflow-graph-intro p {
+  font-size: 13px;
+  color: var(--ink);
+  margin: 0 0 8px;
+}
+.workflow-graph-intro span {
+  font-size: 11px;
+  color: var(--muted);
+}
+.graph-expanded:has(.workflow-graph-intro) .graph-canvas {
+  height: calc(100vh - 300px);
+  min-height: 320px;
+}
+.graph-expanded:has(.workflow-graph-intro) .graph-inspector {
+  max-height: calc(100vh - 300px);
+}
 .graph-context label {
   display: flex;
   align-items: center;
@@ -2005,6 +2029,13 @@ tbody tr:last-child td {
 }
 .graph-node.evidence rect {
   stroke: color-mix(in srgb, var(--blue) 60%, var(--line));
+}
+.graph-node.issue rect {
+  stroke: var(--amber);
+  fill: color-mix(in srgb, var(--amber-bg) 45%, var(--node));
+}
+.graph-node.issue .node-state {
+  fill: var(--amber);
 }
 .graph-node.evidence .node-kind {
   fill: var(--blue);

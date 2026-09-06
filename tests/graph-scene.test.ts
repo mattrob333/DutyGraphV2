@@ -104,6 +104,34 @@ test("focused scenes are bounded, bundle dual roles and keep context traceable",
   noCardIntersections(scene);
   framedAndReadable(scene);
 });
+test("a recorded review detour sits below the direct handoff without losing routes", () => {
+  const records = [
+    r("intake", "task"),
+    r("review", "task"),
+    r("release", "task"),
+    r("ship", "task"),
+    ...[
+      ["intake", "release", "Stock reserved"],
+      ["intake", "review", "Shortage"],
+      ["review", "release", "Receipt accepted"],
+      ["release", "ship", "Ready"],
+    ].map(([a, b, condition], i) =>
+      r(`h${i}`, "handoff", { sourceTaskId: a, targetTaskId: b, condition }),
+    ),
+  ];
+  const scene = workflowScene(records, "*");
+  assert.equal(scene.edges.length, 4);
+  assert.equal(
+    scene.nodes.find((n) => n.id === "review")!.x,
+    scene.nodes.find((n) => n.id === "release")!.x,
+  );
+  assert.ok(
+    scene.nodes.find((n) => n.id === "review")!.y >
+      scene.nodes.find((n) => n.id === "release")!.y,
+  );
+  noCardIntersections(scene);
+  framedAndReadable(scene);
+});
 test("workflow scenes use explicit scoped handoffs and place alternatives below", () => {
   const records = [
     r("a", "task"),

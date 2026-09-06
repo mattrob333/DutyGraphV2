@@ -32,7 +32,7 @@ import {
   defaultSettings,
   type AuthRequest,
 } from "./auth.ts";
-import { demoUser, seedRecords } from "./seed.ts";
+import { demoUser, seedRecords, ensureCobaltExamples } from "./seed.ts";
 import { createOrEdit, refreshTask } from "./records.ts";
 import { confirmationStatus, diagnosisReadiness } from "../shared/domain.ts";
 import { previewRoster } from "./roster.ts";
@@ -327,10 +327,13 @@ export function createApp({
         const u = actor(req),
           existing = (
             await db.query(
-              "SELECT id FROM companies WHERE sandbox=true ORDER BY created_at LIMIT 1",
+              "SELECT c.id FROM companies c WHERE c.sandbox=true AND EXISTS(SELECT 1 FROM records r WHERE r.company_id=c.id AND r.kind='evidence' AND r.data->>'locator'='Synthetic V2 example · full excerpt') ORDER BY c.created_at LIMIT 1",
             )
           ).rows[0];
-        if (existing) return existing;
+        if (existing) {
+          await ensureCobaltExamples(db, u, existing.id);
+          return existing;
+        }
         const id = randomUUID();
         await db.query(
           "INSERT INTO companies(id,tenant_id,name,scope,goal,settings,sandbox) VALUES($1,$2,$3,$4,$5,$6,true)",

@@ -1392,6 +1392,64 @@ test("private sample is isolated, repeatable and does not send email", async () 
   );
   assert.equal(workspace.status, 200);
   assert.ok(workspace.data.records.length >= 25);
+  const flows = workspace.data.records.filter(
+    (r: any) => r.kind === "workflow",
+  );
+  assert.equal(flows.length, 2);
+  assert.equal(
+    workspace.data.records.filter((r: any) => r.kind === "handoff").length,
+    16,
+  );
+  assert.ok(workspace.data.records.some((r: any) => r.kind === "duty"));
+  const snapshots = workspace.data.records.map((r: any) => [
+    r.id,
+    r.version,
+    r.hash,
+  ]);
+  await request(a, "/api/v1/sample-company", "POST", {});
+  const reopened = await request(
+    a,
+    "/api/v1/companies/" + first.data.id + "/workspace",
+  );
+  assert.deepEqual(
+    reopened.data.records.map((r: any) => [r.id, r.version, r.hash]),
+    snapshots,
+  );
+  const flow = flows[0];
+  const changed = Object.fromEntries(
+    [
+      "title",
+      "purpose",
+      "ownerId",
+      "taskIds",
+      "handoffIds",
+      "joinPolicy",
+      "timeoutHours",
+      "maxAttempts",
+      "reason",
+    ].map((key) => [key, flow.data[key]]),
+  );
+  changed.title = "My customized sample workflow";
+  const edited = await request(
+    a,
+    `/api/v1/companies/${first.data.id}/records/${flow.id}`,
+    "PATCH",
+    { expectedVersion: flow.version, data: changed },
+  );
+  assert.equal(edited.status, 200, JSON.stringify(edited.data));
+  await request(a, "/api/v1/sample-company", "POST", {});
+  const afterEdit = await request(
+    a,
+    `/api/v1/companies/${first.data.id}/workspace`,
+  );
+  assert.equal(
+    afterEdit.data.records.filter((r: any) => r.kind === "workflow").length,
+    2,
+  );
+  assert.equal(
+    afterEdit.data.records.find((r: any) => r.id === flow.id).title,
+    changed.title,
+  );
   assert.equal(emailMessages.length, before);
 });
 test("Resend invitation calls once, keeps tokens out of receipts and opens participant page", async () => {

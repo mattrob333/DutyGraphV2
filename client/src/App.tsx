@@ -1696,7 +1696,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         />
         <Panel
           title="Explore a fictional company"
-          subtitle="Load a private Cobalt sample workspace in your account. It contains fictional people and work; it does not contact anyone."
+          subtitle="Explore supplier onboarding and customer order fulfilment, with handoffs, duties and exceptions. Reopening adds missing examples and preserves your edited records. Everything is fictional; no messages are sent."
         >
           <Button
             onClick={async () => {
@@ -1704,6 +1704,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                 const sample = await api("/v1/sample-company", "POST", {});
                 await loadCompanies();
                 setCompanyId(sample.id);
+                if (sample.id === companyId) await refresh();
                 go("graph");
               } catch (e) {
                 setToast((e as Error).message);

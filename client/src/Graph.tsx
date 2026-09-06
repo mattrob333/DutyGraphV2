@@ -34,7 +34,14 @@ export function Graph({
       scanTruncated: boolean;
     } | null>(null),
     [error, setError] = useState(""),
-    [view, setView] = useState("connected"),
+    [view, setView] = useState(() =>
+      records.some(
+        (r) =>
+          r.kind === "workflow" && r.data.sampleKey === "supplier-workflow",
+      )
+        ? "work"
+        : "connected",
+    ),
     [list, setList] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
     [expanded, setExpanded] = useState(false);
@@ -44,7 +51,12 @@ export function Graph({
     (r) => r.kind === "workflow" && r.state !== "withdrawn",
   );
   const activeFocus = focus || defaultGraphFocus(records);
-  const activeWorkflow = workflowId || workflows[0]?.id || "*";
+  const activeWorkflow =
+    workflowId ||
+    workflows.find((r) => r.data.sampleKey === "supplier-workflow")?.id ||
+    workflows[0]?.id ||
+    "*";
+  const currentWorkflow = workflows.find((r) => r.id === activeWorkflow);
   const [retry, setRetry] = useState(0);
   const [camera, setCamera] = useState({ x: 0, y: 0, w: 1120, h: 650 });
   const svg = useRef<SVGSVGElement>(null);
@@ -237,6 +249,17 @@ export function Graph({
           </Button>
         </div>
       </div>
+      {view === "work" && currentWorkflow && (
+        <div className="workflow-graph-intro">
+          <h2>{currentWorkflow.title}</h2>
+          <p>{currentWorkflow.data.purpose}</p>
+          <span>
+            {currentWorkflow.data.taskIds.length} task cards ·{" "}
+            {currentWorkflow.data.handoffIds.length} handoffs · Click an arrow
+            label to inspect what the next person needs.
+          </span>
+        </div>
+      )}
       {view !== "org" && (
         <div className="graph-context">
           <label>
@@ -519,6 +542,7 @@ export function Graph({
                     className={
                       "graph-node " +
                       n.kind +
+                      (n.state === "conflicting" ? " issue" : "") +
                       (selected === n.id ? " selected" : "") +
                       (selected && !neighborhood.has(n.id) ? " muted" : "")
                     }

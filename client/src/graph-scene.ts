@@ -483,16 +483,45 @@ export function workflowScene(records: RecordRow[], workflowId: string): Scene {
     dashed: r.state !== "reviewed",
     recordId: r.id,
   }));
-  // Kahn ranks put dependent work to the right; secondary nodes at a rank sit
-  // below the first path. Cyclic/unconnected records remain visible separately.
+  // A recorded A→C plus A→B→C path can put B below C, keeping the direct
+  // route legible. This is layout only: every real edge and condition remains.
+  const detours = new Map<string, string>();
+  for (const task of tasks) {
+    const incoming = links.filter((l) => l.target === task.id);
+    const outgoing = links.filter((l) => l.source === task.id);
+    if (
+      incoming.length === 1 &&
+      outgoing.length === 1 &&
+      incoming[0].source !== outgoing[0].target &&
+      links.some(
+        (l) =>
+          l.source === incoming[0].source && l.target === outgoing[0].target,
+      )
+    )
+      detours.set(task.id, outgoing[0].target);
+  }
+  // Nested detours use the regular dependency layout rather than hiding ranks.
+  for (const [id, target] of [...detours])
+    if (detours.has(target)) detours.delete(id);
+  const rankedTasks = tasks.filter((t) => !detours.has(t.id));
+  const rankedLinks = links.filter(
+    (l) => !detours.has(l.source) && !detours.has(l.target),
+  );
+  // Kahn ranks put the remaining dependent work to the right. Cyclic and
+  // unconnected records remain visible; no new relationship is inferred.
   const rank = new Map<string, number>();
   const indegree = new Map(
-    tasks.map((t) => [t.id, links.filter((l) => l.target === t.id).length]),
+    rankedTasks.map((t) => [
+      t.id,
+      rankedLinks.filter((l) => l.target === t.id).length,
+    ]),
   );
-  const queue = tasks.filter((t) => indegree.get(t.id) === 0).map((t) => t.id);
+  const queue = rankedTasks
+    .filter((t) => indegree.get(t.id) === 0)
+    .map((t) => t.id);
   for (const id of queue) rank.set(id, 0);
   for (let q = 0; q < queue.length; q++)
-    for (const edge of links.filter((l) => l.source === queue[q])) {
+    for (const edge of rankedLinks.filter((l) => l.source === queue[q])) {
       rank.set(
         edge.target,
         Math.max(rank.get(edge.target) || 0, (rank.get(queue[q]) || 0) + 1),
@@ -500,16 +529,19 @@ export function workflowScene(records: RecordRow[], workflowId: string): Scene {
       indegree.set(edge.target, indegree.get(edge.target)! - 1);
       if (indegree.get(edge.target) === 0) queue.push(edge.target);
     }
-  const cyclic = tasks.filter((t) => !queue.includes(t.id));
+  const cyclic = rankedTasks.filter((t) => !queue.includes(t.id));
   const max = Math.max(0, ...rank.values());
   cyclic.forEach((t) => rank.set(t.id, max + 1));
+  for (const [id, target] of detours) rank.set(id, rank.get(target) || 0);
   const counts = new Map<number, number>();
-  const nodes = tasks.map((r) => {
-    const col = rank.get(r.id) || 0,
-      row = counts.get(col) || 0;
-    counts.set(col, row + 1);
-    return node(r, 48 + col * DX, 170 + row * DY, col, records);
-  });
+  const nodes = [...rankedTasks, ...tasks.filter((t) => detours.has(t.id))].map(
+    (r) => {
+      const col = rank.get(r.id) || 0,
+        row = counts.get(col) || 0;
+      counts.set(col, row + 1);
+      return node(r, 48 + col * DX, 170 + row * DY, col, records);
+    },
+  );
   return finish(
     nodes,
     links,

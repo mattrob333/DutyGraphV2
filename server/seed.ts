@@ -1,7 +1,75 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { pool, tx, putRecord } from "./db.ts";
+import { pool, tx, putRecord, setState, fail } from "./db.ts";
 import { passwordHash, publicUser, defaultSettings } from "./auth.ts";
 import { capturePrompts } from "../shared/domain.ts";
+import { populateCobaltExamples } from "./sample-examples.ts";
+
+export async function ensureCobaltExamples(
+  db: import("pg").PoolClient,
+  user: import("../shared/domain.ts").User,
+  company: string,
+) {
+  const target = (
+    await db.query("SELECT sandbox FROM companies WHERE id=$1 FOR UPDATE", [
+      company,
+    ])
+  ).rows[0];
+  if (!target?.sandbox)
+    fail(
+      422,
+      "SAMPLE_ONLY",
+      "Examples may only be added to a synthetic workspace.",
+    );
+  const { rows } = await db.query(
+    "SELECT r.*, EXISTS(SELECT 1 FROM confirmations c WHERE c.company_id=r.company_id AND c.record_id=r.id) AS has_confirmations FROM records r WHERE r.company_id=$1 ORDER BY r.created_at",
+    [company],
+  );
+  const knownSample = rows.some(
+    (r) =>
+      r.kind === "evidence" &&
+      r.data.locator === "Synthetic V2 example · full excerpt",
+  );
+  if (!knownSample)
+    fail(422, "SAMPLE_ONLY", "This workspace is not the Cobalt sample.");
+  return populateCobaltExamples(
+    rows,
+    async (kind, title, data, state, existing) => {
+      const result = await putRecord(
+        db,
+        user,
+        company,
+        kind,
+        title,
+        data,
+        state,
+        existing,
+        "Enriched fictional Cobalt examples; preserved edited records",
+      );
+      if (existing?.kind === "task") {
+        // Keep the same binding invalidation guarantees as normal task edits.
+        const dependents = await db.query(
+          "SELECT * FROM records WHERE company_id=$1 AND kind IN ('agent','duty','handoff','workflow')",
+          [company],
+        );
+        for (const dependent of dependents.rows) {
+          if (
+            dependent.data.taskIds?.includes(existing.id) ||
+            dependent.data.taskBindings?.some((b: any) => b.id === existing.id)
+          )
+            await setState(
+              db,
+              user,
+              company,
+              dependent,
+              "stale",
+              "manifest.binding_stale",
+            );
+        }
+      }
+      return result;
+    },
+  );
+}
 export async function demoUser() {
   // A demo is always isolated in its own synthetic-data tenant. It grants no production access.
   const existing = await pool.query(
@@ -296,4 +364,5 @@ export async function seedRecords(
     },
     "draft",
   );
+  await ensureCobaltExamples(db, user, company);
 }
