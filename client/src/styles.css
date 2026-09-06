@@ -793,11 +793,7 @@ main#main {
 .candidate-hero {
   border: 1px solid #6c5840;
   border-left: 3px solid var(--amber);
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--amber-bg) 40%, var(--surface)),
-    var(--surface) 80%
-  );
+  background: var(--surface);
   border-radius: 12px;
   overflow: hidden;
   padding: 24px 25px 0;
@@ -3929,8 +3925,7 @@ tbody tr:last-child td {
   border: 1px solid var(--line);
   border-top: 2px solid var(--mode-ink);
   border-radius: 10px;
-  background:
-    linear-gradient(145deg, var(--mode-tint), transparent 55%), var(--surface);
+  background: var(--surface);
   min-height: 300px;
   transition:
     transform 0.15s,
@@ -3952,6 +3947,10 @@ tbody tr:last-child td {
   margin-bottom: 19px;
 }
 .mode-badge {
+  background: var(--mode-tint);
+  border: 1px solid color-mix(in srgb, var(--mode-ink) 30%, transparent);
+  border-radius: 5px;
+  padding: 4px 6px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -4032,7 +4031,7 @@ tbody tr:last-child td {
   color: var(--ink);
 }
 .card-person > svg {
-  color: var(--mode-ink);
+  color: var(--muted);
 }
 .card-person small {
   display: block;
@@ -4077,7 +4076,7 @@ tbody tr:last-child td {
   padding: 24px;
   border: 1px solid var(--line);
   border-top: 2px solid var(--mode-ink);
-  background: linear-gradient(125deg, var(--mode-tint), transparent), var(--bg);
+  background: var(--bg);
   border-radius: 10px;
   margin: 20px 0;
 }
@@ -4225,12 +4224,16 @@ tbody tr:last-child td {
 }
 .framework-library .framework-card {
   border-top: 2px solid var(--strategy-accent);
-  background:
-    linear-gradient(130deg, var(--strategy-tint), transparent), var(--surface);
+  background: var(--surface);
   min-height: 224px;
   padding: 18px;
 }
 .framework-label {
+  display: inline-flex;
+  background: var(--strategy-tint);
+  border: 1px solid color-mix(in srgb, var(--strategy-accent) 30%, transparent);
+  border-radius: 5px;
+  padding: 4px 6px;
   color: var(--strategy-accent);
   font-size: 9px;
   letter-spacing: 0.05em;
@@ -4259,7 +4262,7 @@ tbody tr:last-child td {
   border-left: 3px solid var(--strategy-accent);
   padding: 18px;
   border-radius: 8px;
-  background: var(--strategy-tint);
+  background: var(--surface);
   margin: 18px 0;
 }
 .framework-guide > summary {
