@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "tsx scripts/handbook.ts && tsc --noEmit && vite build",
+    "build": "tsx scripts/learning.ts && tsx scripts/handbook.ts && tsc --noEmit && vite build",
     "start": "tsx server/index.ts --production",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",

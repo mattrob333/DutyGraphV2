@@ -16,7 +16,7 @@ export const pilotSchema = z.object({
   website: z.string().max(200).optional(),
 });
 
-/** Public, write-only intake. No workspace or email is created by this action. */
+/** Public, write-only intake. A trigger queues an operator notification atomically. */
 export const applyForPilot: RequestHandler = async (req, res) => {
   const data = pilotSchema.parse(req.body);
   if (!data.website) {
@@ -38,10 +38,8 @@ export const applyForPilot: RequestHandler = async (req, res) => {
     }
   }
   // Identical receipt for duplicates; never reveal who has applied.
-  res
-    .status(202)
-    .json({
-      message:
-        "Your demo request is saved. We will review it and contact you about a possible pilot. No meeting is booked yet.",
-    });
+  res.status(202).json({
+    message:
+      "Your demo request is saved. We will review it and contact you about a possible pilot. No meeting is booked yet.",
+  });
 };

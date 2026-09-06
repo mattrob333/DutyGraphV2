@@ -3,6 +3,7 @@ import type { RequestHandler } from "express";
 import { pool } from "./db.ts";
 import { projectAll } from "./projection.ts";
 import { runRetention } from "./retention.ts";
+import { sendPilotNotifications } from "./pilot-notifications.ts";
 export const hostedAuthLimit: RequestHandler = async (req, res, next) => {
   try {
     const secret = process.env.PROVIDER_ENCRYPTION_KEY;
@@ -41,6 +42,7 @@ export async function runMaintenance({
   await retention();
   await cleanup();
   await projection();
+  await sendPilotNotifications();
 }
 
 export const maintenance: RequestHandler = async (req, res, next) => {

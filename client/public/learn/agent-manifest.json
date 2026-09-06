@@ -1,0 +1,36 @@
+{
+  "schema": "dutygraph-planning-worksheet-v1",
+  "status": "draft-not-authorized",
+  "owner": {
+    "personId": null,
+    "role": null,
+    "identitySource": null,
+    "verifiedAt": null
+  },
+  "task": {
+    "title": null,
+    "duty": null,
+    "input": null,
+    "instructions": [],
+    "output": null,
+    "handoff": null
+  },
+  "allowedScopes": [],
+  "excludedActions": [],
+  "evidenceReferences": [],
+  "humanCheckpoints": [],
+  "stopConditions": [
+    "Missing or stale permission evidence"
+  ],
+  "approval": {
+    "reviewerId": null,
+    "version": null,
+    "decision": "pending"
+  },
+  "lifecycle": {
+    "reviewAt": null,
+    "expiresAt": null,
+    "revocationSystem": null
+  },
+  "warning": "Planning worksheet only. Not a credential, signed approval, access policy, or runtime enforcement."
+}

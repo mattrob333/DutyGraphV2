@@ -1,3 +1,7 @@
+# Current progress
+
+The first four search guides, resource hub, manifest download, sitemap, canonical URLs, and durable pilot-notification queue are now implemented. See [SEO strategy and activation steps](seo-strategy.md). Sender verification, GA4, Search Console, and custom-domain setup remain pending. The notes below describe the broader growth roadmap.
+
 # Website growth phase — next work
 
 The current website recruits 5–10 pilot companies and provides a public discovery walkthrough. Pilot outcome claims remain unvalidated.
