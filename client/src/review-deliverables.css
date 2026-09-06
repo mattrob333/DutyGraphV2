@@ -21,6 +21,21 @@
   gap: 8px;
   margin-bottom: 20px;
 }
+.standup-questions {
+  list-style: none;
+  padding: 0;
+}
+.standup-questions li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: start;
+}
+.standup-question-number {
+  padding-top: 18px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
 .standup-questions textarea {
   width: 100%;
   margin: 7px 0;

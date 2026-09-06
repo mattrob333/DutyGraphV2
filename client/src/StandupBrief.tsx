@@ -97,9 +97,12 @@ export function StandupBrief({
           ? ` · Latest update: ${latest.state.replaceAll("_", " ")}`
           : " · No update requested yet"}
       </p>
-      <ol className="standup-questions">
+      <ol className="standup-questions" role="list">
         {questions.map((q, index) => (
           <li key={index}>
+            <span className="standup-question-number" aria-hidden="true">
+              {index + 1}.
+            </span>
             <textarea
               aria-label={`Standup question ${index + 1}`}
               value={q}

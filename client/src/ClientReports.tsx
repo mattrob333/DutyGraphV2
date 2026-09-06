@@ -159,7 +159,7 @@ export function ClientReports({
               <textarea
                 name="audience"
                 required
-                placeholder="Executive sponsor\nNamed client review team"
+                placeholder={"Executive sponsor\nNamed client review team"}
               />
             </Field>
             <Field label="Purpose" wide>

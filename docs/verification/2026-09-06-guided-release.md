@@ -27,4 +27,12 @@ The new **DutyGraph** AuraDB Free instance, ID `7c5923e8`, is running in the use
 
 The provider and email tests use synthetic responses. They do not prove actual inbox delivery, speech recognition quality, physical microphone behavior in each browser or live model output quality. Those checks need the configured accounts and representative business material. Agent proposals do not deploy autonomous workers, grant customer-system permissions or activate recurring business actions.
 
-Deployment and production smoke results are appended after release verification.
+## Browser and hosted release checks
+
+The fresh production bundle passed all twelve primary advisor sections at 1440-pixel desktop and 390-pixel mobile widths with zero JavaScript errors or page overflow. Additional clicks checked weekly update preparation, report search, the empty confirmed-packet gate, workflow selection, the populated reporting chart and task-mode filters. The mobile marketing gallery and FAQ also passed.
+
+A separate synthetic participant enrolled through a private invitation, saw the correct questions and role, used recording/pause/resume/finish/playback controls, recovered a typed draft after reload and submitted it. The advisor received the exact response. The submitted request stayed closed after reload. Recording used Chromium's synthetic microphone; no physical microphone or real voice was captured.
+
+Commit `98ae3d34514fc1608c2c872eea5fd417ef9f7518` reached Vercel READY in deployment `dpl_75vw5m3RxuAXP88cKZkp7LF3Dq9e`. [GitHub CI run 34033610593](https://github.com/mattrob333/DutyGraphV2/actions/runs/34033610593) passed build/tests, contract regeneration, dependency audit, the synthetic advisor journey and encrypted backup recovery. Production reads returned HTTP 200 for Discovery, all sixteen framework statuses, Neo4j settings, workspace records and company graph. The production marketing page and its assets also returned HTTP 200. These checks used the isolated QA account and sent no invitation or paid model call.
+
+The final visual pass also corrected the report audience placeholder and aligned weekly question numbers. The final release output records the latest deployment after those small fixes.
