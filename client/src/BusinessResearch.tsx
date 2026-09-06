@@ -19,6 +19,7 @@ type Attempt = {
   publicName: string;
   website: string;
   focus?: string;
+  remaining?: string[];
 };
 function savedAttempt(company: string): Attempt | null {
   try {
@@ -54,7 +55,11 @@ export function BusinessResearch({
   const [status, setStatus] = useState<Status | null>(null),
     [publicName, setPublicName] = useState(attempt?.publicName || company.name),
     [website, setWebsite] = useState(attempt?.website || ""),
-    [focus, setFocus] = useState(attempt?.focus || "company"),
+    [focuses, setFocuses] = useState<string[]>(
+      attempt
+        ? [attempt.focus || "company", ...(attempt.remaining || [])]
+        : researchFocuses.map((f) => f.id),
+    ),
     [ack, setAck] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
@@ -62,8 +67,7 @@ export function BusinessResearch({
   const resuming =
     !!attempt &&
     attempt.publicName === publicName.trim() &&
-    attempt.website === website.trim() &&
-    (attempt.focus || "company") === focus;
+    attempt.website === website.trim();
   const remember = (value: Attempt | null) => {
     setAttempt(value);
     try {
@@ -95,30 +99,50 @@ export function BusinessResearch({
     e.preventDefault();
     setBusy(true);
     setError("");
-    const current = resuming
+    let current: Attempt | null = resuming
       ? attempt!
       : {
           key: crypto.randomUUID(),
           publicName: publicName.trim(),
           website: website.trim(),
-          focus,
+          focus: focuses[0],
+          remaining: focuses.slice(1),
         };
     remember(current);
     try {
-      const run = await api<ResearchRun>(
-        path,
-        "POST",
-        {
-          publicName: current.publicName,
-          website: current.website,
-          ...(current.focus ? { focus: current.focus } : {}),
-          acknowledgePublicQuery: ack,
-        },
-        current.key,
-      );
-      if (["complete", "failed", "unknown"].includes(run.state)) remember(null);
-      await load();
-      if (run.state === "failed") setError(run.message);
+      while (current) {
+        const run = await api<ResearchRun>(
+          path,
+          "POST",
+          {
+            publicName: current.publicName,
+            website: current.website,
+            ...(current.focus ? { focus: current.focus } : {}),
+            acknowledgePublicQuery: true,
+          },
+          current.key,
+        );
+        await load();
+        if (!["complete", "failed", "unknown"].includes(run.state)) break;
+        if (run.state !== "complete") {
+          setError(
+            run.message ||
+              "This search did not finish. Review the saved result before starting more research.",
+          );
+          remember(null);
+          break;
+        }
+        const remaining: string[] = current.remaining || [];
+        current = remaining.length
+          ? {
+              ...current,
+              key: crypto.randomUUID(),
+              focus: remaining[0],
+              remaining: remaining.slice(1),
+            }
+          : null;
+        remember(current);
+      }
     } catch (e) {
       setError(
         (e as Error).message +
@@ -188,16 +212,29 @@ export function BusinessResearch({
           </Badge>
           <form onSubmit={search} className="research-form">
             <Field label="What should we research?">
-              <select value={focus} onChange={(e) => setFocus(e.target.value)}>
+              <div className="discovery-source-list">
                 {researchFocuses.map((f) => (
-                  <option key={f.id} value={f.id}>
-                    {f.label}
-                  </option>
+                  <label className="discovery-source" key={f.id}>
+                    <input
+                      type="checkbox"
+                      checked={focuses.includes(f.id)}
+                      disabled={busy || !!attempt}
+                      onChange={(e) =>
+                        setFocuses(
+                          e.target.checked
+                            ? [...focuses, f.id]
+                            : focuses.filter((id) => id !== f.id),
+                        )
+                      }
+                    />
+                    <span>{f.label}</span>
+                  </label>
                 ))}
-              </select>
+              </div>
             </Field>
             <Field label="Public business name">
               <input
+                disabled={busy || !!attempt}
                 value={publicName}
                 onChange={(e) => setPublicName(e.target.value)}
                 minLength={2}
@@ -207,6 +244,7 @@ export function BusinessResearch({
             </Field>
             <Field label="Official website (optional)">
               <input
+                disabled={busy || !!attempt}
                 value={website}
                 onChange={(e) => setWebsite(e.target.value)}
                 type="url"
@@ -222,7 +260,9 @@ export function BusinessResearch({
             </p>
             <div className="research-query">
               <small>QUERY SENT TO EXA</small>
-              <p>{researchQuery(publicName, focus, "").query}</p>
+              {focuses.map((focus) => (
+                <p key={focus}>{researchQuery(publicName, focus, "").query}</p>
+              ))}
             </div>
             <label className="check-line">
               <input
@@ -240,7 +280,8 @@ export function BusinessResearch({
                 busy ||
                 !status?.configured ||
                 !ack ||
-                (status.used >= status.limit && !resuming)
+                !focuses.length ||
+                (status.limit - status.used < focuses.length && !resuming)
               }
             >
               {busy
@@ -258,8 +299,8 @@ export function BusinessResearch({
             {status && (
               <p className="subtle">
                 {status.used} of {status.limit} requests used in the account’s
-                rolling 24-hour window. Provider charges may apply; no automatic
-                retries.
+                rolling 24-hour window. This selection uses {focuses.length}{" "}
+                requests. Provider charges may apply; no automatic retries.
               </p>
             )}
             {status && !status.configured && (
@@ -273,8 +314,8 @@ export function BusinessResearch({
           <Button onClick={create}>Add a public source manually</Button>
         </Panel>
         <Panel
-          title="What to bring to the first meeting"
-          subtitle="A draft to verify, with clear gaps. A public claim is not proof of an internal process."
+          title="What the meeting pack covers"
+          subtitle="Collect sources, import the useful ones, then prepare the meeting pack below. The saved brief carries its questions into kickoff."
         >
           <div className="research-checklist">
             {researchChecklist.map(([title, detail]) => (
@@ -284,80 +325,89 @@ export function BusinessResearch({
               </div>
             ))}
           </div>
-          <Button onClick={kickoff}>Prepare engagement & kickoff</Button>
+          <Button onClick={kickoff}>Open leadership kickoff</Button>
         </Panel>
       </div>
-      <Panel
-        title="Collected sources"
-        subtitle="Open the source, inspect its content, then import it for review. Import does not accept the source or confirm work."
-        action={
-          <Button
-            onClick={() => {
-              setError("");
-              load().catch((e) => setError(e.message));
-            }}
-          >
-            Refresh research
-          </Button>
-        }
-      >
-        {!status?.runs.length && (
-          <p>
-            No research runs yet. Manual sources appear in the Evidence library.
-          </p>
-        )}
-        {status?.runs.map((run, i) => (
-          <details className="research-run" key={run.id} open={i === 0}>
-            <summary>
-              {run.query} <Badge>{run.state}</Badge>
-              <small>
-                {new Date(run.created_at).toLocaleString()} ·{" "}
-                {run.results.length} sources
-              </small>
-            </summary>
-            {run.message && <p className="notice">{run.message}</p>}
-            {["reserved", "running"].includes(run.state) && (
-              <p>
-                The request is in progress. Refresh to check its saved result;
-                starting another search creates a separate request.
-              </p>
-            )}
-            {run.state === "complete" && !run.results.length && (
-              <p>
-                No usable page text returned. Try a more precise public name or
-                add a source manually.
-              </p>
-            )}
-            {run.results.map((source, index) => (
-              <article className="research-source" key={source.url}>
-                <h3>{source.title}</h3>
-                <a href={source.url} target="_blank" rel="noopener noreferrer">
-                  Open original source ↗
-                </a>
-                <p className="subtle">
-                  Collected {new Date(source.retrievedAt).toLocaleString()}
-                  {source.publishedDate
-                    ? ` · Published ${source.publishedDate}`
-                    : ""}
-                  {source.excerpted ? " · First 6,000 characters retained" : ""}
+      <div className="discovery-section">
+        <Panel
+          title="Collected sources"
+          subtitle="Open the source, inspect its content, then import it for review. Import does not accept the source or confirm work."
+          action={
+            <Button
+              onClick={() => {
+                setError("");
+                load().catch((e) => setError(e.message));
+              }}
+            >
+              Refresh research
+            </Button>
+          }
+        >
+          {!status?.runs.length && (
+            <p>
+              No research runs yet. Manual sources appear in the Evidence
+              library.
+            </p>
+          )}
+          {status?.runs.map((run, i) => (
+            <details className="research-run" key={run.id} open={i === 0}>
+              <summary>
+                {run.query} <Badge>{run.state}</Badge>
+                <small>
+                  {new Date(run.created_at).toLocaleString()} ·{" "}
+                  {run.results.length} sources
+                </small>
+              </summary>
+              {run.message && <p className="notice">{run.message}</p>}
+              {["reserved", "running"].includes(run.state) && (
+                <p>
+                  The request is in progress. Refresh to check its saved result;
+                  starting another search creates a separate request.
                 </p>
-                <details>
-                  <summary>Inspect captured text</summary>
-                  <pre>{source.text}</pre>
-                </details>
-                <Button
-                  disabled={busy}
-                  onClick={() => importSource(run, index)}
-                >
-                  {source.importedId
-                    ? "Open imported evidence"
-                    : "Import as unreviewed evidence"}
-                </Button>
-              </article>
-            ))}
-          </details>
-        ))}
-      </Panel>
+              )}
+              {run.state === "complete" && !run.results.length && (
+                <p>
+                  No usable page text returned. Try a more precise public name
+                  or add a source manually.
+                </p>
+              )}
+              {run.results.map((source, index) => (
+                <article className="research-source" key={source.url}>
+                  <h3>{source.title}</h3>
+                  <a
+                    href={source.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open original source ↗
+                  </a>
+                  <p className="subtle">
+                    Collected {new Date(source.retrievedAt).toLocaleString()}
+                    {source.publishedDate
+                      ? ` · Published ${source.publishedDate}`
+                      : ""}
+                    {source.excerpted
+                      ? " · First 6,000 characters retained"
+                      : ""}
+                  </p>
+                  <details>
+                    <summary>Inspect captured text</summary>
+                    <pre>{source.text}</pre>
+                  </details>
+                  <Button
+                    disabled={busy}
+                    onClick={() => importSource(run, index)}
+                  >
+                    {source.importedId
+                      ? "Open imported evidence"
+                      : "Import as unreviewed evidence"}
+                  </Button>
+                </article>
+              ))}
+            </details>
+          ))}
+        </Panel>
+      </div>
     </>
   );
 }

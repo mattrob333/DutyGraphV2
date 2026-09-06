@@ -766,6 +766,21 @@ before(async () => {
           questions: ["Who approves the supplier?"],
           tasks: [],
           hypotheses: [],
+          ...(input.mode === "roster"
+            ? {
+                people: [
+                  {
+                    name: "Synthetic Participant",
+                    email: "",
+                    role: "Owner",
+                    team: "Operations",
+                    managerName: "",
+                    duties: [],
+                    sourceIds: [input.sources[0].id],
+                  },
+                ],
+              }
+            : {}),
         },
         responseId: "synthetic-openai-id",
         usage: { input_tokens: 10, output_tokens: 10 },
@@ -1590,6 +1605,72 @@ test("AI drafts bind sources, require consent, isolate tenants and do not create
   });
   assert.equal((await request(c, path)).data.jobs[0].stale, true);
   assert.equal((await request(c, path, "POST", body)).status, 422);
+});
+
+test("discovery binds interviews to a company person and limits roster proposals to accepted internal evidence", async () => {
+  const c = await register(),
+    other = await register(),
+    f = await fixture(c),
+    foreign = await fixture(other);
+  await saveProvider(c, "openai");
+  const path = prefix(c) + "/ai";
+  const body = {
+    mode: "interview",
+    sourceIds: [f.e.id],
+    personId: f.p.id,
+    consent: true,
+  };
+  assert.equal(
+    (await request(c, path, "POST", { ...body, personId: foreign.p.id }))
+      .status,
+    404,
+  );
+  assert.equal(
+    (await request(c, path, "POST", { ...body, personId: f.e.id })).status,
+    422,
+  );
+  assert.equal((await request(c, path, "POST", body)).status, 200);
+  let jobs = (await request(c, path)).data.jobs;
+  assert.equal(jobs[0].input.participant.id, f.p.id);
+  assert.equal(jobs[0].stale, false);
+  await tx(c.user.tenant_id, async (db) => {
+    await db.query("UPDATE records SET version=version+1 WHERE id=$1", [
+      f.p.id,
+    ]);
+  });
+  jobs = (await request(c, path)).data.jobs;
+  assert.equal(jobs[0].stale, true);
+  const before = (await request(c, prefix(c) + "/records")).data;
+  assert.equal(
+    (
+      await request(c, path, "POST", {
+        mode: "roster",
+        sourceIds: [f.e.id],
+        consent: true,
+      })
+    ).status,
+    200,
+  );
+  jobs = (await request(c, path)).data.jobs;
+  assert.equal(jobs[0].state, "complete");
+  assert.equal(jobs[0].result.draft.people[0].email, "");
+  assert.deepEqual((await request(c, prefix(c) + "/records")).data, before);
+  await tx(c.user.tenant_id, async (db) => {
+    await db.query(
+      "UPDATE records SET data=jsonb_set(data,'{bucket}','\"biz\"') WHERE id=$1",
+      [f.e.id],
+    );
+  });
+  assert.equal(
+    (
+      await request(c, path, "POST", {
+        mode: "roster",
+        sourceIds: [f.e.id],
+        consent: true,
+      })
+    ).status,
+    422,
+  );
 });
 
 test("hosted rewrite metadata is omitted without weakening graph query validation", async () => {

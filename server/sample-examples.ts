@@ -246,6 +246,53 @@ export async function populateCobaltExamples(
     "Warehouse associate",
     "Warehouse",
   );
+  // Add reporting links only to untouched fictional people. Never replace an advisor edit.
+  const priya = await person(
+    "priya",
+    "Priya Shah",
+    "Systems administrator",
+    "IT",
+  );
+  for (const [member, manager] of [
+    [maya, elena],
+    [dana, elena],
+    [karl, elena],
+    [sofia, elena],
+    [priya, elena],
+    [jordan, elena],
+    [riley, karl],
+    [tariq, maya],
+    [noah, maya],
+    [alex, jordan],
+    [casey, riley],
+  ]) {
+    if (
+      member.version !== 1 ||
+      member.state !== "reported" ||
+      member.data.managerId ||
+      member.data.sampleOrgVersion ||
+      member.data.externalId ||
+      member.data.email !==
+        member.title.toLowerCase().replaceAll(" ", ".") + "@cobalt.example"
+    )
+      continue;
+    const updated = await write(
+      "person",
+      member.title,
+      {
+        ...member.data,
+        managerId: manager.id,
+        sampleOrgVersion: "cobalt-reporting-v1",
+      },
+      member.state,
+      member,
+    );
+    all.splice(
+      all.findIndex((r) => r.id === member.id),
+      1,
+      updated,
+    );
+  }
   const evidence = async (
     key: string,
     title: string,

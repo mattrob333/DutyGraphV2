@@ -15,6 +15,8 @@ export function OrgView({
   open: (record: RecordRow) => void;
 }) {
   const [mode, setMode] = useState("duties");
+  const [department, setDepartment] = useState("");
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const people = records.filter((r) => r.kind === "person");
   const tasks = records.filter((r) => r.kind === "task");
   const dutyRecords = records.filter((r) => r.kind === "duty");
@@ -82,10 +84,30 @@ export function OrgView({
     const children = reports.filter(
       (p) => p.data.managerId === person.id && !next.has(p.id),
     );
+    const childTrees = children.map((p) => branch(p, next));
+    const root = !reports.some((p) => p.id === person.id);
+    const showChildren = root || expanded.has(person.id);
     return (
       <li key={person.id}>
         {personCard(person)}
-        {!!children.length && <ul>{children.map((p) => branch(p, next))}</ul>}
+        {!!children.length && !root && (
+          <button
+            className="org-expand"
+            aria-expanded={showChildren}
+            onClick={() =>
+              setExpanded((previous) => {
+                const next = new Set(previous);
+                if (next.has(person.id)) next.delete(person.id);
+                else next.add(person.id);
+                return next;
+              })
+            }
+          >
+            {showChildren ? "Hide" : "Show"} {children.length} direct{" "}
+            {children.length === 1 ? "report" : "reports"}
+          </button>
+        )}
+        {!!children.length && showChildren && <ul>{childTrees}</ul>}
       </li>
     );
   };
@@ -143,7 +165,12 @@ export function OrgView({
       <div className="org-body">
         <div className="org-content">
           {mode === "duties" ? (
-            <OrgResponsibilities records={records} open={open} />
+            <OrgResponsibilities
+              key={department}
+              initialTeam={department}
+              records={records}
+              open={open}
+            />
           ) : mode === "teams" ? (
             <div className="org-teams">
               {teams.map((team) => {
@@ -183,6 +210,23 @@ export function OrgView({
                 Managers appear above their recorded direct reports. Select any
                 person to inspect their work.
               </p>
+              <div
+                className="org-departments"
+                aria-label="Explore department duties"
+              >
+                {teams.map((team) => (
+                  <Button
+                    key={team}
+                    onClick={() => {
+                      setDepartment(team);
+                      setMode("duties");
+                      select(null);
+                    }}
+                  >
+                    {team} duties
+                  </Button>
+                ))}
+              </div>
               <ul className="org-tree">
                 {trees}
                 {cycleTrees}

@@ -145,6 +145,30 @@ test("reopening examples is idempotent and preserves user revisions", async () =
     "My notes must survive.",
   );
 });
+test("sample reporting hierarchy connects every person and preserves edited or removed manager links", async () => {
+  const { write } = memoryWriter();
+  const rows = await populateCobaltExamples([], write);
+  const people = rows.filter((r) => r.kind === "person");
+  const root = people.find((r) => r.title === "Elena Torres")!;
+  assert.equal(people.length, 12);
+  for (const person of people.filter((r) => r.id !== root.id)) {
+    const seen = new Set<string>();
+    let current = person;
+    while (current.id !== root.id) {
+      assert.ok(!seen.has(current.id));
+      seen.add(current.id);
+      const manager = people.find((r) => r.id === current.data.managerId);
+      assert.ok(manager);
+      current = manager;
+    }
+  }
+  const maya = people.find((r) => r.title === "Maya Chen")!;
+  maya.data.managerId = "";
+  maya.version++;
+  const again = await populateCobaltExamples(rows, write);
+  assert.equal(again.find((r) => r.id === maya.id)?.data.managerId, "");
+});
+
 test("only untouched original tasks qualify for enrichment", () => {
   const r = {
     kind: "task",

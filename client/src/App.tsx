@@ -856,8 +856,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
   else if (page === "discovery") {
     const tabs = [
       ["research", "Business research"],
-      ["plan", "Engagement & kickoff"],
-      ["requests", "Requests & responses"],
+      ["plan", "Leadership kickoff"],
+      ["requests", "Team interviews & responses"],
       ["people", "People in scope"],
       ["evidence", "Evidence library"],
     ];
@@ -937,6 +937,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             />
             <AiWorkbench
               key={company.id + "ai"}
+              kickoff={() => setTab("plan")}
               company={company.id}
               records={records}
               create={(preset) =>
@@ -946,6 +947,21 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           </>
         ) : tab === "plan" ? (
           <Engagement
+            captureMeeting={() =>
+              setModal({
+                type: "form",
+                kind: "evidence",
+                preset: {
+                  type: "Leadership meeting transcript",
+                  bucket: "leadership",
+                  classification: "Inferred",
+                  title: "Leadership kickoff notes",
+                },
+              })
+            }
+            roster={() => setTab("people")}
+            interviews={() => setTab("requests")}
+            key={company.id}
             company={company}
             records={records}
             create={create}
@@ -963,6 +979,22 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                 account.
               </span>
             </div>
+            <AiWorkbench
+              key={company.id + "interview"}
+              company={company.id}
+              records={records}
+              stage="interview"
+              create={(preset) =>
+                setModal({ type: "form", kind: "task", preset })
+              }
+              prepareRequest={(preset) =>
+                setModal({
+                  type: "form",
+                  kind: "request",
+                  preset: { ...preset, notice: company.settings.notice },
+                })
+              }
+            />
             {pending.length > 0 && (
               <Panel
                 title="Returned for your review"
@@ -971,6 +1003,15 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                 {rows(pending)}
               </Panel>
             )}
+            <AiWorkbench
+              key={company.id + "draft-tasks"}
+              company={company.id}
+              records={records}
+              stage="tasks"
+              create={(preset) =>
+                setModal({ type: "form", kind: "task", preset })
+              }
+            />
             <Panel
               title="Requests"
               subtitle="Prepare → private link → participant response → advisor review"
@@ -984,12 +1025,26 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             )}
           </>
         ) : tab === "people" ? (
-          <Panel
-            title="The agreed engagement roster"
-            subtitle="These people define participation coverage. Reporting and duty ownership remain separate claims."
-          >
-            {rows(people)}
-          </Panel>
+          <>
+            <AiWorkbench
+              key={company.id + "roster-ai"}
+              company={company.id}
+              records={records}
+              stage="roster"
+              create={(preset) =>
+                setModal({ type: "form", kind: "task", preset })
+              }
+              createRecord={(kind, preset) =>
+                setModal({ type: "form", kind, preset })
+              }
+            />
+            <Panel
+              title="The agreed engagement roster"
+              subtitle="These people define participation coverage. Reporting and duty ownership remain separate claims."
+            >
+              {rows(people)}
+            </Panel>
+          </>
         ) : (
           <Panel
             title="Every source keeps its origin"

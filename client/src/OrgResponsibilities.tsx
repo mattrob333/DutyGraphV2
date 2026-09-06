@@ -6,9 +6,11 @@ import { Badge, Button, State } from "./ui.tsx";
 export function OrgResponsibilities({
   records,
   open,
+  initialTeam = "",
 }: {
   records: RecordRow[];
   open: (r: RecordRow) => void;
+  initialTeam?: string;
 }) {
   const people = records.filter((r) => r.kind === "person");
   const tasks = records.filter(
@@ -36,7 +38,7 @@ export function OrgResponsibilities({
       (t) => ids.has(t.data.ownerId) || ids.has(t.data.performerId),
     );
   };
-  const [chosen, setChosen] = useState("");
+  const [chosen, setChosen] = useState(initialTeam);
   const team =
     (teams.includes(chosen) ? chosen : "") ||
     [...teams].sort((a, b) => teamTasks(b).length - teamTasks(a).length)[0];
