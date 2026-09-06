@@ -101,7 +101,7 @@
   list-style: none;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(7, 1fr);
   margin: 0 0 24px;
   border-bottom: 1px solid var(--dd-line);
 }
@@ -689,4 +689,15 @@
     margin: -24px -24px 26px;
     padding: 24px;
   }
+}
+
+.dd-answer select {
+  display: block;
+  width: 100%;
+  margin: 12px 0;
+  padding: 12px;
+  background: #252829;
+  color: #f0eee7;
+  border: 1px solid #687273;
+  border-radius: 6px;
 }

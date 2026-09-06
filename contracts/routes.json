@@ -399,6 +399,11 @@
     },
     {
       "method": "POST",
+      "path": "/api/v1/participant/requests/{recordId}/task-draft",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
       "path": "/api/v1/sample-company",
       "source": "server/app.ts"
     }

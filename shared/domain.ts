@@ -59,6 +59,7 @@ export const schemas = {
       inputs: text,
       instructions: text,
       aiPrompt: optional,
+      destination: optional,
       valueStage: z
         .enum(["receive", "prepare", "check", "decide", "deliver", "unmapped"])
         .default("unmapped"),

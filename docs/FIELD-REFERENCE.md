@@ -123,6 +123,7 @@ Generated from the same runtime schemas that validate saved records. Required fi
 | inputs | Yes | string; min 1 characters; max 20000 characters |
 | instructions | Yes | string; min 1 characters; max 20000 characters |
 | aiPrompt | No | string; max 20000 characters; default "" |
+| destination | No | string; max 20000 characters; default "" |
 | valueStage | No | receive, prepare, check, decide, deliver, unmapped; default "unmapped" |
 | output | Yes | string; min 1 characters; max 20000 characters |
 | systems | No | array; max 80 items; default [] |

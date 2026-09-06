@@ -1,3 +1,4 @@
+import { participantDraft, participantCards } from "./participant-cards.ts";
 import { applyForPilot } from "./pilot.ts";
 import { strategyRouter } from "./strategy.ts";
 import { discoveryRouter, type DiscoveryProvider } from "./discovery.ts";
@@ -41,7 +42,11 @@ import {
 import { demoUser, seedRecords, ensureCobaltExamples } from "./seed.ts";
 import { createOrEdit, refreshTask } from "./records.ts";
 import { reviewTask } from "./task-review.ts";
-import { confirmationStatus, diagnosisReadiness } from "../shared/domain.ts";
+import {
+  schemas,
+  confirmationStatus,
+  diagnosisReadiness,
+} from "../shared/domain.ts";
 import { previewRoster } from "./roster.ts";
 import { createExport, exportZip } from "./exports.ts";
 import { linksFor } from "./projection.ts";
@@ -787,6 +792,22 @@ export function createApp({
               const sourceText =
                 r.data.text ||
                 "Audio response; no reviewed transcript was supplied.";
+              const pendingSources = (
+                await db.query(
+                  "SELECT * FROM records WHERE company_id=$1 AND kind='evidence' AND state='proposed' AND data->>'originId'=$2",
+                  [c.id, r.id],
+                )
+              ).rows;
+              for (const source of pendingSources)
+                if (source.data.responseHash === r.hash)
+                  await setState(
+                    db,
+                    user,
+                    c.id,
+                    source,
+                    "accepted",
+                    "evidence.accepted",
+                  );
               const priorSources = (
                 await db.query(
                   "SELECT * FROM records WHERE company_id=$1 AND kind='evidence' AND state='accepted' AND data->>'originId'=$2",
@@ -1047,6 +1068,10 @@ export function createApp({
       }),
     ),
   );
+  api.post(
+    "/participant/requests/:recordId/task-draft",
+    participantDraft(discoveryProvider),
+  );
   api.post("/participant/requests/:recordId/submit", async (req, res) =>
     res.json(
       await run(req, async (db: any) => {
@@ -1077,6 +1102,7 @@ export function createApp({
                 z.enum(["correct", "needs_change", "not_mine", "unsure"]),
               )
               .default({}),
+            taskCards: participantCards.optional(),
             note: z.string().max(10000).default(""),
           })
           .strict()
@@ -1153,9 +1179,100 @@ export function createApp({
             assetId: d.assetId,
             decisions: d.decisions,
             note: d.note,
+            taskCards: d.taskCards || [],
           },
           "returned",
         );
+        if (d.taskCards?.length && r.data.type !== "work")
+          fail(
+            422,
+            "WORK_ONLY",
+            "Task descriptions belong to work interviews.",
+          );
+        const cardEvidence = d.taskCards?.length
+          ? await putRecord(
+              db,
+              u,
+              u.company_id!,
+              "evidence",
+              r.title + " — original account",
+              {
+                type: "Employee account",
+                text: d.text,
+                personId: u.person_id,
+                bucket: "org",
+                assetId: d.assetId,
+                responseId: response.id,
+                originId: response.id,
+                responseHash: response.hash,
+                requestId: r.id,
+                classification: "Known",
+                locator: `Participant response ${response.id}`,
+              },
+              "proposed",
+            )
+          : null;
+        for (const card of d.taskCards || []) {
+          if (card.decision === "not_mine") continue;
+          const taskFields = schemas.task.parse({
+            title: card.title,
+            duty: card.duty,
+            ownerId: "",
+            performerId: u.person_id,
+            purpose: "Work described by the participant",
+            trigger: "Not yet recorded",
+            inputs: card.inputs || "Not yet recorded",
+            instructions: card.instructions || "Not yet recorded",
+            output: card.output || "Not yet recorded",
+            humanGate: "Company authority and checkpoints require review",
+            systems: card.software
+              .split(",")
+              .map((s: string) => s.trim())
+              .filter(Boolean),
+            destination: card.handoff,
+            reviewDue: r.data.dueDate,
+            reason: "Participant reviewed their own description",
+            evidenceIds: cardEvidence ? [cardEvidence.id] : [],
+          });
+          const task = await putRecord(
+            db,
+            u,
+            u.company_id!,
+            "task",
+            taskFields.title,
+            {
+              ...taskFields,
+              reviewed: false,
+              participantResponseId: response.id,
+              sourceBindings: cardEvidence
+                ? [
+                    {
+                      id: cardEvidence.id,
+                      version: cardEvidence.version,
+                      hash: cardEvidence.hash,
+                    },
+                  ]
+                : [],
+            },
+            "proposed",
+          );
+          await db.query(
+            "INSERT INTO confirmations(id,tenant_id,company_id,record_id,version,hash,person_id,user_id,request_id,decision,note) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)",
+            [
+              randomUUID(),
+              u.tenant_id,
+              u.company_id,
+              task.id,
+              task.version,
+              task.hash,
+              u.person_id,
+              u.id,
+              r.id,
+              card.decision,
+              `Original response ${response.id}. Confirms description only; ownership needs advisor review.`,
+            ],
+          );
+        }
         await setState(db, u, u.company_id!, r, "returned", "request.returned");
         return { ok: true, responseId: response.id };
       }),
@@ -1408,7 +1525,10 @@ export function createApp({
     discoveryRouter(discoveryProvider),
   );
   api.use("/companies/:companyId/neo4j", neo4jRouter());
-  api.use("/companies/:companyId/agent-requests", agentRequestsRouter(aiProvider));
+  api.use(
+    "/companies/:companyId/agent-requests",
+    agentRequestsRouter(aiProvider),
+  );
   api.use(
     "/companies/:companyId/framework-runs",
     frameworkRouter(frameworkProvider),

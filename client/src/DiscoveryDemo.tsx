@@ -63,6 +63,7 @@ const steps = [
   "Invitation",
   "Private link",
   "Respond",
+  "Review cards",
   "Submit",
   "Advisor inbox",
 ];
@@ -76,6 +77,8 @@ export function DiscoveryDemo() {
   const [submittedAnswers, setSubmittedAnswers] = useState<
     Record<string, string>
   >({});
+  const [card, setCard] = useState<any>(null);
+  const [submittedCards, setSubmittedCards] = useState<Record<string, any>>({});
   const [saved, setSaved] = useState(false);
   const [voiceExample, setVoiceExample] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -89,6 +92,8 @@ export function DiscoveryDemo() {
     setSelected(people[0].id);
     setAnswers({});
     setSubmittedAnswers({});
+    setSubmittedCards({});
+    setCard(null);
     setReturned([]);
     setSaved(false);
     setVoiceExample(false);
@@ -103,7 +108,8 @@ export function DiscoveryDemo() {
     setReturned((items) =>
       items.includes(selected) ? items : [...items, selected],
     );
-    setStep(4);
+    setSubmittedCards((items) => ({ ...items, [selected]: { ...card } }));
+    setStep(5);
   }
   return (
     <div className="discovery-demo">
@@ -155,7 +161,7 @@ export function DiscoveryDemo() {
         <section className="dd-stage" aria-labelledby="dd-stage-title">
           <div className="dd-stage-bar">
             <span>
-              {step === 0 || step === 5 ? "ADVISOR VIEW" : "PARTICIPANT VIEW"}{" "}
+              {step === 0 || step === 6 ? "ADVISOR VIEW" : "PARTICIPANT VIEW"}{" "}
               <span className="dd-separator">/</span> COBALT INDUSTRIAL SUPPLY
             </span>
             <button onClick={reset} className="dd-text-button">
@@ -163,7 +169,7 @@ export function DiscoveryDemo() {
             </button>
           </div>
           <div className="dd-stage-content">
-            <p className="dd-eyebrow">STEP {step + 1} OF 6</p>
+            <p className="dd-eyebrow">STEP {step + 1} OF 7</p>
             <h2 id="dd-stage-title" tabIndex={-1} ref={heading}>
               {
                 [
@@ -171,6 +177,7 @@ export function DiscoveryDemo() {
                   "A clear request, in their inbox.",
                   "Their invitation opens their own page.",
                   "Let them explain the work.",
+                  "Check what we understood.",
                   "Their part is done.",
                   "The answers come back together.",
                 ][step]
@@ -326,9 +333,9 @@ export function DiscoveryDemo() {
             {step === 3 && (
               <>
                 <p className="dd-lead">
-                  {person.name} · {person.role}. Speak naturally or type. The
-                  advisor wants your account of the work, including the
-                  exceptions.
+                  {person.name} · {person.role}. Voice is preferred: a real
+                  example helps us capture the steps, exceptions, and
+                  frustrations. You can type instead.
                 </p>
                 <div className="dd-response-grid">
                   <div>
@@ -393,16 +400,98 @@ export function DiscoveryDemo() {
                       <button
                         disabled={!answer.trim()}
                         className="dd-primary"
-                        onClick={submit}
+                        onClick={() => {
+                          setCard({
+                            title: person.duty,
+                            inputs: "Describe what starts this task.",
+                            instructions: answer,
+                            output:
+                              "Describe what a finished result looks like.",
+                            handoff:
+                              "Name the person, team or system that receives it.",
+                            software: "Name the software you use.",
+                            decision: "",
+                          });
+                          setStep(4);
+                        }}
                       >
-                        Submit sample response →
+                        Create my sample task card →
                       </button>
                     </div>
                   </div>
                 </div>
               </>
             )}
-            {step === 4 && (
+            {step === 4 && card && (
+              <div className="dd-answer">
+                <p>
+                  Illustrative extraction. In the real flow, AI uses your
+                  response to prepare cards. Edit the details, then confirm your
+                  best understanding.
+                </p>
+                {[
+                  "title",
+                  "inputs",
+                  "instructions",
+                  "output",
+                  "handoff",
+                  "software",
+                ].map((field) => (
+                  <label key={field}>
+                    {
+                      (
+                        {
+                          title: "Task name",
+                          inputs: "What I receive",
+                          instructions: "What I do",
+                          output: "What I produce",
+                          handoff: "Where the output goes",
+                          software: "Software I use",
+                        } as any
+                      )[field]
+                    }
+                    <textarea
+                      value={card[field]}
+                      onChange={(e) =>
+                        setCard({
+                          ...card,
+                          [field]: e.target.value,
+                          decision: "",
+                        })
+                      }
+                    />
+                  </label>
+                ))}
+                <label>
+                  Does this match your understanding?
+                  <select
+                    value={card.decision}
+                    onChange={(e) =>
+                      setCard({ ...card, decision: e.target.value })
+                    }
+                  >
+                    <option value="">Choose after reviewing</option>
+                    <option value="correct">
+                      This matches my understanding
+                    </option>
+                    <option value="not_mine">Remove — not my task</option>
+                    <option value="unsure">I'm not sure</option>
+                  </select>
+                </label>
+                <p>
+                  This records your understanding. Differences between teammates
+                  can be resolved after their cards return.
+                </p>
+                <button
+                  className="dd-primary"
+                  disabled={!card.decision}
+                  onClick={submit}
+                >
+                  Send my answer and reviewed card →
+                </button>
+              </div>
+            )}
+            {step === 5 && (
               <div className="dd-success">
                 <span className="dd-success-icon" aria-hidden="true">
                   ✓
@@ -410,16 +499,16 @@ export function DiscoveryDemo() {
                 <h3>Thanks, {person.name.split(" ")[0]}.</h3>
                 <p>
                   Your sample response is ready for the advisor's inbox. In the
-                  real flow, the advisor reviews it before turning it into work
-                  records.
+                  real flow, your reviewed cards and original answer arrive
+                  together.
                 </p>
                 <span className="dd-chip">SIMULATED SUBMISSION</span>
-                <button className="dd-primary" onClick={() => setStep(5)}>
+                <button className="dd-primary" onClick={() => setStep(6)}>
                   See what the advisor receives →
                 </button>
               </div>
             )}
-            {step === 5 && (
+            {step === 6 && (
               <>
                 <p className="dd-lead">
                   Each return stays connected to its person and request. The
@@ -470,12 +559,25 @@ export function DiscoveryDemo() {
                     {returned.includes(selected) ? (
                       <>
                         <blockquote>{submittedAnswers[selected]}</blockquote>
-                        <span className="dd-chip">Awaiting review</span>
+                        <span className="dd-chip">
+                          Participant review received
+                        </span>
+                        <p>
+                          Task: {submittedCards[selected]?.title} ·{" "}
+                          {submittedCards[selected]?.decision === "correct"
+                            ? "Matches their understanding"
+                            : submittedCards[selected]?.decision === "not_mine"
+                              ? "Removed by participant"
+                              : "Needs clarification"}
+                        </p>
+                        <p>Output: {submittedCards[selected]?.output}</p>
+                        <p>Goes to: {submittedCards[selected]?.handoff}</p>
+                        <p>Software: {submittedCards[selected]?.software}</p>
                         <p className="dd-note">
-                          Next in the real workflow: review the account, draft
-                          task cards, and ask the person to confirm them. A
-                          submitted answer does not automatically confirm a
-                          duty.
+                          The participant has reviewed their description. The
+                          advisor now checks gaps, overlapping responsibilities
+                          and handoffs across the team. A material change may
+                          need the person to check it again.
                         </p>
                       </>
                     ) : (

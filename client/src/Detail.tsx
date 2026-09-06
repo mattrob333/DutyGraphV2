@@ -1,3 +1,4 @@
+import { Panel } from "./ui.tsx";
 import { useState } from "react";
 import {
   Edit3,
@@ -387,6 +388,7 @@ export function Detail({
             <section>
               <small>02 / WORK PRODUCT</small>
               <p>{r.data.output}</p>
+              {r.data.destination && <p>Goes to: {r.data.destination}</p>}
             </section>
           </div>
           <h3>Software used in this task</h3>
@@ -705,6 +707,26 @@ export function Detail({
             />
           )}
           <p>{r.data.note}</p>
+          {r.data.taskCards?.map((card: any, i: number) => (
+            <Panel
+              key={i}
+              title={card.title}
+              subtitle={
+                card.decision === "correct"
+                  ? "Participant confirmed this description"
+                  : card.decision === "not_mine"
+                    ? "Participant removed this task"
+                    : "Participant needs help reviewing"
+              }
+            >
+              <p>{card.duty}</p>
+              <p>{card.inputs}</p>
+              <p>{card.instructions}</p>
+              <p>{card.output}</p>
+              <p>{card.handoff}</p>
+              <p>Software: {card.software || "Not recorded"}</p>
+            </Panel>
+          ))}
           {Object.entries(r.data.decisions || {}).map(([id, decision]) => (
             <Row
               key={id}

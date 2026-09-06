@@ -746,6 +746,27 @@ before(async () => {
   const app = createApp({
     authRequestsPerWindow: 1000,
     hostedRouting: true,
+    discoveryProvider: async (input) => ({
+      summary: "Participant extraction",
+      gaps: [],
+      tasks: [
+        {
+          title: "Check packet",
+          duty: "Prepare records",
+          ownerId: "",
+          performerId: input.people[0].id,
+          purpose: "Prepare packet",
+          trigger: "Packet arrives",
+          inputs: "Supplier packet",
+          instructions: "Check required fields",
+          output: "Complete packet",
+          systems: ["Google Sheets"],
+          humanGate: "Unknown",
+          destination: "Finance",
+          sourceIds: [input.sources[0].id],
+        },
+      ],
+    }),
     emailProvider: async (message, key, id) => {
       emailMessages.push({ message, id });
       if (message.subject.includes("UnknownEmail"))
@@ -1918,4 +1939,105 @@ test("participant transcription preserves audio, isolates access and makes retri
     retry: true,
   });
   assert.equal(transcriptionCalls, before + 3);
+});
+
+test("participant submits reviewed task descriptions with evidence and no company authority", async () => {
+  const c = await register(),
+    f = await fixture(c),
+    i = await invite(c, f, "work");
+  await saveProvider(c, "openai");
+  const draft = await request(
+    i.participant,
+    "/api/v1/participant/requests/" + i.req.id + "/task-draft",
+    "POST",
+    {
+      expectedVersion: i.req.version,
+      text: "I check packets in Google Sheets and send the result to Finance.",
+      acknowledged: true,
+    },
+  );
+  assert.equal(draft.status, 200, JSON.stringify(draft.data));
+  assert.equal(draft.data.cards[0].handoff, "Finance");
+  assert.equal(
+    (
+      await request(
+        c,
+        "/api/v1/participant/requests/" + i.req.id + "/task-draft",
+        "POST",
+        {},
+      )
+    ).status,
+    403,
+  );
+  const cards = [
+    {
+      title: "Check the packet",
+      duty: "Prepare complete records",
+      inputs: "Supplier packet",
+      instructions: "Check required fields",
+      output: "Complete packet",
+      handoff: "Finance",
+      software: "Google Sheets",
+      decision: "correct",
+    },
+    {
+      title: "Release payment",
+      duty: "Payments",
+      inputs: "Invoice",
+      instructions: "Pay it",
+      output: "Payment",
+      handoff: "Bank",
+      software: "ERP",
+      decision: "not_mine",
+    },
+  ];
+  const sent = await request(
+    i.participant,
+    "/api/v1/participant/requests/" + i.req.id + "/submit",
+    "POST",
+    {
+      expectedVersion: i.req.version,
+      acknowledged: true,
+      text: "I check the supplier packet and send it to Finance.",
+      taskCards: cards,
+    },
+  );
+  assert.equal(sent.status, 200, JSON.stringify(sent.data));
+  const records = await tx(
+    c.user.tenant_id,
+    async (db) =>
+      (await db.query("SELECT * FROM records WHERE company_id=$1", [c.company]))
+        .rows,
+  );
+  const response = records.find((r) => r.id === sent.data.responseId);
+  assert.equal(response.data.taskCards.length, 2);
+  const task = records.find(
+    (r) => r.data.participantResponseId === response.id,
+  );
+  assert.equal(task.state, "proposed");
+  assert.equal(task.data.ownerId, "");
+  assert.equal(task.data.performerId, f.p.id);
+  assert.equal(task.data.destination, "Finance");
+  assert.deepEqual(task.data.systems, ["Google Sheets"]);
+  const source = records.find((r) => r.id === task.data.evidenceIds[0]);
+  assert.equal(source.state, "proposed");
+  assert.equal(source.data.responseId, response.id);
+  const confirmations = await tx(
+    c.user.tenant_id,
+    async (db) =>
+      (
+        await db.query("SELECT * FROM confirmations WHERE record_id=$1", [
+          task.id,
+        ])
+      ).rows,
+  );
+  assert.equal(confirmations[0].hash, task.hash);
+  assert.equal(confirmations[0].decision, "correct");
+  assert.equal(
+    records.filter((r) => r.data.participantResponseId === response.id).length,
+    1,
+  );
+  assert.equal((await action(c,response,"accept")).status,200);
+  const accepted=await tx(c.user.tenant_id,async db=>(await db.query("SELECT * FROM records WHERE id=$1",[source.id])).rows[0]);
+  assert.equal(accepted.state,"accepted");
 });

@@ -56,7 +56,7 @@ export function invitationTemplate({
     : "";
   const how = confirmation
     ? "Open your private page, review each work description, and send your corrections."
-    : "Open your private page. You can type your answers or record your voice. Save a draft if you need a break, then review and send your response.";
+    : "Open your private page. Voice is preferred: a real example helps us capture the steps, exceptions, and frustrations. You can type instead. Save a draft if you need a break. For a work interview, create your task cards, check or edit them, then send everything together.";
   const security =
     "Your private link expires in 7 days. On your first visit, create a password to protect your responses. If you already have an account, sign in. Do not forward this link. Your assigned advisor will review your response.";
   const context = [person.data.role, person.data.team]

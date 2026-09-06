@@ -1,3 +1,4 @@
+import { ParticipantCards } from "./ParticipantCards.tsx";
 import { useEffect, useRef, useState } from "react";
 import {
   Mic,
@@ -418,6 +419,7 @@ export function Participant({
   const [data, setData] = useState<any>(null),
     [selected, setSelected] = useState(""),
     [error, setError] = useState(""),
+    [taskCards, setTaskCards] = useState<any[] | null>(null),
     [text, setText] = useState(""),
     [note, setNote] = useState(""),
     [decisions, setDecisions] = useState<Record<string, string>>({}),
@@ -443,6 +445,7 @@ export function Participant({
   useEffect(() => {
     let active = true;
     if (request) {
+      setTaskCards(null);
       setDecisions({});
       setNote("");
       setText("");
@@ -489,6 +492,7 @@ export function Participant({
     }
   };
   const saveText = (value: string) => {
+    setTaskCards(null);
     setText(value);
     try {
       localStorage.setItem(draftKey, value);
@@ -539,7 +543,7 @@ export function Participant({
         <p className="participant-intro">
           {request?.data.type === "leadership"
             ? "Share your goals, your team’s responsibilities and the questions you want this meeting to answer."
-            : "Use a recent example. Explain what you receive, what you do, and who needs the result. You can record or type."}
+            : "Use a recent example. Explain what you receive, what you do, and who needs the result. Voice is preferred: a real example helps us capture the steps, exceptions, and frustrations. You can type instead."}
         </p>
         {data?.person && (
           <p className="participant-role">
@@ -766,9 +770,22 @@ export function Participant({
                 </Panel>
               </>
             )}
+            {request.data.type === "work" && (
+              <ParticipantCards
+                key={request.id + text}
+                request={request}
+                text={text}
+                disabled={
+                  !ack || busy || captureBusy || transcriptBusy || expired
+                }
+                onChange={setTaskCards}
+              />
+            )}
             <div className="submit-bar">
               <div>
-                <strong>Review your response before submitting.</strong>
+                <strong>
+                  Review your answer and task descriptions before sending.
+                </strong>
                 <p>
                   {asset
                     ? "Your saved recording and any text above will be sent to your advisor."
@@ -779,6 +796,7 @@ export function Participant({
                 primary
                 disabled={
                   !ack ||
+                  (request.data.type === "work" && taskCards === null) ||
                   busy ||
                   captureBusy ||
                   transcriptBusy ||
@@ -805,12 +823,16 @@ export function Participant({
                         acknowledged: true,
                         decisions,
                         note,
+                        ...(request.data.type === "work"
+                          ? { taskCards: taskCards || [] }
+                          : {}),
                       },
                     );
                     setSentId(request.id);
                     setSelected(request.id);
                     try {
                       localStorage.removeItem(draftKey);
+                      localStorage.removeItem("dg-task-review:" + request.id);
                       localStorage.removeItem(draftKey + ":upload");
                       localStorage.removeItem(draftKey + ":review");
                       if (asset)

@@ -53,3 +53,26 @@ cover invitation delivery through a test provider, private enrollment, audio
 chunks, participant isolation, responses and confirmation. No real invitations
 are sent by these tests. Browser checks cover the public walkthrough, mobile
 overflow and the pilot form.
+
+
+## Participant review before submission
+
+Work interviews now offer voice-first guidance and Create my task cards after a
+checked transcript or typed answer. The configured OpenAI provider extracts
+input, action, output, destination and software. The participant edits and marks
+each card as matching their understanding, not theirs, or uncertain. Local drafts
+preserve these edits. Changing the original answer starts a new card review.
+The generation attempt saves the original text in a tenant-scoped provider job;
+there is a 60-attempt daily tenant limit and no automatic retry. If the provider
+is unavailable, the person can explicitly send their answer without cards.
+
+Submission atomically saves the original response, reviewed descriptions,
+unreviewed supporting evidence, and proposed task cards for retained descriptions.
+Removed descriptions stay in the response. Confirmation entries bind the exact
+task version/hash to the submitting person. This confirms their understanding,
+not company ownership or permission. The owner remains unresolved and evidence
+requires advisor review. Existing conflict and handoff review remains necessary;
+this change does not implement an automatic cross-team conflict detector.
+
+The public walkthrough includes the same review step, using an explicitly
+illustrative card instead of invoking a model. No demo answers leave the page.
