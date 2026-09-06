@@ -1,6 +1,6 @@
 import { AgentRequests, TeamAgentPortal } from "./AgentRequests.tsx";
 import { StrategyWorkspace } from "./StrategyWorkspace.tsx";
-import { useEffect, useState, lazy, Suspense, type ReactNode } from "react";
+import { useEffect, useState, useRef, lazy, Suspense, type ReactNode } from "react";
 import {
   ArrowRight,
   LayoutGrid,
@@ -193,7 +193,9 @@ function Login({ onLogin }: { onLogin: (result: any) => void }) {
           {mode === "login" ? "Welcome back." : "Start with a bounded scope."}
         </h2>
         <p>
-          {mode === "login"
+          {new URLSearchParams(window.location.search).get("sample") === "agent-governance"
+            ? "Sign in or create an account to open the Cobalt agent workflow example."
+            : mode === "login"
             ? "Sign in to your evidence and work records."
             : "Create a separate account and company record."}
         </p>
@@ -405,6 +407,8 @@ export default function App() {
   return <Workspace user={user} logout={() => void logout()} />;
 }
 function Workspace({ user, logout }: { user: User; logout: () => void }) {
+  const sampleDestination = new URLSearchParams(window.location.search).get("sample") === "agent-governance";
+  const initialWorkspace = useRef<Promise<{ companies: Company[]; selected: string }> | null>(null);
   const [companies, setCompanies] = useState<Company[]>([]),
     [companyId, setCompanyId] = useState(""),
     [data, setData] = useState<any>(null),
@@ -440,7 +444,24 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
     }
   };
   useEffect(() => {
-    void loadCompanies().catch((e) => setError(e.message));
+    let active = true;
+    // Keep one bootstrap request across StrictMode effect replay. The destination
+    // survives authentication because it remains in the URL until we open it.
+    initialWorkspace.current ??= (async () => {
+      const sample = sampleDestination ? await api<{id:string}>("/v1/sample-company", "POST", {}) : null;
+      const companies = await api<Company[]>("/v1/companies");
+      return { companies, selected: sample?.id || companies[0]?.id || "" };
+    })();
+    void initialWorkspace.current.then(({companies,selected}) => {
+      if (!active) return;
+      setCompanies(companies);
+      setCompanyId(selected);
+      if (sampleDestination) {
+        setPage("governance");
+        window.history.replaceState(null, "", "/?sample=agent-governance#governance");
+      }
+    }).catch((e) => { if(active) setError(e.message); });
+    return () => { active = false; };
   }, []);
   useEffect(() => {
     setData(null);
