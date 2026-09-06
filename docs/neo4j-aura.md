@@ -43,7 +43,7 @@ Mount `neo4jRouter()` at `/api/v1/companies/:companyId/neo4j` inside the authent
 
 GET returns `configured`, `connected`, `store: "PostgreSQL"`, `endpoint`, `username`, `database`, `verifiedAt`, `sourceRevision`, `storageReady`, and `projection`. The projection is `null` or `{ source_revision, status, message, updated_at }`. Status is `pending`, `current`, `error`, or `oversized`. `connected` means the last explicit connection test succeeded; it is not a live availability guarantee. A projection whose revision has fallen behind is reported as `pending`.
 
-The generic provider endpoint also returns a safe `neo4j` summary. `server/projection.ts` calls `syncNeo4jTenant()` after processing PostgreSQL projection events. `server/graph-query.ts` calls `readNeo4jSnapshot()` before choosing the view's store. `server/graph-shape.ts` shares the same relationship derivation between both paths without a circular import.
+The generic provider endpoint also returns a safe `neo4j` summary. In `server/projection.ts`, `projectAll()` calls `syncNeo4jSweep()` after processing PostgreSQL projection events for all accounts. The sweep calls `syncNeo4jTenant()` for each account it visits. `server/graph-query.ts` calls `readNeo4jSnapshot()` before choosing the view's store. `server/graph-shape.ts` shares the same relationship derivation between both paths without a circular import.
 
 ## Verification
 
@@ -51,6 +51,12 @@ The generic provider endpoint also returns a safe `neo4j` summary. `server/proje
 
 `tests/neo4j-api.test.ts` tests the mounted API against isolated synthetic PostgreSQL accounts and a fake driver. It covers advisor authorization, session and CSRF requirements, company/tenant isolation, encrypted storage, sanitized responses and audit records, strict request bodies, test status, settings removal, idempotency, and the unconfigured PostgreSQL fallback. It never connects to Aura.
 
-A real Aura verification must still save credentials through the settings page, test, rebuild, read the company graph, then confirm a second rebuild does not create duplicate nodes or edges. Never print downloaded credentials or include them in logs, screenshots, reports, or source control.
+Live acceptance passed on September 6, 2026, against the user's Aura instance `a2d3a8fb`. The downloaded credentials were parsed privately, verified with a direct TLS connection, and saved for the actual advisor account through an authorized operator setup using the application's encryption and audit helpers. This setup did not use the settings page or its HTTP save/test routes.
+
+The deployed `/api/maintenance` operation copied the account's empty Tier 4 company and its Cobalt Industrial Supply company. Cobalt's projection was recorded at 13:03:08 UTC with revision 206, 71 `DGRecord` nodes, 147 `DG_LINK` relationships and one scoped `DGCompany`. The stored connection ID, revision and fingerprint matched PostgreSQL. Record keys and relationship ordinals were unique.
+
+The production `readGraph()` implementation, run locally with the hosted runtime database and saved connection, returned `engine: "Neo4j Aura"` and `neo4jCurrent: true`. A second `projectCompanyToNeo4j()` call through the same adapter at 13:03:26 UTC kept revision 206, the node and relationship counts, and fingerprint `16e3d1a23b4177173212ebce7d028a0d4405d36b7bf4fd12ec11a64db1c777e5` unchanged. The company write-lock counter increased from one to two without duplicate records or relationships.
+
+This proves deployed maintenance can write to Aura and the shared reader can validate and use that copy. The repeat rebuild and reader checks ran locally against the hosted data; they were not authenticated production browser or graph-HTTP checks. The browser was signed out, so those UI checks remain separate. Never print downloaded credentials or include them in logs, screenshots, reports, or source control.
 
 Implementation follows the official [Neo4j JavaScript connection guide](https://neo4j.com/docs/javascript-manual/current/connect/) and [managed transaction guide](https://neo4j.com/docs/javascript-manual/current/transactions/). Driver version is pinned in `package.json`.

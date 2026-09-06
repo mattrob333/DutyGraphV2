@@ -39,7 +39,7 @@ The original Cobalt sample remains unchanged by the training journey. Northstar 
 | Independent release assurance | Full accessibility/browser matrix, physical microphone tests, security review/penetration test, blind diagnostic evaluation and owner acceptance |
 | Enterprise expansion | SSO/SCIM, deployment/isolation choices, permission-safe portfolio reporting and additional adapters |
 
-Exa, OpenAI, Resend and optional Neo4j Aura connections use encrypted account settings. PostgreSQL remains authoritative. The Aura adapter and fallback are implemented and locally tested; real credentials, connectivity and projection acceptance are pending. See guide/00-hosted-quickstart.md for the current workflow; the 0.2 delivery pack remains a historical local release. The app fails closed for live runtime preflight. INTEGRATIONS.md records credential needs and live acceptance boundaries.
+Exa, OpenAI, Resend and optional Neo4j Aura connections use encrypted account settings. PostgreSQL remains authoritative. Aura is connected for the advisor account: production maintenance copied Cobalt revision 206 with 71 records and 147 relationships on September 6, 2026. The shared graph reader returned a validated Aura snapshot; a repeat rebuild preserved counts without duplicates. See verification/2026-09-06-guided-release.md for the exact acceptance scope and guide/00-hosted-quickstart.md for the current workflow. The 0.2 delivery pack remains a historical local release. The app fails closed for live runtime preflight. INTEGRATIONS.md records other credential needs and live acceptance boundaries.
 
 ## Requirement traceability
 

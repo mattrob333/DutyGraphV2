@@ -21,7 +21,7 @@ Open Workspace settings → API keys & connections. Enter the provider key and s
 
 Provider billing and account spending limits are managed with each provider. Removing a saved key stops subsequent calls using it; an already-started provider request may finish. The OpenAI connection used by the development assistant is separate from your application's credentials. Do not send API keys through chat or put them in repository files.
 
-The separate **Neo4j company graph** section accepts your Aura URI, database username, database name and database password. Use the `neo4j+s://…databases.neo4j.io` address from Aura. Saving enables metadata sync for companies in your advisor account. **Test connection** verifies the database, and **Build company graph** requests a current projection. Original records remain in PostgreSQL; full evidence text and recordings are not copied. Removing the connection stops later access without deleting copies already in Aura. The adapter is locally tested; real credentials and a successful projection run are still required for live acceptance.
+The separate **Neo4j company graph** section accepts your Aura URI, database username, database name and database password. Use the `neo4j+s://…databases.neo4j.io` address from Aura. Saving enables metadata sync for companies in your advisor account. **Test connection** verifies the database, and **Build company graph** requests a current projection. Original records remain in PostgreSQL; full evidence text and recordings are not copied. Removing the connection stops later access without deleting copies already in Aura. The pilot advisor account's connection and projection were verified on September 6, 2026. New accounts must save and test their own connection.
 
 ## Research a real business before the first meeting
 
@@ -44,7 +44,7 @@ You can also generate a private link and share it yourself. Every replacement li
 
 ## What is still unfinished
 
-Firecrawl, email delivery webhooks/reminders, password recovery, verified identity/SSO/MFA, full production retention/deletion, external authority integrations and governed customer-system execution remain open. The graph uses a custom SVG view, with an optional current Neo4j Aura projection and PostgreSQL fallback. Real Aura connectivity and projection acceptance are pending. Hosted operation and passing tests do not certify the full original production specification.
+Firecrawl, email delivery webhooks/reminders, password recovery, verified identity/SSO/MFA, full production retention/deletion, external authority integrations and governed customer-system execution remain open. The graph uses a custom SVG view, with an optional current Neo4j Aura projection and PostgreSQL fallback. The pilot advisor account's live Aura projection and repeat rebuild were verified. Hosted operation and passing tests do not certify the full original production specification.
 
 Provider adapters have automated simulated-response tests. Actual AI quality, Exa results and email receipt require live acceptance with your configured accounts. No live paid AI/search calls or real invitation emails were made during this release verification.
 

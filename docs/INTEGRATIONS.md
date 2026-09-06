@@ -34,7 +34,7 @@ Research history retains up to twenty runs in the UI; the database retains earli
 | Sixteen framework analyses | Implemented via OpenAI Responses API; versioned canvases and dependency sequence; simulated-provider tests | Account key, input sharing scope and live quality/usage acceptance |
 | Audio transcription | Implemented with OpenAI; original audio, editable text and advisor recovery; synthetic tests | Account OpenAI key and live microphone/transcription acceptance |
 | Email invitation/reminders | Resend invitation adapter implemented; reminders/webhooks pending | Sender identity/domain, service credentials, consent/delivery/retry/reminder policy |
-| Neo4j Aura graph | Optional encrypted account connection, metadata projection, revision checks and PostgreSQL fallback; local adapter tests | Aura database credentials, real connectivity/projection acceptance and workload testing |
+| Neo4j Aura graph | Connected advisor account; production projection and duplicate-free repeat rebuild verified September 6, 2026; encrypted settings and PostgreSQL fallback | Each additional advisor account supplies its own Aura connection; larger-workload testing remains open |
 | Meeting ingestion | No connection | Authorized account, meeting selection/visibility policy, webhook/replay and lineage validation |
 | Enterprise identity/policy | No connection | Customer-specific identities, effective-access sources, membership and approval assurance |
 | Signet/runtime/customer actions | Fail-closed unconfigured | Managed keys, legitimate authority, precise action/resource scope, conformance and reconciliation |
@@ -43,9 +43,9 @@ The application needs its own service credentials. A connector available to the 
 
 ## Optional Neo4j Aura projection
 
-Settings accepts an Aura `neo4j+s://…databases.neo4j.io` URI, database username, database name and database password. These are database credentials, not an account sign-in password. Saving enables metadata sync across the advisor account's companies. **Test connection** performs a live connectivity check; **Build company graph** requests the current company projection. No real Aura connection was established during local tests.
+Settings accepts an Aura `neo4j+s://…databases.neo4j.io` URI, database username, database name and database password. These are database credentials, not an account sign-in password. Saving enables metadata sync across the advisor account's companies. **Test connection** performs a live connectivity check; **Build company graph** requests the current company projection. On September 6, 2026, authorized operator setup connected the advisor account to Aura instance `a2d3a8fb`. Production maintenance copied Cobalt revision 206: 71 records and 147 relationships. The shared reader validated the snapshot, and a repeat rebuild preserved counts without duplicates. See verification/2026-09-06-guided-release.md for the acceptance details.
 
-Only graph metadata and typed links are copied: record IDs, kinds, titles, states, versions and hashes. Full source bodies, audio and credentials are excluded. PostgreSQL remains authoritative. An unavailable or outdated Aura snapshot falls back to current PostgreSQL records. Removing the connection stops later access but does not remove existing copies from Aura. A real database and successful projection run are required before describing the external graph connection as live.
+Only graph metadata and typed links are copied: record IDs, kinds, titles, states, versions and hashes. Full source bodies, audio and credentials are excluded. PostgreSQL remains authoritative. An unavailable or outdated Aura snapshot falls back to current PostgreSQL records. Removing the connection stops later access but does not remove existing copies from Aura. The verified connection belongs to the configured advisor account; other accounts must configure and test their own connection.
 
 ## OpenAI framework analyses
 
