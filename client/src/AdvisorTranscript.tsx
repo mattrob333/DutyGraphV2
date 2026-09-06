@@ -43,7 +43,7 @@ export function AdvisorTranscript({
     <div>
       <ErrorBox error={error} />
       {busy ? (
-        <p role="status">Saving the reviewed transcript�</p>
+        <p role="status">Saving the reviewed transcript…</p>
       ) : (
         <TranscriptReview
           companyId={company}

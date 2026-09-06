@@ -312,7 +312,7 @@ function Recorder({
             onClick={() => void start()}
           >
             <Mic size={16} />
-            {starting ? "Opening microphone�" : "Start recording"}
+            {starting ? "Opening microphone…" : "Start recording"}
           </Button>
         )}
         {recording && (
