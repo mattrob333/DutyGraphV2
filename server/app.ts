@@ -1,3 +1,4 @@
+import { newsletterInterest } from "./newsletter.ts";
 import { participantDraft, participantCards } from "./participant-cards.ts";
 import { applyForPilot } from "./pilot.ts";
 import { strategyRouter } from "./strategy.ts";
@@ -169,6 +170,7 @@ export function createApp({
           }),
       });
   app.post("/api/pilot-applications", authLimit, applyForPilot);
+  app.post("/api/newsletter-interest", authLimit, newsletterInterest);
   app.get("/api/health", async (_req, res) => {
     await pool.query("SELECT 1");
     res.json({
