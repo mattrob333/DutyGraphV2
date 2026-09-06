@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import type { Company, RecordRow } from "../../shared/domain.ts";
-import { researchChecklist, type ResearchRun } from "../../shared/research.ts";
+import {
+  researchChecklist,
+  researchFocuses,
+  researchQuery,
+  type ResearchRun,
+} from "../../shared/research.ts";
 import { api } from "./api.ts";
 import { Badge, Button, ErrorBox, Field, Panel } from "./ui.tsx";
 type Status = {
@@ -9,7 +14,12 @@ type Status = {
   limit: number;
   runs: ResearchRun[];
 };
-type Attempt = { key: string; publicName: string; website: string };
+type Attempt = {
+  key: string;
+  publicName: string;
+  website: string;
+  focus?: string;
+};
 function savedAttempt(company: string): Attempt | null {
   try {
     const value = JSON.parse(
@@ -44,6 +54,7 @@ export function BusinessResearch({
   const [status, setStatus] = useState<Status | null>(null),
     [publicName, setPublicName] = useState(attempt?.publicName || company.name),
     [website, setWebsite] = useState(attempt?.website || ""),
+    [focus, setFocus] = useState(attempt?.focus || "company"),
     [ack, setAck] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
@@ -51,7 +62,8 @@ export function BusinessResearch({
   const resuming =
     !!attempt &&
     attempt.publicName === publicName.trim() &&
-    attempt.website === website.trim();
+    attempt.website === website.trim() &&
+    (attempt.focus || "company") === focus;
   const remember = (value: Attempt | null) => {
     setAttempt(value);
     try {
@@ -89,6 +101,7 @@ export function BusinessResearch({
           key: crypto.randomUUID(),
           publicName: publicName.trim(),
           website: website.trim(),
+          focus,
         };
     remember(current);
     try {
@@ -98,6 +111,7 @@ export function BusinessResearch({
         {
           publicName: current.publicName,
           website: current.website,
+          ...(current.focus ? { focus: current.focus } : {}),
           acknowledgePublicQuery: ack,
         },
         current.key,
@@ -173,6 +187,15 @@ export function BusinessResearch({
                 : "Checking connection settings…"}
           </Badge>
           <form onSubmit={search} className="research-form">
+            <Field label="What should we research?">
+              <select value={focus} onChange={(e) => setFocus(e.target.value)}>
+                {researchFocuses.map((f) => (
+                  <option key={f.id} value={f.id}>
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
             <Field label="Public business name">
               <input
                 value={publicName}
@@ -192,16 +215,14 @@ export function BusinessResearch({
               />
             </Field>
             <p className="subtle">
-              With a website, results are restricted to that domain. Leave it
-              blank for broader public context. Each run requests up to five
-              sources.
+              Company overview can be limited to the official website.
+              Community, competitor and industry searches use the wider public
+              web. Each run requests up to five sources. Finding a channel does
+              not subscribe to it or start daily monitoring.
             </p>
             <div className="research-query">
               <small>QUERY SENT TO EXA</small>
-              <p>
-                {publicName} company products services customers leadership
-                locations
-              </p>
+              <p>{researchQuery(publicName, focus, "").query}</p>
             </div>
             <label className="check-line">
               <input

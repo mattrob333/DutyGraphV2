@@ -1651,3 +1651,66 @@ test("all provider keys save and remove without account passwords; current model
     );
   }
 });
+
+test("strategy reports bind company context, detect newly accepted sources and isolate report history", async () => {
+  const c = await register(),
+    other = await register(),
+    f = await fixture(c),
+    path = prefix(c) + "/strategy-briefs";
+  const body = { scope: "overview", consent: true };
+  assert.equal((await request(null, path)).status, 401);
+  assert.equal((await request(c, path, "POST", body)).status, 503);
+  await saveProvider(c, "openai");
+  assert.equal(
+    (await request(c, path, "POST", { ...body, consent: false })).status,
+    422,
+  );
+  assert.equal((await request(other, path)).status, 404);
+  const before = aiCalls,
+    headers = { "Idempotency-Key": randomUUID() };
+  const made = await request(c, path, "POST", body, headers);
+  assert.equal(made.status, 200, JSON.stringify(made.data));
+  await request(c, path, "POST", body, headers);
+  assert.equal(aiCalls, before + 1);
+  let data = (await request(c, path)).data;
+  assert.equal(data.jobs[0].state, "complete", JSON.stringify(data));
+  assert.equal(data.jobs[0].stale, false);
+  assert.equal(data.jobs[0].input.sources[0].text, undefined);
+  assert.equal(
+    data.groups.find((g: any) => g.scope === "overview").changed,
+    false,
+  );
+  await tx(c.user.tenant_id, async (db) => {
+    await putRecord(
+      db,
+      c.user,
+      c.company,
+      "evidence",
+      "New leadership guidance",
+      {
+        bucket: "leadership",
+        text: "A new priority with a source.",
+        locator: "Synthetic",
+      },
+      "accepted",
+    );
+  });
+  data = (await request(c, path)).data;
+  assert.equal(data.jobs[0].stale, true);
+  assert.equal(
+    data.groups.find((g: any) => g.scope === "overview").changed,
+    true,
+  );
+  const answer = await request(c, path, "POST", {
+    ...body,
+    question: "Where should we focus?",
+  });
+  assert.equal(answer.status, 200);
+  data = (await request(c, path)).data;
+  assert.equal(data.jobs[0].input.question, "Where should we focus?");
+  assert.equal(
+    data.groups.find((g: any) => g.scope === "overview").changed,
+    true,
+    "A chat answer must not replace the executive brief",
+  );
+});

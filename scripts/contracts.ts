@@ -81,6 +81,7 @@ for (const [source, prefix] of [
   ["server/providers.ts", "/api/v1/companies/:companyId/providers"],
   ["server/invitations.ts", "/api/v1/companies/:companyId/requests"],
   ["server/ai.ts", "/api/v1/companies/:companyId/ai"],
+  ["server/strategy.ts", "/api/v1/companies/:companyId/strategy-briefs"],
 ]) {
   const code = await readFile(source, "utf8");
   for (const match of code.matchAll(

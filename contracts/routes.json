@@ -223,6 +223,16 @@
       "source": "server/app.ts"
     },
     {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/strategy-briefs",
+      "source": "server/strategy.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/strategy-briefs",
+      "source": "server/strategy.ts"
+    },
+    {
       "method": "POST",
       "path": "/api/v1/companies/{companyId}/workflows/{workflowId}/cases",
       "source": "server/workflows.ts"

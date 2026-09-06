@@ -16,6 +16,7 @@ import { providerConfig } from "./providers.ts";
 import {
   publicWebUrl,
   researchInput,
+  researchQuery,
   type ResearchSource,
 } from "../shared/research.ts";
 export type ResearchProvider = (
@@ -185,8 +186,11 @@ export function researchRouter(providerOverride?: ResearchProvider) {
         "RESEARCH_UNCONFIGURED",
         "Add and enable your Exa API key in Workspace settings. You can also add public sources manually.",
       );
-    const query = `${input.publicName} company products services customers leadership locations`,
-      domain = input.website ? new URL(input.website).hostname : "";
+    const { query, domain } = researchQuery(
+      input.publicName,
+      input.focus,
+      input.website,
+    );
     const reservation: any = await run(req, async (db: any) => {
       await companyCheck(db, actor, companyId);
       const used = Number(

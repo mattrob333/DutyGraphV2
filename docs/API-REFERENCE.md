@@ -1,6 +1,6 @@
 # Implemented API reference
 
-Release 0.3. This inventory is generated from server route declarations. It describes 50 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
+Release 0.3. This inventory is generated from server route declarations. It describes 52 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
 
 ## Transport and authentication
 
@@ -58,6 +58,8 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | POST | /api/v1/companies/{companyId}/roster/apply | server/app.ts |
 | POST | /api/v1/companies/{companyId}/roster/preview | server/app.ts |
 | POST | /api/v1/companies/{companyId}/runtime/preflight | server/app.ts |
+| GET | /api/v1/companies/{companyId}/strategy-briefs | server/strategy.ts |
+| POST | /api/v1/companies/{companyId}/strategy-briefs | server/strategy.ts |
 | POST | /api/v1/companies/{companyId}/workflows/{workflowId}/cases | server/workflows.ts |
 | POST | /api/v1/companies/{companyId}/workflows/cases/{caseId}/actions | server/workflows.ts |
 | GET | /api/v1/companies/{companyId}/workspace | server/app.ts |

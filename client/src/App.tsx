@@ -1,3 +1,4 @@
+import { StrategyWorkspace } from "./StrategyWorkspace.tsx";
 import { useEffect, useState, lazy, Suspense, type ReactNode } from "react";
 import {
   ArrowRight,
@@ -43,11 +44,7 @@ import {
 import { RecordForm } from "./forms.tsx";
 import { StandupBrief } from "./StandupBrief.tsx";
 import { WorkflowsOverview } from "./WorkflowsOverview.tsx";
-import {
-  FrameworkLibrary,
-  FrameworkInstructions,
-  ConstraintLedger,
-} from "./StrategyViews.tsx";
+import { FrameworkInstructions, ConstraintLedger } from "./StrategyViews.tsx";
 import { TaskCards } from "./TaskCards.tsx";
 import { Graph } from "./Graph.tsx";
 import { Engagement } from "./Engagement.tsx";
@@ -403,6 +400,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
     [page, setPage] = useState(window.location.hash.slice(1) || "overview"),
     [tab, setTab] = useState("research"),
     [strategyTab, setStrategyTab] = useState("frameworks"),
+    [strategyReport, setStrategyReport] = useState<string | null>(null),
     [modal, setModal] = useState<ModalState>(null),
     [mobile, setMobile] = useState(false),
     [query, setQuery] = useState(""),
@@ -1125,29 +1123,35 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           title="Find what actually limits progress."
           description="Use the evidence to understand the business, test its limits and choose the next action."
           actions={
-            <Button
-              primary
-              onClick={() =>
-                create(
-                  strategyTab === "metrics"
-                    ? "metric"
-                    : strategyTab === "outcomes"
-                      ? "outcome"
-                      : strategyTab === "interventions"
-                        ? "intervention"
-                        : "candidate",
-                )
-              }
-            >
-              <Plus size={16} />
-              {strategyTab === "metrics"
-                ? "Define a measure"
-                : strategyTab === "outcomes"
-                  ? "Review an outcome"
-                  : strategyTab === "interventions"
-                    ? "Propose intervention"
-                    : "Add constraint hypothesis"}
-            </Button>
+            strategyTab === "frameworks" ? (
+              <Button primary onClick={() => setStrategyReport("overview")}>
+                Read executive brief
+              </Button>
+            ) : (
+              <Button
+                primary
+                onClick={() =>
+                  create(
+                    strategyTab === "metrics"
+                      ? "metric"
+                      : strategyTab === "outcomes"
+                        ? "outcome"
+                        : strategyTab === "interventions"
+                          ? "intervention"
+                          : "candidate",
+                  )
+                }
+              >
+                <Plus size={16} />
+                {strategyTab === "metrics"
+                  ? "Define a measure"
+                  : strategyTab === "outcomes"
+                    ? "Review an outcome"
+                    : strategyTab === "interventions"
+                      ? "Propose intervention"
+                      : "Add constraint hypothesis"}
+              </Button>
+            )
           }
         />
         <div className="tabs">
@@ -1196,16 +1200,15 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                 </button>
               ))}
             </div>
-            <div className="notice">
-              Each framework includes a guide. Analyses are saved and reviewed
-              by people. Open the constraint ledger to use the AI assistant.
-              Suggested review times are not active schedules.
-            </div>
-            <FrameworkLibrary
+            <StrategyWorkspace
+              key={companyId}
+              company={companyId}
               registry={data.registry}
               records={records}
               open={open}
               write={(key) => setModal({ type: "framework", key })}
+              scope={strategyReport}
+              setScope={setStrategyReport}
             />
             <Button
               onClick={() =>

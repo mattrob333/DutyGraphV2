@@ -55,11 +55,15 @@ export function FrameworkLibrary({
   records,
   open,
   write,
+  report,
+  reportStatus,
 }: {
   registry: any;
   records: RecordRow[];
   open: (r: RecordRow) => void;
   write: (key: string) => void;
+  report?: (group: string) => void;
+  reportStatus?: (group: string) => string;
 }) {
   return (
     <div className="framework-library">
@@ -74,6 +78,16 @@ export function FrameworkLibrary({
               <h2>{group.label}</h2>
               <p>{group.hint}</p>
             </div>
+            {report && (
+              <button
+                className={`btn framework-report-button ${reportStatus?.(group.id) === "Inputs changed" ? "has-update" : ""}`}
+                onClick={() => report(group.id)}
+              >
+                <BookOpen size={15} />
+                {reportStatus?.(group.id) || "Read report"}
+                <ArrowRight size={14} />
+              </button>
+            )}
           </header>
           <div className="framework-grid">
             {registry.frameworks

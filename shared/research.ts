@@ -22,6 +22,9 @@ export function publicWebUrl(value: string) {
 }
 export const researchInput = z
   .object({
+    focus: z
+      .enum(["company", "communities", "competitors", "industry"])
+      .default("company"),
     publicName: z.string().trim().min(2).max(160),
     website: z
       .string()
@@ -80,3 +83,34 @@ export const researchChecklist = [
     "What is missing, outdated, contradictory or assumed? Ask the team to correct it.",
   ],
 ] as const;
+
+export const researchFocuses = [
+  {
+    id: "company",
+    label: "Company overview",
+    terms: "company products services customers leadership locations",
+  },
+  {
+    id: "communities",
+    label: "Customer communities",
+    terms:
+      "customer industry discussion communities Reddit subreddits professional forums where customers ask questions",
+  },
+  {
+    id: "competitors",
+    label: "Competitors & their channels",
+    terms:
+      "competitors alternatives official social media LinkedIn YouTube customer discussions",
+  },
+  {
+    id: "industry",
+    label: "Industry news & feeds",
+    terms: "industry trade publications news RSS feeds market developments",
+  },
+] as const;
+export function researchQuery(name: string, focus: string, website: string) {
+  return {
+    query: `${name} ${researchFocuses.find((f) => f.id === focus)?.terms || researchFocuses[0].terms}`,
+    domain: focus === "company" && website ? new URL(website).hostname : "",
+  };
+}

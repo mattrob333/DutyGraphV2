@@ -1,3 +1,4 @@
+import { strategyRouter } from "./strategy.ts";
 import express from "express";
 import { allowedOrigins } from "./origins.ts";
 import cookieParser from "cookie-parser";
@@ -1405,6 +1406,7 @@ export function createApp({
   api.use("/companies/:companyId/providers", authLimit, providersRouter());
   api.use("/companies/:companyId/requests", invitationsRouter(emailProvider));
   api.use("/companies/:companyId/ai", aiRouter(aiProvider));
+  api.use("/companies/:companyId/strategy-briefs", strategyRouter(aiProvider));
   api.post("/companies/:companyId/graph/rebuild", advisor, async (req, res) =>
     res.json(
       await run(req, async (db: any) => {
