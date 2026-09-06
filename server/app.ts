@@ -42,6 +42,7 @@ import { readGraph } from "./graph-query.ts";
 import { reportsRouter } from "./reports.ts";
 import { workflowsRouter, checkWorkflow } from "./workflows.ts";
 import { caseStatus, expireSteps } from "../shared/workflow.ts";
+import { FRAMEWORK_GUIDE_VERSION } from "../shared/framework-guides.ts";
 import { researchRouter, type ResearchProvider } from "./research.ts";
 import {
   invitationsRouter,
@@ -417,7 +418,11 @@ export function createApp({
             r.state = confirmationStatus(r, cs);
             r.confirmations = cs.filter((v) => v.record_id === r.id);
           }
-          if (r.kind === "case" && !["complete", "cancelled"].includes(r.state))
+          if (
+            r.kind === "case" &&
+            r.data.executionMode !== "illustrative_snapshot" &&
+            !["complete", "cancelled"].includes(r.state)
+          )
             r.state = caseStatus(expireSteps(r.data.steps, Date.now()));
         }
         const events = (
@@ -1305,6 +1310,7 @@ export function createApp({
               upstreamBindings,
               inputRevision: c.revision,
               authorship: "Human-authored analysis",
+              guideVersion: FRAMEWORK_GUIDE_VERSION,
               provider: null,
             },
             "review_required",

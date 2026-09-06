@@ -6,14 +6,18 @@ export function AiWorkbench({
   company,
   records,
   create,
+  createCandidate,
+  strategy = false,
 }: {
   company: string;
   records: RecordRow[];
   create: (preset: Record<string, unknown>) => void;
+  createCandidate?: (preset: Record<string, unknown>) => void;
+  strategy?: boolean;
 }) {
   const [data, setData] = useState<any>(null),
     [selected, setSelected] = useState<string[]>([]),
-    [mode, setMode] = useState("brief"),
+    [mode, setMode] = useState(strategy ? "hypotheses" : "brief"),
     [consent, setConsent] = useState(false),
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
@@ -26,8 +30,12 @@ export function AiWorkbench({
   );
   return (
     <Panel
-      title="AI discovery drafts"
-      subtitle="Prepare for the first meeting, then ask the team to correct the draft. AI output never confirms internal ownership or authorizes work."
+      title={strategy ? "Strategy assistant" : "AI discovery drafts"}
+      subtitle={
+        strategy
+          ? "Select evidence and draft possible constraints with OpenAI. Review each draft before adding it to the ledger. This is an on-demand assistant, not a scheduled framework agent."
+          : "Prepare for the first meeting, then ask the team to correct the draft. AI output never confirms internal ownership or authorizes work."
+      }
     >
       <ErrorBox error={error} />
       {data && !data.configured && (
@@ -192,6 +200,22 @@ export function AiWorkbench({
                   <p>Alternative: {h.alternative}</p>
                   <p>Test: {h.test}</p>
                   <SourceNames ids={h.sourceIds} sources={job.input.sources} />
+                  {createCandidate && (
+                    <Button
+                      disabled={!job.accepted}
+                      onClick={() =>
+                        createCandidate({
+                          title: h.title,
+                          pressure: h.explanation,
+                          alternative: h.alternative,
+                          discriminator: h.test,
+                          evidenceIds: h.sourceIds,
+                        })
+                      }
+                    >
+                      Review for constraint ledger
+                    </Button>
+                  )}
                   <p className="subtle">
                     Review these ideas with the team before recording a
                     candidate in Strategy.

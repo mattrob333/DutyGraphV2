@@ -76,7 +76,10 @@ export function WorkflowDetail({
         )}
       </>
     );
-  const steps = expireSteps(r.data.steps, Date.now()),
+  const illustrative = r.data.executionMode === "illustrative_snapshot";
+  const steps: CaseStep[] = illustrative
+      ? r.data.steps
+      : expireSteps(r.data.steps, Date.now()),
     definition = r.data.definition;
   const action = (step: CaseStep, name: string) =>
     call(async () => {
@@ -105,8 +108,9 @@ export function WorkflowDetail({
     <>
       <ErrorBox error={error} />
       <div className="notice">
-        Manual work observations · workflow version {r.data.workflowVersion}.
-        The case stores checkpoints and does not run external tools.
+        {illustrative
+          ? "Read-only fictional example. The completed steps are illustrative; no work was executed and no timer is running."
+          : `Manual work observations · workflow version ${r.data.workflowVersion}. The case stores checkpoints and does not run external tools.`}
       </div>
       <p>
         <strong>Starting input:</strong> {r.data.inputReference}
@@ -144,7 +148,8 @@ export function WorkflowDetail({
                   : ""}
               </p>
               {step.note && <p>{step.note}</p>}
-              {!["complete", "cancelled"].includes(r.state) &&
+              {!illustrative &&
+                !["complete", "cancelled"].includes(r.state) &&
                 ["ready", "failed", "escalated"].includes(step.state) && (
                   <>
                     <Field
@@ -229,7 +234,7 @@ export function WorkflowDetail({
           );
         })}
       </div>
-      {!["complete", "cancelled"].includes(r.state) && (
+      {!illustrative && !["complete", "cancelled"].includes(r.state) && (
         <details className="disclosure">
           <summary>Close this case without completing it</summary>
           <Field label="Reason to close the case">

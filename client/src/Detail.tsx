@@ -13,6 +13,7 @@ import { Button, Field, ErrorBox, State, Badge, Row, date } from "./ui.tsx";
 import { api, downloadExport, downloadFile } from "./api.ts";
 import { fieldSets } from "./forms.tsx";
 import { EmailInvitation } from "./EmailInvitation.tsx";
+import { FrameworkInstructions } from "./StrategyViews.tsx";
 import { ModeBadge, SoftwareChips } from "./TaskCards.tsx";
 import { taskMode, stages } from "../../shared/task-presentation.ts";
 import { WorkflowDetail } from "./WorkflowDetail.tsx";
@@ -103,6 +104,9 @@ export function Detail({
         </div>
       </div>
       <ErrorBox error={error} />
+      {r.kind === "framework" && (
+        <FrameworkInstructions frameworkKey={r.data.key} />
+      )}
       {r.kind === "brief" && (
         <>
           <dl className="details">

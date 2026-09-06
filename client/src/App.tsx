@@ -41,6 +41,13 @@ import {
   date,
 } from "./ui.tsx";
 import { RecordForm } from "./forms.tsx";
+import { StandupBrief } from "./StandupBrief.tsx";
+import { WorkflowsOverview } from "./WorkflowsOverview.tsx";
+import {
+  FrameworkLibrary,
+  FrameworkInstructions,
+  ConstraintLedger,
+} from "./StrategyViews.tsx";
 import { TaskCards } from "./TaskCards.tsx";
 import { Graph } from "./Graph.tsx";
 import { Engagement } from "./Engagement.tsx";
@@ -1086,18 +1093,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             </Button>
           }
         />
-        <Panel
-          title="Workflow definitions"
-          subtitle="Each definition pins task and handoff versions. Paths must be connected and acyclic."
-        >
-          {rows(items("workflow"))}
-        </Panel>
-        <Panel
-          title="Work cases"
-          subtitle="Checkpoints survive restarts. A timeout requires human review and never approves a step."
-        >
-          {rows(items("case"))}
-        </Panel>
+        <WorkflowsOverview records={records} open={open} />
         <div className="notice">
           Create the task cards and their handoff contracts in Task cards first.
           Cases record human observations; external systems are not executed.
@@ -1127,7 +1123,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <Heading
           eyebrow="LIVEFRAMEWORKS"
           title="Find what actually limits progress."
-          description="One intake. Sixteen connected lenses. A diagnosis you can test."
+          description="Use the evidence to understand the business, test its limits and choose the next action."
           actions={
             <Button
               primary
@@ -1176,8 +1172,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             <div className="intake-grid">
               {[
                 ["biz", "Business context"],
-                ["leadership", "Leadership accounts"],
-                ["calls", "Customer calls"],
+                ["leadership", "Leadership input"],
+                ["calls", "Customer & prospect calls"],
                 ["org", "People & work"],
               ].map(([key, label]) => (
                 <button
@@ -1201,43 +1197,16 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               ))}
             </div>
             <div className="notice">
-              Framework analyses are entered and reviewed by people in this
-              build. No model-generated results are simulated. Upstream
-              artifacts and source versions must be current.
+              Each framework includes a guide. Analyses are saved and reviewed
+              by people. Open the constraint ledger to use the AI assistant.
+              Suggested review times are not active schedules.
             </div>
-            <div className="framework-grid">
-              {data.registry.frameworks.map((f: any, i: number) => {
-                const r = items("framework").find((r) => r.data.key === f.key);
-                return (
-                  <button
-                    className="framework-card"
-                    key={f.key}
-                    onClick={() =>
-                      r ? open(r) : setModal({ type: "framework", key: f.key })
-                    }
-                  >
-                    <div className="toolbar">
-                      <span className="step-number">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <State value={r?.state || "needs_input"} />
-                    </div>
-                    <h3>{f.name}</h3>
-                    <p>
-                      {f.upstream.length
-                        ? "Requires " + f.upstream.join(", ")
-                        : "Starts from accepted business and leadership evidence."}
-                    </p>
-                    <footer>
-                      <span>
-                        {r ? "Open analysis" : "Write evidence-backed analysis"}
-                      </span>
-                      <ArrowRight size={15} />
-                    </footer>
-                  </button>
-                );
-              })}
-            </div>
+            <FrameworkLibrary
+              registry={data.registry}
+              records={records}
+              open={open}
+              write={(key) => setModal({ type: "framework", key })}
+            />
             <Button
               onClick={() =>
                 setModal({ type: "framework", key: data.registry.order[0] })
@@ -1247,16 +1216,27 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             </Button>
           </>
         ) : strategyTab === "constraints" ? (
-          <Panel
-            title="Keep the strongest alternative visible"
-            subtitle="Pressure signals, independent sources, a global counterfactual, and a discriminating measurement."
-          >
-            {rows(items("candidate"))}
-          </Panel>
+          <>
+            <ConstraintLedger records={records} open={open} />
+            <details className="strategy-assistant">
+              <summary>Draft possible constraints from evidence</summary>
+              <AiWorkbench
+                strategy
+                company={companyId}
+                records={records}
+                create={(preset) =>
+                  setModal({ type: "form", kind: "task", preset })
+                }
+                createCandidate={(preset) =>
+                  setModal({ type: "form", kind: "candidate", preset })
+                }
+              />
+            </details>
+          </>
         ) : strategyTab === "outcomes" ? (
           <Panel
             title="Did the predicted result happen?"
-            subtitle="Compare the frozen prediction with observed measurements, coverage and competing explanations."
+            subtitle="Compare the prediction with what was measured. Record other changes that could explain the result."
           >
             {rows(items("outcome"))}
           </Panel>
@@ -1265,6 +1245,32 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             <div className="notice">
               Missing values stay missing. Zero means measured zero. A target
               needs a defensible basis.
+            </div>
+            <div className="measurement-guide">
+              <section>
+                <h3>Measure the business</h3>
+                <p>
+                  A KPI is a defined measure. Record its formula, source, owner,
+                  group and period. Establish a baseline before choosing a
+                  target.
+                </p>
+              </section>
+              <section>
+                <h3>Compare like with like</h3>
+                <p>
+                  No verified competitor benchmarks are loaded. Record a
+                  competitor or peer group, source date, formula and period
+                  before comparing values. Missing data stays missing.
+                </p>
+              </section>
+              <section>
+                <h3>Set the result to achieve</h3>
+                <p>
+                  An objective states the goal. Key results state the measurable
+                  change and due date. Use Balanced Scorecard / OKRs to link
+                  them to these measures.
+                </p>
+              </section>
             </div>
             <div className="metric-grid">
               {items("metric").map((m) => (
@@ -1303,7 +1309,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         ) : (
           <Panel
             title="The smallest plausible change"
-            subtitle="One constraint → one intervention → one metric → one named human owner."
+            subtitle="An intervention is a specific change to test: what will change, who owns it, what result is expected and when to stop."
           >
             {rows(items("intervention"))}
           </Panel>
@@ -1387,6 +1393,12 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               <Plus size={16} />
               Record decision & owner
             </Button>
+          }
+        />
+        <StandupBrief
+          records={records}
+          prepare={(preset) =>
+            setModal({ type: "form", kind: "request", preset })
           }
         />
         <div className="two-col">
@@ -2287,7 +2299,7 @@ function FrameworkForm({
       }}
     >
       <ErrorBox error={error} />
-      <Field label="Canonical framework">
+      <Field label="Choose a framework">
         <select value={key} onChange={(e) => setKey(e.target.value)}>
           {registry.frameworks.map((f: any) => (
             <option value={f.key} key={f.key}>
@@ -2296,11 +2308,16 @@ function FrameworkForm({
           ))}
         </select>
       </Field>
+      <FrameworkInstructions frameworkKey={key} />
       <p className="subtle">
-        Required upstream analyses:{" "}
+        Required earlier analyses:{" "}
         {registry.frameworks
           .find((f: any) => f.key === key)
-          .upstream.join(", ") || "None"}
+          .upstream.map(
+            (id: string) =>
+              registry.frameworks.find((f: any) => f.key === id)?.name || id,
+          )
+          .join(", ") || "None"}
         . All must be current and reviewed.
       </p>
       <Field label="Analysis with exact source locators">

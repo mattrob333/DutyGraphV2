@@ -3,6 +3,7 @@ import { pool, tx, putRecord, setState, fail } from "./db.ts";
 import { passwordHash, publicUser, defaultSettings } from "./auth.ts";
 import { capturePrompts } from "../shared/domain.ts";
 import { populateCobaltExamples } from "./sample-examples.ts";
+import { sampleCases } from "./sample-cases.ts";
 
 export async function ensureCobaltExamples(
   db: import("pg").PoolClient,
@@ -31,7 +32,7 @@ export async function ensureCobaltExamples(
   );
   if (!knownSample)
     fail(422, "SAMPLE_ONLY", "This workspace is not the Cobalt sample.");
-  return populateCobaltExamples(
+  const enriched = await populateCobaltExamples(
     rows,
     async (kind, title, data, state, existing) => {
       const result = await putRecord(
@@ -69,6 +70,21 @@ export async function ensureCobaltExamples(
       return result;
     },
   );
+  for (const example of sampleCases(enriched))
+    enriched.push(
+      await putRecord(
+        db,
+        user,
+        company,
+        "case",
+        example.title,
+        example.data,
+        "illustrative",
+        undefined,
+        "Added a read-only fictional case walkthrough. No work executed.",
+      ),
+    );
+  return enriched;
 }
 export async function demoUser() {
   // A demo is always isolated in its own synthetic-data tenant. It grants no production access.

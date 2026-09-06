@@ -13,6 +13,7 @@ export function stateLabel(s: string) {
   return (
     (
       {
+        illustrative: "Read-only example",
         awaiting_confirmation: "Awaiting confirmation",
         pending_review: "Needs review",
         constraint_hypothesis: "Constraint hypothesis",

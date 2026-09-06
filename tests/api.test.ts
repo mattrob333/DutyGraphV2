@@ -1401,6 +1401,23 @@ test("private sample is isolated, repeatable and does not send email", async () 
     16,
   );
   assert.ok(workspace.data.records.some((r: any) => r.kind === "duty"));
+  const examples = workspace.data.records.filter(
+    (r: any) =>
+      r.kind === "case" && r.data.executionMode === "illustrative_snapshot",
+  );
+  assert.equal(examples.length, 2);
+  assert.ok(examples.every((r: any) => r.state === "illustrative"));
+  const forbidden = await request(
+    a,
+    `/api/v1/companies/${first.data.id}/workflows/cases/${examples[0].id}/actions`,
+    "POST",
+    {
+      expectedVersion: examples[0].version,
+      action: "cancel",
+      note: "Do not mutate an illustrative case.",
+    },
+  );
+  assert.equal(forbidden.status, 409);
   const snapshots = workspace.data.records.map((r: any) => [
     r.id,
     r.version,

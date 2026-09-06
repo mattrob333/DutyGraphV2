@@ -144,6 +144,12 @@ export function workflowsRouter() {
           .strict()
           .parse(req.body);
         if (r.kind !== "case") fail(404, "NOT_FOUND", "Case not found.");
+        if (r.data.executionMode === "illustrative_snapshot")
+          fail(
+            409,
+            "ILLUSTRATIVE_CASE",
+            "This is a read-only example. Review a workflow to start a real manual case.",
+          );
         if (r.version !== d.expectedVersion)
           fail(
             409,
