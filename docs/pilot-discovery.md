@@ -29,8 +29,7 @@ The operator can run `node scripts/pilot-inbox.mjs` with the **operator**
 `MIGRATION_DATABASE_URL` to review the latest 200 requests privately. Output
 contains personal contact information; do not put it in public logs. Hosted
 credentials must be supplied through the environment, never committed. Review
-this inbox regularly; this release does not send applicant or operator email
-notifications. Remove applications on request using the operator database.
+this inbox regularly; operator notifications queue and can be enabled with a verified Resend sender; no applicant confirmation email is sent. See seo-strategy.md for activation. Remove applications on request using the operator database.
 
 ## Real participant flow
 
@@ -76,3 +75,9 @@ this change does not implement an automatic cross-team conflict detector.
 
 The public walkthrough includes the same review step, using an explicitly
 illustrative card instead of invoking a model. No demo answers leave the page.
+
+## Commercial inquiry paths
+
+The form now records pilot, advisor, enterprise, or team interest. Each email may submit once per interest; repeats return the same receipt. All requests remain in the private operator inbox. The new public pages at /pilot/, /advisors/, /enterprise/, and /team/ preselect the matching interest. They do not book a meeting, grant a program place, or make an employment offer.
+
+Use `node scripts/pilot-inbox.mjs list` with the operator connection to inspect the private pipeline. To record progress, use `node scripts/pilot-inbox.mjs update <private-json-file>`. The JSON contains id, stage, nextAction, and nextActionAt (YYYY-MM-DD or null). Stages are new, contacted, qualified, scheduled, active, completed, closed. Keep contact details and update files outside the public repository. Updating a stage sends no email and changes no company work records.

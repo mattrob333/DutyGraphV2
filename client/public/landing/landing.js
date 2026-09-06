@@ -112,3 +112,15 @@ document.querySelector('#pilot-form')?.addEventListener('submit', async event =>
   } catch (error) { result.textContent = error.message || 'We could not save your request. Please try again.'; }
   finally { button.disabled = false; }
 });
+
+(() => {
+ const select = document.querySelector('#inquiry-type');
+ if (!select) return;
+ const labels = {pilot:'Sign up for a demo',advisor:'Explore the advisor program',enterprise:'Discuss an enterprise evaluation',team:'Help build DutyGraph'};
+ const interest = new URLSearchParams(location.search).get('interest');
+ if (Object.hasOwn(labels, interest || '')) select.value = interest;
+ const update = () => { document.querySelector('#inquiry-title').textContent = labels[select.value]; document.querySelector('#pilot-form button[type=submit]').textContent = select.value === 'pilot' ? 'Request my demo ↗' : 'Send my inquiry ↗'; };
+ select.addEventListener('change',update);
+ document.querySelector('#pilot-form').addEventListener('reset', () => setTimeout(update,0));
+ update();
+})();

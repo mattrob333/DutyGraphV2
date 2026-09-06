@@ -64,6 +64,10 @@ test("pilot intake saves once, requires consent, and exposes no applicant data",
       0,
     );
     assert.notEqual((await fetch(base)).status, 200);
+    assert.equal(
+      (await post({ ...payload, inquiryType: "invalid" })).status,
+      422,
+    );
     const id = (
       await admin.query("SELECT id FROM pilot_applications WHERE email=$1", [
         email,
@@ -173,6 +177,21 @@ test("pilot intake saves once, requires consent, and exposes no applicant data",
         else process.env[k] = prior[i];
       });
     }
+    for (const inquiryType of ["advisor", "enterprise", "team"]) {
+      assert.equal((await post({ ...payload, inquiryType })).status, 202);
+      assert.equal((await post({ ...payload, inquiryType })).status, 202);
+    }
+    const interests = (
+      await admin.query(
+        "SELECT inquiry_type,stage FROM pilot_applications WHERE email=$1 ORDER BY inquiry_type",
+        [email],
+      )
+    ).rows;
+    assert.deepEqual(
+      interests.map((r) => r.inquiry_type),
+      ["advisor", "enterprise", "pilot", "team"],
+    );
+    assert.ok(interests.every((r) => r.stage === "new"));
   } finally {
     await admin.query("DELETE FROM pilot_applications WHERE email=$1", [email]);
     await admin.end();

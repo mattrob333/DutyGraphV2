@@ -16,6 +16,7 @@ export function pilotEmail(
   to: string,
 ) {
   const fields = [
+    ["Interest", data.inquiry_type || "pilot"],
     ["Name", data.name],
     ["Email", data.email],
     ["Company", data.company],
@@ -27,11 +28,11 @@ export function pilotEmail(
     from,
     to: [to],
     reply_to: data.email,
-    subject: "New DutyGraph pilot request",
+    subject: `New DutyGraph ${data.inquiry_type || "pilot"} request`,
     text:
-      "New DutyGraph pilot request\n\n" +
+      "New DutyGraph inquiry\n\n" +
       fields.map(([k, v]) => `${k}: ${v}`).join("\n\n"),
-    html: `<div style="background:#f4f3ef;padding:24px;font:16px Arial,sans-serif;color:#202225"><div style="max-width:600px;margin:auto;background:white"><div style="padding:24px;background:#202225;color:white;font-size:24px;font-weight:bold">DutyGraph</div><div style="padding:24px"><h1 style="font-size:24px">A new team wants to join the pilot.</h1>${fields.map(([k, v]) => `<p><strong>${escape(k!)}</strong><br>${escape(v!).replaceAll("\n", "<br>")}</p>`).join("")}<p>Reply to this email to contact the applicant. A meeting has not been booked.</p></div></div></div>`,
+    html: `<div style="background:#f4f3ef;padding:24px;font:16px Arial,sans-serif;color:#202225"><div style="max-width:600px;margin:auto;background:white"><div style="padding:24px;background:#202225;color:white;font-size:24px;font-weight:bold">DutyGraph</div><div style="padding:24px"><h1 style="font-size:24px">A new DutyGraph inquiry.</h1>${fields.map(([k, v]) => `<p><strong>${escape(k!)}</strong><br>${escape(v!).replaceAll("\n", "<br>")}</p>`).join("")}<p>Reply to this email to contact the applicant. A meeting has not been booked.</p></div></div></div>`,
   };
 }
 

@@ -1,5 +1,7 @@
 import { mkdir, writeFile, readFile } from "node:fs/promises";
-import { articles, vendors } from "./learning-content.ts";
+import { articles as originalArticles, vendors } from "./learning-content.ts";
+import { nextArticles } from "./learning-next.ts";
+const articles = [...originalArticles, ...nextArticles];
 const root = new URL("../client/public/", import.meta.url);
 const origin = new URL(
   process.env.MARKETING_ORIGIN || "https://dutygraph-v2.vercel.app",
@@ -25,7 +27,7 @@ const shell = (
   body: string,
   article = false,
 ) =>
-  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} | DutyGraph</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${origin}${path}"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="${article ? "article" : "website"}"><meta property="og:url" content="${origin}${path}"><link rel="icon" href="/brand/dutygraph-symbol.svg"><link rel="stylesheet" href="/landing/landing.css"><link rel="stylesheet" href="/learn/learning.css"><script src="/learn/learning.js" defer></script><script type="application/ld+json">${JSON.stringify(article ? { "@context": "https://schema.org", "@type": "Article", headline: title, description, datePublished: "2026-09-06", dateModified: "2026-09-06", author: { "@type": "Organization", name: "DutyGraph" }, mainEntityOfPage: origin + path } : { "@context": "https://schema.org", "@type": "CollectionPage", name: title, url: origin + path }).replaceAll("<", "\\u003c")}</script></head><body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="wrap navigation"><a class="wordmark" href="/landing/"><img src="/brand/dutygraph-symbol.svg" alt="" width="34" height="33"><span>DutyGraph</span></a><nav aria-label="Main navigation"><a href="/learn/">Field guides</a></nav><a class="button button-small" href="/landing/#pilot">Join the pilot ↗</a></div></header><main id="main" class="wrap learning">${body}<aside class="learn-cta"><p class="eyebrow">START WITH YOUR TEAM</p><h2>Understand the work before you delegate it.</h2><p>We’re seeking 5–10 companies to test advisor-led discovery. Start with a demo and decide whether the pilot fits your team.</p><div class="learn-actions"><a class="button" href="/landing/#pilot">Join the pilot ↗</a><a class="text-link" href="/?demo=discovery">Try the discovery walkthrough →</a></div></aside><section aria-label="More field guides"><h2>Keep exploring</h2><div class="guide-grid">${cards}</div></section></main><footer class="wrap learn-footer"><a href="/landing/">DutyGraph</a><a href="/handbook/25-participant-review.html">Participant guide</a><span>Work made visible. Authority made explicit.</span></footer></body></html>`;
+  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(title)} | DutyGraph</title><meta name="description" content="${escape(description)}"><link rel="canonical" href="${origin}${path}"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:type" content="${article ? "article" : "website"}"><meta property="og:url" content="${origin}${path}"><link rel="icon" href="/brand/dutygraph-symbol.svg"><link rel="stylesheet" href="/landing/landing.css"><link rel="stylesheet" href="/learn/learning.css"><script src="/learn/learning.js" defer></script><script type="application/ld+json">${JSON.stringify(article ? { "@context": "https://schema.org", "@type": "Article", headline: title, description, datePublished: "2026-09-06", dateModified: "2026-09-06", author: { "@type": "Organization", name: "DutyGraph" }, mainEntityOfPage: origin + path } : { "@context": "https://schema.org", "@type": "CollectionPage", name: title, url: origin + path }).replaceAll("<", "\\u003c")}</script></head><body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="wrap navigation"><a class="wordmark" href="/landing/"><img src="/brand/dutygraph-symbol.svg" alt="" width="34" height="33"><span>DutyGraph</span></a><nav aria-label="Main navigation"><a href="/learn/">Field guides</a> · <a href="/directory/ai-governance/">Directory</a></nav><a class="button button-small" href="/landing/#pilot">Join the pilot ↗</a></div></header><main id="main" class="wrap learning">${body}<aside class="learn-cta"><p class="eyebrow">START WITH YOUR TEAM</p><h2>Understand the work before you delegate it.</h2><p>We’re seeking 5–10 companies to test advisor-led discovery. Start with a demo and decide whether the pilot fits your team.</p><div class="learn-actions"><a class="button" href="/landing/#pilot">Join the pilot ↗</a><a class="text-link" href="/?demo=discovery">Try the discovery walkthrough →</a></div></aside><section aria-label="More field guides"><h2>Keep exploring</h2><div class="guide-grid">${cards}</div></section></main><footer class="wrap learn-footer"><a href="/landing/">DutyGraph</a><a href="/handbook/25-participant-review.html">Participant guide</a><span>Work made visible. Authority made explicit.</span></footer></body></html>`;
 await mkdir(new URL("learn/", root), { recursive: true });
 await writeFile(
   new URL("learn/index.html", root),
@@ -39,7 +41,7 @@ await writeFile(
 for (const a of articles) {
   const vendorMap =
     a.slug === "ai-governance-landscape"
-      ? `<section class="landscape" aria-label="Governance landscape"><div class="filters" aria-label="Filter companies">${["All", "AI risk & oversight", "Identity & access", "Work discovery"].map((x, i) => `<button type="button" data-filter="${escape(x)}" aria-pressed="${i === 0}">${x}</button>`).join("")}</div><p id="vendor-count" role="status">6 organizations shown</p><div class="vendor-grid">${vendors.map((v) => `<article class="vendor-card" data-category="${escape(v.category)}"><span class="eyebrow">${v.category}</span><h3>${v.name}</h3><p>${v.description}</p><a href="${v.url}">${v.name === "DutyGraph" ? "Explore the sample story" : "Read the source"} ↗</a></article>`).join("")}</div><p class="small">Representative map · Vendor descriptions, not tested rankings · Checked September 6, 2026</p></section>`
+      ? `<p><a class="text-link" href="/directory/ai-governance/">Search the full directory →</a></p><section class="landscape" aria-label="Governance landscape"><div class="filters" aria-label="Filter companies">${["All", "AI risk & oversight", "Identity & access", "Work discovery"].map((x, i) => `<button type="button" data-filter="${escape(x)}" aria-pressed="${i === 0}">${x}</button>`).join("")}</div><p id="vendor-count" role="status">6 organizations shown</p><div class="vendor-grid">${vendors.map((v) => `<article class="vendor-card" data-category="${escape(v.category)}"><span class="eyebrow">${v.category}</span><h3>${v.name}</h3><p>${v.description}</p><a href="${v.url}">${v.name === "DutyGraph" ? "Explore the sample story" : "Read the source"} ↗</a></article>`).join("")}</div><p class="small">Representative map · Vendor descriptions, not tested rankings · Checked September 6, 2026</p></section>`
       : "";
   const download =
     a.slug === "agent-manifest-template"
@@ -57,16 +59,22 @@ for (const a of articles) {
       "",
     )}${a.sources.length ? `<section class="sources"><h2>Sources</h2><p>Primary references used in this guide.</p><ul>${a.sources.map(([label, url]) => `<li><a href="${url}">${label} ↗</a></li>`).join("")}</ul></section>` : ""}</article></div>`;
   await mkdir(new URL(`learn/${a.slug}/`, root), { recursive: true });
-  const searchTitle = (
-    {
-      "ai-governance": "AI Governance: A Practical Guide",
-      "ai-agent-governance":
-        "AI Agent Governance: Ownership, Scopes and Approval",
-      "ai-governance-landscape":
-        "AI Governance Landscape: Platforms and Their Roles",
-      "agent-manifest-template": "Agent Manifest Template: Free JSON Worksheet",
-    } as Record<string, string>
-  )[a.slug]!;
+  const searchTitle =
+    (
+      {
+        "ai-governance": "AI Governance: A Practical Guide",
+        "ai-agent-governance":
+          "AI Agent Governance: Ownership, Scopes and Approval",
+        "ai-governance-landscape":
+          "AI Governance Landscape: Platforms and Their Roles",
+        "agent-manifest-template":
+          "Agent Manifest Template: Free JSON Worksheet",
+      } as Record<string, string>
+    )[a.slug] ||
+    a.slug
+      .split("-")
+      .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+      .join(" ");
   await writeFile(
     new URL(`learn/${a.slug}/index.html`, root),
     shell(searchTitle, a.description, `/learn/${a.slug}/`, body, true),
@@ -125,5 +133,5 @@ html = html
   );
 await writeFile(landing, html);
 console.log(
-  "Built 4 field guides, resource hub, manifest worksheet, sitemap, and robots.txt",
+  "Built 7 field guides, resource hub, manifest worksheet, sitemap, and robots.txt",
 );

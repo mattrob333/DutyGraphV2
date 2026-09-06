@@ -1,0 +1,74 @@
+[
+  {
+    "name": "Aembit",
+    "category": "Runtime access",
+    "description": "Policy-based access for agents and workloads, with identity verification and short-lived credentials.",
+    "url": "https://docs.aembit.io/get-started/use-cases/ai-agents/",
+    "question": "Show how a denied request and a revoked user-agent combination behave in our target system.",
+    "reviewed": "2026-09-06"
+  },
+  {
+    "name": "Credo AI",
+    "category": "AI risk & oversight",
+    "description": "A platform for enterprise AI governance and oversight, including agentic AI.",
+    "url": "https://www.credo.ai/",
+    "question": "Show how a policy becomes an assigned review and how the decision retains its supporting evidence.",
+    "reviewed": "2026-09-06"
+  },
+  {
+    "name": "DutyGraph",
+    "category": "Work discovery",
+    "description": "Advisor-led discovery connecting people, duties, tasks, and software. Governance workflow available as a fictional sample.",
+    "url": "/landing/#delegation",
+    "question": "Show how a participant-reviewed task reaches the advisor and how an unresolved handoff stays visible.",
+    "reviewed": "2026-09-06"
+  },
+  {
+    "name": "IBM watsonx.governance",
+    "category": "AI risk & oversight",
+    "description": "Enterprise AI governance and assurance across models, applications, and agents.",
+    "url": "https://www.ibm.com/products/watsonx-governance",
+    "question": "Show which governance and monitoring functions apply to our chosen model, application, and hosting setup.",
+    "reviewed": "2026-09-06"
+  },
+  {
+    "name": "Microsoft Entra",
+    "category": "Identity & access",
+    "description": "Agent identity objects and governance of access rights across their lifecycle.",
+    "url": "https://learn.microsoft.com/en-us/entra/id-governance/agent-id-governance-overview",
+    "question": "Show the agent objects, access review, and owner lifecycle behavior supported by our tenant and license.",
+    "reviewed": "2026-09-06"
+  },
+  {
+    "name": "Okta",
+    "category": "Identity & access",
+    "description": "Agent visibility, least-privilege access, and identity governance.",
+    "url": "https://help.okta.com/oie/en-us/content/topics/ai-agents/ai-agents-home.htm",
+    "question": "Show how agent discovery, identity, and access controls cover the specific agent platform we use.",
+    "reviewed": "2026-09-06"
+  },
+  {
+    "name": "OneTrust",
+    "category": "AI risk & oversight",
+    "description": "AI inventory, risk assessment, ownership, and governance workflows across an AI program.",
+    "url": "https://www.onetrust.com/solutions/ai-governance/",
+    "question": "Show how our AI inventory, risk review, and technical controls remain linked after a system changes.",
+    "reviewed": "2026-09-06"
+  },
+  {
+    "name": "SailPoint",
+    "category": "Identity & access",
+    "description": "Agent identity visibility, human ownership, and access review within its identity security platform.",
+    "url": "https://www.sailpoint.com/products/agent-identity-security",
+    "question": "Show how ownership succession, access review, and tool-service accounts are governed in our deployment.",
+    "reviewed": "2026-09-06"
+  },
+  {
+    "name": "Saviynt",
+    "category": "Identity & access",
+    "description": "AI identity visibility, lifecycle governance, and access controls.",
+    "url": "https://saviynt.com/products/zuma",
+    "question": "Show which source systems provide current entitlements and how a conflicting access request is handled.",
+    "reviewed": "2026-09-06"
+  }
+]

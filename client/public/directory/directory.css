@@ -1,0 +1,89 @@
+.directory-tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 24px;
+  padding: 24px;
+  border: 1px solid #485359;
+  border-radius: 12px;
+  margin-bottom: 32px;
+}
+.directory-tools label {
+  font-size: 0.85rem;
+}
+.directory-tools input,
+.directory-tools select,
+.directory-tools button {
+  padding: 14px;
+  font: inherit;
+  color: #eee;
+  background: #222426;
+  border: 1px solid #666;
+  border-radius: 6px;
+  min-width: 0;
+}
+.directory-tools label[for="directory-category"] {
+  grid-column: 2;
+  grid-row: 1;
+}
+.directory-tools input {
+  grid-column: 1;
+  grid-row: 2;
+}
+.directory-tools select {
+  grid-column: 2;
+  grid-row: 2;
+}
+.directory-tools button {
+  cursor: pointer;
+  justify-self: start;
+}
+.directory-tools p {
+  align-self: center;
+  margin: 0;
+}
+.directory-card {
+  scroll-margin-top: 100px;
+}
+.directory-card h2 {
+  font-size: 1.6rem;
+  margin: 18px 0;
+}
+.directory-card dt {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #b6cbd3;
+  margin-top: 20px;
+}
+.directory-card dd {
+  margin: 8px 0 0;
+  line-height: 1.65;
+  color: #ccc;
+}
+.directory-card[hidden] {
+  display: none;
+}
+.directory-tools :focus-visible {
+  outline: 2px solid #c4d8df;
+  outline-offset: 4px;
+}
+@media (max-width: 650px) {
+  .directory-tools {
+    grid-template-columns: 1fr;
+  }
+  .directory-tools label[for="directory-category"],
+  .directory-tools input,
+  .directory-tools select {
+    grid-column: auto;
+    grid-row: auto;
+  }
+  .directory-tools input {
+    grid-row: 2;
+  }
+  .directory-tools label[for="directory-category"] {
+    grid-row: 3;
+  }
+  .directory-tools select {
+    grid-row: 4;
+  }
+}

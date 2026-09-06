@@ -3,6 +3,9 @@ import { z } from "zod";
 import { pool } from "./db.ts";
 
 export const pilotSchema = z.object({
+  inquiryType: z
+    .enum(["pilot", "advisor", "enterprise", "team"])
+    .default("pilot"),
   name: z.string().trim().min(2).max(120),
   email: z
     .email()
@@ -22,8 +25,8 @@ export const applyForPilot: RequestHandler = async (req, res) => {
   if (!data.website) {
     try {
       await pool.query(
-        `INSERT INTO pilot_applications(email,name,company,role,team_size,goal,consent_version)
-       VALUES($1,$2,$3,$4,$5,$6,'pilot-contact-v1')`,
+        `INSERT INTO pilot_applications(email,name,company,role,team_size,goal,consent_version,inquiry_type)
+       VALUES($1,$2,$3,$4,$5,$6,'commercial-contact-v2',$7)`,
         [
           data.email,
           data.name,
@@ -31,6 +34,7 @@ export const applyForPilot: RequestHandler = async (req, res) => {
           data.role,
           data.teamSize,
           data.goal,
+          data.inquiryType,
         ],
       );
     } catch (error) {
@@ -40,6 +44,8 @@ export const applyForPilot: RequestHandler = async (req, res) => {
   // Identical receipt for duplicates; never reveal who has applied.
   res.status(202).json({
     message:
-      "Your demo request is saved. We will review it and contact you about a possible pilot. No meeting is booked yet.",
+      data.inquiryType === "pilot"
+        ? "Your demo request is saved. We will review it and contact you about a possible pilot. No meeting is booked yet."
+        : "Your request is saved. We will review it and contact you about the next step. No meeting, program place, or role is confirmed yet.",
   });
 };
