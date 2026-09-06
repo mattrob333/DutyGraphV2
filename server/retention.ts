@@ -13,6 +13,10 @@ export async function purgeExpiredAudio(tenant: string) {
         "UPDATE assets SET state='expired' WHERE company_id=$1 AND id=$2",
         [a.company_id, a.id],
       );
+      await db.query(
+        "UPDATE provider_jobs SET state='expired',result=NULL,message='The source recording reached its retention limit.' WHERE company_id=$1 AND kind='audio_transcription' AND input->>'assetId'=$2",
+        [a.company_id, a.id],
+      );
     }
     return expired.rowCount;
   });

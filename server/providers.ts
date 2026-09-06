@@ -90,27 +90,39 @@ export function providersRouter() {
       company = z
         .uuid()
         .parse((req.params as Record<string, string>).companyId);
-    const data = await tx(u.tenant_id, async (db) => {
+    const result = await tx(u.tenant_id, async (db) => {
       await companyCheck(db, u, company);
       const rows = (
         await db.query(
           "SELECT provider,enabled,config,updated_at FROM provider_settings",
         )
       ).rows;
-      return providerNames.map((provider) => ({
-        provider,
-        config: {},
-        configured: !!rows.find((r) => r.provider === provider)?.enabled,
-        source: rows.some((r) => r.provider === provider) ? "account" : "none",
-        ...rows.find((r) => r.provider === provider),
-      }));
+      const neo = rows.find((r) => r.provider === "neo4j");
+      return {
+        data: providerNames.map((provider) => ({
+          provider,
+          config: {},
+          configured: !!rows.find((r) => r.provider === provider)?.enabled,
+          source: rows.some((r) => r.provider === provider)
+            ? "account"
+            : "none",
+          ...rows.find((r) => r.provider === provider),
+        })),
+        neo4j: {
+          configured: !!neo?.enabled,
+          connected: !!neo?.enabled && !!neo?.config?.verifiedAt,
+          verifiedAt: neo?.config?.verifiedAt || null,
+          endpoint: neo?.config?.endpoint || "",
+          store: "PostgreSQL",
+        },
+      };
     });
     res.json({
       storageReady: /^[a-f0-9]{64}$/.test(
         process.env.PROVIDER_ENCRYPTION_KEY || "",
       ),
-      providers: data,
-      neo4j: { connected: false, store: "PostgreSQL" },
+      providers: result.data,
+      neo4j: result.neo4j,
     });
   });
   router.put("/:provider", async (req, res) => {

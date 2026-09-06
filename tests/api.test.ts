@@ -13,6 +13,7 @@ import { normalizeResearch } from "../server/research.ts";
 let researchCalls = 0,
   aiCalls = 0;
 const emailMessages: any[] = [];
+let transcriptionCalls = 0;
 let server: Server, base: string;
 type Client = { cookie: string; csrf: string; user: any; company: string };
 async function request(
@@ -802,7 +803,18 @@ before(async () => {
       });
     },
   });
-  app.use("/api/v1/companies/:companyId/assets", assetsRouter());
+  app.use(
+    "/api/v1/companies/:companyId/assets",
+    assetsRouter(async (input) => {
+      transcriptionCalls++;
+      if (input.bytes.toString() === "transcription timeout")
+        throw new Error("private diagnostic");
+      return {
+        text: "Synthetic transcript: we check the stock, then send the order.",
+        requestId: "synthetic-transcript-id",
+      };
+    }),
+  );
   app.use(errorHandler);
   server = app.listen(0, "127.0.0.1");
   await new Promise<void>((resolve) => server.once("listening", resolve));
@@ -1247,6 +1259,10 @@ test("expired audio is inaccessible before purge and its chunks are removed", as
     checksum: sum,
   });
   await request(c, path + "/finalize", "POST", { checksum: sum });
+  const transcript = await request(c, path + "/transcribe", "POST", {
+    consent: true,
+  });
+  assert.equal(transcript.data.state, "complete");
   await tx(c.user.tenant_id, async (db) => {
     await db.query(
       "UPDATE assets SET created_at=now()-interval '31 days' WHERE id=$1",
@@ -1265,6 +1281,17 @@ test("expired audio is inaccessible before purge and its chunks are removed", as
       ).rows[0].count,
   );
   assert.equal(count, "0");
+  const expiredTranscript = await tx(
+    c.user.tenant_id,
+    async (db) =>
+      (
+        await db.query("SELECT state,result FROM provider_jobs WHERE id=$1", [
+          transcript.data.id,
+        ])
+      ).rows[0],
+  );
+  assert.equal(expiredTranscript.state, "expired");
+  assert.equal(expiredTranscript.result, null);
 });
 test("export checksums match actual archive file bytes and omit original source text", async () => {
   const c = await register();
@@ -1511,6 +1538,18 @@ test("Resend invitation calls once, keeps tokens out of receipts and opens parti
   assert.equal(emailMessages.length, before + 1);
   const message = emailMessages.at(-1).message;
   assert.deepEqual(message.to, [f.p.data.email]);
+  assert.ok(message.html.includes("What do you do?"));
+  const preview = await request(
+    c,
+    prefix(c) + "/requests/" + r.id + "/email-preview",
+  );
+  assert.equal(preview.status, 200);
+  assert.ok(preview.data.html.includes("Open your private response page"));
+  assert.equal(
+    (await request(other, prefix(c) + "/requests/" + r.id + "/email-preview"))
+      .status,
+    404,
+  );
   const token = message.text.match(/invite\/([a-f0-9]{64})/)[1];
   assert.equal((await request(null, "/api/invitations/" + token)).status, 200);
   const jobs = await request(c, prefix(c) + "/requests/" + r.id + "/emails");
@@ -1794,4 +1833,89 @@ test("strategy reports bind company context, detect newly accepted sources and i
     true,
     "A chat answer must not replace the executive brief",
   );
+});
+
+test("participant transcription preserves audio, isolates access and makes retries explicit", async () => {
+  const c = await register(),
+    f = await fixture(c),
+    i = await invite(c, f, "work"),
+    other = await register();
+  const upload = async (text: string) => {
+    const bytes = Buffer.from(text),
+      checksum = createHash("sha256").update(bytes).digest("hex");
+    const a = await request(i.participant, prefix(c) + "/assets", "POST", {
+      mime: "audio/webm",
+      size: bytes.length,
+      requestId: i.req.id,
+    });
+    assert.equal(a.status, 201);
+    const path = prefix(c) + "/assets/" + a.data.id;
+    await request(i.participant, path + "/chunks/0", "PUT", {
+      base64: bytes.toString("base64"),
+      checksum,
+    });
+    assert.equal(
+      (await request(i.participant, path + "/finalize", "POST", { checksum }))
+        .status,
+      200,
+    );
+    return path;
+  };
+  const path = await upload("synthetic recording");
+  const before = transcriptionCalls;
+  assert.equal(
+    (await request(other, path + "/transcribe", "POST", { consent: true }))
+      .status,
+    404,
+  );
+  assert.equal(
+    (await request(i.participant, path + "/transcribe", "POST", {})).status,
+    422,
+  );
+  const key = randomUUID();
+  const result = await request(
+    i.participant,
+    path + "/transcribe",
+    "POST",
+    { consent: true },
+    { "Idempotency-Key": key },
+  );
+  assert.equal(result.status, 200, JSON.stringify(result.data));
+  assert.equal(result.data.state, "complete");
+  assert.ok(result.data.result.text.includes("Synthetic transcript"));
+  await request(
+    i.participant,
+    path + "/transcribe",
+    "POST",
+    { consent: true },
+    { "Idempotency-Key": key },
+  );
+  await request(i.participant, path + "/transcribe", "POST", {
+    consent: true,
+    retry: true,
+  });
+  assert.equal(transcriptionCalls, before + 1);
+  assert.equal(
+    (await request(i.participant, path + "/content")).data.toString(),
+    "synthetic recording",
+  );
+  assert.equal((await request(other, path + "/transcription")).status, 404);
+  const failedPath = await upload("transcription timeout");
+  const failed = await request(
+    i.participant,
+    failedPath + "/transcribe",
+    "POST",
+    { consent: true },
+  );
+  assert.equal(failed.data.state, "unknown");
+  assert.ok(!failed.data.message.includes("private diagnostic"));
+  await request(i.participant, failedPath + "/transcribe", "POST", {
+    consent: true,
+  });
+  assert.equal(transcriptionCalls, before + 2);
+  await request(i.participant, failedPath + "/transcribe", "POST", {
+    consent: true,
+    retry: true,
+  });
+  assert.equal(transcriptionCalls, before + 3);
 });

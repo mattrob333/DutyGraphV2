@@ -1,20 +1,9 @@
 import { z } from "zod";
-import { linksFor } from "./projection.ts";
+import { graphEdges, graphKinds } from "./graph-shape.ts";
+export { graphEdges } from "./graph-shape.ts";
+import { projectionFingerprint, readNeo4jSnapshot } from "./neo4j.ts";
 import { confirmationStatus } from "../shared/domain.ts";
 import { fail } from "./db.ts";
-const graphKinds = [
-  "person",
-  "task",
-  "evidence",
-  "candidate",
-  "agent",
-  "metric",
-  "intervention",
-  "duty",
-  "handoff",
-  "workflow",
-  "outcome",
-];
 const relations = [
   "ACCOUNTABLE_FOR",
   "PERFORMS",
@@ -40,34 +29,10 @@ export const graphQuerySchema = z
       .optional(),
   })
   .strict();
-export function graphEdges(records: any[]) {
-  return records.flatMap((r) =>
-    r.kind === "handoff"
-      ? [
-          {
-            source: r.data.sourceTaskId,
-            target: r.data.targetTaskId,
-            relationship: "HANDS_OFF_TO",
-            sourceRecordId: r.id,
-            sourceVersion: r.version,
-            sourceHash: r.hash,
-            validation: r.state,
-          },
-        ]
-      : linksFor(r).map((l) => ({
-          source: l.inbound ? l.target : r.id,
-          target: l.inbound ? r.id : l.target,
-          relationship: l.relationship,
-          sourceRecordId: r.id,
-          sourceVersion: r.version,
-          sourceHash: r.hash,
-          validation: r.state,
-        })),
-  );
-}
 export function boundedGraph(
   records: any[],
   query: z.infer<typeof graphQuerySchema>,
+  projectedEdges?: ReturnType<typeof graphEdges>,
 ) {
   const kinds = query.kinds?.split(",") || graphKinds,
     rels = query.relationships?.split(",") || relations;
@@ -87,7 +52,7 @@ export function boundedGraph(
       (states ? states.includes(r.state) : r.state !== "retracted"),
   );
   const allowed = new Set(visible.map((r) => r.id));
-  const edges = graphEdges(records).filter(
+  const edges = (projectedEdges || graphEdges(records)).filter(
     (e) =>
       allowed.has(e.source) &&
       allowed.has(e.target) &&
@@ -164,8 +129,17 @@ export async function readGraph(db: any, company: any, input: unknown) {
       [company.id],
     )
   ).rows[0];
+  const projected = !scanTruncated
+    ? await readNeo4jSnapshot(
+        company.tenant_id,
+        company.id,
+        Number(company.revision),
+        projectionFingerprint(records),
+        db,
+      )
+    : null;
   return {
-    ...boundedGraph(records, query),
+    ...boundedGraph(projected?.nodes || records, query, projected?.edges),
     sourceRevision: company.revision,
     pending: status.pending,
     projectedThrough: status.projected_through,
@@ -176,6 +150,7 @@ export async function readGraph(db: any, company: any, input: unknown) {
     focus: query.focus || null,
     depth: query.depth,
     nodeBudget: query.limit,
-    engine: "Authoritative PostgreSQL fallback",
+    engine: projected ? "Neo4j Aura" : "Authoritative PostgreSQL fallback",
+    neo4jCurrent: !!projected,
   };
 }

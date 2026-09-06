@@ -1,6 +1,6 @@
 # Architecture and implementation decisions
 
-Release 0.2 is a single-origin React/TypeScript application backed by Express and PostgreSQL. The browser binds to localhost:4317; the dedicated PostgreSQL 17 Compose service binds to localhost:55437. The original visual reference remains separate in `reference/`. The commercial handoff and predecessor repositories are not bundled into the public source.
+Release 0.3 is a single-origin React/TypeScript application backed by Express and PostgreSQL. The local preview uses localhost:4317; the dedicated PostgreSQL 17 Compose service binds to localhost:55437. The original visual reference remains separate in `reference/`. The commercial handoff and predecessor repositories are not bundled into the public source.
 
 ## Authoritative data and command consistency
 
@@ -30,17 +30,21 @@ The outbox worker materializes metadata and typed links into a local PostgreSQL 
 
 The UI displays connected evidence/people/tasks/hypotheses/proposals, focused neighborhoods, a work view, an accessible register, and a separate team/reporting view. Cards have wider gutters, separate connection ports and routed arrows. Recorded managers alone determine the org chart. Graph reconstruction is company-scoped and atomic; it verifies node count and records an audit event. No business action is replayed.
 
-Neo4j, generation-based distributed projection rebuild and large-scale graph evaluation are not implemented. The full workspace read also returns all current company records; pagination and larger-domain query planning are future scaling work.
+An optional Neo4j Aura adapter keeps a second projection of graph metadata and typed relationships. Database credentials are encrypted per advisor account. The adapter accepts verified-TLS Aura URIs, scopes every node and relationship by tenant and company, and writes each company snapshot in one transaction. Revision and payload checks prevent an older snapshot from replacing a newer one. Projection is bounded to 5,000 nodes and 40,000 relationships. Full evidence bodies, audio and credentials are excluded.
+
+PostgreSQL remains authoritative. Graph reads use Aura only when its revision, fingerprint and counts match the current company; otherwise they use current PostgreSQL records. The worker syncs enabled connections. Settings offers connection testing, graph rebuilding and status. Removing a connection stops later access but does not delete copies already in Aura. Local adapter tests pass; real Aura credentials, connectivity and projection acceptance remain pending. Distributed coordination and large-scale evaluation remain future work. Full workspace reads still return all current records; pagination and larger-domain query planning remain future scaling work.
 
 ## Evidence and capture
 
 Original evidence and requests are immutable. Retraction preserves history and propagates staleness through current dependencies. Participant text and audio preserve original provenance. Audio uploads use 512 KB chunks, checksums and final size/hash checks, with a 25 MB ceiling. Scoped local storage is PostgreSQL bytea, marked unscanned. Access expires after 30 days and the retention worker purges chunks; local browser drafts remain until submission/discard.
 
-There is no malware scanner, document parser, transcript provider, AI extraction queue or source-instruction execution path. Comprehensive erasure, derivatives, legal hold and production private object storage remain open. Engagement policy text does not change these technical mechanisms.
+On-demand OpenAI transcription accepts bounded recordings and preserves their original lineage. Participants can edit and review the transcript before submitting; advisors can recover text from an audio-only reply and accept it as separate transcript evidence. Failed or uncertain attempts require an explicit retry. Synthetic tests cover the adapter and record flow; live microphone and provider acceptance remain pending. There is no malware scanner, general document parser, continuous ingestion queue or autonomous source-instruction execution. Comprehensive erasure, legal hold and production private object storage remain open.
 
 ## Strategy and reports
 
-The preserved sixteen-framework registry determines dependencies and four source buckets. Human-authored analyses bind exact evidence and upstream versions. Changes invalidate downstream analysis. Structural diagnosis checks require independent origins, a tested alternative, a discriminator and a measured baseline; they are not an empirically validated causal engine.
+The preserved sixteen-framework registry determines dependencies and four source buckets. Each framework has specific system instructions, variable requirements and a validated visual output shape. On-demand OpenAI runs bind exact source excerpts, model and prompt version, and full current direct-upstream analyses. All upstream joins must be ready; source changes and upstream reruns invalidate dependent analyses recursively. A browser-led sequence runs ready analyses in order with separate account limits and no automatic retries. AI outputs remain versioned interpretations, separate from advisor-authored records and authoritative duties.
+
+Human-authored analyses also bind exact evidence and upstream versions. Current generated analyses can inform reports and the copilot, with citations to exact saved canvas versions and source excerpts. Structural diagnosis checks require independent origins, a tested alternative, a discriminator and a measured baseline; they are not an empirically validated causal engine.
 
 Metrics append observations. Outcomes freeze the original intervention prediction and measurement snapshot, record coverage/confounders, and support inconclusive results. Reviewing a falsified result reopens the hypothesis.
 
@@ -65,4 +69,6 @@ The API route catalog is generated from implemented declarations. OpenAPI has ru
 
 ## Public research boundary
 
-Discovery uses an optional Exa search/content adapter. A tenant-scoped research_runs table reserves each command before the external request, preserves its outcome and permits review/import of immutable source snapshots. The provider endpoint is fixed; no arbitrary URL is fetched by this server. Queries contain the explicit public name and optional domain, never workspace evidence. A retained snapshot imports as pending-review evidence with URL, date and digest. Ten requests per rolling 24 hours are enforced across each tenant account. Replay does not repeat a call; crashes can leave an unknown provider outcome without automatic retry. Model synthesis and background research cancellation remain open.
+Discovery uses an optional Exa search/content adapter. A tenant-scoped research_runs table reserves each command before the external request, preserves its outcome and permits review/import of immutable source snapshots. The provider endpoint is fixed; no arbitrary URL is fetched by this server. Queries contain the explicit public name and optional domain, never workspace evidence. A retained snapshot imports as pending-review evidence with URL, date and digest. Ten requests per rolling 24 hours are enforced across each tenant account. Replay does not repeat a call; crashes can leave an unknown provider outcome without automatic retry.
+
+Guided discovery carries stage-appropriate context automatically: public research into the contact email; research and the contact's reply into the leadership agenda; internal meeting accounts into reviewed people and duties; reviewed dossiers into personal interviews; and returned interviews into task drafts. First-meeting preparation never requires later employee accounts. Each draft retains its input references, review precedes record changes, and email sending remains separate. Recurring source collection and background research cancellation remain open.

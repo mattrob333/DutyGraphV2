@@ -50,7 +50,9 @@ import { Graph } from "./Graph.tsx";
 import { Engagement } from "./Engagement.tsx";
 import { AiWorkbench } from "./AiWorkbench.tsx";
 import { BusinessResearch } from "./BusinessResearch.tsx";
+import { DiscoveryJourney } from "./DiscoveryJourney.tsx";
 import { ProviderSettings } from "./ProviderSettings.tsx";
+import { Neo4jSettings } from "./Neo4jSettings.tsx";
 import { ClientReports } from "./ClientReports.tsx";
 const Help = lazy(() =>
   import("./Help.tsx").then((module) => ({ default: module.Help })),
@@ -111,7 +113,7 @@ type ModalState =
   | { type: "framework"; key: string }
   | null;
 function Login({ onLogin }: { onLogin: (result: any) => void }) {
-  const [mode, setMode] = useState("login"),
+  const [mode, setMode] = useState(new URLSearchParams(location.search).get("signup") === "1" ? "register" : "login"),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [demo, setDemo] = useState(false);
@@ -840,6 +842,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                     <i className="dot" />
                     <p>
                       {e.type.replaceAll(".", " · ").replaceAll("_", " ")}
+                      {records.find(r => r.id === e.record_id)?.title && <span> · {records.find(r => r.id === e.record_id)?.title}</span>}
                       <small>
                         {date(e.created_at)}
                         {e.detail?.version ? " · v" + e.detail.version : ""}
@@ -854,207 +857,21 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
       </>
     );
   else if (page === "discovery") {
-    const tabs = [
-      ["research", "Business research"],
-      ["plan", "Leadership kickoff"],
-      ["requests", "Team interviews & responses"],
-      ["people", "People in scope"],
-      ["evidence", "Evidence library"],
-    ];
-    body = (
-      <>
-        <Heading
-          eyebrow="DISCOVER THE BUSINESS"
-          title="Understand how the work happens."
-          description="Capture original accounts. Preserve disagreements. Review before updating the work record."
-          actions={
-            <Button
-              primary
-              onClick={() =>
-                create(
-                  tab === "plan"
-                    ? "engagement"
-                    : tab === "people"
-                      ? "person"
-                      : tab === "evidence" || tab === "research"
-                        ? "evidence"
-                        : "request",
-                )
-              }
-            >
-              <Plus size={16} />{" "}
-              {tab === "plan"
-                ? "Create engagement plan"
-                : tab === "people"
-                  ? "Add participant"
-                  : tab === "evidence" || tab === "research"
-                    ? "Add source"
-                    : "Prepare request"}
-            </Button>
-          }
-        />
-        <div className="toolbar">
-          <div className="tabs">
-            {tabs.map(([id, label]) => (
-              <button
-                key={id}
-                className={tab === id ? "active" : ""}
-                onClick={() => setTab(id)}
-              >
-                {label}
-                {id === "requests" && pending.length > 0 && (
-                  <Badge tone="amber">{pending.length}</Badge>
-                )}
-              </button>
-            ))}
-          </div>
-          {tab === "people" && (
-            <Button onClick={() => setModal({ type: "roster" })}>
-              <Upload size={15} />
-              Import roster CSV
-            </Button>
-          )}
-        </div>
-        {tab === "research" ? (
-          <>
-            <BusinessResearch
-              key={company.id}
-              company={company}
-              create={() =>
-                setModal({
-                  type: "form",
-                  kind: "evidence",
-                  preset: {
-                    type: "Public research",
-                    classification: "Inferred",
-                    bucket: "biz",
-                  },
-                })
-              }
-              open={open}
-              kickoff={() => setTab("plan")}
-              refresh={refresh}
-            />
-            <AiWorkbench
-              key={company.id + "ai"}
-              kickoff={() => setTab("plan")}
-              company={company.id}
-              records={records}
-              create={(preset) =>
-                setModal({ type: "form", kind: "task", preset })
-              }
-            />
-          </>
-        ) : tab === "plan" ? (
-          <Engagement
-            captureMeeting={() =>
-              setModal({
-                type: "form",
-                kind: "evidence",
-                preset: {
-                  type: "Leadership meeting transcript",
-                  bucket: "leadership",
-                  classification: "Inferred",
-                  title: "Leadership kickoff notes",
-                },
-              })
-            }
-            roster={() => setTab("people")}
-            interviews={() => setTab("requests")}
-            key={company.id}
-            company={company}
-            records={records}
-            create={create}
-            open={open}
-            refresh={refresh}
-          />
-        ) : tab === "requests" ? (
-          <>
-            <div className="notice blue">
-              <Mic size={20} />
-              <span>
-                Participants receive a focused page with five prompts, voice or
-                typed capture, and their exact task versions. Private links are
-                shared manually or emailed through your configured Resend
-                account.
-              </span>
-            </div>
-            <AiWorkbench
-              key={company.id + "interview"}
-              company={company.id}
-              records={records}
-              stage="interview"
-              create={(preset) =>
-                setModal({ type: "form", kind: "task", preset })
-              }
-              prepareRequest={(preset) =>
-                setModal({
-                  type: "form",
-                  kind: "request",
-                  preset: { ...preset, notice: company.settings.notice },
-                })
-              }
-            />
-            {pending.length > 0 && (
-              <Panel
-                title="Returned for your review"
-                subtitle="A response becomes evidence only after you review the original."
-              >
-                {rows(pending)}
-              </Panel>
-            )}
-            <AiWorkbench
-              key={company.id + "draft-tasks"}
-              company={company.id}
-              records={records}
-              stage="tasks"
-              create={(preset) =>
-                setModal({ type: "form", kind: "task", preset })
-              }
-            />
-            <Panel
-              title="Requests"
-              subtitle="Prepare → private link → participant response → advisor review"
-            >
-              {rows(items("request"))}
-            </Panel>
-            {responses.filter((r) => r.state === "accepted").length > 0 && (
-              <Panel title="Reviewed responses">
-                {rows(responses.filter((r) => r.state === "accepted"))}
-              </Panel>
-            )}
-          </>
-        ) : tab === "people" ? (
-          <>
-            <AiWorkbench
-              key={company.id + "roster-ai"}
-              company={company.id}
-              records={records}
-              stage="roster"
-              create={(preset) =>
-                setModal({ type: "form", kind: "task", preset })
-              }
-              createRecord={(kind, preset) =>
-                setModal({ type: "form", kind, preset })
-              }
-            />
-            <Panel
-              title="The agreed engagement roster"
-              subtitle="These people define participation coverage. Reporting and duty ownership remain separate claims."
-            >
-              {rows(people)}
-            </Panel>
-          </>
-        ) : (
-          <Panel
-            title="Every source keeps its origin"
-            subtitle="Original accounts, policies, and observed records. No source text is executed as an instruction."
-          >
-            {rows(evidence)}
-          </Panel>
-        )}
-      </>
-    );
+    body = <>
+      <Heading eyebrow="DISCOVER THE BUSINESS" title="From first conversation to clear work."
+        description="Research the business. Meet the leaders. Hear from the team. Build the work record."
+        actions={<Button onClick={() => create("engagement")}>Engagement scope</Button>} />
+      <DiscoveryJourney key={company.id} company={company} records={records} refresh={refresh} open={open}
+        settings={() => go("settings")}
+        addSource={() => setModal({ type: "form", kind: "evidence", preset: {type: "Public research", classification: "Inferred", bucket: "biz"} })}
+        goTasks={() => go("tasks")}
+        prepareConfirmation={() => setModal({type:"form",kind:"request",preset:{type:"confirmation",notice:company.settings.notice}})} />
+      <div className="discovery-record-tools">
+        <details><summary>People in scope · {people.length}</summary><div className="toolbar"><Button onClick={() => create("person")}>Add person</Button><Button onClick={() => setModal({type:"roster"})}>Import roster CSV</Button></div><Panel title="People in this workspace">{rows(people)}</Panel></details>
+        <details><summary>Requests and responses · {items("request").length} requests</summary><Panel title="Requests">{rows(items("request"))}</Panel><Panel title="Returned responses">{rows(responses)}</Panel></details>
+        <details><summary>Evidence history · {evidence.length} sources</summary><Button onClick={() => create("evidence")}>Add source</Button><Panel title="Every source keeps its origin" subtitle="Original research, meeting notes and participant responses remain available here.">{rows(evidence)}</Panel></details>
+      </div>
+    </>;
   } else if (page === "tasks")
     body = (
       <>
@@ -1378,7 +1195,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
     body = (
       <>
         <Heading
-          eyebrow="PEDIGREE & SIGNET"
+          eyebrow="AGENT GOVERNANCE"
           title="Delegate with a clear human boundary."
           description="A work description starts a proposal. Authority, approval, and enforcement are separate decisions."
           actions={
@@ -1556,7 +1373,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               {confirmed.length} of {tasks.length} tasks currently qualify.
               Every excluded task carries its reason.
             </p>
-            <Button onClick={() => void makeExport("confirmed")}>
+            {confirmed.length === 0 && <p>Ask the task owners and performers to confirm their task cards first.</p>}
+            <Button disabled={confirmed.length === 0} onClick={() => void makeExport("confirmed")}>
               <ShieldCheck size={16} />
               Freeze confirmed subset
             </Button>
@@ -1628,16 +1446,16 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                 "Chunked database storage with checksums; unscanned",
                 "Pilot",
               ],
-              ["Neo4j", "Dedicated graph projection adapter", "Not configured"],
+              ["Neo4j", "Company graph projection with current-record fallback", data.connections?.neo4j?.connected ? "Connection verified" : data.connections?.neo4j?.configured ? "Saved · test connection" : "Set up connection"],
               [
                 "Email",
-                "Resend invitation sending; delivery tracking and reminders pending",
-                "Configure in Settings",
+                "Private invitations with a saved email-service receipt",
+                data.connections?.email === "configured" ? "Configured · not verified" : "Set up connection",
               ],
               [
                 "OpenAI discovery drafts",
-                "Meeting briefs, task suggestions and hypotheses; transcription pending",
-                "Configure in Settings",
+                "Meeting guides, team interviews, framework analyses and audio transcription",
+                data.connections?.ai === "configured" ? "Configured · not verified" : "Set up connection",
               ],
               [
                 "Fireflies",
@@ -1668,9 +1486,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                   <strong>{name}</strong>
                   <p>{scope}</p>
                 </div>
-                <Badge tone={state === "Current" ? "sage" : "neutral"}>
-                  {state}
-                </Badge>
+                {state === "Set up connection" ? <Button onClick={() => go("settings")}>{state}</Button> : <Badge tone={state === "Current" ? "sage" : "neutral"}>{state}</Badge>}
               </div>
             ))}
           </div>
@@ -1751,6 +1567,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           </Button>
         </Panel>
         <ProviderSettings key={companyId} company={companyId} />
+        <Neo4jSettings key={companyId+"neo4j"} company={companyId} />
         <Panel title="Your authenticated account">
           <dl className="details">
             <dt>Name</dt>
@@ -2318,7 +2135,7 @@ function RosterImport({
               }
             }}
           >
-            Import {preview.validCount} valid people
+            Import {preview.validCount} valid {preview.validCount === 1 ? "person" : "people"}
           </Button>
         </>
       )}

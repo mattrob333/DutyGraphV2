@@ -16,6 +16,7 @@ import { EmailInvitation } from "./EmailInvitation.tsx";
 import { FrameworkInstructions } from "./StrategyViews.tsx";
 import { ModeBadge, SoftwareChips } from "./TaskCards.tsx";
 import { taskMode, stages } from "../../shared/task-presentation.ts";
+import { AdvisorTranscript } from "./AdvisorTranscript.tsx";
 import { WorkflowDetail } from "./WorkflowDetail.tsx";
 export function Detail({
   record: r,
@@ -114,7 +115,7 @@ export function Detail({
             <dd>{r.data.packet.audience.join("; ")}</dd>
             <dt>Purpose</dt>
             <dd>{r.data.packet.purpose}</dd>
-            <dt>Frozen company revision</dt>
+            <dt>Company version in this report</dt>
             <dd>{r.data.packet.sourceRevision}</dd>
             <dt>Selected records</dt>
             <dd>{r.data.packet.records.length}</dd>
@@ -142,7 +143,7 @@ export function Detail({
                 applies to this exact report; changing records or audience
                 requires a new draft.
               </div>
-              <Field label="Publication review rationale">
+              <Field label="Why is this report ready to share?">
                 <textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
@@ -257,7 +258,13 @@ export function Detail({
                   <div key={f.key}>
                     <dt>{f.label}</dt>
                     <dd>
-                      {linkedRecord ? (
+                      {f.key === "joinPolicy" ? (
+                        value === "all" ? (
+                          "All required incoming steps must finish."
+                        ) : (
+                          "Any one accepted incoming path can continue."
+                        )
+                      ) : linkedRecord ? (
                         <button
                           className="text-link"
                           onClick={() => open(linkedRecord)}
@@ -441,7 +448,7 @@ export function Detail({
           </div>
           <h3>Supporting evidence</h3>
           {linked(r.data.evidenceIds)}
-          <h3>Exact-version confirmation history</h3>
+          <h3>Task confirmation history</h3>
           {r.confirmations?.length ? (
             r.confirmations.map((c: any) => (
               <Row
@@ -688,6 +695,15 @@ export function Detail({
               src={`/api/v1/companies/${company}/assets/${r.data.assetId}/content`}
             />
           )}
+          {r.data.assetId && (
+            <AdvisorTranscript
+              company={company}
+              response={r}
+              records={records}
+              refresh={refresh}
+              open={open}
+            />
+          )}
           <p>{r.data.note}</p>
           {Object.entries(r.data.decisions || {}).map(([id, decision]) => (
             <Row
@@ -854,20 +870,20 @@ export function Detail({
               <strong>Not deployed</strong>
             </div>
           </div>
-          <h3>Bound task versions</h3>
+          <h3>Task versions in this proposal</h3>
           {r.data.taskBindings?.map((b: any) => {
             const t = records.find((x) => x.id === b.id);
             return (
               <Row
                 key={b.id}
                 title={t?.title || "Unavailable task"}
-                detail={`Manifest binds v${b.version}; current task is v${t?.version || "?"}`}
+                detail={`Uses version ${b.version} · Current task version ${t?.version || "?"}`}
                 onClick={t ? () => open(t) : undefined}
               >
                 <Badge tone={t?.version === b.version ? "neutral" : "amber"}>
                   {t?.version === b.version
                     ? "Version current"
-                    : "Binding stale"}
+                    : "Task changed"}
                 </Badge>
               </Row>
             );
@@ -892,9 +908,8 @@ export function Detail({
             )}
           </div>
           <div className="notice amber">
-            This is an instruction-compatible proposal. Authority
-            reconciliation, customer approvals, provisioning, and runtime
-            enforcement are not configured.
+            This proposal defines the work and its limits. Customer approval,
+            system access and agent execution still need to be set up.
           </div>
           <Button
             disabled={busy}
@@ -929,7 +944,7 @@ export function Detail({
               disabled={busy}
               onClick={() => void action("review")}
             >
-              Review analysis against current inputs
+              I reviewed this analysis
             </Button>
           )}
         </>

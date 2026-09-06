@@ -4,13 +4,19 @@ Open Strategy to understand the business without reading each framework separate
 
 ## Read a report
 
-1. Add evidence in Discovery. Review it and mark it accepted. Choose Business context, Leadership input, Customer calls, or People and work.
+1. Add evidence in Discovery. Review it and mark it accepted. Choose Business context, Leadership input, Customer calls, or People and work. Run the relevant framework canvases when you want their analysis included too.
 2. In Strategy, select **Read executive brief** for the whole company. Use **Read report** beside a framework group for a focused view.
 3. Select **Generate with OpenAI**. The app uses the API key and model in your account settings.
-4. Read the overall picture, findings, suggested next steps, and open questions. Select a source link to check the record behind a finding.
+4. Read the overall picture, findings, suggested next steps, and open questions. Select a source link to check the record behind a finding. A citation to a generated framework opens that exact saved canvas version.
 5. Use report history to compare saved drafts. AI reports do not overwrite your framework analyses, confirm a constraint, create duties, or authorize work.
 
-A report is an AI interpretation. Inferred means the AI drew a conclusion from the sources. Assumed means a premise still needs checking. Missing means the required information was not supplied. A source may describe a belief rather than an established fact.
+A report is an AI interpretation. Inferred means the AI drew a conclusion from the sources. Assumed means a premise still needs checking. Missing means the required information was not supplied. A source may describe a belief rather than an established fact. A framework analysis is also an interpretation; citing it does not make its conclusions primary evidence.
+
+## Read the underlying frameworks
+
+Select any of the sixteen framework cards to open its recognizable canvas or table. The canvas shows findings, data gaps, confidence notes, supporting sources and next questions. Its input section explains which variables the framework needs and what the supplied material actually established. Use the saved-version selector to compare earlier runs. Manual advisor analyses remain available inside the canvas.
+
+Each framework uses its own system instructions. All required upstream analyses must be complete and current. **Run remaining sequence** runs ready frameworks in order using the account's OpenAI key. An upstream change marks its dependent analyses out of date recursively. Old versions remain readable, but reports and the copilot exclude generated frameworks whose inputs are no longer current. The framework sequence has a separate limit of 32 attempts per account in 24 hours. See [Live framework canvases](24-live-framework-canvases.md).
 
 ## Ask the copilot
 
@@ -18,7 +24,7 @@ Select **Ask the copilot** to open the side drawer. Ask one strategic question, 
 
 ## Understand update alerts
 
-The Strategy page checks input status each minute while it is visible. A new accepted source, changed source, withdrawn source, or changed saved analysis can show **Inputs changed** beside an existing report. This is a prompt to refresh the analysis. It does not claim that AI has already read the change. A copilot answer does not replace or mark the executive brief current.
+The Strategy page checks report input status each minute while it is visible. A new accepted source, changed source, withdrawn source, or changed saved analysis can show **Inputs changed** beside an existing report. A newly completed current framework run can also change report inputs. This is a prompt to refresh the report. It does not claim that AI has already read the change. A copilot answer does not replace or mark the executive brief current.
 
 Report generation runs when you press the OpenAI button. Reports do not run on a daily schedule yet. The app checks source IDs, versions, hashes, and status. It labels older reports when their input set changes, including changes to records outside the excerpt limit.
 

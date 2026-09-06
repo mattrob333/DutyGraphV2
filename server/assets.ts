@@ -5,8 +5,12 @@ import { z } from "zod";
 import { randomUUID, createHash } from "node:crypto";
 import { tx, command, companyCheck, getRecord, fail } from "./db.ts";
 import type { AuthRequest } from "./auth.ts";
+import {
+  transcriptionRouter,
+  type TranscriptionProvider,
+} from "./transcription.ts";
 const checksum = (b: Buffer) => createHash("sha256").update(b).digest("hex");
-export function assetsRouter() {
+export function assetsRouter(transcriptionProvider?: TranscriptionProvider) {
   const router = Router({ mergeParams: true });
   router.post("/", async (req, res) => {
     const u = (req as unknown as AuthRequest).actor,
@@ -226,7 +230,7 @@ export function assetsRouter() {
             state: "stored_unscanned",
             checksum: d.checksum,
             processing:
-              "No transcription or malware scanner configured; local audio playback only.",
+              "Recording saved. You can create a transcript, review it, then send your response.",
           };
         },
       ),
@@ -280,5 +284,6 @@ export function assetsRouter() {
       })(),
     ).pipe(res);
   });
+  router.use(transcriptionRouter(asset, transcriptionProvider));
   return router;
 }

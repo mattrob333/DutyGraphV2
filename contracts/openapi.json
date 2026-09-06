@@ -988,6 +988,16 @@
                               "maxLength": 100
                             }
                           },
+                          "emailSubject": {
+                            "default": "",
+                            "type": "string",
+                            "maxLength": 200
+                          },
+                          "emailBody": {
+                            "default": "",
+                            "type": "string",
+                            "maxLength": 12000
+                          },
                           "taskIds": {
                             "default": [],
                             "maxItems": 150,
@@ -2247,6 +2257,16 @@
               "type": "string",
               "maxLength": 100
             }
+          },
+          "emailSubject": {
+            "default": "",
+            "type": "string",
+            "maxLength": 200
+          },
+          "emailBody": {
+            "default": "",
+            "type": "string",
+            "maxLength": 12000
           },
           "taskIds": {
             "default": [],

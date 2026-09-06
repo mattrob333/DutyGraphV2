@@ -9,7 +9,7 @@ import { Badge, Button, ErrorBox, Field, Panel } from "./ui.tsx";
 const descriptions = {
   openai: [
     "OpenAI",
-    "Draft a meeting brief, task descriptions and hypotheses from selected evidence.",
+    "Prepare discovery, framework analyses and task drafts from the relevant evidence. Transcribe participant recordings for review.",
   ],
   exa: ["Exa", "Search public business sources and retrieve their page text."],
   resend: [
@@ -45,9 +45,9 @@ export function ProviderSettings({ company }: { company: string }) {
         />
       ))}
       <p className="subtle">
-        Neo4j: not connected. Company records and the derived graph currently
-        use PostgreSQL. Saving keys does not make a live provider request; test
-        research in Discovery and review AI drafts before using them.
+        Saving these keys does not make a live provider request. Run research in
+        Discovery and review AI drafts before using them. Each provider uses
+        your own account and billing.
       </p>
     </Panel>
   );

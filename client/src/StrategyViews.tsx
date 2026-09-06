@@ -1,3 +1,10 @@
+import { useEffect, useRef, useState } from "react";
+import { FrameworkWorkspace } from "./FrameworkWorkspace.tsx";
+import {
+  frameworkOrder,
+  frameworkSpecs,
+} from "../../shared/framework-specs.ts";
+import { api } from "./api.ts";
 import {
   ArrowRight,
   BookOpen,
@@ -11,7 +18,7 @@ import {
   analysisRules,
 } from "../../shared/framework-guides.ts";
 import type { RecordRow } from "../../shared/domain.ts";
-import { State } from "./ui.tsx";
+import { State, Button, ErrorBox } from "./ui.tsx";
 export function FrameworkInstructions({
   frameworkKey,
 }: {
@@ -57,7 +64,9 @@ export function FrameworkLibrary({
   write,
   report,
   reportStatus,
+  companyId,
 }: {
+  companyId?: string;
   registry: any;
   records: RecordRow[];
   open: (r: RecordRow) => void;
@@ -65,8 +74,162 @@ export function FrameworkLibrary({
   report?: (group: string) => void;
   reportStatus?: (group: string) => string;
 }) {
+  const [selected, setSelected] = useState<string | null>(null),
+    [selectedVersion, setSelectedVersion] = useState<string | undefined>(),
+    [runs, setRuns] = useState<any>(null),
+    [error, setError] = useState(""),
+    [sequence, setSequence] = useState(""),
+    [message, setMessage] = useState("");
+  const stop = useRef(false),
+    alive = useRef(true),
+    activeCompany = useRef(companyId),
+    generation = useRef(0);
+  activeCompany.current = companyId;
+  const path = `/v1/companies/${companyId}/framework-runs`;
+  const load = () =>
+    companyId
+      ? api(path).then((d) => {
+          if (alive.current && activeCompany.current === companyId) setRuns(d);
+          return d;
+        })
+      : Promise.resolve(null);
+  useEffect(() => {
+    alive.current = true;
+    stop.current = false;
+    generation.current++;
+    setSequence("");
+    setRuns(null);
+    setSelected(null);
+    setSelectedVersion(undefined);
+    return () => {
+      alive.current = false;
+      stop.current = true;
+      generation.current++;
+    };
+  }, [companyId]);
+  useEffect(() => {
+    load().catch((e) => {
+      if (alive.current && activeCompany.current === companyId)
+        setError(e.message);
+    });
+  }, [companyId, records]);
+  const status = (key: string) =>
+    runs?.frameworks.find((f: any) => f.key === key);
+  async function runSequence() {
+    if (sequence || !companyId) return;
+    stop.current = false;
+    setError("");
+    setMessage("");
+    setSequence("Checking the analysis sequence…");
+    let completed = 0;
+    const runGeneration = generation.current;
+    const stillHere = () =>
+      alive.current &&
+      activeCompany.current === companyId &&
+      generation.current === runGeneration;
+    try {
+      for (const key of frameworkOrder) {
+        if (stop.current || !stillHere()) break;
+        const current = await load(),
+          state = current?.frameworks.find((f: any) => f.key === key);
+        if (stop.current || !stillHere()) break;
+        if (!state?.ready || state.current) continue;
+        setSequence(`Running ${frameworkSpecs[key].name} · ${completed} saved`);
+        const result = await api(`${path}/${key}`, "POST", { consent: true });
+        const history = await api(`${path}/${key}`),
+          job = history.jobs.find((j: any) => j.id === result.id);
+        if (job?.state !== "complete")
+          throw new Error(
+            job?.message ||
+              "The sequence stopped because this analysis did not complete.",
+          );
+        completed++;
+      }
+      await load();
+      if (stillHere())
+        setMessage(
+          completed
+            ? `${completed} analyses saved${stop.current ? ". The sequence was stopped." : ". Open a canvas to review its findings."}`
+            : "No further analyses are ready. Check missing evidence and upstream analyses.",
+        );
+    } catch (e: any) {
+      if (stillHere()) setError(e.message);
+    } finally {
+      if (stillHere()) {
+        setSequence("");
+        load().catch(() => {});
+      }
+    }
+  }
   return (
     <div className="framework-library">
+      {companyId && (
+        <section className="framework-sequence">
+          <div>
+            <h3>From business context to the next decision</h3>
+            <p>
+              Start with the Business Model Canvas. Each analysis waits for all
+              its required upstream analyses. A changed source marks affected
+              versions for an update. Run the sequence to prepare up to 16
+              analyses using your OpenAI account.
+            </p>
+          </div>
+          <div className="actions">
+            {sequence ? (
+              <Button
+                onClick={() => {
+                  stop.current = true;
+                }}
+              >
+                Stop after this analysis
+              </Button>
+            ) : (
+              <Button
+                primary
+                disabled={
+                  !runs?.configured ||
+                  !runs?.frameworks.some((f: any) => f.ready && !f.current)
+                }
+                onClick={runSequence}
+              >
+                Run remaining sequence
+              </Button>
+            )}
+          </div>
+        </section>
+      )}
+      {sequence && (
+        <p role="status" className="framework-sequence-status">
+          {sequence}
+        </p>
+      )}
+      <ErrorBox error={error} />
+      {message && (
+        <div className="notice" role="status">
+          {message}
+        </div>
+      )}
+      {selected && companyId && (
+        <FrameworkWorkspace
+          key={`${companyId}:${selected}:${selectedVersion || "latest"}`}
+          companyId={companyId}
+          frameworkKey={selected}
+          initialJobId={selectedVersion}
+          records={records}
+          close={() => {
+            setSelected(null);
+            setSelectedVersion(undefined);
+          }}
+          openRecord={open}
+          write={write}
+          navigate={(key, jobId) => {
+            setSelected(key);
+            setSelectedVersion(jobId);
+          }}
+          saved={() => load().catch((e) => setError(e.message))}
+        />
+      )}
+
       {frameworkGroups.map((group) => (
         <section
           key={group.id}
@@ -101,11 +264,29 @@ export function FrameworkLibrary({
                   <button
                     className="framework-card"
                     key={f.key}
-                    onClick={() => (r ? open(r) : write(f.key))}
+                    onClick={() =>
+                      companyId
+                        ? setSelected(f.key)
+                        : r
+                          ? open(r)
+                          : write(f.key)
+                    }
                   >
                     <div className="toolbar">
                       <span className="framework-label">{group.label}</span>
-                      <State value={r?.state || "needs_input"} />
+                      <State
+                        value={
+                          status(f.key)?.current
+                            ? "complete"
+                            : status(f.key)?.stale
+                              ? "stale"
+                              : status(f.key)?.missingUpstream.length
+                                ? "waiting_for_context"
+                                : status(f.key)?.ready
+                                  ? "ready_to_analyze"
+                                  : r?.state || "needs_input"
+                        }
+                      />
                     </div>
                     <h3>{f.name}</h3>
                     <p>{g.question}</p>
@@ -113,8 +294,26 @@ export function FrameworkLibrary({
                       <Clock size={12} />
                       {g.cadence}
                     </span>
+                    {!!status(f.key)?.missingUpstream.length && (
+                      <span className="framework-upstream-hint">
+                        Needs{" "}
+                        {status(f.key)
+                          .missingUpstream.map(
+                            (k: string) => frameworkSpecs[k].name,
+                          )
+                          .join(", ")}
+                      </span>
+                    )}
                     <footer>
-                      <span>{r ? "Open analysis" : "Read guide & start"}</span>
+                      <span>
+                        {companyId
+                          ? status(f.key)?.current
+                            ? "Open populated canvas"
+                            : "Open framework canvas"
+                          : r
+                            ? "Open analysis"
+                            : "Read guide & start"}
+                      </span>
                       <ArrowRight size={14} />
                     </footer>
                   </button>

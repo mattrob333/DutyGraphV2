@@ -16,6 +16,7 @@ import {
   AppError,
 } from "./db.ts";
 import { providerConfig } from "./providers.ts";
+import { invitationTemplate } from "./invitation-template.ts";
 
 export async function issueInvitation(
   db: pg.PoolClient,
@@ -79,6 +80,7 @@ export type InvitationMessage = {
   to: string[];
   subject: string;
   text: string;
+  html?: string;
 };
 export type EmailProvider = (
   message: InvitationMessage,
@@ -119,6 +121,34 @@ export async function sendResend(
 export function invitationsRouter(provider: EmailProvider = sendResend) {
   const router = Router({ mergeParams: true });
   router.use(advisor);
+  router.get("/:recordId/email-preview", async (req, res) => {
+    const u = (req as unknown as AuthRequest).actor;
+    res.json(
+      await tx(u.tenant_id, async (db) => {
+        const c = z
+          .uuid()
+          .parse((req.params as Record<string, string>).companyId);
+        const company = await companyCheck(db, u, c);
+        const request = await getRecord(
+          db,
+          c,
+          z.uuid().parse(req.params.recordId),
+        );
+        if (request.kind !== "request")
+          fail(422, "REQUEST_REQUIRED", "Choose an information request.");
+        const person = await getRecord(db, c, request.data.personId);
+        return {
+          recipient: person.data.email,
+          ...invitationTemplate({
+            company: company.name,
+            person,
+            request,
+            url: "#",
+          }),
+        };
+      }),
+    );
+  });
   router.get("/:recordId/emails", async (req, res) => {
     const u = (req as unknown as AuthRequest).actor,
       c = z.uuid().parse((req.params as Record<string, string>).companyId),
@@ -188,10 +218,12 @@ export function invitationsRouter(provider: EmailProvider = sendResend) {
         outgoing = {
           from: config.config.from,
           to: [invite.email],
-          subject: `Your Duty Graph session for ${String(company.name)
-            .replace(/[\r\n]/g, " ")
-            .slice(0, 100)}`,
-          text: `Hello ${invite.name},\n\nYou have been invited to answer questions about your work for ${company.name}.\n\nOpen your private session: ${invite.url}\n\nThis link expires in 7 days. Create your participant password, review the notice, and submit your answers. Your advisor will review what you return. Do not forward this private link.\n\nIf you were not expecting this invitation, contact your advisor before continuing.`,
+          ...invitationTemplate({
+            company: company.name,
+            person: await getRecord(db, c, r.data.personId),
+            request: r,
+            url: invite.url,
+          }),
         };
         key = config.key;
         await db.query(

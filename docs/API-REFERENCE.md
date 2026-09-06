@@ -1,6 +1,6 @@
 # Implemented API reference
 
-Release 0.3. This inventory is generated from server route declarations. It describes 52 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
+Release 0.3. This inventory is generated from server route declarations. It describes 69 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
 
 ## Transport and authentication
 
@@ -34,11 +34,27 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | GET | /api/v1/companies/{companyId}/assets/{assetId}/content | server/assets.ts |
 | POST | /api/v1/companies/{companyId}/assets/{assetId}/finalize | server/assets.ts |
 | GET | /api/v1/companies/{companyId}/assets/{assetId}/status | server/assets.ts |
+| POST | /api/v1/companies/{companyId}/assets/{assetId}/transcribe | server/transcription.ts |
+| GET | /api/v1/companies/{companyId}/assets/{assetId}/transcription | server/transcription.ts |
+| POST | /api/v1/companies/{companyId}/assets/{assetId}/transcription-review | server/transcription.ts |
+| GET | /api/v1/companies/{companyId}/discovery | server/discovery.ts |
+| POST | /api/v1/companies/{companyId}/discovery/{jobId}/apply | server/discovery.ts |
+| POST | /api/v1/companies/{companyId}/discovery/draft | server/discovery.ts |
+| POST | /api/v1/companies/{companyId}/discovery/meeting | server/discovery.ts |
 | POST | /api/v1/companies/{companyId}/exports | server/app.ts |
 | GET | /api/v1/companies/{companyId}/exports/{recordId}/download | server/app.ts |
+| GET | /api/v1/companies/{companyId}/framework-runs | server/frameworks.ts |
+| GET | /api/v1/companies/{companyId}/framework-runs/{key} | server/frameworks.ts |
+| POST | /api/v1/companies/{companyId}/framework-runs/{key} | server/frameworks.ts |
+| GET | /api/v1/companies/{companyId}/framework-runs/{key}/{runId}/source | server/frameworks.ts |
 | POST | /api/v1/companies/{companyId}/frameworks/{key}/manual | server/app.ts |
 | GET | /api/v1/companies/{companyId}/graph | server/app.ts |
 | POST | /api/v1/companies/{companyId}/graph/rebuild | server/app.ts |
+| DELETE | /api/v1/companies/{companyId}/neo4j | server/neo4j.ts |
+| GET | /api/v1/companies/{companyId}/neo4j | server/neo4j.ts |
+| PUT | /api/v1/companies/{companyId}/neo4j | server/neo4j.ts |
+| POST | /api/v1/companies/{companyId}/neo4j/rebuild | server/neo4j.ts |
+| POST | /api/v1/companies/{companyId}/neo4j/test | server/neo4j.ts |
 | GET | /api/v1/companies/{companyId}/providers | server/providers.ts |
 | DELETE | /api/v1/companies/{companyId}/providers/{provider} | server/providers.ts |
 | PUT | /api/v1/companies/{companyId}/providers/{provider} | server/providers.ts |
@@ -50,6 +66,7 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | GET | /api/v1/companies/{companyId}/reports/{reportId}/{format} | server/reports.ts |
 | POST | /api/v1/companies/{companyId}/reports/{reportId}/review | server/reports.ts |
 | POST | /api/v1/companies/{companyId}/requests/{recordId}/email | server/invitations.ts |
+| GET | /api/v1/companies/{companyId}/requests/{recordId}/email-preview | server/invitations.ts |
 | GET | /api/v1/companies/{companyId}/requests/{recordId}/emails | server/invitations.ts |
 | POST | /api/v1/companies/{companyId}/requests/{recordId}/issue | server/app.ts |
 | GET | /api/v1/companies/{companyId}/research | server/research.ts |

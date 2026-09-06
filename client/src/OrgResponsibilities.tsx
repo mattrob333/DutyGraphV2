@@ -160,8 +160,10 @@ export function OrgResponsibilities({
                 {name.length > 22 ? name.slice(0, 20) + "…" : name}
               </text>
               <text x="15" y="58" className="node-subtitle">
-                {teamPeople(name).length} people · {teamTasks(name).length}{" "}
-                tasks
+                {teamPeople(name).length}{" "}
+                {teamPeople(name).length === 1 ? "person" : "people"} ·{" "}
+                {teamTasks(name).length}{" "}
+                {teamTasks(name).length === 1 ? "task" : "tasks"}
               </text>
             </g>
           ))}
@@ -257,7 +259,7 @@ export function OrgResponsibilities({
             <summary>
               {g.title}{" "}
               <span>
-                {g.items.length} tasks ·{" "}
+                {g.items.length} {g.items.length === 1 ? "task" : "tasks"} ·{" "}
                 {g.record ? "Duty record" : "Grouped from task descriptions"}
               </span>
             </summary>

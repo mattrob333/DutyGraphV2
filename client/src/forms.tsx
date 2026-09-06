@@ -501,6 +501,7 @@ export function RecordForm({
         setError("");
         try {
           const d = { ...values };
+          if (kind === "request" && d.type !== "confirmation") d.taskIds = [];
           for (const f of defs) {
             if (f.type === "lines")
               d[f.key] = d[f.key]
@@ -528,6 +529,7 @@ export function RecordForm({
       <ErrorBox error={error} />
       <div className="form-grid">
         {defs.map((f) => {
+          if (kind === "request" && f.key === "taskIds" && values.type !== "confirmation") return null;
           const refKinds: Record<string, string> = {
             person: "person",
             personOptional: "person",

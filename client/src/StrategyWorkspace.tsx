@@ -1,3 +1,4 @@
+import { FrameworkWorkspace } from "./FrameworkWorkspace.tsx";
 import { useEffect, useState } from "react";
 import { FileText, MessageSquare, RefreshCw, ArrowRight } from "lucide-react";
 import type { RecordRow } from "../../shared/domain.ts";
@@ -23,6 +24,10 @@ export function StrategyWorkspace({
   scope: string | null;
   setScope: (scope: string | null) => void;
 }) {
+  const [frameworkSource, setFrameworkSource] = useState<{
+    key: string;
+    id?: string;
+  } | null>(null);
   const [data, setData] = useState<any>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
@@ -88,6 +93,20 @@ export function StrategyWorkspace({
   const updated = data?.groups.filter((g: any) => g.changed).length || 0;
   return (
     <>
+      {frameworkSource && (
+        <FrameworkWorkspace
+          key={`${frameworkSource.key}:${frameworkSource.id || "latest"}`}
+          companyId={company}
+          frameworkKey={frameworkSource.key}
+          initialJobId={frameworkSource.id}
+          records={records}
+          close={() => setFrameworkSource(null)}
+          openRecord={open}
+          write={write}
+          navigate={(key, id) => setFrameworkSource({ key, id })}
+          saved={() => {}}
+        />
+      )}
       <section className="strategy-brief-bar" aria-label="Strategy reports">
         <div>
           <span className="eyebrow">YOUR BUSINESS, EXPLAINED</span>
@@ -115,6 +134,7 @@ export function StrategyWorkspace({
       </section>
       {!scope && <ErrorBox error={error} />}
       <FrameworkLibrary
+        companyId={company}
         registry={registry}
         records={records}
         open={open}
@@ -293,6 +313,20 @@ export function StrategyWorkspace({
                             >
                               {source?.title || record.title} · v
                               {source?.version}
+                            </button>
+                          ) : source?.frameworkKey ? (
+                            <button
+                              className="text-link"
+                              key={id}
+                              onClick={() => {
+                                setScope(null);
+                                setFrameworkSource({
+                                  key: source.frameworkKey,
+                                  id,
+                                });
+                              }}
+                            >
+                              {source.title} · v{source.version}
                             </button>
                           ) : (
                             <span key={id}>

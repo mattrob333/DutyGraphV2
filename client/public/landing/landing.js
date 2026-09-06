@@ -1,0 +1,94 @@
+(() => {
+  const gallery = document.querySelector('.product-gallery');
+  const tabs = [...gallery.querySelectorAll('[role="tab"]')];
+  const panels = [...gallery.querySelectorAll('[role="tabpanel"]')];
+  const play = document.querySelector('#gallery-play');
+  const caption = document.querySelector('#gallery-caption');
+  const announcement = document.querySelector('#gallery-announcement');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const captions = [
+    'Supplier onboarding: follow the usual path, inspect exceptions, and see the approval responsibility that still needs agreement.',
+    'The task library: compare Human, AI, and AI + human review roles across the work. Each card keeps its output, tools, and owner in view.',
+    'A task in context: open the human checkpoint and its connected records without losing the workflow around it.'
+  ];
+  let current = 0;
+  let paused = reduced.matches;
+  let hovered = false;
+  let visible = false;
+  let timer;
+  function updatePlay() {
+    play.textContent = paused ? 'Play' : 'Pause';
+    play.setAttribute('aria-pressed', String(paused));
+    play.setAttribute('aria-label', paused ? 'Play product gallery' : 'Pause product gallery');
+  }
+  function schedule() {
+    clearTimeout(timer);
+    if (!paused && !hovered && visible && !document.hidden && !gallery.contains(document.activeElement)) {
+      timer = setTimeout(() => show(current + 1, false), 8500);
+    }
+  }
+  function show(index, manual) {
+    current = (index + tabs.length) % tabs.length;
+    tabs.forEach((tab, i) => {
+      const active = current === i;
+      tab.setAttribute('aria-selected', String(active));
+      tab.tabIndex = active ? 0 : -1;
+      panels[i].hidden = !active;
+    });
+    caption.textContent = captions[current];
+    document.querySelector('#gallery-count').textContent = `0${current + 1} / 03`;
+    if (manual) {
+      paused = true;
+      updatePlay();
+      announcement.textContent = `${current + 1} of 3. ${tabs[current].querySelector('strong').textContent} ${captions[current]}`;
+    }
+    schedule();
+  }
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => show(index, true));
+    tab.addEventListener('keydown', event => {
+      let next;
+      if (event.key === 'ArrowRight') next = (current + 1) % tabs.length;
+      if (event.key === 'ArrowLeft') next = (current + tabs.length - 1) % tabs.length;
+      if (event.key === 'Home') next = 0;
+      if (event.key === 'End') next = tabs.length - 1;
+      if (next !== undefined) { event.preventDefault(); show(next, true); tabs[next].focus(); }
+    });
+  });
+  document.querySelector('#gallery-prev').addEventListener('click', () => show(current - 1, true));
+  document.querySelector('#gallery-next').addEventListener('click', () => show(current + 1, true));
+  play.addEventListener('click', () => { paused = !paused; updatePlay(); schedule(); });
+  gallery.addEventListener('mouseenter', () => { hovered = true; schedule(); });
+  gallery.addEventListener('mouseleave', () => { hovered = false; schedule(); });
+  gallery.addEventListener('focusin', () => clearTimeout(timer));
+  gallery.addEventListener('focusout', () => setTimeout(schedule, 0));
+  document.addEventListener('visibilitychange', schedule);
+  reduced.addEventListener('change', () => { if (reduced.matches) paused = true; updatePlay(); schedule(); });
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(entries => { visible = entries[0].isIntersecting; schedule(); }, {threshold:.2}).observe(gallery);
+  } else { visible = true; }
+  updatePlay();
+  schedule();
+
+  const dialog = document.querySelector('#image-dialog');
+  const expanded = document.querySelector('#expanded-image');
+  let opener;
+  document.querySelectorAll('[data-zoom]').forEach(link => link.addEventListener('click', event => {
+    if (typeof dialog.showModal !== 'function') return;
+    event.preventDefault();
+    opener = link;
+    paused = true;
+    updatePlay();
+    schedule();
+    expanded.src = link.href;
+    expanded.alt = link.querySelector('img').alt;
+    document.querySelector('#image-dialog-title').textContent = link.dataset.zoom;
+    dialog.showModal();
+  }));
+  document.querySelector('#close-image').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('close', () => opener?.focus());
+  dialog.addEventListener('click', event => {
+    const bounds = dialog.getBoundingClientRect();
+    if (event.target === dialog && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) dialog.close();
+  });
+})();

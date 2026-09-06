@@ -105,9 +105,12 @@ export function TaskCards({
   const person = (id: string) =>
     records.find((r) => r.kind === "person" && r.id === id)?.title ||
     "Owner unresolved";
-  const visibleStages = stages.filter(
-    (s) =>
-      s.id !== "unmapped" || tasks.some((t) => taskStage(t) === "unmapped"),
+  const onlyUnmapped =
+    tasks.length > 0 && tasks.every((t) => taskStage(t) === "unmapped");
+  const visibleStages = stages.filter((s) =>
+    onlyUnmapped
+      ? s.id === "unmapped"
+      : s.id !== "unmapped" || tasks.some((t) => taskStage(t) === "unmapped"),
   );
   return (
     <section className="task-library" aria-label="Task card library">
@@ -144,15 +147,23 @@ export function TaskCards({
             </button>
           ))}
         </div>
-        <span className="subtle">{tasks.length} task cards</span>
+        <span className="subtle">
+          {tasks.length} task {tasks.length === 1 ? "card" : "cards"}
+        </span>
       </div>
       <p className="library-explainer">
-        Follow the value from left to right. Categories organize the work; the
-        workflow graph shows the actual handoffs. AI labels describe the
-        proposed role, not a live deployment.
+        {onlyUnmapped ? (
+          "These task cards are ready to review. Open a card to assign its value-chain stage when the work is understood."
+        ) : (
+          <>
+            Follow the value from left to right. Categories organize the work;
+            the workflow graph shows the actual handoffs. AI labels describe the
+            proposed role, not a live deployment.
+          </>
+        )}
       </p>
       <div
-        className="value-board"
+        className={`value-board${onlyUnmapped ? " unmapped-inbox" : ""}`}
         tabIndex={0}
         aria-label="Value-chain stages; scroll horizontally for more"
       >

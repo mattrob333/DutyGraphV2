@@ -171,32 +171,6 @@ export function BusinessResearch({
   }
   return (
     <>
-      <div className="research-stages">
-        <div>
-          <span>01 / BEFORE THE MEETING</span>
-          <h3>Build a public-source picture</h3>
-          <p>
-            Collect the business’s own pages and relevant public context. Keep
-            links and dates.
-          </p>
-        </div>
-        <div>
-          <span>02 / FIRST MEETING</span>
-          <h3>Let the team correct it</h3>
-          <p>
-            Review the draft together. Capture corrections, competing accounts
-            and missing information.
-          </p>
-        </div>
-        <div>
-          <span>03 / AFTER THE MEETING</span>
-          <h3>Validate the work</h3>
-          <p>
-            Revise task descriptions, then ask the owners and performers to
-            confirm their exact work.
-          </p>
-        </div>
-      </div>
       <ErrorBox error={error} />
       <div className="two-col research-layout">
         <Panel
@@ -314,8 +288,8 @@ export function BusinessResearch({
           <Button onClick={create}>Add a public source manually</Button>
         </Panel>
         <Panel
-          title="What the meeting pack covers"
-          subtitle="Collect sources, import the useful ones, then prepare the meeting pack below. The saved brief carries its questions into kickoff."
+          title="What the research helps you understand"
+          subtitle="Collected research carries into the contact email and meeting guide automatically. Internal roles and duties come from the leadership meeting."
         >
           <div className="research-checklist">
             {researchChecklist.map(([title, detail]) => (
@@ -325,13 +299,13 @@ export function BusinessResearch({
               </div>
             ))}
           </div>
-          <Button onClick={kickoff}>Open leadership kickoff</Button>
+          <Button onClick={kickoff}>Prepare the contact email</Button>
         </Panel>
       </div>
       <div className="discovery-section">
         <Panel
           title="Collected sources"
-          subtitle="Open the source, inspect its content, then import it for review. Import does not accept the source or confirm work."
+          subtitle="Read the pages behind the research here. Their content is available to meeting preparation automatically. Import a page if you also want it in the evidence history."
           action={
             <Button
               onClick={() => {

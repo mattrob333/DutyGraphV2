@@ -94,6 +94,8 @@ export const schemas = {
       questions: z.array(short).min(1).max(10),
       questionPlanVersion: z.string().max(100).default("custom-v1"),
       questionIds: z.array(z.string().max(100)).max(10).default([]),
+      emailSubject: z.string().max(200).default(""),
+      emailBody: z.string().max(12000).default(""),
       taskIds: ids,
       dueDate: z.iso.date(),
       notice: text,

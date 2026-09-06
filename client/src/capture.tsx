@@ -14,6 +14,8 @@ import {
 import { api } from "./api.ts";
 import { Button, Panel, Field, ErrorBox, Badge, State, Empty } from "./ui.tsx";
 import type { User } from "../../shared/domain.ts";
+import { TranscriptReview } from "./TranscriptReview.tsx";
+import "./participant.css";
 async function draftStore(
   mode: "read" | "write" | "delete",
   key: string,
@@ -30,15 +32,29 @@ async function draftStore(
           mode === "read" ? "readonly" : "readwrite",
         ),
         store = tx.objectStore("clips");
+      let result: Blob | undefined;
       const r =
         mode === "read"
           ? store.get(key)
           : mode === "delete"
             ? store.delete(key)
             : store.put(value, key);
-      r.onsuccess = () => resolve(mode === "read" ? r.result : undefined);
+      r.onsuccess = () => {
+        result = mode === "read" ? r.result : undefined;
+      };
       r.onerror = () => reject(r.error);
-      tx.oncomplete = () => db.close();
+      tx.oncomplete = () => {
+        db.close();
+        resolve(result);
+      };
+      tx.onerror = () => {
+        db.close();
+        reject(tx.error);
+      };
+      tx.onabort = () => {
+        db.close();
+        reject(tx.error || new Error("Device storage was interrupted."));
+      };
     };
   });
 }
@@ -64,16 +80,19 @@ function Recorder({
   draftKey,
   onAsset,
   acknowledged,
+  onBusy,
 }: {
   requestId: string;
   companyId: string;
   draftKey: string;
   onAsset: (id: string) => void;
   acknowledged: boolean;
+  onBusy: (busy: boolean) => void;
 }) {
   const [blob, setBlob] = useState<Blob>(),
     [url, setUrl] = useState(""),
     [recording, setRecording] = useState(false),
+    [starting, setStarting] = useState(false),
     [paused, setPaused] = useState(false),
     [elapsed, setElapsed] = useState(0),
     [progress, setProgress] = useState(0),
@@ -85,8 +104,16 @@ function Recorder({
     started = useRef(0),
     pauseAt = useRef(0),
     pauseTotal = useRef(0),
-    chunks = useRef<Blob[]>([]);
+    chunks = useRef<Blob[]>([]),
+    active = useRef(true),
+    draftChanged = useRef(false);
   const save = async (b: Blob) => {
+    if (!active.current) return;
+    draftChanged.current = true;
+    setProgress(0);
+    try {
+      localStorage.removeItem(draftKey + ":upload");
+    } catch {}
     setBlob(b);
     onAsset("");
     try {
@@ -99,19 +126,25 @@ function Recorder({
     }
   };
   useEffect(() => {
+    active.current = true;
     draftStore("read", draftKey)
       .then((b) => {
-        if (b) {
+        if (b && active.current && !draftChanged.current) {
           setBlob(b);
           setStatus("Recovered an unfinished clip from this device.");
         }
       })
       .catch(() => {});
     return () => {
-      media.current?.state === "recording" && media.current.stop();
+      active.current = false;
+      if (media.current && media.current.state !== "inactive")
+        media.current.stop();
       stream.current?.getTracks().forEach((t) => t.stop());
     };
   }, [draftKey]);
+  useEffect(() => {
+    onBusy(starting || recording || uploading);
+  }, [starting, recording, uploading]);
   useEffect(() => {
     if (!blob) return;
     const u = URL.createObjectURL(blob);
@@ -131,6 +164,8 @@ function Recorder({
   }, [recording, paused]);
   const start = async () => {
     setError("");
+    setStarting(true);
+    onBusy(true);
     try {
       if (!acknowledged)
         throw new Error("Read and acknowledge the capture notice first.");
@@ -141,6 +176,10 @@ function Recorder({
       stream.current = await navigator.mediaDevices.getUserMedia({
         audio: true,
       });
+      if (!active.current) {
+        stream.current.getTracks().forEach((t) => t.stop());
+        return;
+      }
       const mime = [
         "audio/webm;codecs=opus",
         "audio/mp4",
@@ -153,8 +192,15 @@ function Recorder({
       chunks.current = [];
       media.current.ondataavailable = (e) => {
         if (e.data.size) chunks.current.push(e.data);
+        if (
+          chunks.current.reduce((size, chunk) => size + chunk.size, 0) >=
+            24 * 1024 * 1024 &&
+          media.current?.state === "recording"
+        )
+          media.current.stop();
       };
       media.current.onstop = () => {
+        if (!active.current) return;
         setRecording(false);
         setPaused(false);
         stream.current?.getTracks().forEach((t) => t.stop());
@@ -168,7 +214,9 @@ function Recorder({
       setBlob(undefined);
     } catch (e) {
       stream.current?.getTracks().forEach((t) => t.stop());
-      setError((e as Error).message);
+      if (active.current) setError((e as Error).message);
+    } finally {
+      if (active.current) setStarting(false);
     }
   };
   const upload = async () => {
@@ -178,7 +226,7 @@ function Recorder({
     try {
       if (blob.size > 25 * 1024 * 1024)
         throw new Error(
-          "The local pilot limit is 25 MB per clip. Record a shorter clip or type your response.",
+          "Each clip can be up to 25 MB. Record a shorter clip or type your response.",
         );
       const sum = await digest(blob);
       let cached: any;
@@ -224,7 +272,7 @@ function Recorder({
         );
       onAsset(cached.id);
       setStatus(
-        "Upload complete. The server verified every byte. Review and submit below.",
+        "Recording saved. Create a transcript or add a written answer, then send your response below.",
       );
     } catch (e) {
       setError((e as Error).message + " You can resume this upload.");
@@ -258,9 +306,13 @@ function Recorder({
       {blob && url && <audio controls src={url} />}
       <div className="actions centered">
         {!recording && !blob && (
-          <Button primary disabled={!acknowledged} onClick={() => void start()}>
+          <Button
+            primary
+            disabled={!acknowledged || starting}
+            onClick={() => void start()}
+          >
             <Mic size={16} />
-            Start recording
+            {starting ? "Opening microphone�" : "Start recording"}
           </Button>
         )}
         {recording && (
@@ -294,8 +346,15 @@ function Recorder({
                 setProgress(0);
                 setStatus("");
                 onAsset("");
-                await draftStore("delete", draftKey);
-                localStorage.removeItem(draftKey + ":upload");
+                draftChanged.current = true;
+                try {
+                  await draftStore("delete", draftKey);
+                  localStorage.removeItem(draftKey + ":upload");
+                } catch {
+                  setError(
+                    "The clip was removed from this page, but this browser could not clear its saved draft.",
+                  );
+                }
               }}
               disabled={uploading}
             >
@@ -311,8 +370,8 @@ function Recorder({
               {uploading
                 ? "Uploading " + progress + "%"
                 : progress === 100
-                  ? "Verify upload"
-                  : "Upload / resume"}
+                  ? "Recording saved · verify again"
+                  : "Save recording"}
             </Button>
           </>
         )}
@@ -323,12 +382,12 @@ function Recorder({
             <input
               type="file"
               accept="audio/webm,audio/ogg,audio/wav,audio/mp4,audio/mpeg"
-              disabled={!acknowledged || uploading}
+              disabled={!acknowledged || uploading || starting}
               onChange={(e) => {
                 const f = e.target.files?.[0];
                 if (f) {
                   if (f.size > 25 * 1024 * 1024)
-                    setError("This clip exceeds the 25 MB pilot limit.");
+                    setError("This clip exceeds the 25 MB limit.");
                   else void save(f);
                 }
               }}
@@ -365,6 +424,9 @@ export function Participant({
     [ack, setAck] = useState(false),
     [asset, setAsset] = useState(""),
     [busy, setBusy] = useState(false),
+    [captureBusy, setCaptureBusy] = useState(false),
+    [transcriptBusy, setTranscriptBusy] = useState(false),
+    [sentId, setSentId] = useState(""),
     [saved, setSaved] = useState("");
   const load = () =>
     api("/v1/participant/requests")
@@ -375,19 +437,69 @@ export function Participant({
   }, []);
   const request =
     data?.requests.find((r: any) => r.id === selected) ||
-    data?.requests.find((r: any) => r.state === "sent");
+    data?.requests.find((r: any) => r.state === "sent") ||
+    data?.requests[0];
   const draftKey = "dg-draft:" + user.id + ":" + request?.id;
   useEffect(() => {
+    let active = true;
     if (request) {
+      setDecisions({});
+      setNote("");
+      setText("");
       try {
         setText(localStorage.getItem(draftKey) || "");
+        const review = JSON.parse(
+          localStorage.getItem(draftKey + ":review") || "null",
+        );
+        if (review) {
+          setDecisions(review.decisions || {});
+          setNote(review.note || "");
+        }
+        const upload = JSON.parse(
+          localStorage.getItem(draftKey + ":upload") || "null",
+        );
+        if (upload?.id)
+          api(`/v1/companies/${data.company.id}/assets/${upload.id}/status`)
+            .then((status) => {
+              if (active && status.state === "stored_unscanned")
+                setAsset(upload.id);
+            })
+            .catch(() => {});
       } catch {}
-      setDecisions({});
       setAck(false);
       setAsset("");
       setSaved("");
+      setCaptureBusy(false);
+      setTranscriptBusy(false);
     }
+    return () => {
+      active = false;
+    };
   }, [request?.id]);
+  const saveReview = (values: Record<string, string>, context: string) => {
+    setDecisions(values);
+    setNote(context);
+    try {
+      localStorage.setItem(
+        draftKey + ":review",
+        JSON.stringify({ decisions: values, note: context }),
+      );
+    } catch {
+      /* Review remains on screen if device storage is unavailable. */
+    }
+  };
+  const saveText = (value: string) => {
+    setText(value);
+    try {
+      localStorage.setItem(draftKey, value);
+      setSaved("Draft saved on this device.");
+    } catch {
+      setSaved("Keep this page open. Your browser could not save a draft.");
+    }
+  };
+  const expired =
+    request &&
+    Date.now() > new Date(request.data.dueDate + "T23:59:59Z").getTime();
   return (
     <div className="participant">
       <header className="participant-header">
@@ -397,7 +509,10 @@ export function Participant({
             DutyGraph<small>YOUR WORK, IN YOUR WORDS</small>
           </span>
         </div>
-        <Button onClick={onLogout}>
+        <Button
+          disabled={captureBusy || transcriptBusy || busy}
+          onClick={onLogout}
+        >
           <LogOut size={15} />
           Sign out
         </Button>
@@ -407,18 +522,29 @@ export function Participant({
           {data?.company.name} · {user.name}
         </div>
         <h1>
-          {request?.data.type === "confirmation"
-            ? "Does this describe your work?"
-            : "Read the questions. Then just talk."}
+          {sentId === request?.id
+            ? "Thank you. Your response is received."
+            : request?.data.type === "confirmation"
+              ? "Does this describe your work?"
+              : request?.data.type === "leadership"
+                ? "Help us prepare a useful meeting."
+                : "Read the questions. Then just talk."}
         </h1>
         <p className="participant-intro">
-          No script. No perfect answer. Walk through what really happens.
-          Stories, frustrations, and tangents help us understand the work.
+          {request?.data.type === "leadership"
+            ? "Share your goals, your team’s responsibilities and the questions you want this meeting to answer."
+            : "Use a recent example. Explain what you receive, what you do, and who needs the result. You can record or type."}
         </p>
+        {data?.person && (
+          <p className="participant-role">
+            {[data.person.role, data.person.team].filter(Boolean).join(" · ")}
+          </p>
+        )}
         <ErrorBox error={error} />
         {data?.requests.length > 1 && (
           <Field label="Your assigned requests">
             <select
+              disabled={captureBusy || transcriptBusy || busy}
               value={request?.id || ""}
               onChange={(e) => setSelected(e.target.value)}
             >
@@ -437,9 +563,9 @@ export function Participant({
             title="You’re all caught up"
             detail="There are no open requests assigned to you."
           />
-        ) : request.state !== "sent" ? (
+        ) : request.state !== "sent" || sentId === request.id ? (
           <Panel title="Response received">
-            <State value={request.state} />
+            <State value={sentId === request.id ? "returned" : request.state} />
             <p>
               Your original response is saved. The advisor will review it before
               updating the work record.
@@ -447,16 +573,36 @@ export function Participant({
           </Panel>
         ) : (
           <>
+            <div className="participant-steps" aria-label="Response steps">
+              <span>
+                <b>01</b> Read your questions
+              </span>
+              <span>
+                <b>02</b> Record or write
+              </span>
+              <span>
+                <b>03</b> Review and send
+              </span>
+            </div>
+            <div className="participant-deadline">
+              <span>
+                Private request for <strong>{user.name}</strong>
+              </span>
+              <span>Due {request.data.dueDate}</span>
+            </div>
+            {expired && (
+              <ErrorBox error="This request is past its due date. Ask your advisor to extend it or send a new request. Your local draft is still saved." />
+            )}
             <div className="capture-notice">
               <ShieldCheck size={22} />
               <div>
                 <h3>Before you begin</h3>
                 <p>{request.data.notice}</p>
                 <p>
-                  Audio is stored in this local service. Transcription and
-                  malware scanning are not configured. Invitation enrollment
-                  uses link possession and a password; email identity is not
-                  independently verified.
+                  Your answers are shared with your assigned advisor. A
+                  recording is saved when you choose Save recording. If you
+                  choose Create transcript, OpenAI converts the audio into
+                  editable text. You can type instead.
                 </p>
                 <label className="check">
                   <input
@@ -513,7 +659,10 @@ export function Participant({
                         value={decisions[s.id] || ""}
                         required
                         onChange={(e) =>
-                          setDecisions({ ...decisions, [s.id]: e.target.value })
+                          saveReview(
+                            { ...decisions, [s.id]: e.target.value },
+                            note,
+                          )
                         }
                       >
                         <option value="">Choose your response</option>
@@ -533,7 +682,7 @@ export function Participant({
                   <textarea
                     rows={4}
                     value={note}
-                    onChange={(e) => setNote(e.target.value)}
+                    onChange={(e) => saveReview(decisions, e.target.value)}
                   />
                 </Field>
               </div>
@@ -546,17 +695,50 @@ export function Participant({
                   draftKey={draftKey}
                   onAsset={setAsset}
                   acknowledged={ack}
+                  onBusy={setCaptureBusy}
                 />
+                {asset && (
+                  <TranscriptReview
+                    key={asset}
+                    companyId={data.company.id}
+                    assetId={asset}
+                    draftKey={draftKey}
+                    onBusy={setTranscriptBusy}
+                    onUse={(value) => {
+                      if (
+                        !text.includes(value) &&
+                        text.trim().length + value.trim().length + 2 > 100000
+                      ) {
+                        setError(
+                          "The combined answer is too long. Shorten your answer or transcript before adding it. Both remain on this page.",
+                        );
+                        return;
+                      }
+                      saveText(
+                        text.includes(value)
+                          ? text
+                          : [text.trim(), value.trim()]
+                              .filter(Boolean)
+                              .join("\n\n"),
+                      );
+                      document
+                        .querySelector<HTMLTextAreaElement>(".capture-text")
+                        ?.focus();
+                    }}
+                  />
+                )}
                 <Panel
-                  title="Or write your response"
-                  subtitle="You can type instead of recording, or add context to your clip."
+                  title="Your written answer"
+                  subtitle="Type here, add your reviewed transcript, or add context to your recording. Draft text saves on this device."
                 >
                   <textarea
                     className="capture-text"
                     rows={7}
                     placeholder="Here’s what actually happens…"
                     value={text}
-                    onChange={(e) => setText(e.target.value)}
+                    maxLength={100000}
+                    aria-label="Your written answer"
+                    onChange={(e) => saveText(e.target.value)}
                   />
                   <div className="actions">
                     <Button
@@ -582,13 +764,27 @@ export function Participant({
               <div>
                 <strong>Review your response before submitting.</strong>
                 <p>
-                  Submitting shares it with your assigned advisor. It does not
-                  grant any authority.
+                  {asset
+                    ? "Your saved recording and any text above will be sent to your advisor."
+                    : "Your written answer will be sent to your advisor."}
                 </p>
               </div>
               <Button
                 primary
-                disabled={!ack || busy}
+                disabled={
+                  !ack ||
+                  busy ||
+                  captureBusy ||
+                  transcriptBusy ||
+                  expired ||
+                  (request.data.type !== "confirmation" &&
+                    !asset &&
+                    !text.trim()) ||
+                  (request.data.type === "confirmation" &&
+                    request.data.taskSnapshots.some(
+                      (s: any) => !decisions[s.id],
+                    ))
+                }
                 onClick={async () => {
                   setBusy(true);
                   setError("");
@@ -605,19 +801,34 @@ export function Participant({
                         note,
                       },
                     );
-                    localStorage.removeItem(draftKey);
-                    localStorage.removeItem(draftKey + ":upload");
-                    await draftStore("delete", draftKey);
+                    setSentId(request.id);
+                    setSelected(request.id);
+                    try {
+                      localStorage.removeItem(draftKey);
+                      localStorage.removeItem(draftKey + ":upload");
+                      localStorage.removeItem(draftKey + ":review");
+                      if (asset)
+                        localStorage.removeItem(
+                          `${draftKey}:transcript:${asset}`,
+                        );
+                      await draftStore("delete", draftKey);
+                    } catch {
+                      /* A successful submission remains successful if local cleanup fails. */
+                    }
                     await load();
                   } catch (e) {
-                    setError((e as Error).message);
+                    if ((e as any).code === "ALREADY_SUBMITTED") {
+                      await load();
+                      setSentId(request.id);
+                      setSelected(request.id);
+                    } else setError((e as Error).message);
                   } finally {
                     setBusy(false);
                   }
                 }}
               >
                 <Check size={17} />
-                {busy ? "Submitting…" : "Submit response"}
+                {busy ? "Sending response…" : "Send my response"}
               </Button>
             </div>
           </>

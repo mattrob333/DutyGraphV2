@@ -6,14 +6,14 @@ This release adds a Vercel/Neon hosted pilot, private sample workspaces, encrypt
 
 | Area | Implemented in the local application |
 | --- | --- |
-| Scope and kickoff | Engagement plan, sponsor/roster coverage, bounded executive questions, preserved request plan |
+| Scope and kickoff | Five-stage guided discovery, contact preparation email, leadership agenda and notes, reviewed team dossiers, personal interviews, proposed task cards and confirmation handoff |
 | Pre-meeting research | Optional Exa source collection, public query preview, bounded requests, durable replay prevention, source snapshots and unreviewed evidence import; no live key configured |
 | People and organization | CSV preview/quarantine, reported managers, teams, explicit duty claims and task responsibilities |
-| Evidence and capture | Immutable typed/audio originals, private local enrollment, resumable uploads, review/retraction and dependent staleness |
+| Evidence and capture | Immutable typed/audio originals, private enrollment, resumable uploads up to 25 MB, on-demand OpenAI transcription, participant edits and advisor recovery for audio-only replies, accepted transcript evidence with original lineage, review/retraction and dependent staleness |
 | Work | Versioned tasks, unresolved proposals, exact owner/performer confirmation, conflict handling, duties and handoff contracts |
-| Graph | Focused semantic columns, labeled routes, actual handoff workflow diagrams, team-to-duty maps, recorded-manager chart, register, bounded API and repair |
+| Graph | Focused semantic columns, actual handoff diagrams, team-to-duty maps, recorded-manager chart, register and bounded API; optional encrypted Neo4j Aura metadata projection with current-record fallback |
 | Workflows | Reviewed acyclic definitions, pinned dependencies, manual cases, selected routes, all/any joins, deadlines, failures, retries and history |
-| Strategy | Human-authored framework DAG, testable hypotheses, measurements, preserved intervention predictions and reviewed outcomes |
+| Strategy | Sixteen specific AI instruction sets and visual canvases, on-demand dependency sequence, exact source/version citations and recursive staleness; advisor analyses, testable hypotheses, measurements, intervention predictions and reviewed outcomes |
 | Weekly review | Evidence/work exceptions, cases needing attention, owner/action/due-date commitments |
 | Client delivery | Frozen executive/weekly/audit reports, explicit audience approval, current binding checks, printable HTML and checksummed ZIPs |
 | Internal handoff | Workspace, confirmed-work and non-operative agent proposal packages with exclusions |
@@ -39,7 +39,7 @@ The original Cobalt sample remains unchanged by the training journey. Northstar 
 | Independent release assurance | Full accessibility/browser matrix, physical microphone tests, security review/penetration test, blind diagnostic evaluation and owner acceptance |
 | Enterprise expansion | SSO/SCIM, deployment/isolation choices, permission-safe portfolio reporting and additional adapters |
 
-Hosted Exa, OpenAI and Resend use Workspace settings. See guide/00-hosted-quickstart.md for the current provider workflow; the 0.2 delivery pack remains a historical local release. Neo4j is not connected. The app fails closed for live runtime preflight. INTEGRATIONS.md records implementation, credential needs and live acceptance boundaries.
+Exa, OpenAI, Resend and optional Neo4j Aura connections use encrypted account settings. PostgreSQL remains authoritative. The Aura adapter and fallback are implemented and locally tested; real credentials, connectivity and projection acceptance are pending. See guide/00-hosted-quickstart.md for the current workflow; the 0.2 delivery pack remains a historical local release. The app fails closed for live runtime preflight. INTEGRATIONS.md records credential needs and live acceptance boundaries.
 
 ## Requirement traceability
 

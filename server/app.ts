@@ -1,4 +1,7 @@
 import { strategyRouter } from "./strategy.ts";
+import { discoveryRouter, type DiscoveryProvider } from "./discovery.ts";
+import { frameworkRouter, type FrameworkProvider } from "./frameworks.ts";
+import { neo4jRouter, neo4jPublicStatus } from "./neo4j.ts";
 import express from "express";
 import { allowedOrigins } from "./origins.ts";
 import cookieParser from "cookie-parser";
@@ -35,6 +38,7 @@ import {
 } from "./auth.ts";
 import { demoUser, seedRecords, ensureCobaltExamples } from "./seed.ts";
 import { createOrEdit, refreshTask } from "./records.ts";
+import { reviewTask } from "./task-review.ts";
 import { confirmationStatus, diagnosisReadiness } from "../shared/domain.ts";
 import { previewRoster } from "./roster.ts";
 import { createExport, exportZip } from "./exports.ts";
@@ -51,7 +55,7 @@ import {
   type EmailProvider,
 } from "./invitations.ts";
 import { aiRouter, type AiProvider } from "./ai.ts";
-import { providersRouter } from "./providers.ts";
+import { providersRouter, providerConfig } from "./providers.ts";
 import { hostedAuthLimit, maintenance } from "./hosted.ts";
 export const registry = JSON.parse(
   await readFile(
@@ -82,12 +86,16 @@ export function createApp({
   researchProvider,
   emailProvider,
   aiProvider,
+  discoveryProvider,
+  frameworkProvider,
   hostedRouting = !!process.env.VERCEL,
 }: {
   authRequestsPerWindow?: number;
   researchProvider?: ResearchProvider;
   emailProvider?: EmailProvider;
   aiProvider?: AiProvider;
+  discoveryProvider?: DiscoveryProvider;
+  frameworkProvider?: FrameworkProvider;
   hostedRouting?: boolean;
 } = {}) {
   const app = express();
@@ -450,10 +458,26 @@ export function createApp({
           },
           connections: {
             postgres: "current",
-            neo4j: "not_configured",
-            email: "not_configured",
-            transcription: "not_configured",
-            ai: "not_configured",
+            neo4j: neo4jPublicStatus(
+              (
+                await db.query(
+                  "SELECT enabled,config FROM provider_settings WHERE provider='neo4j'",
+                )
+              ).rows[0],
+            ),
+            email: (await providerConfig(actor(req).tenant_id, "resend", db))
+              .configured
+              ? "configured"
+              : "not_configured",
+            transcription: (
+              await providerConfig(actor(req).tenant_id, "openai", db)
+            ).configured
+              ? "configured"
+              : "not_configured",
+            ai: (await providerConfig(actor(req).tenant_id, "openai", db))
+              .configured
+              ? "configured"
+              : "not_configured",
             saviynt: "not_configured",
             serviceNow: "not_configured",
             oracle: "not_configured",
@@ -640,62 +664,8 @@ export function createApp({
             });
             return { ok: true };
           }
-          if (d.action === "review" && r.kind === "task") {
-            if (
-              !r.data.ownerId ||
-              !r.data.performerId ||
-              !r.data.evidenceIds.length
-            )
-              fail(
-                422,
-                "WORK_INCOMPLETE",
-                "Resolve the accountable owner, performer and supporting evidence before requesting confirmation.",
-              );
-            if (r.data.conflict)
-              fail(
-                422,
-                "CONFLICT_OPEN",
-                "Resolve the conflicting work claim before review.",
-              );
-            const sources = (
-              await db.query(
-                "SELECT id,state FROM records WHERE company_id=$1 AND kind='evidence'",
-                [c.id],
-              )
-            ).rows;
-            if (
-              r.data.evidenceIds.some(
-                (id: string) =>
-                  !sources.some(
-                    (s: any) => s.id === id && s.state === "accepted",
-                  ),
-              )
-            )
-              fail(
-                422,
-                "STALE_EVIDENCE",
-                "A required source is unavailable. Revise the task and its evidence first.",
-              );
-            if (
-              new Date(r.data.reviewDue + "T23:59:59Z").getTime() < Date.now()
-            )
-              fail(
-                422,
-                "REVIEW_EXPIRED",
-                "Set a current review due date first.",
-              );
-            return putRecord(
-              db,
-              user,
-              c.id,
-              r.kind,
-              r.title,
-              { ...r.data, reviewed: true },
-              "awaiting_confirmation",
-              r,
-              "Advisor reviewed the cited work description",
-            );
-          }
+          if (d.action === "review" && r.kind === "task")
+            return reviewTask(db, user, c.id, r);
           if (
             d.action === "accept" &&
             r.kind === "evidence" &&
@@ -811,33 +781,51 @@ export function createApp({
                 else await refreshTask(db, user, c.id, task);
               }
             } else {
-              await putRecord(
-                db,
-                user,
-                c.id,
-                "evidence",
-                request.title + " — participant response",
-                {
-                  title: request.title,
-                  type:
-                    request.data.type === "leadership"
-                      ? "Leadership account"
-                      : "Employee account",
-                  text:
-                    r.data.text ||
-                    "Audio source — transcription not configured.",
-                  personId: request.data.personId,
-                  locator:
-                    "Participant response " + r.id + " · original submission",
-                  originId: r.id,
-                  classification: "Known",
-                  bucket:
-                    request.data.type === "leadership" ? "leadership" : "org",
-                  assetId: r.data.assetId || "",
-                  sourceDate: r.created_at,
-                },
-                "accepted",
+              const sourceText =
+                r.data.text ||
+                "Audio response; no reviewed transcript was supplied.";
+              const priorSources = (
+                await db.query(
+                  "SELECT * FROM records WHERE company_id=$1 AND kind='evidence' AND state='accepted' AND data->>'originId'=$2",
+                  [c.id, r.id],
+                )
+              ).rows;
+              const preserved = priorSources.some(
+                (source: any) =>
+                  source.data.responseHash === r.hash ||
+                  (source.data.text === sourceText &&
+                    (source.data.assetId || "") === (r.data.assetId || "")),
               );
+              if (!preserved)
+                await putRecord(
+                  db,
+                  user,
+                  c.id,
+                  "evidence",
+                  request.title + " — participant response",
+                  {
+                    title: request.title,
+                    responseHash: r.hash,
+                    responseVersion: r.version,
+                    type:
+                      request.data.type === "leadership"
+                        ? "Leadership account"
+                        : "Employee account",
+                    text:
+                      r.data.text ||
+                      "Audio response; no reviewed transcript was supplied.",
+                    personId: request.data.personId,
+                    locator:
+                      "Participant response " + r.id + " · original submission",
+                    originId: r.id,
+                    classification: "Known",
+                    bucket:
+                      request.data.type === "leadership" ? "leadership" : "org",
+                    assetId: r.data.assetId || "",
+                    sourceDate: r.created_at,
+                  },
+                  "accepted",
+                );
             }
             await setState(db, user, c.id, r, "accepted", "response.accepted");
             await setState(
@@ -1009,6 +997,7 @@ export function createApp({
             "Sign in with a participant account.",
           );
         const company = await companyCheck(db, u, u.company_id!);
+        const person = await getRecord(db, u.company_id!, u.person_id!);
         const requests = (
           await db.query(
             "SELECT * FROM records WHERE company_id=$1 AND kind='request' AND data->>'personId'=$2 AND state NOT IN ('draft','withdrawn') ORDER BY created_at DESC",
@@ -1017,6 +1006,11 @@ export function createApp({
         ).rows;
         return {
           company: { id: company.id, name: company.name },
+          person: {
+            name: person.title,
+            role: person.data.role,
+            team: person.data.team,
+          },
           requests: requests.map((r) => ({
             id: r.id,
             title: r.title,
@@ -1406,6 +1400,15 @@ export function createApp({
   api.use("/companies/:companyId/providers", authLimit, providersRouter());
   api.use("/companies/:companyId/requests", invitationsRouter(emailProvider));
   api.use("/companies/:companyId/ai", aiRouter(aiProvider));
+  api.use(
+    "/companies/:companyId/discovery",
+    discoveryRouter(discoveryProvider),
+  );
+  api.use("/companies/:companyId/neo4j", neo4jRouter());
+  api.use(
+    "/companies/:companyId/framework-runs",
+    frameworkRouter(frameworkProvider),
+  );
   api.use("/companies/:companyId/strategy-briefs", strategyRouter(aiProvider));
   api.post("/companies/:companyId/graph/rebuild", advisor, async (req, res) =>
     res.json(

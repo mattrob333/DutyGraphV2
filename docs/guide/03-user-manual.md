@@ -75,7 +75,7 @@ Inspect each original link and its captured text before choosing Import as unrev
 
 The application allows ten requests per tenant account across all companies in a rolling 24-hour window. Failed or uncertain requests count. Replaying the same command does not repeat the provider call, and there are no automatic retries. A request left unresolved by a server interruption is marked unknown after five minutes when history is refreshed. Consult the operator before deliberately starting another request if the provider outcome is uncertain.
 
-Prepare a short draft covering offer/customers, footprint, publicly named people, delivery process, recent changes and open questions. This synthesis is advisor-authored; model-generated analysis is not configured. In the first meeting, have the team correct the draft. Preserve the original page, collect corrections as new sources, and revise downstream work. Confirm exact task versions later with the responsible people.
+The guided journey automatically carries research into a contact email and a leadership meeting guide. The contact reply and kickoff notes then supply the reviewed team roster and personalized interviews. Read [the five discovery steps](23-discovery-to-confirmed-work.md) for the current flow. Earlier manual source selection is no longer part of the main discovery journey.
 
 ### Request and response workflow
 

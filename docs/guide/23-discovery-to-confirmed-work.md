@@ -1,33 +1,47 @@
 # From business research to confirmed work
 
-Discovery follows this sequence: research, leadership meeting, agreed roster, individual interviews, task drafts, and human confirmation.
+Discovery has five steps. Each step uses the information collected in the preceding steps. You do not select source checkboxes or choose a generic interview template.
 
-## Research and prepare the meeting
+## 1. Research and contact
 
-Business research selects all four search areas by default: company overview, customer communities, competitors and their channels, and industry news and feeds. Each selected area uses one Exa request and returns up to five sources. The default selection therefore uses four requests from the account's ten-request daily allowance. Searches run in sequence. An interrupted request retains its key so resuming does not repeat a recorded provider call. A failed or unknown search stops the batch; completed results remain available. Finding a community or RSS feed does not subscribe to it.
+Enter the public business name and website. All four research areas are selected by default: company overview, customer communities, competitors and their channels, and industry news and feeds. Each area uses one Exa request and returns up to five pages. The default selection uses four requests from the ten-request daily allowance. Finding a community or feed does not subscribe to it.
 
-Results appear in Collected sources. Inspect the original page and captured text, then import useful results into the company's Evidence library. Importing does not accept evidence. Select up to eight sources under Prepare the leadership meeting. OpenAI creates a saved brief with findings, gaps and tailored questions. The latest completed brief appears in Leadership kickoff, with editable questions. A brief with changed sources is flagged and does not supply questions automatically.
+Read the results in Collected sources. Research text is available to the contact email and meeting guide automatically. Import is optional when you also want a page in the evidence history. Public research does not establish internal duties or reporting lines.
 
-## Meet with leadership
+Enter the name and email of your point of contact. Add agreed meeting details if available. Choose **Draft contact email**. The draft asks the contact to invite the leaders who should attend, provide the participating people's names, emails and departments, describe responsibilities, and consider the company's goals, vision and problems. It does not assume supplier onboarding or any other internal workflow.
 
-Agree goals, the engagement scope, participating departments and the employee roster with the owners or executives. Create engagement plan records that agreement; it does not infer it from research. Hold the meeting together using your meeting service, or prepare an individual kickoff request. Preparing a request does not send it. Open the saved request to create a private link or send its invitation through Resend.
+Edit the subject, message and preliminary questions. **Save contact request** creates a private request. Preview the branded email, then choose **Send invitation email**. Saving and sending are separate actions. The contact can speak or type answers on their private page. Their response appears in this discovery journey and the evidence history tools.
 
-After the meeting, add the transcript or notes as leadership evidence and review the source. Voice recording does not currently provide automatic transcription. Fireflies ingestion is not part of this release.
+## 2. Leadership meeting
 
-## Review the roster and duties
+Choose **Prepare meeting guide**. The guide uses public research and the contact's actual reply, when available. It groups questions for the live discussion: scope, customers and value, goals, people and responsibilities, and next steps. The advisor uses the guide during the meeting.
 
-People in scope provides an AI roster draft from accepted leadership or team evidence. Public research is excluded from this operation. Suggestions contain cited people, departments and duties. Missing details stay blank. Review each person before saving, supply a valid email, and select the reported manager from the roster. Review each duty and choose its accountable owner. You can also import an agreed CSV roster with manager emails. AI does not create these records automatically.
+After the meeting, paste the transcript or your notes into **Capture the leadership meeting**. Review the notes, then save them. These notes are accepted as the advisor's account of the meeting and become the source for team dossiers. They do not establish independent proof of every claim. Direct Fireflies import is not connected; paste an authorized transcript here.
 
-## Interview the team
+## 3. Review the team
 
-In Team interviews & responses, choose a person and relevant evidence. The interview draft includes that person's recorded name, role and team. It asks about duties, inputs, outputs, handoffs, tools, decisions and exceptions. Review the questions in the request form before saving. Send the saved request's private link individually. Responses appear here for advisor review; an accepted response becomes evidence. Coverage counts come from the company's actual roster and records, not from public searches.
+Choose **Build team dossiers**. AI extracts the people, departments, roles, manager emails and duties stated in the kickoff notes and contact reply. Missing information stays blank. Public research cannot create the internal roster.
 
-## Draft, check and delegate
+Review each person's dossier. Correct an email or role, add a stated duty, or remove a mistaken suggestion. Every saved person needs an email, role and department. **Save reviewed team** records the roster and responsibilities. Existing work records remain available in the workspace; a new roster does not silently erase them.
 
-Draft task cards from accepted evidence on the same page. Review each proposed card, name its owner and performer, and complete the work description. Use a confirmation request with the task selected to ask its people to check the exact version. Changed work needs another check. Hand-off contracts and workflow definitions still require explicit review and entry; task drafting does not infer a complete executable workflow.
+## 4. Team interviews
 
-After confirmation, use Agent governance to assess a bounded delegation. An AI label is not a deployed agent or permission to run work.
+Choose **Create question sets**. AI prepares one tailored interview for every person in the reviewed team. It uses their role, reviewed duties and leadership context. Questions ask about a real example: what starts the work, what is needed, what they do, the tools they use, what they produce, who receives it, and where decisions or delays occur.
 
-## Sample reporting chart
+Review the questions and email messages, then **Save all personal requests**. **Send pending team invitations** sends each person's private request in sequence. A confirmed email-service receipt is skipped on later batch attempts. An uncertain result stops the batch for review. Open each request to inspect its email preview, delivery attempt and original questions.
 
-Cobalt includes a fictional reporting hierarchy. Open Company graph, Org & duties, Reporting chart. Select a person to inspect their work, or select a department button to explore its duties. Reopening the sample preserves revised people and existing reporting links. The workflow template library remains a proposed next feature, not a live integration with n8n or Make.
+The recipient opens the private link and signs in or creates a participant password. They type or record, save the recording, optionally create and correct a transcript, and send their response. The advisor sees who has replied and can read the original response. A returned interview does not confirm task ownership.
+
+## 5. Review task cards
+
+After team responses arrive, choose **Draft task cards**. The draft uses the current reviewed team and returned interviews. Each task keeps its source references, accountable person, performer, duty, trigger, inputs, instructions, output, tools and human decisions. Missing ownership stays visible.
+
+Review and save the proposed cards. Ask the named owners and performers to check the exact task versions. Their confirmations and the advisor's review make the work record current. Agent proposals come afterward; discovery does not grant an agent permission to act.
+
+## Research, history and recovery
+
+The lower **People in scope**, **Requests and responses**, and **Evidence history** sections provide access to the underlying records. Sources used by a draft appear in an expandable list. The advisor chooses the next action; the app chooses the relevant context within that stage.
+
+Discovery drafts have a 30-run allowance per account in 24 hours. Failed and uncertain runs count. They do not retry automatically. A run that loses its confirmed result is marked unknown; check provider usage before starting another one. Source changes mark an unapplied draft stale. Prepare a new draft before saving it. Source identifiers provide traceability, not proof that AI interpreted the source correctly.
+
+The Cobalt sample has illustrative work records and a fictional reporting hierarchy. These later-stage examples are deliberately excluded from first-contact research. Open Company graph → Org & duties → Reporting chart to inspect the hierarchy. Reopening the sample preserves edited records.

@@ -1,8 +1,9 @@
 import { pool, tx } from "./db.ts";
+import { syncNeo4jSweep } from "./neo4j.ts";
 import { linksFor } from "../shared/record-links.ts";
 export { linksFor } from "../shared/record-links.ts";
 export async function projectTenant(tenant: string) {
-  return tx(tenant, async (db) => {
+  const count = await tx(tenant, async (db) => {
     const events = await db.query(
       "SELECT * FROM outbox WHERE processed_at IS NULL ORDER BY sequence LIMIT 100 FOR UPDATE SKIP LOCKED",
     );
@@ -32,6 +33,7 @@ export async function projectTenant(tenant: string) {
     }
     return events.rowCount;
   });
+  return count;
 }
 let running = false;
 export async function projectAll() {
@@ -40,6 +42,9 @@ export async function projectAll() {
   try {
     for (const t of (await pool.query("SELECT id FROM tenants")).rows)
       await projectTenant(t.id);
+    // Complete authoritative PostgreSQL work for every account before spending
+    // the bounded external-maintenance budget.
+    await syncNeo4jSweep();
   } finally {
     running = false;
   }

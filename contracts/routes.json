@@ -104,6 +104,41 @@
     },
     {
       "method": "POST",
+      "path": "/api/v1/companies/{companyId}/assets/{assetId}/transcribe",
+      "source": "server/transcription.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/assets/{assetId}/transcription",
+      "source": "server/transcription.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/assets/{assetId}/transcription-review",
+      "source": "server/transcription.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/discovery",
+      "source": "server/discovery.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/discovery/{jobId}/apply",
+      "source": "server/discovery.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/discovery/draft",
+      "source": "server/discovery.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/discovery/meeting",
+      "source": "server/discovery.ts"
+    },
+    {
+      "method": "POST",
       "path": "/api/v1/companies/{companyId}/exports",
       "source": "server/app.ts"
     },
@@ -111,6 +146,26 @@
       "method": "GET",
       "path": "/api/v1/companies/{companyId}/exports/{recordId}/download",
       "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/framework-runs",
+      "source": "server/frameworks.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/framework-runs/{key}",
+      "source": "server/frameworks.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/framework-runs/{key}",
+      "source": "server/frameworks.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/framework-runs/{key}/{runId}/source",
+      "source": "server/frameworks.ts"
     },
     {
       "method": "POST",
@@ -126,6 +181,31 @@
       "method": "POST",
       "path": "/api/v1/companies/{companyId}/graph/rebuild",
       "source": "server/app.ts"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/v1/companies/{companyId}/neo4j",
+      "source": "server/neo4j.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/neo4j",
+      "source": "server/neo4j.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/companies/{companyId}/neo4j",
+      "source": "server/neo4j.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/neo4j/rebuild",
+      "source": "server/neo4j.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/neo4j/test",
+      "source": "server/neo4j.ts"
     },
     {
       "method": "GET",
@@ -180,6 +260,11 @@
     {
       "method": "POST",
       "path": "/api/v1/companies/{companyId}/requests/{recordId}/email",
+      "source": "server/invitations.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/requests/{recordId}/email-preview",
       "source": "server/invitations.ts"
     },
     {

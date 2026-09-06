@@ -1,0 +1,80 @@
+.neo4j-settings .neo4j-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.neo4j-status > span:last-child {
+  font-size: 12px;
+  color: var(--muted);
+}
+.neo4j-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  border-block: 1px solid var(--line);
+  padding: 18px 0;
+  margin: 0 0 20px;
+}
+.neo4j-facts dt {
+  font-size: 12px;
+  color: var(--muted);
+}
+.neo4j-facts dd {
+  font-size: 13px;
+  margin: 6px 0 0;
+  overflow-wrap: anywhere;
+}
+.neo4j-settings .neo4j-actions {
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.neo4j-connection-form {
+  margin-top: 23px;
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.neo4j-connection-form summary,
+.neo4j-remove summary {
+  cursor: pointer;
+  font-weight: 500;
+}
+.neo4j-connection-form > p,
+.neo4j-remove > p {
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 700px;
+  margin: 15px 0;
+}
+.neo4j-connection-form form {
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-top: 23px;
+}
+.neo4j-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.neo4j-connection-form .btn {
+  align-self: start;
+}
+.neo4j-remove {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+@media (max-width: 650px) {
+  .neo4j-facts,
+  .neo4j-form-row {
+    grid-template-columns: 1fr;
+  }
+  .neo4j-settings .neo4j-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

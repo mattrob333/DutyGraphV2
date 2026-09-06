@@ -1,6 +1,7 @@
 import express from "express";
 import { z } from "zod";
 import JSZip from "jszip";
+import { reportTheme } from "./report-theme.ts";
 import { createHash } from "node:crypto";
 import type { RecordRow, Company } from "../shared/domain.ts";
 import { confirmationStatus } from "../shared/domain.ts";
@@ -179,8 +180,8 @@ export function renderReport(packet: any, approved = false) {
   const paragraph = (text: string) =>
     `<p>${escape(text).replaceAll("\n", "<br>")}</p>`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(packet.title)}</title><style>
-  *{box-sizing:border-box}body{margin:0;background:#f2f3ef;color:#25352d;font:15px/1.65 system-ui,sans-serif}main{max-width:1020px;margin:36px auto;background:white;padding:56px;border:1px solid #d6ded4}header{border-bottom:2px solid #496a52;padding-bottom:26px;margin-bottom:30px}.brand{text-transform:uppercase;font-size:11px;letter-spacing:2px;color:#61725f}h1{font-size:38px;line-height:1.2;letter-spacing:-1px}h2{font-size:23px;margin:34px 0 12px}h3{font-size:17px;margin:0 0 12px}.meta,.muted{font-size:12px;color:#657466}.notice{padding:14px 18px;background:#f5f0df;border-left:3px solid #b38b3d}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:26px 0}.stats div{background:#f3f6f0;padding:16px}.stats strong{display:block;font-size:24px}article{border:1px solid #dbe1d8;border-radius:8px;padding:22px;margin:18px 0;break-inside:avoid}dl{display:grid;grid-template-columns:175px 1fr;gap:10px;margin-bottom:0}dt{color:#657466;font-size:12px}dd{margin:0;overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:12px}td,th{padding:9px;text-align:left;border-bottom:1px solid #ddd}footer{margin-top:36px;border-top:1px solid #ddd;padding-top:15px;font-size:11px;color:#657466}@media(max-width:640px){main{padding:24px;margin:0}h1{font-size:29px}.stats{grid-template-columns:1fr}dl{grid-template-columns:1fr;gap:4px}dd{margin-bottom:10px}}@media print{body{background:white}main{border:0;margin:0;max-width:none;padding:12mm}.notice{print-color-adjust:exact}h2,h3{break-after:avoid}a{color:inherit}}
-  </style></head><body><main><header><div class="brand">Duty Graph · ${escape(packet.company.name)}</div><h1>${escape(packet.title)}</h1><p>${escape(packet.purpose)}</p><div class="meta">${approved ? "Reviewed for manual delivery" : "DRAFT — review before delivery"} · ${escape(packet.generatedAt.slice(0, 10))} · Company revision ${packet.sourceRevision}</div><div class="meta">Audience: ${packet.audience.map(escape).join("; ")}</div></header>
+  ${reportTheme}
+  </style></head><body><main><header><div class="brand">DutyGraph · ${escape(packet.company.name)}</div><h1>${escape(packet.title)}</h1><p>${escape(packet.purpose)}</p><div class="meta">${approved ? "Reviewed for manual delivery" : "DRAFT — review before delivery"} · ${escape(packet.generatedAt.slice(0, 10))} · Company revision ${packet.sourceRevision}</div><div class="meta">Audience: ${packet.audience.map(escape).join("; ")}</div></header>
   ${packet.sandbox ? '<div class="notice"><strong>Synthetic training example.</strong> This company and its people, claims and measurements are illustrative. This is not an actual client finding.</div>' : ""}
   <div class="stats"><div><strong>${packet.coverage.participants}</strong>people in the engagement roster</div><div><strong>${packet.coverage.responded} / ${packet.coverage.participants}</strong>people with a returned response</div><div><strong>${packet.coverage.confirmedTasks} / ${packet.coverage.totalTasks}</strong>tasks with current human confirmations</div></div>
   <h2>Executive summary</h2>${paragraph(packet.summary)}<h2>Decisions for the client</h2>${paragraph(packet.decisions || "No decision recorded.")}<h2>Next steps</h2>${paragraph(packet.nextSteps)}<h2>Scope and limitations</h2>${paragraph(packet.limitations)}<p class="muted">Scope: ${escape(packet.company.scope)}. ${escape(packet.collectionNotice)}</p>
@@ -204,7 +205,10 @@ export function renderReport(packet: any, approved = false) {
       : "<p>No detailed records selected.</p>"
   }
   ${packet.auditEvents ? `<h2>Recorded activity</h2><p>${escape(packet.auditCoverage)}</p><table><thead><tr><th>When</th><th>Recorded event</th><th>Record</th></tr></thead><tbody>${packet.auditEvents.map((e: any) => `<tr><td>${escape(e.created_at)}</td><td>${escape(e.type)}</td><td>${escape(e.record_id || "Workspace")}</td></tr>`).join("")}</tbody></table>` : ""}
-  <footer>Frozen review packet. Source text, recordings, passwords and invitation tokens are excluded. Work confirmation, business authority, deployment and observed execution are distinct. This document grants no system permission.</footer></main></body></html>`.replace(/[ \t]+$/gm, "");
+  <footer>Frozen review packet. Source text, recordings, passwords and invitation tokens are excluded. Work confirmation, business authority, deployment and observed execution are distinct. This document grants no system permission.</footer></main></body></html>`.replace(
+    /[ \t]+$/gm,
+    "",
+  );
 }
 export async function reportZip(record: RecordRow) {
   const packet = record.data.packet;

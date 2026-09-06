@@ -24,6 +24,8 @@ import {
   FRAMEWORK_GUIDE_VERSION,
 } from "../shared/framework-guides.ts";
 import type { RecordRow } from "../shared/domain.ts";
+import { currentFrameworkRuns, frameworkInputs } from "./frameworks.ts";
+import { frameworkSpecs } from "../shared/framework-specs.ts";
 
 const buckets: Record<string, string[]> = {
   business: ["biz", "leadership", "calls"],
@@ -126,6 +128,7 @@ export function strategyContext(records: RecordRow[], scope: string) {
       title: r.title,
       state: r.state,
       kind: r.kind,
+      ...(r.kind === "framework" ? { frameworkKey: r.data.key } : {}),
       locator: String(r.data.locator || r.kind),
       text: content.slice(0, 4000),
       excerpted: content.length > 4000,
@@ -137,6 +140,42 @@ export function strategyContext(records: RecordRow[], scope: string) {
     sources,
     omitted: eligible.length - chosen.length,
   };
+}
+
+async function withCurrentFrameworks(
+  db: any,
+  companyId: string,
+  records: RecordRow[],
+) {
+  const data = await frameworkInputs(db, companyId);
+  const generated = currentFrameworkRuns(records, data.research, data.prior);
+  // Preserve the source ID of the saved run so each strategy citation points
+  // back to the exact AI version, never to an invented primary-evidence record.
+  return [
+    ...records,
+    ...generated.map(
+      (job) =>
+        ({
+          id: job.id,
+          company_id: companyId,
+          kind: "framework",
+          title: `${frameworkSpecs[job.input.frameworkKey].name} · AI analysis`,
+          version: job.input.version,
+          state: "review_required",
+          hash: hash(job.result),
+          created_at: job.created_at,
+          updated_at: job.created_at,
+          data: {
+            key: job.input.frameworkKey,
+            analysis: job.result.output.summary,
+            sections: job.result.output.sections,
+            gaps: job.result.output.questions,
+            assumptions: job.result.output.warnings,
+            locator: `Saved AI framework run ${job.id}`,
+          },
+        }) as RecordRow,
+    ),
+  ];
 }
 
 export function strategyRouter(provider: AiProvider = openAiDraft) {
@@ -170,10 +209,11 @@ export function strategyRouter(provider: AiProvider = openAiDraft) {
             [c],
           )
         ).rows;
+        const contextRecords = await withCurrentFrameworks(db, c, records);
         const contexts = Object.fromEntries(
           Object.keys(buckets).map((scope) => [
             scope,
-            strategyContext(records, scope),
+            strategyContext(contextRecords, scope),
           ]),
         );
         const groups = Object.entries(contexts).map(([scope, context]) => {
@@ -272,7 +312,10 @@ export function strategyRouter(provider: AiProvider = openAiDraft) {
             "STRATEGY_SCOPE",
             "This company exceeds the current strategy context limit of 1,000 records.",
           );
-        const context = strategyContext(records, d.scope);
+        const context = strategyContext(
+          await withCurrentFrameworks(db, c, records),
+          d.scope,
+        );
         if (!context.sources.some((s) => s.kind === "evidence"))
           fail(
             422,

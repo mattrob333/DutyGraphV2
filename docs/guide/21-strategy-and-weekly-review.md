@@ -6,7 +6,7 @@ The Strategy page connects five steps: collect evidence, record a possible const
 
 Each card states the suspected limit, why it is suspected, another explanation, what would change if it were removed, and how to test it. The Cobalt sample has two hypotheses. Neither is a proven constraint. Compare independent accounts and actual work records before selecting a diagnosis.
 
-The Strategy assistant uses the existing OpenAI connection. Select up to eight sources, approve sending those excerpts, and request hypotheses. Review a result for the ledger. Complete the owner, output unit and missing fields before saving. The assistant does not review its own diagnosis or run all sixteen frameworks automatically.
+The Strategy assistant uses the existing OpenAI connection. Select up to eight sources, approve sending those excerpts, and request hypotheses. Review a result for the ledger. Complete the owner, output unit and missing fields before saving. The assistant does not review its own diagnosis. The separate framework library can run all sixteen analyses in dependency order when you select **Run remaining sequence**; it does not run unattended.
 
 ## Define a KPI
 
@@ -38,7 +38,7 @@ An outcome review compares the recorded prediction with observations. State the 
 
 ## Prepare a weekly standup
 
-Weekly review now prepares four questions from the selected person’s current tasks and measures. The advisor can review them as a participant request. Saving does not send email. The existing invitation flow can send a reviewed request using Resend. Participants can return the supported response types; automatic audio transcription is not yet connected.
+Weekly review now prepares four questions from the selected person’s current tasks and measures. The advisor can review them as a participant request. Saving does not send email. The existing invitation flow can send a reviewed request using Resend. Participants can type or record a response, create an editable OpenAI transcript, and check it before sending. Their advisor must have an OpenAI key configured for transcription. The four draft questions and response due date can be edited before preparing the request. Status counts show draft, sent and returned weekly requests.
 
 The intended full cycle is:
 
@@ -49,12 +49,16 @@ The intended full cycle is:
 5. A verified webhook identifies the completed transcript. Import it with meeting, speaker and time references, deduplicate it, and route it to Customer calls or People & work according to meeting type.
 6. A person checks the transcript and proposed decisions. Accepted evidence creates new analysis versions and proposed work. It does not silently change duties or authorize agents.
 
-The rule-based request draft is implemented. The scheduled invitation cycle, Fireflies import, transcription, AI agenda and continuous framework refresh remain integration work. Monday at 10 am was an example, not a configured schedule.
+The rule-based request draft is implemented. The scheduled invitation cycle, Fireflies import, AI meeting agenda and continuous framework refresh remain integration work. Participant audio transcription is available on demand; it does not run unattended. Monday at 10 am was an example, not a configured schedule.
 
 ## Review frameworks when needed
 
-Each framework now has a specific guide and a suggested review frequency. Customer frameworks respond to new interviews. Operational constraints and KPIs need weekly review. External-environment frameworks usually need less frequent review unless a material event occurs.
+Each framework has a specific AI instruction set, named input requirements, a visual canvas, and a suggested review frequency. Open a card to read its canvas, inspect citations and confidence, or run a saved analysis with OpenAI. Relevant accepted evidence, public research and current upstream analyses are included automatically. You do not need to select source checkboxes. Manual advisor analyses remain available.
 
-The intended refresh service will use changed source versions to find affected analyses, debounce repeated events, check the required earlier analyses, draft a new version with a change summary, and queue it for human review. It will retain model, prompt version, input references, cost and errors. It will not run the entire chain on every new sentence or replace a reviewed version without review.
+Customer frameworks respond to new interviews. Operational constraints and KPIs need weekly review. External-environment frameworks usually need less frequent review unless a material event occurs. These are suggested review times, not active schedules.
+
+The app detects changed inputs and marks affected saved analyses out of date. A changed upstream analysis also makes its downstream analyses out of date, through the full dependency chain. Every required upstream analysis must be current before a dependent run starts. **Run remaining sequence** updates ready analyses in order, skips current ones, and stops if a run fails. It can make up to sixteen provider calls; charges apply. Each run saves its model, prompt version, exact inputs, citations, output, provider usage and outcome. A run does not confirm a constraint or change authoritative duties.
+
+Scheduled refresh, automatic change summaries and notifications remain future work. See [Live framework canvases](24-live-framework-canvases.md) for all sixteen layouts, input limits and version history.
 
 Sources: [ASD-STE100](https://www.asd-ste100.org/about_STE.html), [Porter’s Five Forces](https://www.isc.hbs.edu/strategy/business-strategy/Pages/the-five-forces.aspx), [Fireflies signed webhooks](https://docs.fireflies.ai/graphql-api/webhooks-v2).

@@ -81,6 +81,10 @@ for (const [source, prefix] of [
   ["server/providers.ts", "/api/v1/companies/:companyId/providers"],
   ["server/invitations.ts", "/api/v1/companies/:companyId/requests"],
   ["server/ai.ts", "/api/v1/companies/:companyId/ai"],
+  ["server/discovery.ts", "/api/v1/companies/:companyId/discovery"],
+  ["server/neo4j.ts", "/api/v1/companies/:companyId/neo4j"],
+  ["server/frameworks.ts", "/api/v1/companies/:companyId/framework-runs"],
+  ["server/transcription.ts", "/api/v1/companies/:companyId/assets"],
   ["server/strategy.ts", "/api/v1/companies/:companyId/strategy-briefs"],
 ]) {
   const code = await readFile(source, "utf8");

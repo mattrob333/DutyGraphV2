@@ -147,6 +147,8 @@ Generated from the same runtime schemas that validate saved records. Required fi
 | questions | Yes | array; max 10 items |
 | questionPlanVersion | No | string; max 100 characters; default "custom-v1" |
 | questionIds | No | array; max 10 items; default [] |
+| emailSubject | No | string; max 200 characters; default "" |
+| emailBody | No | string; max 12000 characters; default "" |
 | taskIds | No | array; max 150 items; default [] |
 | dueDate | Yes | string; date |
 | notice | Yes | string; min 1 characters; max 20000 characters |
