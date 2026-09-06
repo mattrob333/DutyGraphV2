@@ -170,7 +170,7 @@ export function AiWorkbench({
                         ...fields,
                         evidenceIds: sourceIds,
                         classification: "Inferred",
-                        mode: "ai_draft",
+                        mode: "human_only",
                         reason: `Advisor review of AI draft ${job.id}`,
                       });
                     }}

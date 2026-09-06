@@ -58,6 +58,10 @@ export const schemas = {
       trigger: text,
       inputs: text,
       instructions: text,
+      aiPrompt: optional,
+      valueStage: z
+        .enum(["receive", "prepare", "check", "decide", "deliver", "unmapped"])
+        .default("unmapped"),
       output: text,
       systems: lines,
       allowed: lines,
@@ -74,7 +78,7 @@ export const schemas = {
           "ai_execute_bounded",
           "prohibited",
         ])
-        .default("ai_draft"),
+        .default("human_only"),
       classification: z.enum(evidenceLabels).default("Inferred"),
       conflict: z.boolean().default(false),
       stopConditions: optional,

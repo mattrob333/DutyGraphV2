@@ -13,6 +13,8 @@ import { Button, Field, ErrorBox, State, Badge, Row, date } from "./ui.tsx";
 import { api, downloadExport, downloadFile } from "./api.ts";
 import { fieldSets } from "./forms.tsx";
 import { EmailInvitation } from "./EmailInvitation.tsx";
+import { ModeBadge, SoftwareChips } from "./TaskCards.tsx";
+import { taskMode, stages } from "../../shared/task-presentation.ts";
 import { WorkflowDetail } from "./WorkflowDetail.tsx";
 export function Detail({
   record: r,
@@ -340,6 +342,22 @@ export function Detail({
       )}
       {r.kind === "task" && (
         <>
+          <div
+            className={`task-detail-banner mode-${taskMode(r.data.mode).id}`}
+          >
+            <ModeBadge mode={r.data.mode} />
+            <span>
+              {stages.find((s) => s.id === r.data.valueStage)?.label ||
+                "Stage not mapped"}{" "}
+              · {r.data.duty}
+            </span>
+            <h2>{r.title}</h2>
+            <p>{r.data.purpose}</p>
+            <small>
+              {taskMode(r.data.mode).detail}. This record does not establish an
+              active deployment.
+            </small>
+          </div>
           <div className="ownership">
             <div>
               <span>Accountable human</span>
@@ -350,14 +368,41 @@ export function Detail({
               <strong>{person(r.data.performerId)}</strong>
             </div>
           </div>
-          <p className="lead">{r.data.purpose}</p>
+          <div className="task-io">
+            <section>
+              <small>01 / REQUIRED INPUT</small>
+              <p>{r.data.inputs}</p>
+            </section>
+            <section>
+              <small>02 / WORK PRODUCT</small>
+              <p>{r.data.output}</p>
+            </section>
+          </div>
+          <h3>Software used in this task</h3>
+          <SoftwareChips systems={r.data.systems || []} />
+          <p className="subtle">
+            Described software. These chips do not verify credentials or an
+            active connection.
+          </p>
+          <section className="task-instructions">
+            <h3>Human work instructions</h3>
+            <p className="preserve-lines">{r.data.instructions}</p>
+          </section>
+          {r.data.mode !== "human_only" && (
+            <section className="task-prompt">
+              <h3>
+                AI instructions / prompt <span className="badge">Proposed</span>
+              </h3>
+              <p className="preserve-lines">
+                {r.data.aiPrompt ||
+                  "No AI prompt has been recorded. Add its input, output and limits before proposing an agent."}
+              </p>
+            </section>
+          )}
           <dl className="details">
             {[
               ["Standing duty", "duty"],
               ["Starts when", "trigger"],
-              ["Required inputs", "inputs"],
-              ["Instructions", "instructions"],
-              ["Produces", "output"],
               ["Stop conditions", "stopConditions"],
             ].map(([label, key]) => (
               <div key={key}>

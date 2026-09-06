@@ -808,6 +808,23 @@
                             "minLength": 1,
                             "maxLength": 20000
                           },
+                          "aiPrompt": {
+                            "default": "",
+                            "type": "string",
+                            "maxLength": 20000
+                          },
+                          "valueStage": {
+                            "default": "unmapped",
+                            "type": "string",
+                            "enum": [
+                              "receive",
+                              "prepare",
+                              "check",
+                              "decide",
+                              "deliver",
+                              "unmapped"
+                            ]
+                          },
                           "output": {
                             "type": "string",
                             "minLength": 1,
@@ -856,7 +873,7 @@
                             }
                           },
                           "mode": {
-                            "default": "ai_draft",
+                            "default": "human_only",
                             "type": "string",
                             "enum": [
                               "human_only",
@@ -2064,6 +2081,23 @@
             "minLength": 1,
             "maxLength": 20000
           },
+          "aiPrompt": {
+            "default": "",
+            "type": "string",
+            "maxLength": 20000
+          },
+          "valueStage": {
+            "default": "unmapped",
+            "type": "string",
+            "enum": [
+              "receive",
+              "prepare",
+              "check",
+              "decide",
+              "deliver",
+              "unmapped"
+            ]
+          },
           "output": {
             "type": "string",
             "minLength": 1,
@@ -2112,7 +2146,7 @@
             }
           },
           "mode": {
-            "default": "ai_draft",
+            "default": "human_only",
             "type": "string",
             "enum": [
               "human_only",

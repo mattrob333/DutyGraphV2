@@ -5,6 +5,7 @@ import type { RecordRow } from "../shared/domain.ts";
 import {
   populateCobaltExamples,
   canEnrichOriginalTask,
+  canUpgradeV2,
 } from "../server/sample-examples.ts";
 import { workflowScene } from "../client/src/graph-scene.ts";
 import {
@@ -166,6 +167,50 @@ test("only untouched original tasks qualify for enrichment", () => {
       ...r,
       data: { ...r.data, instructions: "A user's revised instruction." },
     }),
+    false,
+  );
+});
+
+test("v2 enrichment adds modes, software and stages while preserving edited content and refreshing bindings", async () => {
+  const initial = memoryWriter();
+  const records = await populateCobaltExamples([], initial.write);
+  for (const r of records) {
+    r.data.sampleVersion = "cobalt-guided-v2";
+    if (r.data.reason)
+      r.data.reason =
+        "Cobalt guided example v2; entirely fictional training data.";
+    if (r.kind === "task")
+      Object.assign(r.data, {
+        mode: "human_only",
+        systems: ["ERP", "Document workspace"],
+        valueStage: "unmapped",
+        aiPrompt: "",
+      });
+  }
+  const customized = records.find((r) => r.data.sampleKey === "order-intake")!;
+  customized.data.instructions = "Keep my customer-specific instructions.";
+  customized.version++;
+  const writer = memoryWriter();
+  const upgraded = await populateCobaltExamples(records, writer.write);
+  assert.equal(
+    upgraded.find((r) => r.id === customized.id)?.data.instructions,
+    customized.data.instructions,
+  );
+  const packet = upgraded.find((r) => r.data.sampleKey === "supplier-packet")!;
+  assert.equal(packet.data.mode, "ai_execute_bounded");
+  assert.equal(packet.data.valueStage, "receive");
+  assert.ok(packet.data.aiPrompt.includes("Do not change the ERP"));
+  assert.deepEqual(packet.data.systems, ["Google Drive", "Google Sheets"]);
+  for (const r of upgraded.filter((r) =>
+    ["handoff", "workflow", "duty", "agent"].includes(r.kind),
+  ))
+    for (const b of r.data.taskBindings || [])
+      assert.equal(b.hash, upgraded.find((t) => t.id === b.id)?.hash);
+  const before = writer.writes.length;
+  await populateCobaltExamples(upgraded, writer.write);
+  assert.equal(writer.writes.length, before);
+  assert.equal(
+    canUpgradeV2({ ...packet, has_confirmations: true }, "task", packet.data),
     false,
   );
 });

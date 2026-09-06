@@ -122,13 +122,15 @@ Generated from the same runtime schemas that validate saved records. Required fi
 | trigger | Yes | string; min 1 characters; max 20000 characters |
 | inputs | Yes | string; min 1 characters; max 20000 characters |
 | instructions | Yes | string; min 1 characters; max 20000 characters |
+| aiPrompt | No | string; max 20000 characters; default "" |
+| valueStage | No | receive, prepare, check, decide, deliver, unmapped; default "unmapped" |
 | output | Yes | string; min 1 characters; max 20000 characters |
 | systems | No | array; max 80 items; default [] |
 | allowed | No | array; max 80 items; default [] |
 | denied | No | array; max 80 items; default [] |
 | humanGate | Yes | string; min 1 characters; max 20000 characters |
 | evidenceIds | No | array; max 150 items; default [] |
-| mode | No | human_only, ai_assist, ai_draft, ai_recommend, ai_execute_with_approval, ai_execute_bounded, prohibited; default "ai_draft" |
+| mode | No | human_only, ai_assist, ai_draft, ai_recommend, ai_execute_with_approval, ai_execute_bounded, prohibited; default "human_only" |
 | classification | No | Known, Inferred, Assumed, Missing; default "Inferred" |
 | conflict | No | boolean; default false |
 | stopConditions | No | string; max 20000 characters; default "" |

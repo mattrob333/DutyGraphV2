@@ -41,6 +41,7 @@ import {
   date,
 } from "./ui.tsx";
 import { RecordForm } from "./forms.tsx";
+import { TaskCards } from "./TaskCards.tsx";
 import { Graph } from "./Graph.tsx";
 import { Engagement } from "./Engagement.tsx";
 import { AiWorkbench } from "./AiWorkbench.tsx";
@@ -1036,48 +1037,13 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             />
           </label>
         </div>
-        <div className="task-grid">
-          {tasks
-            .filter(
-              (t) =>
-                (filter === "all" || t.state === filter) &&
-                t.title.toLowerCase().includes(query.toLowerCase()),
-            )
-            .map((t) => (
-              <button className="task-card" key={t.id} onClick={() => open(t)}>
-                <div className="toolbar">
-                  <Badge>v{t.version}</Badge>
-                  <State value={t.state} />
-                </div>
-                <h2>{t.title}</h2>
-                <p>{t.data.purpose}</p>
-                <div className="task-owner">
-                  <span className="avatar">
-                    {personName(t.data.ownerId)
-                      .split(" ")
-                      .map((n) => n[0])
-                      .slice(0, 2)
-                      .join("")}
-                  </span>
-                  <div>
-                    <strong>{personName(t.data.ownerId)}</strong>
-                    <small>Accountable human</small>
-                  </div>
-                </div>
-                <footer>
-                  <span>
-                    <FileText size={13} />
-                    {t.data.evidenceIds.length} source
-                    {t.data.evidenceIds.length === 1 ? "" : "s"}
-                  </span>
-                  <span>
-                    {t.data.mode.replaceAll("_", " ")}
-                    <ArrowRight size={14} />
-                  </span>
-                </footer>
-              </button>
-            ))}
-        </div>
+        <TaskCards
+          key={company.id}
+          records={records}
+          filter={filter}
+          query={query}
+          open={open}
+        />
         {!tasks.length && (
           <Empty
             title="Describe one evidence-backed task"

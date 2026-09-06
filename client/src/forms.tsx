@@ -225,6 +225,12 @@ export const fieldSets: Record<string, Def[]> = {
   ],
   task: [
     { key: "title", label: "Task name" },
+    {
+      key: "valueStage",
+      label: "Value-chain stage",
+      options: ["unmapped", "receive", "prepare", "check", "decide", "deliver"],
+      hint: "A category for browsing work. Recorded handoffs define its actual sequence.",
+    },
     { key: "duty", label: "Standing duty" },
     {
       key: "ownerId",
@@ -241,6 +247,13 @@ export const fieldSets: Record<string, Def[]> = {
     { key: "trigger", label: "Starts when", type: "textarea" },
     { key: "inputs", label: "Required inputs", type: "textarea" },
     { key: "instructions", label: "Steps / instructions", type: "textarea" },
+    {
+      key: "aiPrompt",
+      label: "AI instructions / prompt",
+      type: "textarea",
+      required: false,
+      hint: "Describe the AI role, input, output and limits. Saving a prompt does not deploy an agent.",
+    },
     {
       key: "output",
       label: "Produces / completion evidence",
