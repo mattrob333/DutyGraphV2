@@ -388,9 +388,10 @@ button {
   text-align: left;
 }
 .sidebar .brand {
-  margin: 0 8px 22px;
-  transform: scale(0.8);
-  transform-origin: left center;
+  width: max-content;
+  margin: 0 auto 22px;
+  transform: scale(0.88);
+  transform-origin: center;
 }
 .brand-mark {
   display: block;
@@ -4500,4 +4501,55 @@ tbody tr:last-child td {
   .workflow-summary {
     gap: 14px;
   }
+}
+
+/* A restrained actor key shared by the responsibility and handoff views. */
+.graph-node.mode-human > rect {
+  stroke: var(--blue);
+}
+.graph-node.mode-ai > rect {
+  stroke: #b2a3dc;
+}
+.graph-node.mode-hybrid > rect {
+  stroke: var(--amber);
+}
+.graph-node.mode-human .node-kind {
+  fill: var(--blue);
+}
+.graph-node.mode-ai .node-kind {
+  fill: #b2a3dc;
+}
+.graph-node.mode-hybrid .node-kind {
+  fill: var(--amber);
+}
+.graph-node.issue > rect {
+  stroke: var(--amber);
+  stroke-dasharray: 5 3;
+}
+.dot.violet {
+  background: #b2a3dc;
+}
+.graph-missing-label {
+  fill: var(--amber);
+  font-size: 13px;
+}
+.graph-node .node-subtitle {
+  font-size: 12px;
+}
+
+@media (min-width: 761px) {
+  .graph-standard .graph-canvas {
+    height: clamp(420px, calc(100vh - 360px), 620px);
+  }
+  .graph-standard .graph-inspector {
+    max-height: clamp(420px, calc(100vh - 360px), 620px);
+  }
+}
+
+.graph-expanded:has(.workflow-graph-intro) .graph-canvas {
+  height: max(300px, calc(100dvh - 330px));
+  min-height: 300px;
+}
+.graph-expanded:has(.workflow-graph-intro) .graph-inspector {
+  max-height: max(300px, calc(100dvh - 330px));
 }

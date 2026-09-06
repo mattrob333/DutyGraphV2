@@ -1,10 +1,17 @@
 import type { RecordRow } from "../../shared/domain.ts";
-import { linksFor } from "../../shared/record-links.ts";
+import { taskMode } from "../../shared/task-presentation.ts";
 import type { GraphNode, GraphEdge } from "./graph-layout.ts";
 
 export type Point = { x: number; y: number };
 export type SceneNode = GraphNode &
-  Point & { w: number; h: number; subtitle: string; column: number };
+  Point & {
+    w: number;
+    h: number;
+    subtitle: string;
+    column: number;
+    mode?: string;
+    modeLabel?: string;
+  };
 export type SceneEdge = GraphEdge & {
   id: string;
   path: string;
@@ -44,6 +51,13 @@ export function defaultGraphFocus(records: RecordRow[]) {
   const tasks = records.filter((r) => r.kind === "task" && active(r));
   return (
     (
+      records.find(
+        (r) =>
+          r.kind === "duty" &&
+          active(r) &&
+          r.data.ownerId &&
+          r.data.taskIds?.length,
+      ) ||
       tasks.find(
         (r) => r.data.conflict || ["conflicting", "stale"].includes(r.state),
       ) ||
@@ -63,6 +77,8 @@ function node(
   records: RecordRow[],
 ): SceneNode {
   const owner = records.find((p) => p.id === r.data.ownerId);
+  const performer = records.find((p) => p.id === r.data.performerId);
+  const mode = r.kind === "task" ? taskMode(r.data.mode) : undefined;
   return {
     id: r.id,
     kind: r.kind,
@@ -72,15 +88,19 @@ function node(
     x,
     y,
     column,
+    mode: mode?.id,
+    modeLabel: mode?.label,
     w: W,
     h: H,
     subtitle:
       r.kind === "person"
         ? r.data.role
         : r.kind === "task"
-          ? owner
-            ? `Owner: ${owner.title}`
-            : "Owner not recorded"
+          ? mode?.id === "ai"
+            ? "AI execution · proposed"
+            : performer
+              ? `Performer: ${performer.title}`
+              : "Performer not recorded"
           : r.kind === "evidence"
             ? r.data.type
             : r.kind === "duty"
@@ -332,129 +352,94 @@ function finish(
   };
 }
 export function connectedScene(records: RecordRow[], focus: string): Scene {
-  const allowed = new Set([
-    "evidence",
-    "candidate",
-    "intervention",
-    "metric",
-    "duty",
-    "task",
-    "person",
-    "agent",
-  ]);
-  const all = records.filter((r) => active(r) && allowed.has(r.kind));
-  const ids = new Set(all.map((r) => r.id));
-  const links: Link[] = all
-    .flatMap((r) =>
-      linksFor(r).map((l) => ({
-        source: l.inbound ? l.target : r.id,
-        target: l.inbound ? r.id : l.target,
-        relationship: l.relationship,
-      })),
-    )
-    .filter((e) => ids.has(e.source) && ids.has(e.target));
+  const all = records.filter(active);
   const root =
     all.find((r) => r.id === focus) ||
-    all.find((r) => r.id === defaultGraphFocus(all)) ||
-    all[0];
+    all.find((r) => r.id === defaultGraphFocus(all));
   if (!root) return finish([], [], [], 0, "");
-  const chosen = new Set([root.id]);
-  const direct = links.filter(
-    (e) => e.source === root.id || e.target === root.id,
-  );
-  const priority = (id: string) =>
-    [
-      "evidence",
-      "duty",
-      "candidate",
-      "person",
-      "agent",
-      "task",
-      "intervention",
-      "metric",
-    ].indexOf(all.find((r) => r.id === id)!.kind);
-  for (const id of [
-    ...new Set(direct.flatMap((e) => [e.source, e.target])),
-  ].sort((a, b) => priority(a) - priority(b)))
-    if (chosen.size < 10) chosen.add(id);
-  // Context may share a source with the focus. Add only a few records, never the
-  // whole two-hop fan-out of every person's work.
-  const secondary = links.filter(
-    (e) => chosen.has(e.source) || chosen.has(e.target),
-  );
-  for (const id of secondary.flatMap((e) => [e.source, e.target]))
-    if (
-      chosen.size < 10 &&
-      ["candidate", "duty", "intervention", "metric"].includes(
-        all.find((r) => r.id === id)!.kind,
-      )
-    )
-      chosen.add(id);
-  for (const r of all.filter(
+  // Show one recorded duty at a time. Shared evidence is inspected separately:
+  // it does not imply that unrelated duties belong to this responsibility chain.
+  const duties = all.filter((r) => r.kind === "duty");
+  const duty =
+    root.kind === "duty"
+      ? root
+      : duties.find((d) =>
+          root.kind === "person"
+            ? d.data.ownerId === root.id
+            : root.kind === "task"
+              ? (d.data.taskIds || []).includes(root.id)
+              : false,
+        );
+  const relatedTasks = all.filter(
     (r) =>
-      chosen.has(r.id) &&
-      ["candidate", "duty", "intervention"].includes(r.kind),
-  )) {
-    for (const id of r.data.evidenceIds || [])
-      if (chosen.size < 10 && ids.has(id)) chosen.add(id);
-  }
-  const group = (r: RecordRow) =>
-    r.kind === "evidence"
-      ? 0
-      : ["candidate", "intervention", "metric"].includes(r.kind)
-        ? 1
-        : ["task", "duty"].includes(r.kind)
-          ? 2
-          : 3;
-  const names = [
-    "01 / EVIDENCE",
-    "02 / BUSINESS CONTEXT",
-    "03 / WORK & DUTIES",
-    "04 / PEOPLE & DELEGATION",
-  ];
-  const groups = [0, 1, 2, 3].filter((g) =>
-    all.some((r) => chosen.has(r.id) && group(r) === g),
+      r.kind === "task" &&
+      (duty
+        ? (duty.data.taskIds || []).includes(r.id)
+        : root.kind === "task"
+          ? r.id === root.id
+          : root.kind === "person" &&
+            (r.data.ownerId === root.id || r.data.performerId === root.id)),
   );
-  const visible = all.filter((r) => chosen.has(r.id));
-  const rows = Math.max(
-    ...groups.map((g) => visible.filter((r) => group(r) === g).length),
-  );
-  const top = 140;
-  const nodes = groups.flatMap((g, col) => {
-    const members = visible
-      .filter((r) => group(r) === g)
-      .sort((a, b) => Number(b.id === root.id) - Number(a.id === root.id));
-    return members.map((r, row) =>
+  const tasks = [...relatedTasks]
+    .sort((a, b) => Number(b.id === root.id) - Number(a.id === root.id))
+    .slice(0, 3);
+  const ownerIds = duty
+    ? [duty.data.ownerId]
+    : tasks.map((t) => t.data.ownerId);
+  const people = all
+    .filter((r) => r.kind === "person" && ownerIds.includes(r.id))
+    .slice(0, 3);
+  const groups = [people, duty ? [duty] : [], tasks];
+  const rows = Math.max(1, ...groups.map((g) => g.length));
+  const nodes = groups.flatMap((members, col) =>
+    members.map((r, row) =>
       node(
         r,
         48 + col * DX,
-        top + row * DY + ((rows - members.length) * DY) / 2,
+        116 + row * DY + ((rows - members.length) * DY) / 2,
         col,
-        records,
+        all,
       ),
-    );
-  });
-  const bundled: Link[] = [];
-  for (const link of links.filter(
-    (e) => chosen.has(e.source) && chosen.has(e.target),
-  )) {
-    const previous = bundled.find(
-      (e) =>
-        e.source === link.source &&
-        e.target === link.target &&
-        ["ACCOUNTABLE_FOR", "PERFORMS"].includes(e.relationship) &&
-        ["ACCOUNTABLE_FOR", "PERFORMS"].includes(link.relationship),
-    );
-    if (previous) previous.caption = "owns & performs";
-    else bundled.push({ ...link });
-  }
-  return finish(
-    nodes,
-    bundled,
-    groups.map((g, col) => ({ kind: names[g], x: 48 + col * DX, y: 62 })),
-    all.length - chosen.size,
-    `Connections around ${root.title}. Select another record to explore its context.`,
+    ),
   );
+  const links: Link[] = [];
+  if (duty) {
+    if (people.some((p) => p.id === duty.data.ownerId))
+      links.push({
+        source: duty.data.ownerId,
+        target: duty.id,
+        relationship: "ACCOUNTABLE_FOR",
+      });
+    for (const task of tasks)
+      links.push({
+        source: duty.id,
+        target: task.id,
+        relationship: "CONTAINS",
+        caption: "includes task",
+      });
+  } else {
+    for (const task of tasks)
+      if (people.some((p) => p.id === task.data.ownerId))
+        links.push({
+          source: task.data.ownerId,
+          target: task.id,
+          relationship: "ACCOUNTABLE_FOR",
+        });
+  }
+  const scene = finish(
+    nodes,
+    links,
+    [
+      "01 / PEOPLE · ACCOUNTABLE OWNER",
+      "02 / DUTY · ONGOING RESPONSIBILITY",
+      "03 / TASKS · WHO DOES THE WORK",
+    ].map((kind, col) => ({ kind, x: 48 + col * DX, y: 62 })),
+    all.length - nodes.length,
+    `${duty?.title || root.title}. ${tasks.length} of ${relatedTasks.length} related tasks shown. Choose a duty or task to explore its responsibility. Evidence and other connections are in the record details.`,
+  );
+  // Keep all three columns visible even when responsibility is not recorded.
+  scene.width = Math.max(scene.width, 48 + 2 * DX + W + 70);
+  return scene;
 }
 export function workflowScene(records: RecordRow[], workflowId: string): Scene {
   const workflow = records.find(

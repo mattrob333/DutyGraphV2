@@ -1,3 +1,4 @@
+import { linksFor } from "../../shared/record-links.ts";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Expand, Focus, Minus, Plus, List, Network } from "lucide-react";
 import type { RecordRow } from "../../shared/domain.ts";
@@ -79,10 +80,7 @@ export function Graph({
     };
   }, [company, revision, focus, retry]);
   const layout = useMemo(() => {
-    const currentRecords = records.map((r) => {
-      const projected = graph?.nodes.find((n) => n.id === r.id);
-      return projected ? { ...r, state: projected.state } : r;
-    });
+    const currentRecords = records;
     return view === "work"
       ? workflowScene(currentRecords, activeWorkflow)
       : connectedScene(currentRecords, activeFocus);
@@ -90,7 +88,7 @@ export function Graph({
   const frame = (readable = false) => {
     const { width, height } = viewport.current;
     const scale = Math.max(
-      readable ? 0.55 : 0,
+      readable ? 0.75 : 0,
       Math.min(1, width / layout.width, height / layout.height),
     );
     const w = width / scale,
@@ -217,7 +215,7 @@ export function Graph({
       />
     );
   return (
-    <div className={expanded ? "graph-expanded" : ""}>
+    <div className={expanded ? "graph-expanded" : "graph-standard"}>
       <div className="toolbar">
         <div className="tabs">
           {[
@@ -288,16 +286,8 @@ export function Graph({
                 records
                   .filter(
                     (r) =>
-                      [
-                        "person",
-                        "task",
-                        "evidence",
-                        "candidate",
-                        "agent",
-                        "duty",
-                        "intervention",
-                        "metric",
-                      ].includes(r.kind) && r.state !== "retracted",
+                      ["person", "task", "duty"].includes(r.kind) &&
+                      r.state !== "retracted",
                   )
                   .map((r) => (
                     <option key={r.id} value={r.id}>
@@ -310,7 +300,7 @@ export function Graph({
           <span>
             {view === "work"
               ? "Recorded task-to-task handoffs, with conditions on each connection."
-              : "A focused view of up to 10 records. The register contains all available records."}
+              : "People own duties. Duties contain tasks. Each task shows who performs the work."}
           </span>
         </div>
       )}
@@ -368,7 +358,7 @@ export function Graph({
               <span className="eyebrow">
                 {view === "work"
                   ? "From one completed step to the next"
-                  : "Evidence. Work. Accountability."}
+                  : "Responsibility, from people to tasks"}
               </span>
               <Badge>
                 {graph.pending
@@ -501,6 +491,23 @@ export function Graph({
                   {col.kind}
                 </text>
               ))}
+              {view === "connected" &&
+                [0, 1, 2]
+                  .filter((col) => !layout.nodes.some((n) => n.column === col))
+                  .map((col) => (
+                    <text
+                      key={`missing-${col}`}
+                      x={48 + col * 360}
+                      y={140}
+                      className="graph-missing-label"
+                    >
+                      {col === 0
+                        ? "Owner not recorded"
+                        : col === 1
+                          ? "Duty not mapped yet"
+                          : "No tasks recorded"}
+                    </text>
+                  ))}
               {[...layout.edges]
                 .sort(
                   (a, b) =>
@@ -531,7 +538,7 @@ export function Graph({
                     data-node={n.id}
                     role="button"
                     tabIndex={0}
-                    aria-label={`${n.kind}: ${n.title}, ${n.state}. Inspect connections.`}
+                    aria-label={`${n.kind}: ${n.title}, ${n.modeLabel || n.kind}, ${n.state}. Inspect connections.`}
                     onClick={() => setSelected(n.id)}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
@@ -542,6 +549,7 @@ export function Graph({
                     className={
                       "graph-node " +
                       n.kind +
+                      (n.mode ? ` mode-${n.mode}` : "") +
                       (n.state === "conflicting" ? " issue" : "") +
                       (selected === n.id ? " selected" : "") +
                       (selected && !neighborhood.has(n.id) ? " muted" : "")
@@ -551,7 +559,10 @@ export function Graph({
                     <title>{n.title}</title>
                     <rect width={n.w} height={n.h} rx="9" />
                     <text x="16" y="23" className="node-kind">
-                      {n.kind.toUpperCase()} · V{n.version}
+                      {n.modeLabel
+                        ? n.modeLabel.toUpperCase()
+                        : n.kind.toUpperCase()}{" "}
+                      · V{n.version}
                     </text>
                     {lines.slice(0, 2).map((line, i) => (
                       <text
@@ -669,8 +680,25 @@ export function Graph({
                   current.data.role ||
                   current.data.type}
               </p>
-              <h3>Connected records</h3>
-              {layout.edges
+              {current.kind === "task" && current.data.humanGate && (
+                <>
+                  <h3>Human checkpoint</h3>
+                  <p>{current.data.humanGate}</p>
+                </>
+              )}
+              <h3>Evidence & connected records</h3>
+              {[
+                ...layout.edges.filter(
+                  (e) => e.relationship === "HANDS_OFF_TO",
+                ),
+                ...records.flatMap((r) =>
+                  linksFor(r).map((l) => ({
+                    source: l.inbound ? l.target : r.id,
+                    target: l.inbound ? r.id : l.target,
+                    relationship: l.relationship,
+                  })),
+                ),
+              ]
                 .filter(
                   (e: any) =>
                     e.source === current.id || e.target === current.id,
@@ -711,7 +739,7 @@ export function Graph({
               <Button primary onClick={() => open(current)}>
                 Open full record
               </Button>
-              {!focus && (
+              {!focus && ["person", "duty", "task"].includes(current.kind) && (
                 <Button onClick={() => setFocus(current.id)}>
                   Focus connections
                 </Button>
@@ -729,9 +757,9 @@ export function Graph({
         ) : (
           <div className="legend">
             <span className="dot blue" />
-            Evidence <span className="dot sage" />
-            People & work <span className="dot amber" />
-            Hypotheses
+            Human <span className="dot violet" />
+            AI <span className="dot amber" />
+            AI + human review · AI modes are proposed
           </div>
         )}
         <span>

@@ -1106,7 +1106,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <Heading
           eyebrow="THE CONNECTED RECORD"
           title="See how the company connects."
-          description="Follow the work from its source to the people accountable for it. Relationships remain evidence-backed claims."
+          description="See who owns each duty and who performs each task. Switch to Work flow to follow the handoffs."
         />
         <Graph
           key={companyId}

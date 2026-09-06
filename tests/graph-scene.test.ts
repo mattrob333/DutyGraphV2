@@ -76,7 +76,7 @@ function framedAndReadable(scene: Scene) {
       );
   }
 }
-test("focused scenes are bounded, bundle dual roles and keep context traceable", () => {
+test("unmapped tasks retain real ownership without inventing a duty", () => {
   const records = [
     r("owner", "person", { role: "Lead" }),
     r("task", "task", {
@@ -94,13 +94,14 @@ test("focused scenes are bounded, bundle dual roles and keep context traceable",
   assert.equal(defaultGraphFocus(records), "task");
   const scene = connectedScene(records, "task");
   assert.ok(scene.nodes.length <= 10);
-  assert.ok(scene.nodes.some((n) => n.id === "hypothesis"));
+  assert.ok(!scene.nodes.some((n) => n.id === "hypothesis"));
+  assert.ok(!scene.nodes.some((n) => n.kind === "duty"));
   assert.ok(!scene.nodes.some((n) => n.id === "peer0"));
   const links = scene.edges.filter(
     (e) => e.source === "owner" && e.target === "task",
   );
   assert.equal(links.length, 1);
-  assert.equal(links[0].caption, "owns & performs");
+  assert.equal(links[0].caption, "accountable for");
   noCardIntersections(scene);
   framedAndReadable(scene);
 });
@@ -215,7 +216,7 @@ test("unconnected and cyclic work never gains an invented execution sequence", (
   framedAndReadable(cycle);
 });
 
-test("dense duty context keeps same-column routes out of neighboring people and fits all bypasses", () => {
+test("responsibility view stays landscape and follows people to duties to tasks", () => {
   const records = [
     r("p1", "person", { role: "Lead", managerId: "p2" }),
     r("p2", "person", { role: "Director" }),
@@ -251,7 +252,18 @@ test("dense duty context keeps same-column routes out of neighboring people and 
   ];
   const scene = connectedScene(records, "d");
   assert.ok(scene.nodes.length <= 10);
-  assert.ok(scene.edges.length >= 20);
+  assert.equal(scene.edges.length, 4);
+  assert.ok(scene.width > scene.height * 1.5);
+  assert.equal(scene.nodes.find((n) => n.id === "p1")?.column, 0);
+  assert.equal(scene.nodes.find((n) => n.id === "d")?.column, 1);
+  assert.ok(
+    scene.nodes.filter((n) => n.kind === "task").every((n) => n.column === 2),
+  );
+  assert.ok(
+    scene.edges.every((e) =>
+      ["ACCOUNTABLE_FOR", "CONTAINS"].includes(e.relationship),
+    ),
+  );
   assert.ok(
     scene.edges.some((edge) => edge.source === "d" && edge.target === "t2"),
   );
@@ -304,4 +316,39 @@ test("empty scenes retain finite usable frame dimensions", () => {
     assert.equal(scene.edges.length, 0);
     framedAndReadable(scene);
   }
+});
+
+test("large duties stay readable and selecting a hidden task brings it into view", () => {
+  const tasks = Array.from({ length: 20 }, (_, i) =>
+    r(`task${i}`, "task", { mode: i === 19 ? "ai_draft" : "human_only" }),
+  );
+  const records = [
+    r("owner", "person", { role: "Lead" }),
+    r("duty", "duty", { ownerId: "owner", taskIds: tasks.map((t) => t.id) }),
+    ...tasks,
+  ];
+  const scene = connectedScene(records, "task19");
+  assert.equal(scene.nodes.filter((n) => n.kind === "task").length, 3);
+  assert.equal(scene.nodes.find((n) => n.id === "task19")?.mode, "hybrid");
+  assert.match(scene.note, /3 of 20/);
+  assert.ok(scene.width > scene.height * 1.5);
+  noCardIntersections(scene);
+  framedAndReadable(scene);
+});
+test("missing duty ownership never gains a fabricated accountable person", () => {
+  const scene = connectedScene(
+    [
+      r("d", "duty", { taskIds: ["t"] }),
+      r("t", "task", { performerId: "p", mode: "ai_execute_bounded" }),
+      r("p", "person", { role: "Reviewer" }),
+    ],
+    "d",
+  );
+  assert.equal(scene.nodes.filter((n) => n.kind === "person").length, 0);
+  assert.equal(
+    scene.edges.filter((e) => e.relationship === "ACCOUNTABLE_FOR").length,
+    0,
+  );
+  assert.equal(scene.nodes.find((n) => n.id === "t")?.mode, "ai");
+  framedAndReadable(scene);
 });

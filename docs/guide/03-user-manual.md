@@ -145,7 +145,9 @@ Handoff timeout and retry fields describe the receiving contract. The manual cas
 
 ## 10. Graph and organization views
 
-Connected opens around a relevant task and shows up to ten related records in labeled Evidence, Business context, Work & duties, and People & delegation columns where present. Choose another record in Explore. Parallel ownership/performance links for the same person are combined into one labeled connection. The register shows all available supported record kinds, including records outside the focused picture.
+Connected shows responsibility from left to right: People → Duties → Tasks. Explore a duty or task to see its recorded owner and up to three related tasks. A person selection opens one of their duties. To see a task outside this view, select it in Explore. The task card shows its performer, which can differ from the accountable owner. Missing owners and unmapped duties remain visible as gaps. Human, AI, and AI + human review labels describe the recorded work mode; AI modes are proposals, not proof that an agent is running. Select a card for its human checkpoint, evidence, and other connections. The register retains records outside the picture.
+
+Work flow shows the actual handoffs between task cards. It can span several duties and people. A task can contain a human checkpoint in its instructions; DutyGraph does not invent separate substeps from those instructions. The initial zoom keeps cards readable. Pan horizontally to continue along a long workflow, or select Fit to see the whole path.
 
 Work flow follows actual recorded task-to-task handoffs. Choose a workflow to scope its steps; alternate paths sit below the first path at the same stage. This position is a layout choice, not a claim about which branch is usual. Select a connection label to open its full condition and handoff contract. Dashed connections need review. No execution order is invented where handoffs are absent.
 
