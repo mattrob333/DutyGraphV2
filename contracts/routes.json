@@ -69,6 +69,56 @@
     },
     {
       "method": "GET",
+      "path": "/api/v1/companies/{companyId}/agent-requests",
+      "source": "server/agent-requests.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/agent-requests",
+      "source": "server/agent-requests.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/agent-requests/{requestId}/ai-draft",
+      "source": "server/agent-requests.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/agent-requests/{requestId}/issue",
+      "source": "server/agent-requests.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/agent-requests/{requestId}/manifest",
+      "source": "server/agent-requests.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/agent-requests/{requestId}/manifest",
+      "source": "server/agent-requests.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/agent-requests/{requestId}/review",
+      "source": "server/agent-requests.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/agent-requests/{requestId}/simulate",
+      "source": "server/agent-requests.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/agent-requests/{requestId}/withdraw",
+      "source": "server/agent-requests.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/agent-requests/demo",
+      "source": "server/agent-requests.ts"
+    },
+    {
+      "method": "GET",
       "path": "/api/v1/companies/{companyId}/ai",
       "source": "server/ai.ts"
     },

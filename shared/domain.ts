@@ -162,7 +162,7 @@ export const schemas = {
     .strict(),
 };
 export type Kind =
-  keyof typeof schemas | "response" | "framework" | "export" | "brief" | "case";
+  keyof typeof schemas | "response" | "framework" | "export" | "brief" | "case" | "agent_request";
 export type RecordRow = {
   id: string;
   company_id: string;

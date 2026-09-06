@@ -794,12 +794,17 @@
       "targetRelease": "R1",
       "localStatus": "Local subset",
       "productionAccepted": false,
-      "implementation": "Work descriptions and version-bound draft proposals/export packages. No operative authority is granted.",
+      "implementation": "Agent request portal, immutable manifest drafts, independent business review and Cobalt-only authority simulation with documented vendor-shaped snapshots, scope intersection and stale-source rejection. No live grants or signed attestations.",
       "evidence": [
         "server/records.ts",
         "server/exports.ts",
         "client/src/App.tsx",
-        "tests/api.test.ts"
+        "tests/api.test.ts",
+        "server/agent-requests.ts",
+        "server/authority-demo.ts",
+        "shared/authority-demo.ts",
+        "tests/agent-requests.test.ts",
+        "docs/agent-authority-demo.md"
       ],
       "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
       "acceptanceTestId": "AT-GOV-001"
@@ -810,12 +815,17 @@
       "targetRelease": "R1",
       "localStatus": "Local subset",
       "productionAccepted": false,
-      "implementation": "Work descriptions and version-bound draft proposals/export packages. No operative authority is granted.",
+      "implementation": "Agent request portal, immutable manifest drafts, independent business review and Cobalt-only authority simulation with documented vendor-shaped snapshots, scope intersection and stale-source rejection. No live grants or signed attestations.",
       "evidence": [
         "server/records.ts",
         "server/exports.ts",
         "client/src/App.tsx",
-        "tests/api.test.ts"
+        "tests/api.test.ts",
+        "server/agent-requests.ts",
+        "server/authority-demo.ts",
+        "shared/authority-demo.ts",
+        "tests/agent-requests.test.ts",
+        "docs/agent-authority-demo.md"
       ],
       "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
       "acceptanceTestId": "AT-GOV-002"
@@ -826,12 +836,17 @@
       "targetRelease": "R1",
       "localStatus": "Local subset",
       "productionAccepted": false,
-      "implementation": "Work descriptions and version-bound draft proposals/export packages. No operative authority is granted.",
+      "implementation": "Agent request portal, immutable manifest drafts, independent business review and Cobalt-only authority simulation with documented vendor-shaped snapshots, scope intersection and stale-source rejection. No live grants or signed attestations.",
       "evidence": [
         "server/records.ts",
         "server/exports.ts",
         "client/src/App.tsx",
-        "tests/api.test.ts"
+        "tests/api.test.ts",
+        "server/agent-requests.ts",
+        "server/authority-demo.ts",
+        "shared/authority-demo.ts",
+        "tests/agent-requests.test.ts",
+        "docs/agent-authority-demo.md"
       ],
       "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
       "acceptanceTestId": "AT-GOV-003"
@@ -840,14 +855,19 @@
       "id": "GOV-004",
       "title": "Versioned Control Context",
       "targetRelease": "R3",
-      "localStatus": "Open",
+      "localStatus": "Local subset",
       "productionAccepted": false,
-      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "implementation": "Agent request portal, immutable manifest drafts, independent business review and Cobalt-only authority simulation with documented vendor-shaped snapshots, scope intersection and stale-source rejection. No live grants or signed attestations.",
       "evidence": [
         "server/records.ts",
         "server/exports.ts",
         "client/src/App.tsx",
-        "tests/api.test.ts"
+        "tests/api.test.ts",
+        "server/agent-requests.ts",
+        "server/authority-demo.ts",
+        "shared/authority-demo.ts",
+        "tests/agent-requests.test.ts",
+        "docs/agent-authority-demo.md"
       ],
       "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
       "acceptanceTestId": "AT-GOV-004"
@@ -856,14 +876,19 @@
       "id": "GOV-005",
       "title": "Authority and owner ceiling",
       "targetRelease": "R3",
-      "localStatus": "Open",
+      "localStatus": "Local subset",
       "productionAccepted": false,
-      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "implementation": "Agent request portal, immutable manifest drafts, independent business review and Cobalt-only authority simulation with documented vendor-shaped snapshots, scope intersection and stale-source rejection. No live grants or signed attestations.",
       "evidence": [
         "server/records.ts",
         "server/exports.ts",
         "client/src/App.tsx",
-        "tests/api.test.ts"
+        "tests/api.test.ts",
+        "server/agent-requests.ts",
+        "server/authority-demo.ts",
+        "shared/authority-demo.ts",
+        "tests/agent-requests.test.ts",
+        "docs/agent-authority-demo.md"
       ],
       "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
       "acceptanceTestId": "AT-GOV-005"
@@ -872,14 +897,19 @@
       "id": "GOV-006",
       "title": "Authenticated stage approvals",
       "targetRelease": "R3",
-      "localStatus": "Open",
+      "localStatus": "Local subset",
       "productionAccepted": false,
-      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "implementation": "Agent request portal, immutable manifest drafts, independent business review and Cobalt-only authority simulation with documented vendor-shaped snapshots, scope intersection and stale-source rejection. No live grants or signed attestations.",
       "evidence": [
         "server/records.ts",
         "server/exports.ts",
         "client/src/App.tsx",
-        "tests/api.test.ts"
+        "tests/api.test.ts",
+        "server/agent-requests.ts",
+        "server/authority-demo.ts",
+        "shared/authority-demo.ts",
+        "tests/agent-requests.test.ts",
+        "docs/agent-authority-demo.md"
       ],
       "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
       "acceptanceTestId": "AT-GOV-006"
@@ -888,14 +918,19 @@
       "id": "GOV-007",
       "title": "Partial approval and invalidation",
       "targetRelease": "R3",
-      "localStatus": "Open",
+      "localStatus": "Local subset",
       "productionAccepted": false,
-      "implementation": "Not implemented in release 0.2. See the remaining work and integration decision record.",
+      "implementation": "Agent request portal, immutable manifest drafts, independent business review and Cobalt-only authority simulation with documented vendor-shaped snapshots, scope intersection and stale-source rejection. No live grants or signed attestations.",
       "evidence": [
         "server/records.ts",
         "server/exports.ts",
         "client/src/App.tsx",
-        "tests/api.test.ts"
+        "tests/api.test.ts",
+        "server/agent-requests.ts",
+        "server/authority-demo.ts",
+        "shared/authority-demo.ts",
+        "tests/agent-requests.test.ts",
+        "docs/agent-authority-demo.md"
       ],
       "remaining": "Authority baseline/control contexts, verified owner ceilings, staged approvals, managed Signet issuance and drift enforcement.",
       "acceptanceTestId": "AT-GOV-007"

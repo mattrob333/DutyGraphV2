@@ -1,3 +1,4 @@
+import { AgentRequests, TeamAgentPortal } from "./AgentRequests.tsx";
 import { StrategyWorkspace } from "./StrategyWorkspace.tsx";
 import { useEffect, useState, lazy, Suspense, type ReactNode } from "react";
 import {
@@ -113,7 +114,11 @@ type ModalState =
   | { type: "framework"; key: string }
   | null;
 function Login({ onLogin }: { onLogin: (result: any) => void }) {
-  const [mode, setMode] = useState(new URLSearchParams(location.search).get("signup") === "1" ? "register" : "login"),
+  const [mode, setMode] = useState(
+      new URLSearchParams(location.search).get("signup") === "1"
+        ? "register"
+        : "login",
+    ),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [demo, setDemo] = useState(false);
@@ -391,7 +396,12 @@ export default function App() {
     );
   if (!user) return <Login onLogin={login} />;
   if (user.role === "participant")
-    return <Participant user={user} onLogout={() => void logout()} />;
+    return new URLSearchParams(window.location.search).get("view") ===
+      "agent-requests" ? (
+      <TeamAgentPortal user={user} onLogout={() => void logout()} />
+    ) : (
+      <Participant user={user} onLogout={() => void logout()} />
+    );
   return <Workspace user={user} logout={() => void logout()} />;
 }
 function Workspace({ user, logout }: { user: User; logout: () => void }) {
@@ -842,7 +852,12 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                     <i className="dot" />
                     <p>
                       {e.type.replaceAll(".", " · ").replaceAll("_", " ")}
-                      {records.find(r => r.id === e.record_id)?.title && <span> · {records.find(r => r.id === e.record_id)?.title}</span>}
+                      {records.find((r) => r.id === e.record_id)?.title && (
+                        <span>
+                          {" "}
+                          · {records.find((r) => r.id === e.record_id)?.title}
+                        </span>
+                      )}
                       <small>
                         {date(e.created_at)}
                         {e.detail?.version ? " · v" + e.detail.version : ""}
@@ -857,21 +872,76 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
       </>
     );
   else if (page === "discovery") {
-    body = <>
-      <Heading eyebrow="DISCOVER THE BUSINESS" title="From first conversation to clear work."
-        description="Research the business. Meet the leaders. Hear from the team. Build the work record."
-        actions={<Button onClick={() => create("engagement")}>Engagement scope</Button>} />
-      <DiscoveryJourney key={company.id} company={company} records={records} refresh={refresh} open={open}
-        settings={() => go("settings")}
-        addSource={() => setModal({ type: "form", kind: "evidence", preset: {type: "Public research", classification: "Inferred", bucket: "biz"} })}
-        goTasks={() => go("tasks")}
-        prepareConfirmation={() => setModal({type:"form",kind:"request",preset:{type:"confirmation",notice:company.settings.notice}})} />
-      <div className="discovery-record-tools">
-        <details><summary>People in scope · {people.length}</summary><div className="toolbar"><Button onClick={() => create("person")}>Add person</Button><Button onClick={() => setModal({type:"roster"})}>Import roster CSV</Button></div><Panel title="People in this workspace">{rows(people)}</Panel></details>
-        <details><summary>Requests and responses · {items("request").length} requests</summary><Panel title="Requests">{rows(items("request"))}</Panel><Panel title="Returned responses">{rows(responses)}</Panel></details>
-        <details><summary>Evidence history · {evidence.length} sources</summary><Button onClick={() => create("evidence")}>Add source</Button><Panel title="Every source keeps its origin" subtitle="Original research, meeting notes and participant responses remain available here.">{rows(evidence)}</Panel></details>
-      </div>
-    </>;
+    body = (
+      <>
+        <Heading
+          eyebrow="DISCOVER THE BUSINESS"
+          title="From first conversation to clear work."
+          description="Research the business. Meet the leaders. Hear from the team. Build the work record."
+          actions={
+            <Button onClick={() => create("engagement")}>
+              Engagement scope
+            </Button>
+          }
+        />
+        <DiscoveryJourney
+          key={company.id}
+          company={company}
+          records={records}
+          refresh={refresh}
+          open={open}
+          settings={() => go("settings")}
+          addSource={() =>
+            setModal({
+              type: "form",
+              kind: "evidence",
+              preset: {
+                type: "Public research",
+                classification: "Inferred",
+                bucket: "biz",
+              },
+            })
+          }
+          goTasks={() => go("tasks")}
+          prepareConfirmation={() =>
+            setModal({
+              type: "form",
+              kind: "request",
+              preset: { type: "confirmation", notice: company.settings.notice },
+            })
+          }
+        />
+        <div className="discovery-record-tools">
+          <details>
+            <summary>People in scope · {people.length}</summary>
+            <div className="toolbar">
+              <Button onClick={() => create("person")}>Add person</Button>
+              <Button onClick={() => setModal({ type: "roster" })}>
+                Import roster CSV
+              </Button>
+            </div>
+            <Panel title="People in this workspace">{rows(people)}</Panel>
+          </details>
+          <details>
+            <summary>
+              Requests and responses · {items("request").length} requests
+            </summary>
+            <Panel title="Requests">{rows(items("request"))}</Panel>
+            <Panel title="Returned responses">{rows(responses)}</Panel>
+          </details>
+          <details>
+            <summary>Evidence history · {evidence.length} sources</summary>
+            <Button onClick={() => create("evidence")}>Add source</Button>
+            <Panel
+              title="Every source keeps its origin"
+              subtitle="Original research, meeting notes and participant responses remain available here."
+            >
+              {rows(evidence)}
+            </Panel>
+          </details>
+        </div>
+      </>
+    );
   } else if (page === "tasks")
     body = (
       <>
@@ -1194,66 +1264,14 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
   else if (page === "governance")
     body = (
       <>
-        <Heading
-          eyebrow="AGENT GOVERNANCE"
-          title="Delegate with a clear human boundary."
-          description="A work description starts a proposal. Authority, approval, and enforcement are separate decisions."
-          actions={
-            <Button primary onClick={() => create("agent")}>
-              <Plus size={16} />
-              Propose an agent
-            </Button>
-          }
-        />
-        <div className="scope-stages">
-          {[
-            [
-              "01",
-              "Work confirmation",
-              `${confirmed.length} current task descriptions`,
-            ],
-            ["02", "Authority approval", "Customer authority source required"],
-            ["03", "Provisioning", "No target system configured"],
-            ["04", "Observed execution", "No runtime is connected"],
-          ].map(([n, title, description]) => (
-            <div key={n}>
-              <span>{n}</span>
-              <strong>{title}</strong>
-              <p>{description}</p>
-            </div>
-          ))}
-        </div>
-        <div className="notice amber">
-          <ShieldCheck size={20} />
-          <span>
-            Export-first pilot. Draft packages are instruction-compatible. They
-            are not signed authority grants and do not provision or run agents.
-          </span>
-        </div>
-        <Panel
-          title="Agent proposals"
-          subtitle="Each proposal binds one accountable human and exact versions of selected tasks."
-        >
-          {rows(items("agent"))}
-        </Panel>
-        <Panel title="What must be verified before a grant can be issued">
-          <div className="control-grid">
-            {[
-              "Current human authority and effective access",
-              "Existing customer approval chain",
-              "Exact task and manifest versions",
-              "Target runtime capabilities and restrictions",
-              "Revocation, stop, and lifecycle behavior",
-              "Observed action receipts and coverage gaps",
-            ].map((t) => (
-              <div key={t}>
-                <ShieldCheck size={18} />
-                <span>{t}</span>
-                <Badge tone="amber">Not configured</Badge>
-              </div>
-            ))}
-          </div>
-        </Panel>
+        <AgentRequests company={company.id} user={user} />
+        <details>
+          <summary>Earlier agent proposals</summary>
+          <Panel title="Agent proposals">
+            {rows(items("agent"))}
+            <Button onClick={() => create("agent")}>Propose an agent</Button>
+          </Panel>
+        </details>
       </>
     );
   else if (page === "weekly")
@@ -1373,8 +1391,16 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               {confirmed.length} of {tasks.length} tasks currently qualify.
               Every excluded task carries its reason.
             </p>
-            {confirmed.length === 0 && <p>Ask the task owners and performers to confirm their task cards first.</p>}
-            <Button disabled={confirmed.length === 0} onClick={() => void makeExport("confirmed")}>
+            {confirmed.length === 0 && (
+              <p>
+                Ask the task owners and performers to confirm their task cards
+                first.
+              </p>
+            )}
+            <Button
+              disabled={confirmed.length === 0}
+              onClick={() => void makeExport("confirmed")}
+            >
               <ShieldCheck size={16} />
               Freeze confirmed subset
             </Button>
@@ -1446,16 +1472,28 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                 "Chunked database storage with checksums; unscanned",
                 "Pilot",
               ],
-              ["Neo4j", "Company graph projection with current-record fallback", data.connections?.neo4j?.connected ? "Connection verified" : data.connections?.neo4j?.configured ? "Saved · test connection" : "Set up connection"],
+              [
+                "Neo4j",
+                "Company graph projection with current-record fallback",
+                data.connections?.neo4j?.connected
+                  ? "Connection verified"
+                  : data.connections?.neo4j?.configured
+                    ? "Saved · test connection"
+                    : "Set up connection",
+              ],
               [
                 "Email",
                 "Private invitations with a saved email-service receipt",
-                data.connections?.email === "configured" ? "Configured · not verified" : "Set up connection",
+                data.connections?.email === "configured"
+                  ? "Configured · not verified"
+                  : "Set up connection",
               ],
               [
                 "OpenAI discovery drafts",
                 "Meeting guides, team interviews, framework analyses and audio transcription",
-                data.connections?.ai === "configured" ? "Configured · not verified" : "Set up connection",
+                data.connections?.ai === "configured"
+                  ? "Configured · not verified"
+                  : "Set up connection",
               ],
               [
                 "Fireflies",
@@ -1486,7 +1524,13 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                   <strong>{name}</strong>
                   <p>{scope}</p>
                 </div>
-                {state === "Set up connection" ? <Button onClick={() => go("settings")}>{state}</Button> : <Badge tone={state === "Current" ? "sage" : "neutral"}>{state}</Badge>}
+                {state === "Set up connection" ? (
+                  <Button onClick={() => go("settings")}>{state}</Button>
+                ) : (
+                  <Badge tone={state === "Current" ? "sage" : "neutral"}>
+                    {state}
+                  </Badge>
+                )}
               </div>
             ))}
           </div>
@@ -1567,7 +1611,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           </Button>
         </Panel>
         <ProviderSettings key={companyId} company={companyId} />
-        <Neo4jSettings key={companyId+"neo4j"} company={companyId} />
+        <Neo4jSettings key={companyId + "neo4j"} company={companyId} />
         <Panel title="Your authenticated account">
           <dl className="details">
             <dt>Name</dt>
@@ -2135,7 +2179,8 @@ function RosterImport({
               }
             }}
           >
-            Import {preview.validCount} valid {preview.validCount === 1 ? "person" : "people"}
+            Import {preview.validCount} valid{" "}
+            {preview.validCount === 1 ? "person" : "people"}
           </Button>
         </>
       )}

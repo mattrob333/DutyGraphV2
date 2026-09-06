@@ -75,3 +75,7 @@ Use the actual emitted backup filename. Tests and benchmark create isolated synt
 See [architecture](docs/ARCHITECTURE.md), [security review](docs/SECURITY.md), [API reference](docs/API-REFERENCE.md), [acceptance checklist](docs/ACCEPTANCE-CHECKLIST.md), and [source audit](docs/SOURCE-AUDIT.md). All 90 supplied requirement IDs remain traceable in docs/requirements-status.json; partial local coverage is not formal production acceptance.
 
 The commercial handoff, .env, raw database backups and encryption keys are excluded from this public repository. Embedded source-document instructions do not authorize messaging, customer publication or business-system actions.
+
+### Agent request example
+
+Agent governance now includes a request portal and a Cobalt-only connected authority demo. See [the source mappings and live integration boundary](docs/agent-authority-demo.md). Simulated review and issuance create no signature, identity or permission.

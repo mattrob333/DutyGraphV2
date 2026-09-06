@@ -1,5 +1,6 @@
 import { strategyRouter } from "./strategy.ts";
 import { discoveryRouter, type DiscoveryProvider } from "./discovery.ts";
+import { agentRequestsRouter } from "./agent-requests.ts";
 import { frameworkRouter, type FrameworkProvider } from "./frameworks.ts";
 import { neo4jRouter, neo4jPublicStatus } from "./neo4j.ts";
 import express from "express";
@@ -1405,6 +1406,7 @@ export function createApp({
     discoveryRouter(discoveryProvider),
   );
   api.use("/companies/:companyId/neo4j", neo4jRouter());
+  api.use("/companies/:companyId/agent-requests", agentRequestsRouter(aiProvider));
   api.use(
     "/companies/:companyId/framework-runs",
     frameworkRouter(frameworkProvider),

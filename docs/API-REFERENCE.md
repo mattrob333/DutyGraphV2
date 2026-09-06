@@ -1,6 +1,6 @@
 # Implemented API reference
 
-Release 0.3. This inventory is generated from server route declarations. It describes 69 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
+Release 0.3. This inventory is generated from server route declarations. It describes 79 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
 
 ## Transport and authentication
 
@@ -27,6 +27,16 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | GET | /api/v1/companies | server/app.ts |
 | POST | /api/v1/companies | server/app.ts |
 | PATCH | /api/v1/companies/{companyId} | server/app.ts |
+| GET | /api/v1/companies/{companyId}/agent-requests | server/agent-requests.ts |
+| POST | /api/v1/companies/{companyId}/agent-requests | server/agent-requests.ts |
+| POST | /api/v1/companies/{companyId}/agent-requests/{requestId}/ai-draft | server/agent-requests.ts |
+| POST | /api/v1/companies/{companyId}/agent-requests/{requestId}/issue | server/agent-requests.ts |
+| GET | /api/v1/companies/{companyId}/agent-requests/{requestId}/manifest | server/agent-requests.ts |
+| POST | /api/v1/companies/{companyId}/agent-requests/{requestId}/manifest | server/agent-requests.ts |
+| POST | /api/v1/companies/{companyId}/agent-requests/{requestId}/review | server/agent-requests.ts |
+| POST | /api/v1/companies/{companyId}/agent-requests/{requestId}/simulate | server/agent-requests.ts |
+| POST | /api/v1/companies/{companyId}/agent-requests/{requestId}/withdraw | server/agent-requests.ts |
+| POST | /api/v1/companies/{companyId}/agent-requests/demo | server/agent-requests.ts |
 | GET | /api/v1/companies/{companyId}/ai | server/ai.ts |
 | POST | /api/v1/companies/{companyId}/ai | server/ai.ts |
 | POST | /api/v1/companies/{companyId}/assets | server/assets.ts |

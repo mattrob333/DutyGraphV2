@@ -511,6 +511,12 @@ export function Participant({
         </div>
         <Button
           disabled={captureBusy || transcriptBusy || busy}
+          onClick={() => window.location.assign("/?view=agent-requests")}
+        >
+          Request an agent
+        </Button>
+        <Button
+          disabled={captureBusy || transcriptBusy || busy}
           onClick={onLogout}
         >
           <LogOut size={15} />
