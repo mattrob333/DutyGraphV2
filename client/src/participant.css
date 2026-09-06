@@ -1,8 +1,27 @@
 .participant {
   min-height: 100vh;
+  background: var(--bg);
 }
 .participant main {
   max-width: 920px;
+}
+.participant main > h1 {
+  font-size: clamp(30px, 4vw, 48px);
+  letter-spacing: -1.4px;
+  line-height: 1.15;
+  max-width: 750px;
+}
+.participant-header {
+  border-bottom: 1px solid var(--line);
+}
+.participant .participant-steps {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 20px;
+}
+.participant .participant-intro {
+  font-size: 17px;
 }
 .participant .participant-intro {
   max-width: 660px;

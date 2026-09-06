@@ -1,3 +1,4 @@
+import { applyForPilot } from "./pilot.ts";
 import { strategyRouter } from "./strategy.ts";
 import { discoveryRouter, type DiscoveryProvider } from "./discovery.ts";
 import { agentRequestsRouter } from "./agent-requests.ts";
@@ -162,6 +163,7 @@ export function createApp({
             retryable: true,
           }),
       });
+  app.post("/api/pilot-applications", authLimit, applyForPilot);
   app.get("/api/health", async (_req, res) => {
     await pool.query("SELECT 1");
     res.json({

@@ -92,3 +92,23 @@
     if (event.target === dialog && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) dialog.close();
   });
 })();
+document.querySelector('#pilot-form')?.addEventListener('submit', async event => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const button = form.querySelector('button[type=submit]');
+  const result = document.querySelector('#pilot-result');
+  button.disabled = true;
+  result.textContent = 'Saving your request…';
+  const fields = Object.fromEntries(new FormData(form));
+  try {
+    const response = await fetch('/api/pilot-applications', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({...fields, consent:fields.consent === 'on'})
+    });
+    const body = await response.json();
+    if (!response.ok) throw new Error(body.message || 'We could not save your request. Please try again.');
+    result.textContent = body.message;
+    form.reset();
+  } catch (error) { result.textContent = error.message || 'We could not save your request. Please try again.'; }
+  finally { button.disabled = false; }
+});

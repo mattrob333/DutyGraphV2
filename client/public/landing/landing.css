@@ -22,3 +22,18 @@
 .delegation-feature{padding:100px 0;border-top:1px solid #444}.delegation-chain{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:30px 0;margin:20px 0 32px;border-top:1px solid #555;border-bottom:1px solid #555}.delegation-chain span{font-size:clamp(17px,2vw,28px);font-weight:500}.delegation-chain i{font-style:normal;color:#a9b8b1}.delegation-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}.delegation-cards article{padding:24px 0;border-top:2px solid #a9b8b1}.delegation-cards small{text-transform:uppercase;letter-spacing:1px;font-size:11px}.delegation-cards h3{font-size:24px;margin:18px 0}.delegation-cards p,.delegation-foot p{line-height:1.65;max-width:64ch}.delegation-foot{display:flex;gap:32px;align-items:center;justify-content:space-between;margin-top:34px}.delegation-foot .button{flex-shrink:0}@media(max-width:760px){.delegation-feature{padding:60px 0}.delegation-cards{grid-template-columns:1fr;gap:12px}.delegation-chain{gap:8px;flex-wrap:wrap}.delegation-foot{display:block}}
 
 .delegation-foot .hero-note{font-size:12px;color:var(--muted);margin-top:14px}.delegation-foot .button{margin-top:18px}@media(max-width:760px){.delegation-chain{flex-wrap:nowrap;gap:6px}.delegation-chain span{font-size:14px}.delegation-chain i{font-size:12px}}
+/* Recruitment and asynchronous discovery share the restrained product palette. */
+.async-section,.pilot-section{padding:100px 0}
+.pilot-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,6vw,100px)}
+.pilot-grid p,.pilot-grid li{line-height:1.75;max-width:560px}
+.pilot-grid li{margin:12px 0}
+#pilot-form{padding:32px;border:1px solid #c7c6c0;border-radius:12px;background:#faf9f5}
+#pilot-form label{display:block;font-size:14px;font-weight:500;margin:18px 0}
+#pilot-form input:not([type=checkbox]),#pilot-form select,#pilot-form textarea{display:block;width:100%;box-sizing:border-box;margin-top:8px;border:1px solid #aaaead;border-radius:5px;padding:12px;background:#fff;color:#242627;font:inherit}
+#pilot-form .pilot-consent{display:flex;align-items:flex-start;gap:10px;font-size:13px}
+#pilot-form .pilot-consent input{margin-top:5px}
+#pilot-form .button{background:#242627;color:#fff}
+#pilot-form small{display:block;line-height:1.6;color:#596062}
+#pilot-form .pilot-trap{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}
+#pilot-result{font-weight:500}
+@media(max-width:760px){.pilot-grid{grid-template-columns:1fr}.async-section,.pilot-section{padding:60px 0}#pilot-form{padding:22px}}

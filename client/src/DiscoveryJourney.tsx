@@ -246,7 +246,8 @@ export function DiscoveryJourney({
               0,
               200,
             ),
-            emailBody: "We have prepared task cards from the team's responses. Please use your private link to check the work you own or perform. Each card includes its instructions, inputs and result. Confirm what is correct and describe any changes. Thank you.",
+            emailBody:
+              "We have prepared task cards from the team's responses. Please use your private link to check the work you own or perform. Each card includes its instructions, inputs and result. Confirm what is correct and describe any changes. Thank you.",
           },
         };
         const bytes = new TextEncoder().encode(
@@ -387,6 +388,12 @@ export function DiscoveryJourney({
     });
   return (
     <div className="discovery-journey">
+      <p className="subtle">
+        <a href="/?demo=discovery" target="_blank" rel="noopener noreferrer">
+          Preview the participant journey ↗
+        </a>{" "}
+        · Five-person sample. No emails are sent.
+      </p>
       <nav className="journey-steps" aria-label="Discovery steps">
         {stages.map((s, i) => (
           <button

@@ -79,3 +79,7 @@ The commercial handoff, .env, raw database backups and encryption keys are exclu
 ### Agent request example
 
 Agent governance now includes a request portal and a Cobalt-only connected authority demo. See [the source mappings and live integration boundary](docs/agent-authority-demo.md). Simulated review and issuance create no signature, identity or permission.
+
+## Pilot recruitment
+
+See [Pilot recruitment and participant journey](docs/pilot-discovery.md) for the public demo, signup storage, private operator inbox, and actual participant flow.
