@@ -30,18 +30,16 @@ Choose **Create question sets**. AI prepares one tailored interview for every pe
 
 Review the questions and email messages, then **Save all personal requests**. **Send pending team invitations** sends each person's private request in sequence. A confirmed email-service receipt is skipped on later batch attempts. An uncertain result stops the batch for review. Open each request to inspect its email preview, delivery attempt and original questions.
 
-The recipient opens the private link and signs in or creates a participant password. They type or record, save the recording, optionally create and correct a transcript, and send their response. The advisor sees who has replied and can read the original response. A returned interview does not confirm task ownership.
+The recipient opens the private link and signs in or creates a participant password. Voice is preferred: a real example helps capture steps, exceptions and frustrations. Typing is also available.
+
+After recording, they save the clip, create and check its transcript, and add it to their answer. **Create my task cards** uses the configured AI service to extract their work. They check the input, action, output, destination and software. Each card is marked **This matches my understanding**, **Remove — this is not my task**, or **I'm not sure — ask the advisor**. Edits require another check before sending.
+
+Their original answer and reviewed descriptions arrive together. This is their understanding of the work, not company approval of ownership or agent permissions. If AI is unavailable, they can send the answer without cards for advisor review. See [Review your task cards before sending](25-participant-review.md).
 
 ## 5. Review task cards
 
-After team responses arrive, choose **Draft task cards**. The draft uses the current reviewed team and returned interviews. Each task keeps its source references, accountable person, performer, duty, trigger, inputs, instructions, output, tools and human decisions. Missing ownership stays visible.
+Start with the descriptions people have already reviewed. Open their returned responses to see their original account, corrections and decisions. Retained cards are proposed tasks, with the participant as performer; accountable ownership still needs review. Removed cards remain in the response history.
 
-Review and save the proposed cards. Ask the named owners and performers to check the exact task versions. Their confirmations and the advisor's review make the work record current. Agent proposals come afterward; discovery does not grant an agent permission to act.
+Accept the original evidence after reviewing it. Resolve missing owners, overlapping responsibilities and handoff differences with the relevant people. This release does not automatically detect cross-team conflicts. **Draft task cards** remains available for answers sent without cards and for further analysis; check existing cards before saving more to avoid duplicates.
 
-## Research, history and recovery
-
-The lower **People in scope**, **Requests and responses**, and **Evidence history** sections provide access to the underlying records. Sources used by a draft appear in an expandable list. The advisor chooses the next action; the app chooses the relevant context within that stage.
-
-Discovery drafts have a 30-run allowance per account in 24 hours. Failed and uncertain runs count. They do not retry automatically. A run that loses its confirmed result is marked unknown; check provider usage before starting another one. Source changes mark an unapplied draft stale. Prepare a new draft before saving it. Source identifiers provide traceability, not proof that AI interpreted the source correctly.
-
-The Cobalt sample has illustrative work records and a fictional reporting hierarchy. These later-stage examples are deliberately excluded from first-contact research. Open Company graph → Org & duties → Reporting chart to inspect the hierarchy. Reopening the sample preserves edited records.
+A participant's initial check records their understanding. Company-level task confirmation still uses the existing exact-version owner/performer rules. A changed description may need another check. Agent proposals come afterward; this process does not grant access or deploy an agent.

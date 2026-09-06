@@ -58,6 +58,8 @@ Keep the two source origins independent. Copying the checklist into a second evi
 
 ## 5. Describe three task cards
 
+This exercise teaches manual task creation and exact-version company confirmation. For the newer participant-first interview flow, use [Review your task cards before sending](25-participant-review.md) or the [interactive discovery demo](/?demo=discovery).
+
 Open **Task cards** and add the following work. Use Jamie as accountable owner for all three; use Sam as performer for intake and release, and Robin for credit review.
 
 | Task | Trigger | Required input | Output |

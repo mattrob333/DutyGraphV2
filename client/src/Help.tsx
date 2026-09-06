@@ -36,6 +36,8 @@ export function Help({ go }: { go: (page: string) => void }) {
         }
       />
       <div className="help-shortcuts">
+        <a className="btn" href="/?demo=discovery" target="_blank" rel="noopener">Try the participant walkthrough <ArrowRight size={15}/></a>
+        <Button onClick={() => setSelected("25-participant-review.md")}>Participant review guide</Button>
         <Button onClick={() => go("discovery")}>
           Open Discovery <ArrowRight size={15} />
         </Button>
