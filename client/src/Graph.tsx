@@ -5,6 +5,7 @@ import type { RecordRow } from "../../shared/domain.ts";
 import { api } from "./api.ts";
 import { Button, Badge, Empty, ErrorBox, State, stateLabel } from "./ui.tsx";
 import { OrgView } from "./OrgView.tsx";
+import { AuditGraph } from "./AuditGraph.tsx";
 import {
   wrapNodeTitle,
   type GraphNode,
@@ -222,6 +223,7 @@ export function Graph({
             ["connected", "Connected"],
             ["work", "Work flow"],
             ["org", "Org & duties"],
+            ["audit", "Agents & controls"],
           ].map(([id, label]) => (
             <button
               key={id}
@@ -258,7 +260,7 @@ export function Graph({
           </span>
         </div>
       )}
-      {view !== "org" && (
+      {view !== "org" && view !== "audit" && (
         <div className="graph-context">
           <label>
             {view === "work" ? "Workflow" : "Explore"}{" "}
@@ -304,7 +306,7 @@ export function Graph({
           </span>
         </div>
       )}
-      {list ? (
+      {view === "audit" ? <AuditGraph company={company} records={records} open={open}/> : list ? (
         <div className="table-wrap">
           <table>
             <thead>

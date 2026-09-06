@@ -127,6 +127,7 @@ Generated from the same runtime schemas that validate saved records. Required fi
 | valueStage | No | receive, prepare, check, decide, deliver, unmapped; default "unmapped" |
 | output | Yes | string; min 1 characters; max 20000 characters |
 | systems | No | array; max 80 items; default [] |
+| controlAreas | No | array; max 3 items; default [] |
 | allowed | No | array; max 80 items; default [] |
 | denied | No | array; max 80 items; default [] |
 | humanGate | Yes | string; min 1 characters; max 20000 characters |

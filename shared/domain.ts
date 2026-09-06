@@ -65,6 +65,7 @@ export const schemas = {
         .default("unmapped"),
       output: text,
       systems: lines,
+      controlAreas: z.array(z.enum(['Access review', 'Change review', 'Confidential data'])).max(3).default([]),
       allowed: lines,
       denied: lines,
       humanGate: text,
