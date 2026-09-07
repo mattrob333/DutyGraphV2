@@ -16,6 +16,8 @@ time, proven outcome, free engagement, or automatic acceptance.
 
 ## Recruitment operations
 
+Use `node scripts/pilot-inbox.mjs summary` for aggregate pipeline and notification counts without personal contact details. See [website measurement](website-measurement.md) for the counting definitions and consented website events.
+
 `POST /api/pilot-applications` saves a write-only recruitment record. It uses
 the authentication rate limiter, request-origin checks, length validation and
 a honeypot. Duplicate emails receive the same receipt without overwriting the

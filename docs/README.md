@@ -8,6 +8,8 @@ Start with the [project wiki](wiki/Home.md) and [repository README](../README.md
 
 ## Detailed references
 
+[Website measurement](website-measurement.md): consent, event contract, Google activation and aggregate pilot reporting.
+
 [Cross-team analysis](team-analysis.md): context contracts, jobs, citations, advisor review and limits.
 
 [Architecture](ARCHITECTURE.md) · [API](API-REFERENCE.md) · [Fields](FIELD-REFERENCE.md) · [Integrations](INTEGRATIONS.md) · [Security](SECURITY.md) · [Operations](OPERATIONS.md) · [Hosting](HOSTING.md) · [Neo4j](neo4j-aura.md) · [Verification](VERIFICATION.md) · [Release status](RELEASE-STATUS.md)

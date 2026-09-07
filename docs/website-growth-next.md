@@ -1,6 +1,6 @@
 # Current progress
 
-The first four search guides, resource hub, manifest download, sitemap, canonical URLs, and durable pilot-notification queue are now implemented. See [SEO strategy and activation steps](seo-strategy.md). Sender verification, GA4, Search Console, and custom-domain setup remain pending. The notes below describe the broader growth roadmap.
+Updated September 7, 2026: dutygraph.com is live. Seven field guides, 160 offering profiles, 12 category buyer guides and worksheets, the article section, sitemap and durable pilot-notification queue are implemented. The consent-gated analytics layer, privacy page and aggregate pilot report are also built. Google account completion and Search Console verification are pending owner approval; measurement remains off. Sender delivery must be verified separately. See [SEO strategy](seo-strategy.md) and [measurement activation](website-measurement.md). The notes below preserve the earlier growth roadmap, not the current implementation inventory.
 
 # Website growth phase — next work
 

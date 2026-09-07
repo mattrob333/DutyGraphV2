@@ -31,6 +31,7 @@ test("SEO publishing rejects broken pages and excludes private surfaces", () => 
     "directory",
     "newsletter",
     "perspectives",
+    "privacy",
   ];
   const html = (name: string) =>
     `<!doctype html><html><head><title>${name}</title><meta name="description" content="Description of ${name}"><meta name="viewport" content="width=device-width"><link rel="canonical" href="https://dutygraph.com/${name}/"></head><body><h1>${name}</h1>${surfaces.map((s) => `<a href="/${s}/">${s}</a>`).join("")}</body></html>`;
@@ -55,7 +56,7 @@ test("SEO publishing rejects broken pages and excludes private surfaces", () => 
       resolve(temporary, "client/index.html"),
       '<meta name="robots" content="noindex,nofollow">',
     );
-    assert.match(run(true), /9 public pages/);
+    assert.match(run(true), /10 public pages/);
     assert.match(run(), /SEO verified/);
     const sitemap = readFileSync(resolve(root, "sitemap.xml"), "utf8");
     assert.ok(!sitemap.includes("/invite/"));

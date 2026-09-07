@@ -18,6 +18,7 @@ document
       if (!response.ok)
         throw new Error(body.message || "Unable to save. Please try again.");
       result.textContent = body.message;
+      if (!fields.website) window.dispatchEvent(new CustomEvent('dutygraph:newsletter-receipt'));
       form.reset();
     } catch (error) {
       result.textContent = error.message || "Unable to save. Please try again.";

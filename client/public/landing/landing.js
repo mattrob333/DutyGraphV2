@@ -115,6 +115,7 @@ document.querySelector('#pilot-form')?.addEventListener('submit', async event =>
     const body = await response.json();
     if (!response.ok) throw new Error(body.message || 'We could not save your request. Please try again.');
     result.textContent = body.message;
+    if (!fields.website) window.dispatchEvent(new CustomEvent('dutygraph:pilot-receipt', {detail:{inquiryType:fields.inquiryType || 'pilot'}}));
     form.reset();
   } catch (error) { result.textContent = error.message || 'We could not save your request. Please try again.'; }
   finally { button.disabled = false; }

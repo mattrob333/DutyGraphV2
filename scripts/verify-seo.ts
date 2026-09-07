@@ -16,6 +16,7 @@ const surfaces = [
   "directory",
   "newsletter",
   "perspectives",
+  "privacy",
 ];
 const errors: string[] = [];
 const pages = new Map<

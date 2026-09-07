@@ -36,7 +36,7 @@ The generator keeps imported source evidence separate from our editorial recomme
 
 ## Automated checks
 
-The validator scans only declared marketing surfaces: landing, learn, pilot, advisors, enterprise, team, directory, newsletter and perspectives. At this release it discovers 190 pages. It requires one title, description, H1 and canonical per page; unique titles/descriptions; the correct canonical origin/path; a viewport; parseable JSON-LD; existing local navigation/assets and fragment targets; inbound links for every non-home page; and no public `noindex` flag. It requires the app shell to retain `noindex,nofollow`.
+The validator scans only declared marketing surfaces: landing, learn, pilot, advisors, enterprise, team, directory, newsletter, perspectives and privacy. At this release it discovers 191 pages. It requires one title, description, H1 and canonical per page; unique titles/descriptions; the correct canonical origin/path; a viewport; parseable JSON-LD; existing local navigation/assets and fragment targets; inbound links for every non-home page; and no public `noindex` flag. It requires the app shell to retain `noindex,nofollow`.
 
 After validation, build writes a sorted sitemap and robots file. No artificial freshness dates or keyword-priority scores are generated. The auditor is designed for the project's controlled static HTML templates, not arbitrary third-party HTML. It does not test remote vendor URLs, search rankings, schema rich-result eligibility, Google indexing, semantic content quality or real-device accessibility.
 
@@ -48,11 +48,9 @@ Vercel sends `/` directly to `/landing/` with a permanent redirect unless a `dem
 
 This replaces the bare root's former noindex app document followed by a JavaScript-only marketing redirect. Verify both the HTTP response and browser behavior when changing these routes.
 
-## Measurement still to connect
+## Measurement and search activation
 
-Content generation is ready; traffic attribution is a separate task. No GA4 measurement ID has been supplied for this change, and no analytics deployment or Search Console access is claimed. Verify the owner's domain property, submit `https://dutygraph.com/sitemap.xml`, inspect several guide/profile URLs, and measure actual impressions, indexed pages and qualified pilot inquiries before expanding page volume.
-
-For analytics, obtain the intended GA4 public measurement ID and implement an appropriate consent choice. Keep names, emails, free-text form fields, invitation tokens, employee answers and task evidence out of analytics. Useful events are public guide views, worksheet downloads, demo entry and a successfully saved pilot application. A button click is not a completed lead, a sent email or a booked pilot.
+The consent-gated measurement layer, privacy page and aggregate pilot report are implemented. Google account completion and Search Console ownership verification still need owner approval. Tracking remains off while `content/measurement.json` contains null IDs. See [website measurement](website-measurement.md) for activation, event definitions, tests and the distinction between receipts and qualified inquiries.
 
 ## References
 

@@ -31,7 +31,7 @@ The directory has 160 source-linked offering profiles, plus 12 crawlable categor
 
 The hub links to every category; profiles link back to their categories; category pages link to relevant profiles and adjacent layers. CollectionPage, ItemList and BreadcrumbList JSON-LD describe visible content. Vendor research dates stay September 6; new editorial guidance is dated September 7. No fake ratings, rankings, customer outcomes or unsupported integration claims are added.
 
-Publishing workflow and validation details: [programmatic SEO](programmatic-seo.md). The deterministic final sitemap includes 190 public pages at this release; it excludes application, invitation and handbook surfaces.
+Publishing workflow and validation details: [programmatic SEO](programmatic-seo.md). The deterministic final sitemap includes 191 public pages at this release; it excludes application, invitation and handbook surfaces.
 
 ## Conversion and measurement
 
@@ -41,7 +41,7 @@ All static publishers now share `scripts/marketing-origin.ts`, defaulting to `ht
 
 Google Search Console property verification and sitemap submission remain operational steps to verify in the owner account. Submit `https://dutygraph.com/sitemap.xml` after verification. A sitemap and crawlable HTML do not establish that Google has indexed or ranked the pages.
 
-Next analytics setup requires the selected GA4 property/measurement ID and an agreed consent configuration. Track guide views, manifest downloads, walkthrough entry, pilot form start, and successful saved application. Never include names, emails, company names, answers, private-link tokens, or form contents in analytics. No GA tracking is active in this change.
+The consent-gated tracking code and privacy explanation are implemented; Google activation is pending owner approval. No GA tracking is active with the current null measurement ID. See [website measurement](website-measurement.md) for event definitions and activation. Public receipt counts include repeat inquiries, so qualified leads are measured separately with the operator aggregate report.
 
 Review Search Console impressions, query intent, indexed pages, and successful applications by entry page monthly. Measure qualified pilot conversations, not just traffic. Expand pages based on actual questions and search evidence.
 

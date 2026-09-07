@@ -30,7 +30,7 @@ Use the private operator tooling described in [pilot discovery](../pilot-discove
 ## Publishing checklist
 
 - Edit source content/generators and regenerate with `npm run build`.
-- Run `npm run verify:seo` to check the 190-page public sitemap, unique metadata, canonicals, local links, anchors and JSON-LD.
+- Run `npm run verify:seo` to check the 191-page public sitemap, unique metadata, canonicals, local links, anchors and JSON-LD.
 - See [programmatic publishing](../programmatic-seo.md) for category authoring and the indexing boundary.
 - Check claims, citations, images, canonical URLs, and schema.
 - Check desktop/mobile layout and actual CTA destination.
@@ -39,3 +39,7 @@ Use the private operator tooling described in [pilot discovery](../pilot-discove
 - Preserve evidence dates when directory content changes.
 
 See [SEO strategy](../seo-strategy.md) and [newsletter operations](../newsletter-operations.md). Analytics configuration and real conversion measurement must be verified separately; content generation alone does not establish attribution.
+
+## Measurement
+
+The public website has consent-gated analytics and an aggregate operator pilot report. Google account completion and Search Console verification remain pending owner approval; configuration is off until actual IDs are published. See [measurement and activation](../website-measurement.md).
