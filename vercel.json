@@ -8,6 +8,7 @@
     "api/index.ts": { "maxDuration": 120, "includeFiles": "contracts/**" }
   },
   "rewrites": [
+    { "source": "/login", "destination": "/index.html" },
     { "source": "/api/:path*", "destination": "/api" },
     { "source": "/invite/:path*", "destination": "/index.html" }
   ],

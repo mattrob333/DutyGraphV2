@@ -193,7 +193,7 @@ function Login({ onLogin }: { onLogin: (result: any) => void }) {
             </span>
           </div>
         </div>
-        <small>Duty Graph · LiveFrameworks · Pedigree · Signet</small>
+        <small>A Tier 4 Intelligence company</small>
       </div>
       <div className="login-form">
         <div className="eyebrow">YOUR COMPANY WORKSPACE</div>
