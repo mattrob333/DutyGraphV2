@@ -6,7 +6,7 @@ DutyGraph is an advisor-led business discovery and strategy application from Tie
 
 The ambition is a living map of a business: evidence informs strategy, strategy informs proposed work, and outcomes inform the next decision. This is the direction of the product, not a claim that autonomous business management exists today.
 
-[Website](https://dutygraph.com) · [Discovery demo](https://dutygraph.com/?demo=discovery) · [Project wiki](docs/wiki/Home.md) · [Developer onboarding](docs/wiki/Developer-Onboarding.md) · [Documentation index](docs/README.md)
+[Website](https://dutygraph.com) · [Discovery demo](https://dutygraph.com/?demo=discovery) · [Project wiki](docs/wiki/Home.md) · [Developer onboarding](docs/wiki/Developer-Onboarding.md) · [Documentation index](docs/README.md) · [Development log](DEVLOG.md)
 
 ## Start here
 
@@ -23,9 +23,11 @@ The ambition is a living map of a business: evidence informs strategy, strategy 
 
 ## Current status
 
-Documentation baseline: **September 7, 2026**, application source through `97335fd`. Package version: `0.3.0`. This is a hosted pilot with working application code, fictional demonstrations, and remaining enterprise acceptance work.
+Current release documented: **September 7, 2026**, application source through `178aba0`. Package version: `0.3.0`. This is a hosted pilot with working application code, fictional demonstrations, and remaining enterprise acceptance work. The [development log](DEVLOG.md) records subsequent changes and their verification boundaries.
 
 Implemented areas include authenticated company workspaces, roster imports/reporting charts, discovery requests, participant audio/text capture, AI task drafts and participant review, task/evidence versioning, workflows/cases, strategy framework runs, company work maps, optional Neo4j projections, reports, training, and public marketing/intake pages.
+
+Recent additions include [grounded cross-team analysis](docs/team-analysis.md), [programmatic SEO publishing](docs/programmatic-seo.md), and [website measurement and pilot reporting](docs/website-measurement.md). The public site has 160 offering profiles, 12 category buyer guides and worksheets, and a 191-page sitemap. Consent-gated analytics code, a privacy page and an aggregate operator pipeline report are implemented. **Google Analytics activation and Search Console ownership verification remain pending owner approval; tracking is off.** Release `178aba0` passed all 190 tests and CI, and its public assets were verified on dutygraph.com. Those results do not establish indexing, actual Google collection or customer outcomes.
 
 Important boundaries:
 
@@ -80,6 +82,8 @@ Both local modes bind to `127.0.0.1`. Hosted deployment uses the Vercel API entr
 | `npm run backup` | Back up dedicated local Docker database |
 | `npm run restore:drill -- <backup-file>` | Rehearse local restore; see runbook |
 | `npm run handbook` | Generate portable help handbook |
+| `npm run verify:seo` | Audit generated public metadata, links and sitemap |
+| `node scripts/pilot-inbox.mjs summary` | Operator-only aggregate inquiry, follow-up and notification report |
 
 See [CI](.github/workflows) and [verification](docs/VERIFICATION.md) for release checks. Synthetic tests do not establish real-client extraction accuracy.
 
@@ -114,4 +118,6 @@ Read [integrations](docs/INTEGRATIONS.md), [hosting](docs/HOSTING.md), [security
 
 ## Contributing
 
-Start with [CONTRIBUTING.md](CONTRIBUTING.md). Keep changes reviewable, preserve tenant isolation/provenance, and document limitations alongside features. The version-controlled wiki is canonical and reviewed with code; a separate GitHub Wiki should be a mirror, not a second independently edited source of truth.
+Start with [CONTRIBUTING.md](CONTRIBUTING.md). **Every change must update this README and [DEVLOG.md](DEVLOG.md) in the same change set**, including documentation-only changes. Keep the README a concise current-state guide; record dated details, reasons, validation and remaining work in the development log. This documentation convention was added September 7, 2026.
+
+Keep changes reviewable, preserve tenant isolation/provenance, and document limitations alongside features. The version-controlled wiki is canonical and reviewed with code; a separate GitHub Wiki should be a mirror, not a second independently edited source of truth.

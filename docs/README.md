@@ -2,6 +2,8 @@
 
 Start with the [project wiki](wiki/Home.md) and [repository README](../README.md).
 
+The [development log](../DEVLOG.md) records changes, reasons, validation and remaining work. Update it and the repository README with every change.
+
 ## Maintained project handbook
 
 [Vision](wiki/Product-Vision.md) · [Journeys](wiki/User-Journeys.md) · [Current state](wiki/Current-State.md) · [Onboarding](wiki/Developer-Onboarding.md) · [Architecture](wiki/Architecture-and-Data.md) · [Strategy](wiki/Discovery-and-Strategy.md) · [Governance](wiki/Governance-and-Integrations.md) · [Operations](wiki/Operations-and-Deployment.md) · [Marketing](wiki/Marketing-and-Publishing.md) · [Roadmap](wiki/Roadmap.md) · [Decisions](wiki/Decisions.md)
