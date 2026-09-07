@@ -33,6 +33,8 @@ The [business-specific kickoff and capture flow](docs/kickoff-capture.md) adds a
 
 Initial Discovery now uses [one form for research and AI classification](docs/initial-research.md): company name, URL and an optional description. Four research areas default on in a collapsed drawer, run sequentially, and feed a sector/operating-model recommendation without a repeated website search. The Industry Map remains a separate deeper step. All sixteen framework views include section navigation, review/gap counts, expandable confidence explanations and responsive labeled data rows. Implementation `736e394` passed all 204 tests and CI, was verified READY on Vercel, and serves the updated code/help on dutygraph.com; [browser verification](docs/verification/2026-09-07-initial-research.md) used synthetic providers. Provider connections are required; pilot acceptance remains separate from synthetic verification.
 
+The Discovery business-type catalog now shows all 52 operating patterns as cards with descriptions, familiar organization examples, stage previews and an explicit add action. Search by type, family or example company. Examples are recognition aids only, kept out of AI prompts and company evidence. See [initial research](docs/initial-research.md).
+
 Important boundaries:
 
 - Public discovery and authority samples are fictional. They do not prove real email, model, identity-provider, or agent-runtime execution.

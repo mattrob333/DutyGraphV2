@@ -10,6 +10,12 @@ The recommendation includes the sector, up to three supported operating models f
 
 Collected public pages remain available to discovery and strategy without importing them as accepted evidence. The classification reuses the exact completed research-run IDs from the pass and does not make a fifth search. Citations are validated against the supplied excerpts and description. A URL alone is never treated as proof of what a company does. No usable excerpts and no description produces an actionable error.
 
+## Explore the business types
+
+**Browse all 52 business types** opens a catalog directly below the recommendation (or below the research form before any recommendation). Each card shows the existing template title and description, a recognizable organization example with an explanatory line and official website, and expandable operating stages. Search matches type, family, description and example company; a family filter narrows the list. The general-business fallback uses a conceptual example. Branded examples illustrate part of an organization, not a complete audited model or a customer relationship.
+
+**Add [type]** adds that flow to the proposed profile and marks the card. **Use this business profile** saves through the existing revision-checked API. Up to eight flows are allowed. **Edit the profile and stages** contains manual changes, removal and custom flows. AI suggestions remain the primary onboarding route; browsing is optional. Example data lives in `client/src/business-type-examples.ts`, consumed only by `BusinessTypeCatalog.tsx`, so analogy companies do not become evidence or AI prompt context for the client.
+
 ## Configuration and limits
 
 - Exa supplies public search results; OpenAI supplies the classification. Each uses the advisor account's encrypted provider configuration. Without Exa, a description can still support classification. Without OpenAI, public research can still be collected, but no AI classification is claimed.

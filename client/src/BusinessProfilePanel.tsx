@@ -12,6 +12,7 @@ import { api } from "./api.ts";
 import { Button, Panel, ErrorBox } from "./ui.tsx";
 import "./business-profile.css";
 import { researchFocuses } from "../../shared/research.ts";
+import { BusinessTypeCatalog } from "./BusinessTypeCatalog.tsx";
 import {
   collectInitialResearch,
   readResearchPlan,
@@ -198,10 +199,7 @@ export function BusinessProfilePanel({
         streams: [],
       },
   );
-  const [search, setSearch] = useState(""),
-    [group, setGroup] = useState(""),
-    [templateId, setTemplateId] = useState(""),
-    [dirty, setDirty] = useState(false),
+  const [dirty, setDirty] = useState(false),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [notice, setNotice] = useState(""),
@@ -305,14 +303,6 @@ export function BusinessProfilePanel({
       setBusy(false);
     }
   };
-  const matches = businessTemplates.filter(
-    (t) =>
-      (!group || t.group === group) &&
-      (t.label + " " + t.description)
-        .toLowerCase()
-        .includes(search.toLowerCase()),
-  );
-  const selected = matches.find((t) => t.id === templateId);
   return (
     <Panel
       title="Start with the company. We’ll build the research brief."
@@ -445,7 +435,7 @@ export function BusinessProfilePanel({
         {classification?.configured === false && (
           <p className="notice">
             Connect OpenAI in Workspace settings to get AI suggestions. You can
-            still choose a business type under “Edit or choose manually” below.
+            still choose a business type in the catalog below.
           </p>
         )}
       </div>
@@ -524,8 +514,13 @@ export function BusinessProfilePanel({
           </p>
         </section>
       )}
+      <BusinessTypeCatalog
+        selectedIds={profile.streams.map((s) => s.templateId)}
+        disabled={busy || profile.streams.length >= 8}
+        add={add}
+      />
       <details className="business-manual">
-        <summary>Edit or choose manually</summary>
+        <summary>Edit the profile and stages</summary>
         <div className="business-fields">
           <label>
             Industry or sector
@@ -573,85 +568,12 @@ export function BusinessProfilePanel({
             })}
           </div>
         )}
-        <details>
-          <summary>
-            Browse {businessTemplates.length} business types or create a custom
-            flow
-          </summary>
-          <div className="business-fields">
-            <label>
-              Search business types
-              <input
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setTemplateId("");
-                }}
-                placeholder="Manufacturing, SaaS, advisory…"
-              />
-            </label>
-            <label>
-              Business family
-              <select
-                value={group}
-                onChange={(e) => {
-                  setGroup(e.target.value);
-                  setTemplateId("");
-                }}
-              >
-                <option value="">All families</option>
-                {[...new Set(businessTemplates.map((t) => t.group))].map(
-                  (g) => (
-                    <option key={g}>{g}</option>
-                  ),
-                )}
-              </select>
-            </label>
-          </div>
-          <label>
-            Starting template
-            <select
-              value={selected?.id || ""}
-              onChange={(e) => setTemplateId(e.target.value)}
-            >
-              <option value="">Choose from {matches.length} types</option>
-              {matches.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          {selected && (
-            <div className="business-template">
-              <p>{selected.description}</p>
-              <div className="business-flow-preview">
-                {selected.stages.map((s) => (
-                  <span key={s.id}>
-                    {s.name}
-                    <small>
-                      {s.functionIds
-                        .map((id) => backbone.find((f) => f.id === id)?.label)
-                        .join(", ")}
-                    </small>
-                  </span>
-                ))}
-              </div>
-              <Button
-                disabled={profile.streams.length >= 8}
-                onClick={() => add(selected.id)}
-              >
-                Add this business flow
-              </Button>
-            </div>
-          )}
-          <Button
-            disabled={profile.streams.length >= 8}
-            onClick={() => add("custom")}
-          >
-            Create custom flow
-          </Button>
-        </details>
+        <Button
+          disabled={profile.streams.length >= 8}
+          onClick={() => add("custom")}
+        >
+          Create custom flow
+        </Button>
         <div className="business-streams">
           {profile.streams.map((stream, i) => (
             <details key={stream.id}>

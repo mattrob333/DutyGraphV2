@@ -4,6 +4,13 @@ Newest entries first. This log was established September 7, 2026. The two preced
 
 For every future logical change, update this log and the [README](README.md) together. Record the date, change and reason, affected areas, checks actually performed, known publication status, and remaining work. Link a commit or detailed evidence when available. Do not include credentials, private transcripts or lead details.
 
+## 2026-09-07 — Recognizable business-type catalog
+
+- **Change and reason:** Replaced the names-only dropdown buried under two disclosures with a top-level “Browse all 52 business types” catalog in Discovery. Cards show the title, description, a familiar organization with an explanation and official link, and expandable stage previews. Search covers names, descriptions, families and example companies. A general-business fallback uses a conceptual example rather than falsely assigning a specific company to that catch-all.
+- **Behavior:** Add a flow to the proposed profile, receive visible confirmation, then save through the existing profile action. Already-added templates are marked and the eight-flow limit remains. Manual stage edits and custom flows stay in a separate editor. The examples are client-side recognition aids, never company evidence or model input. No database or API changes.
+- **Validation:** Build and all 204 tests passed; generated contracts unchanged (89 routes), dependency audit reports zero vulnerabilities, and diff check is clean. Catalog integrity check found 52 matching example entries (51 official-site links and one general example), no missing or extra IDs. Browser checks on fictional local data covered 52 rendered cards/examples, Wesco/Salesforce searches, stage expansion, adding/saving, empty results, and 390px mobile layout without horizontal overflow. Dark/light presentation inspected. No provider calls or emails were sent. Hosted publication follows the implementation commit.
+- **Documentation:** README, discovery help and initial-research reference updated. Examples illustrate one business line and do not imply customers, endorsements or identical internal processes.
+
 ## 2026-09-07 — One-form research, AI business classification and framework readability
 
 - **Change and reason:** Replaced mandatory manual selection from 52 business templates with a company/URL/description form. Four default research areas live in a collapsed drawer. One action collects them sequentially, then AI proposes the sector and operating flow with reasons, confidence and kickoff questions. The separate Industry Map reuses collected context. Added saved/resumable research steps, bounded paid calls, reusable research snapshots, strict classification/citation validation, tenant isolation and revision checks.
