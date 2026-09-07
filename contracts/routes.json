@@ -54,6 +54,11 @@
     },
     {
       "method": "POST",
+      "path": "/api/newsletter-interest",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
       "path": "/api/pilot-applications",
       "source": "server/app.ts"
     },
@@ -171,6 +176,11 @@
       "method": "POST",
       "path": "/api/v1/companies/{companyId}/assets/{assetId}/transcription-review",
       "source": "server/transcription.ts"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/v1/companies/{companyId}/business-profile",
+      "source": "server/app.ts"
     },
     {
       "method": "GET",
@@ -371,6 +381,26 @@
       "method": "POST",
       "path": "/api/v1/companies/{companyId}/strategy-briefs",
       "source": "server/strategy.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/team-analysis",
+      "source": "server/team-analysis.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/team-analysis",
+      "source": "server/team-analysis.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/team-analysis/{runId}/review",
+      "source": "server/team-analysis.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/team-analysis/{runId}/sources",
+      "source": "server/team-analysis.ts"
     },
     {
       "method": "POST",

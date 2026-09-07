@@ -1,6 +1,6 @@
 # Implemented API reference
 
-Release 0.3. This inventory is generated from server route declarations. It describes 81 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
+Release 0.3. This inventory is generated from server route declarations. It describes 87 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
 
 ## Transport and authentication
 
@@ -24,6 +24,7 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | GET | /api/invitations/{token} | server/app.ts |
 | POST | /api/invitations/{token}/enroll | server/app.ts |
 | GET | /api/maintenance | server/app.ts |
+| POST | /api/newsletter-interest | server/app.ts |
 | POST | /api/pilot-applications | server/app.ts |
 | GET | /api/v1/companies | server/app.ts |
 | POST | /api/v1/companies | server/app.ts |
@@ -48,6 +49,7 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | POST | /api/v1/companies/{companyId}/assets/{assetId}/transcribe | server/transcription.ts |
 | GET | /api/v1/companies/{companyId}/assets/{assetId}/transcription | server/transcription.ts |
 | POST | /api/v1/companies/{companyId}/assets/{assetId}/transcription-review | server/transcription.ts |
+| PUT | /api/v1/companies/{companyId}/business-profile | server/app.ts |
 | GET | /api/v1/companies/{companyId}/discovery | server/discovery.ts |
 | POST | /api/v1/companies/{companyId}/discovery/{jobId}/apply | server/discovery.ts |
 | POST | /api/v1/companies/{companyId}/discovery/draft | server/discovery.ts |
@@ -88,6 +90,10 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | POST | /api/v1/companies/{companyId}/runtime/preflight | server/app.ts |
 | GET | /api/v1/companies/{companyId}/strategy-briefs | server/strategy.ts |
 | POST | /api/v1/companies/{companyId}/strategy-briefs | server/strategy.ts |
+| GET | /api/v1/companies/{companyId}/team-analysis | server/team-analysis.ts |
+| POST | /api/v1/companies/{companyId}/team-analysis | server/team-analysis.ts |
+| POST | /api/v1/companies/{companyId}/team-analysis/{runId}/review | server/team-analysis.ts |
+| GET | /api/v1/companies/{companyId}/team-analysis/{runId}/sources | server/team-analysis.ts |
 | POST | /api/v1/companies/{companyId}/workflows/{workflowId}/cases | server/workflows.ts |
 | POST | /api/v1/companies/{companyId}/workflows/cases/{caseId}/actions | server/workflows.ts |
 | GET | /api/v1/companies/{companyId}/workspace | server/app.ts |

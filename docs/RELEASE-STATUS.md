@@ -6,6 +6,8 @@ DutyGraph is a hosted advisor pilot. See the maintained [current-state matrix](w
 
 ## Delivered in code
 
+- Cross-team work analysis added September 7: structural checks, evidence-cited AI hypotheses, durable attempts and advisor review. See [implementation and limits](team-analysis.md) and [183-test verification](verification/2026-09-07-team-analysis.md).
+
 - Authenticated company workspaces with PostgreSQL records, versions, tenant isolation and audit/confirmation semantics.
 - Discovery, roster/reporting charts, invitations, audio/text responses, transcription integration, AI task drafting and participant review.
 - Task/duty/handoff records, workflows/cases, a stable company work map and focused relationship exploration.

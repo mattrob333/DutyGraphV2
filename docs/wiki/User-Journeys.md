@@ -40,4 +40,4 @@ An advisor identifies a task candidate. Governance then evaluates the person, pe
 
 The real participant routes, provider-backed drafts, and public fictional walkthrough are separate implementations. The demo demonstrates a prepared story; it does not analyze arbitrary sample text or send real messages.
 
-Cross-team analysis, continuously maintained findings, and end-to-end governed execution are not fully automated today. See [current state](Current-State.md) and [discovery reference](../pilot-discovery.md).
+Cross-team analysis now has structural checks and an explicit AI review with citations and advisor decisions; see [team analysis](../team-analysis.md). Continuous analysis, automatic conflict resolution, and end-to-end governed execution remain future work. See [current state](Current-State.md) and [discovery reference](../pilot-discovery.md).

@@ -1,0 +1,76 @@
+.team-analysis-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+.team-analysis-stats b {
+  display: block;
+  font-size: 28px;
+}
+.team-analysis-actions {
+  padding: 20px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.team-analysis-actions label,
+.team-analysis-actions p {
+  flex-basis: 100%;
+}
+.team-finding {
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line, #45484a);
+}
+.team-finding h3 {
+  margin: 12px 0;
+}
+.team-finding dl {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 12px;
+}
+.team-finding dd {
+  margin: 0;
+}
+.team-finding blockquote {
+  margin: 16px 0;
+  padding-left: 16px;
+  border-left: 2px solid #b0c7be;
+  overflow-wrap: anywhere;
+}
+.team-finding footer {
+  font-size: 12px;
+  margin-top: 8px;
+}
+.team-analysis details pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+@media (max-width: 600px) {
+  .team-finding dl {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .team-finding dd {
+    margin-bottom: 12px;
+  }
+}
+
+.team-finding-review {
+  margin-top: 18px;
+}
+.team-finding-review label {
+  display: block;
+}
+.team-finding-review textarea {
+  display: block;
+  width: 100%;
+  min-height: 70px;
+  margin: 8px 0;
+}
+.team-finding-review .btn {
+  margin: 0 8px 8px 0;
+}

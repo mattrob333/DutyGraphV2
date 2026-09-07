@@ -1,4 +1,5 @@
 import { businessProfileSchema } from "../shared/business-types.ts";
+import { teamAnalysisRouter, type TeamProvider } from "./team-analysis.ts";
 import { newsletterInterest } from "./newsletter.ts";
 import { participantDraft, participantCards } from "./participant-cards.ts";
 import { applyForPilot } from "./pilot.ts";
@@ -97,6 +98,7 @@ export function createApp({
   aiProvider,
   discoveryProvider,
   frameworkProvider,
+  teamProvider,
   hostedRouting = !!process.env.VERCEL,
 }: {
   authRequestsPerWindow?: number;
@@ -105,6 +107,7 @@ export function createApp({
   aiProvider?: AiProvider;
   discoveryProvider?: DiscoveryProvider;
   frameworkProvider?: FrameworkProvider;
+  teamProvider?: TeamProvider;
   hostedRouting?: boolean;
 } = {}) {
   const app = express();
@@ -1567,6 +1570,10 @@ export function createApp({
   api.use(
     "/companies/:companyId/framework-runs",
     frameworkRouter(frameworkProvider),
+  );
+  api.use(
+    "/companies/:companyId/team-analysis",
+    teamAnalysisRouter(teamProvider),
   );
   api.use("/companies/:companyId/strategy-briefs", strategyRouter(aiProvider));
   api.post("/companies/:companyId/graph/rebuild", advisor, async (req, res) =>

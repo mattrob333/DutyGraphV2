@@ -8,6 +8,7 @@ Baseline: September 7, 2026, application source through `97335fd`. “Implemente
 | Discovery | Research, kickoff/request flows, roster, evidence | Initial research is not verified company testimony |
 | Participants | Private invitations, text/audio, transcription adapter, task draft/review/submission | Real delivery and physical-microphone acceptance are separate from fixture tests |
 | Work records | Versioned tasks/evidence, confirmation, duties/handoffs/workflows/cases | Review does not automatically settle conflicting accounts |
+| Cross-team analysis | Structural checks, bounded AI hypotheses, exact citations, durable attempts and advisor decisions | Implemented September 7; synthetic tests, real-client reasoning acceptance pending; see [reference](../team-analysis.md) |
 | Company work map | Stable flow/task presentation and ownership/AI overlays | No inferred measured bottleneck or live wait-time claim |
 | Organization | CSV/reporting relationships and interactive reporting chart | Imported relationships require validation |
 | Relationship exploration | Focused connections and control-related scenarios | No blanket compliance conclusion |
@@ -21,6 +22,8 @@ Baseline: September 7, 2026, application source through `97335fd`. “Implemente
 | Newsletter | Launch-list/intake foundations | Not an established recurring editorial delivery operation |
 
 ## What has been tested
+
+September 7 cross-team analysis release: build and all 183 tests passed, plus scoped desktop/mobile browser fixtures. See [dated evidence](../verification/2026-09-07-team-analysis.md). This supersedes the earlier test count below for the new release.
 
 The preceding implementation work recorded 171 passing unit/database/API tests and scoped browser checks. These are historical verification results, not a fresh execution of those tests during this documentation-only pass. See [verification records](../verification/) and [verification procedure](../VERIFICATION.md).
 

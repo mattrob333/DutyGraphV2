@@ -844,6 +844,19 @@
                               "maxLength": 1000
                             }
                           },
+                          "controlAreas": {
+                            "default": [],
+                            "maxItems": 3,
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "enum": [
+                                "Access review",
+                                "Change review",
+                                "Confidential data"
+                              ]
+                            }
+                          },
                           "allowed": {
                             "default": [],
                             "maxItems": 80,
@@ -2130,6 +2143,19 @@
             "items": {
               "type": "string",
               "maxLength": 1000
+            }
+          },
+          "controlAreas": {
+            "default": [],
+            "maxItems": 3,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Access review",
+                "Change review",
+                "Confidential data"
+              ]
             }
           },
           "allowed": {

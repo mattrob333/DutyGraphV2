@@ -1,4 +1,5 @@
 import { BusinessProfilePanel } from "./BusinessProfilePanel.tsx";
+import { TeamAnalysis } from "./TeamAnalysis.tsx";
 import { FrameworkWorkspace } from "./FrameworkWorkspace.tsx";
 import { useEffect, useState } from "react";
 import {
@@ -598,6 +599,15 @@ export function DiscoveryJourney({
             </p>
           )}
         </Panel>
+      )}
+      {stage === "tasks" && (
+        <TeamAnalysis
+          key={company.id}
+          companyId={company.id}
+          revision={company.revision}
+          records={records}
+          open={open}
+        />
       )}
       <div id="journey-draft">
         <Panel
