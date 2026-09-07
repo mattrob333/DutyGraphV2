@@ -186,14 +186,51 @@ export function researchRouter(providerOverride?: ResearchProvider) {
         "RESEARCH_UNCONFIGURED",
         "Add and enable your Exa API key in Workspace settings. You can also add public sources manually.",
       );
+    const officialContext = await tx(actor.tenant_id, async (db) => {
+      await companyCheck(db, actor, companyId);
+      const excerpts: string[] = [];
+      for (const id of input.contextRunIds) {
+        const prior = (
+          await db.query(
+            "SELECT domain,results FROM research_runs WHERE id=$1 AND company_id=$2 AND state='complete'",
+            [id, companyId],
+          )
+        ).rows[0];
+        if (!prior)
+          fail(
+            422,
+            "RESEARCH_CONTEXT",
+            "A previous research result is unavailable for this company.",
+          );
+        if (prior.domain)
+          for (const source of prior.results) {
+            try {
+              const host = new URL(source.url).hostname.replace(/^www\./, "");
+              const target = new URL(input.website).hostname.replace(
+                /^www\./,
+                "",
+              );
+              if (host === target || host.endsWith(`.${target}`))
+                excerpts.push(String(source.text).slice(0, 1300));
+            } catch {
+              /* Only official-site text may steer wider searches. */
+            }
+          }
+      }
+      return excerpts.slice(0, 2).join("\n");
+    });
     const { query, domain } = researchQuery(
       input.publicName,
       input.focus,
       input.website,
+      input.description,
+      officialContext,
     );
     const reservation: any = await run(req, async (db: any) => {
       await companyCheck(db, actor, companyId);
-      await db.query("SELECT pg_advisory_xact_lock(hashtext($1))", [`research-quota:${actor.tenant_id}`]);
+      await db.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
+        `research-quota:${actor.tenant_id}`,
+      ]);
       const used = Number(
         (
           await db.query(

@@ -1,6 +1,7 @@
 import type { ClassificationIntake } from "../../shared/business-classification.ts";
 import { api } from "./api.ts";
 export type ResearchPlan = {
+  version?: 2;
   intake: ClassificationIntake;
   focuses: string[];
   index: number;
@@ -55,6 +56,9 @@ export async function collectInitialResearch(
       {
         publicName: plan.intake.name,
         website: plan.intake.website,
+        ...(plan.version === 2
+          ? { description: plan.intake.description, contextRunIds: plan.runIds }
+          : {}),
         focus: plan.focuses[plan.index],
         acknowledgePublicQuery: true,
       },

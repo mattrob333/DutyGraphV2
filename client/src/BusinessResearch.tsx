@@ -322,8 +322,8 @@ export function BusinessResearch({
       )}
       <div className="discovery-section">
         <Panel
-          title="Collected sources"
-          subtitle="Read the pages behind the research here. Their content is available to meeting preparation automatically. Import a page if you also want it in the evidence history."
+          title="Research evidence library"
+          subtitle="Retrieved pages are working material, not established facts. The business brief above selects supported findings. Expand this library to inspect the original excerpts."
           action={
             <Button
               onClick={() => {
@@ -348,8 +348,9 @@ export function BusinessResearch({
               library.
             </p>
           )}
-          {status?.runs.map((run, i) => (
-            <details className="research-run" key={run.id} open={i === 0}>
+          <details><summary>Inspect retrieved pages · {status?.runs.length || 0} searches</summary>
+          {status?.runs.map((run) => (
+            <details className="research-run" key={run.id}>
               <summary>
                 {run.query} <Badge>{run.state}</Badge>
                 <small>
@@ -404,7 +405,7 @@ export function BusinessResearch({
                 </article>
               ))}
             </details>
-          ))}
+          ))}</details>
         </Panel>
       </div>
     </>

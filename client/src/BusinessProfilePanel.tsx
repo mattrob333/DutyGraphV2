@@ -1,3 +1,4 @@
+import { BusinessBrief } from "./BusinessBrief.tsx";
 import { useEffect, useState } from "react";
 import { Sparkles, Check, ArrowRight } from "lucide-react";
 import { profileFromClassification } from "../../shared/business-classification.ts";
@@ -50,6 +51,7 @@ export function BusinessProfilePanel({
       },
   );
   const [classification, setClassification] = useState<any>(null);
+  const [briefJob, setBriefJob] = useState<any>(null);
   const [analysis, setAnalysis] = useState<any>(null);
   const [baseRevision, setBaseRevision] = useState(company.revision);
   const classificationPath = `/v1/companies/${company.id}/business-classification`;
@@ -73,6 +75,7 @@ export function BusinessProfilePanel({
           description: job.input.description,
         });
         setAnalysis(job);
+        setBriefJob(job);
         setBaseRevision(job.input.revision);
         update(profileFromClassification(job.result.draft));
         setError("");
@@ -90,6 +93,19 @@ export function BusinessProfilePanel({
       .then((data) => {
         if (!active) return;
         setClassification(data);
+        const savedBrief = data.jobs?.find(
+          (j: any) =>
+            j.state === "complete" &&
+            j.result?.draft?.brief &&
+            ["name", "website", "description"].every(
+              (k) =>
+                j.input[k] ===
+                (company.settings.businessIntake || intake)[
+                  k as keyof typeof intake
+                ],
+            ),
+        );
+        if (savedBrief) setBriefJob(savedBrief);
         const latest = data.jobs?.[0];
         if (latest?.input && !company.settings.businessIntake && !plan)
           setIntake({
@@ -103,6 +119,7 @@ export function BusinessProfilePanel({
           latest.input.revision === company.revision
         ) {
           setAnalysis(latest);
+          setBriefJob(latest);
           setProfile(profileFromClassification(latest.result.draft));
           setDirty(true);
         }
@@ -128,8 +145,13 @@ export function BusinessProfilePanel({
       };
       setIntake(normalized);
       let current: ResearchPlan = plan || {
+        version: 2,
         intake: normalized,
-        focuses: classification?.researchConfigured ? focuses : [],
+        focuses: classification?.researchConfigured
+          ? researchFocuses
+              .map((f) => f.id)
+              .filter((id) => focuses.includes(id))
+          : [],
         index: 0,
         keys: focuses.map(() => crypto.randomUUID()),
         runIds: [],
@@ -178,10 +200,19 @@ export function BusinessProfilePanel({
       }
       checkpoint(null);
       setAnalysis(job);
+      setBriefJob(job);
       setBaseRevision(job.input.revision);
       update(profileFromClassification(job.result.draft));
+      requestAnimationFrame(() => {
+        document
+          .getElementById("business-brief")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" });
+        document
+          .getElementById("business-brief")
+          ?.focus({ preventScroll: true });
+      });
       setNotice(
-        "Your recommendation is ready. Review it below and use it to prepare the kickoff.",
+        "Your business brief is ready. Review the findings and confirm the business streams below.",
       );
     } catch (e) {
       setError((e as Error).message);
@@ -297,6 +328,7 @@ export function BusinessProfilePanel({
           ? "Business profile saved as advisor reviewed."
           : "Proposed business profile saved.",
       );
+      return true;
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -306,7 +338,7 @@ export function BusinessProfilePanel({
   return (
     <Panel
       title="Start with the company. We’ll build the research brief."
-      subtitle="Enter the name, website and an optional short description. Research runs in sequence, then AI suggests the sector, business type and operating flow."
+      subtitle="Enter the company once. Get a sourced business overview, competitive context and the questions to take into your first meeting."
     >
       <div className="business-intake">
         <div className="business-fields">
@@ -417,9 +449,9 @@ export function BusinessProfilePanel({
           )}
         </div>
         <p className="subtle">
-          By starting, you send the public company name and URL to Exa for the
-          selected research, and the description and collected excerpts to
-          OpenAI for a draft.{" "}
+          By starting, you send the company name, URL, description and selected
+          official-site excerpts to Exa for contextual public research, and the
+          description and collected excerpts to OpenAI for a draft.{" "}
           {classification?.researchConfigured
             ? `This pass uses ${focuses.length} searches and one AI analysis when configured. Provider charges apply.`
             : "Based on your description; enable Exa in Workspace settings to include website research."}{" "}
@@ -441,6 +473,24 @@ export function BusinessProfilePanel({
       </div>
       <ErrorBox error={error} />
       {notice && <p role="status">{notice}</p>}
+      {briefJob &&
+        ["name", "website", "description"].every(
+          (k) => briefJob.input[k] === intake[k as keyof typeof intake],
+        ) && (
+          <BusinessBrief
+            job={briefJob}
+            busy={busy}
+            prepare={async () => {
+              if (dirty && !(await save("proposed"))) return;
+              document
+                .getElementById("journey-draft")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" });
+              document
+                .getElementById("discovery-contact-name")
+                ?.focus({ preventScroll: true });
+            }}
+          />
+        )}
       {!!profile.streams.length && (
         <section
           className="business-recommendation"
@@ -454,14 +504,58 @@ export function BusinessProfilePanel({
                 : "Saved proposed profile"}
           </div>
           <h3>{profile.industry}</h3>
-          <p>{analysis?.result?.draft.summary || profile.rationale}</p>
-          {profile.streams.map((stream) => {
+          <p>
+            {briefJob?.result?.draft?.brief
+              ? "Confirm the operating streams for this engagement. Primary is the starting focus, not a claim about revenue share. Shared departments can support both streams."
+              : analysis?.result?.draft.summary || profile.rationale}
+          </p>
+          {profile.streams.map((stream, streamIndex) => {
             const recommendation = analysis?.result?.draft.recommendations.find(
               (r: any) => r.templateId === stream.templateId,
             );
             return (
               <article key={stream.id}>
                 <h4>{stream.name}</h4>
+                <span className="stream-role">
+                  {streamIndex === 0
+                    ? "Primary for this engagement"
+                    : "Supporting business stream"}
+                </span>
+                <div className="actions">
+                  {streamIndex > 0 && (
+                    <Button
+                      disabled={busy}
+                      onClick={() =>
+                        update({
+                          ...profile,
+                          streams: [
+                            stream,
+                            ...profile.streams.filter(
+                              (s) => s.id !== stream.id,
+                            ),
+                          ],
+                        })
+                      }
+                    >
+                      Make primary
+                    </Button>
+                  )}
+                  {profile.streams.length > 1 && (
+                    <Button
+                      disabled={busy}
+                      onClick={() =>
+                        update({
+                          ...profile,
+                          streams: profile.streams.filter(
+                            (s) => s.id !== stream.id,
+                          ),
+                        })
+                      }
+                    >
+                      Remove this stream
+                    </Button>
+                  )}
+                </div>
                 {recommendation && (
                   <p>
                     {recommendation.reason}{" "}
@@ -470,17 +564,59 @@ export function BusinessProfilePanel({
                     </span>
                   </p>
                 )}
-                <div className="business-flow-preview">
-                  {stream.stages.map((s, i) => (
-                    <span key={s.id}>
-                      <small>{i + 1}</small>
-                      {s.name}
-                    </span>
-                  ))}
-                </div>
+                <details>
+                  <summary>View the operating stages</summary>
+                  <div className="business-flow-preview">
+                    {stream.stages.map((s, i) => (
+                      <span key={s.id}>
+                        <small>{i + 1}</small>
+                        {s.name}
+                      </span>
+                    ))}
+                  </div>
+                </details>
               </article>
             );
           })}
+          {!!analysis?.result?.draft?.alternatives?.length && (
+            <details>
+              <summary>
+                Other possible classifications · choose only if they fit
+              </summary>
+              {analysis.result.draft.alternatives.map((a: any) => (
+                <article key={a.templateId}>
+                  <h4>
+                    {
+                      businessTemplates.find((t) => t.id === a.templateId)
+                        ?.label
+                    }
+                  </h4>
+                  <p>{a.reason}</p>
+                  <Button
+                    disabled={busy}
+                    onClick={() => {
+                      const t = businessTemplates.find(
+                        (t) => t.id === a.templateId,
+                      )!;
+                      update({
+                        ...profile,
+                        streams: [
+                          {
+                            id: `suggested-${t.id}`,
+                            templateId: t.id,
+                            name: t.label,
+                            stages: structuredClone(t.stages),
+                          },
+                        ],
+                      });
+                    }}
+                  >
+                    Use this instead of the suggested streams
+                  </Button>
+                </article>
+              ))}
+            </details>
+          )}
           {analysis && (
             <details>
               <summary>Why AI suggested this</summary>
@@ -488,13 +624,19 @@ export function BusinessProfilePanel({
               {analysis.result.draft.questions.map((q: string) => (
                 <p key={q}>Confirm at kickoff: {q}</p>
               ))}
-              {analysis.input.sources.map((s: any) => (
-                <p key={s.id}>
-                  <a href={s.url} target="_blank" rel="noreferrer">
-                    {s.title}
-                  </a>
-                </p>
-              ))}
+              {analysis.input.sources
+                .filter((s: any) =>
+                  analysis.result.draft.recommendations.some((r: any) =>
+                    r.sourceIds.includes(s.id),
+                  ),
+                )
+                .map((s: any) => (
+                  <p key={s.id}>
+                    <a href={s.url} target="_blank" rel="noreferrer">
+                      {s.title}
+                    </a>
+                  </p>
+                ))}
             </details>
           )}
           <div className="actions">

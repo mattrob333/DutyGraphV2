@@ -147,6 +147,6 @@ test("community and competitor research uses the wider web and preserves company
     researchQuery("Acme", "communities", "https://example.com").domain,
     "",
   );
-  assert.match(researchQuery("Acme", "communities", "").query, /Reddit/);
-  assert.match(researchQuery("Acme", "industry", "").query, /RSS/);
+  assert.match(researchQuery("Acme", "communities", "").query, /subreddit/);
+  assert.match(researchQuery("Acme", "industry", "").query, /headcount/);
 });

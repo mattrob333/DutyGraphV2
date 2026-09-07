@@ -169,7 +169,7 @@ export function businessClassificationRouter(
         for (const id of body.researchRunIds || []) {
           const run = (
             await db.query(
-              "SELECT results FROM research_runs WHERE id=$1 AND company_id=$2 AND state='complete'",
+              "SELECT results,query,domain FROM research_runs WHERE id=$1 AND company_id=$2 AND state='complete'",
               [id, company.id],
             )
           ).rows[0];
@@ -179,13 +179,16 @@ export function businessClassificationRouter(
               "RESEARCH_NOT_READY",
               "A selected research result is unavailable for this company.",
             );
-          for (const [index, source] of run.results.slice(0, 3).entries()) {
-            if (collected.length < 12)
+          for (const [index, source] of run.results.slice(0, 5).entries()) {
+            if (collected.length < 20)
               collected.push({
                 id: `research:${id}:${index}`,
                 title: String(source.title).slice(0, 200),
-                text: String(source.text).slice(0, 4000),
+                text: String(source.text).slice(0, 6000),
                 url: source.url,
+                retrievedAt: source.retrievedAt,
+                publishedDate: source.publishedDate,
+                focus: run.domain ? "official company website" : "public web",
               });
           }
         }
@@ -249,7 +252,7 @@ export function businessClassificationRouter(
           website: body.website,
           description: body.description,
           revision: company.revision,
-          promptVersion: "business-classification-v1",
+          promptVersion: "business-brief-v2",
           sources: collected,
           websiteRead:
             !!body.website &&

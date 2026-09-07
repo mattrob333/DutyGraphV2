@@ -1,3 +1,4 @@
+import { briefCategories } from "../shared/business-brief.ts";
 import "dotenv/config";
 import test, { before, after } from "node:test";
 import assert from "node:assert/strict";
@@ -16,6 +17,18 @@ import { frameworkInputs } from "../server/frameworks.ts";
 import { discoveryContext } from "../server/discovery.ts";
 
 const draft = {
+  brief: {
+    facts: Object.keys(briefCategories).map((category) => ({
+      category,
+      label: "Not established",
+      value: "No public evidence in this fixture.",
+      basis: "Not established",
+      asOf: "",
+      citations: [],
+    })),
+    monitoring: [],
+  },
+  alternatives: [],
   industry: "Business advisory",
   summary: "The description fits a consulting business.",
   recommendations: [
@@ -250,6 +263,19 @@ test("description produces a recoverable draft once; saving adapts profile and r
     );
     const context = await discoveryContext(db, saved.data, "contact");
     assert.ok(context.sources.some((s) => s.text.includes(intake.description)));
+    assert.ok(context.sources.some((s) => s.id === `business-brief:${job.id}`));
+    const changed = await discoveryContext(
+      db,
+      {
+        ...saved.data,
+        settings: {
+          ...saved.data.settings,
+          businessIntake: { ...intake, description: "A different business" },
+        },
+      },
+      "contact",
+    );
+    assert.ok(!changed.sources.some((s) => s.id.startsWith("business-brief:")));
   });
 });
 
@@ -361,6 +387,39 @@ test("classification reuses a completed research pass without a fifth search and
     },
   );
   assert.equal(research.data.state, "complete");
+  const forbiddenContext = await request(
+    other,
+    `/api/v1/companies/${other.company}/research`,
+    "POST",
+    {
+      publicName: "Other",
+      website: "",
+      description: "Advisory",
+      focus: "competitors",
+      contextRunIds: [research.data.id],
+      acknowledgePublicQuery: true,
+    },
+  );
+  assert.equal(forbiddenContext.status, 422);
+  const contextual = await request(
+    c,
+    `/api/v1/companies/${c.company}/research`,
+    "POST",
+    {
+      publicName: "Synthetic",
+      website: "https://consulting.test.invalid",
+      description: "We build custom software",
+      focus: "competitors",
+      contextRunIds: [research.data.id],
+      acknowledgePublicQuery: true,
+    },
+  );
+  assert.equal(contextual.data.state, "complete");
+  assert.match(
+    contextual.data.query,
+    /We advise companies on their operations/,
+  );
+  assert.match(contextual.data.query, /We build custom software/);
   const input = body(c, {
     description: "",
     website: "https://consulting.test.invalid",
@@ -373,7 +432,7 @@ test("classification reuses a completed research pass without a fifth search and
   assert.equal(
     (await request(c, `/api/v1/companies/${c.company}/research`)).data.runs
       .length,
-    1,
+    2,
   );
   assert.equal(
     (

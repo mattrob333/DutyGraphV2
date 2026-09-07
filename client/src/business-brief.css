@@ -1,0 +1,133 @@
+.business-brief {
+  margin: 28px 0;
+  border: 1px solid var(--line);
+  border-top: 3px solid #94b8a4;
+  border-radius: 14px;
+  overflow: hidden;
+  scroll-margin-top: 30px;
+}
+.business-brief header {
+  padding: 28px;
+  background: var(--surface);
+}
+.business-brief h2 {
+  margin: 12px 0;
+  font-size: clamp(24px, 3vw, 34px);
+}
+.brief-summary {
+  max-width: 90ch;
+  font-size: 17px;
+  line-height: 1.6;
+}
+.brief-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 20px;
+}
+.brief-grid > article {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+}
+.brief-grid h3 {
+  font-size: 17px;
+  margin: 0 0 18px;
+}
+.brief-fact + .brief-fact {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+}
+.brief-fact-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.brief-basis {
+  font-size: 10px;
+  border: 1px solid #94b8a4;
+  padding: 3px 6px;
+  border-radius: 5px;
+}
+.brief-basis.missing {
+  border-color: var(--line);
+  color: var(--muted);
+}
+.business-brief p {
+  line-height: 1.6;
+}
+.business-brief small {
+  color: var(--muted);
+  display: block;
+  line-height: 1.5;
+}
+.business-brief summary {
+  cursor: pointer;
+  font-size: 12px;
+}
+.brief-evidence {
+  padding: 12px 0;
+  font-size: 12px;
+}
+.business-brief blockquote {
+  border-left: 2px solid #94b8a4;
+  margin: 10px 0;
+  padding-left: 12px;
+}
+.business-brief a,
+.business-brief p,
+.business-brief blockquote {
+  overflow-wrap: anywhere;
+}
+.brief-meeting {
+  border-top: 1px solid var(--line);
+  padding: 24px;
+}
+.brief-meeting li {
+  padding: 4px 0;
+}
+.brief-meeting small {
+  margin-top: 12px;
+}
+.brief-monitoring {
+  padding: 24px;
+  border-top: 1px solid var(--line);
+}
+.brief-monitoring > summary {
+  font-size: 14px;
+  font-weight: 600;
+}
+.brief-monitoring .brief-grid {
+  padding: 12px 0 0;
+}
+.stream-role {
+  color: var(--muted);
+  font-size: 12px;
+  display: block;
+  margin-bottom: 8px;
+}
+@media (max-width: 1100px) {
+  .brief-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 650px) {
+  .brief-grid {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+  .business-brief header,
+  .brief-meeting,
+  .brief-monitoring {
+    padding: 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .business-brief {
+    scroll-behavior: auto;
+  }
+}

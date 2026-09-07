@@ -1,5 +1,12 @@
 # DutyGraph development log
 
+## 2026-09-07 — Business briefing instead of a search-results dump
+
+- Reworked the bounded four-search pass to use public description and official-site context for competitor, market/scale and monitoring-channel discovery. Cross-company run references are rejected before searching; existing durable keys, quotas and resume behavior remain.
+- Added the v2 briefing contract: six fact areas, Reported/Inferred/Not established distinctions, exact-source quote validation, date fields and separate channel recommendations. Expanded the final snapshot to up to 20 excerpts. Matching text proves provenance, not correctness; real-company research quality still needs pilot acceptance.
+- Added a responsive briefing dashboard, collapsed evidence library and monitoring drawer, primary/supporting stream controls, separate classification alternatives, and a save-and-prepare-email action. Matching saved intake lets kickoff preparation use the brief instead of raw automatic search pages. Older jobs remain readable; rerun research to obtain a v2 brief.
+- README and research guide updated. Validation and release results recorded in docs/verification/2026-09-07-business-brief.md. Local build and 209 tests passed; 89-route contracts unchanged; dependency audit clean. Desktop/mobile synthetic workflow checked. No migrations, paid-provider test calls, email sends or feed subscriptions.
+
 Newest entries first. This log was established September 7, 2026. The two preceding website releases are backfilled below; older history remains in Git and dated [verification records](docs/verification/). This is not a claim that every historical change has been reconstructed.
 
 For every future logical change, update this log and the [README](README.md) together. Record the date, change and reason, affected areas, checks actually performed, known publication status, and remaining work. Link a commit or detailed evidence when available. Do not include credentials, private transcripts or lead details.
