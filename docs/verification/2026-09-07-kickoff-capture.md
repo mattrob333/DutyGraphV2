@@ -22,6 +22,10 @@ An isolated localhost:4337 app used the dedicated local database and fake email/
 - Repeated enrollment after fixing the URL, refreshed `/respond?request=…`, and verified the same assigned form remained visible. The revised card showed purpose, trigger and reported checkpoints before approval and submission.
 - Viewed the branded HTML invitation in the browser. This establishes browser rendering, not compatibility in every email client.
 
+## Hosted release
+
+Implementation `4a883ec1cb9e649960a2c72773b9a92e59123d00` passed CI run [34162455255](https://github.com/mattrob333/DutyGraphV2/actions/runs/34162455255). Vercel deployment `dpl_4Ua7eMB5bY9SABkK4UmnDabeeKwo` reported READY for that exact commit. Production checks on dutygraph.com returned 200 for `/respond?request=<synthetic-id>`, app asset `/assets/index-C1jxfpPw.js` with the new response route/kickoff guide, and the updated participant handbook. The participant API returned 401 without a session. A hosted browser check displayed sign-in at the private response route. No production customer records were changed.
+
 ## Boundaries
 
 No physical microphone recording, real email delivery or paid provider reasoning-quality evaluation was performed. Typed/browser checks and synthetic audio/API tests are different evidence. Company model templates do not prove actual tasks, bottlenecks, authority or customer outcomes. Old discovery drafts require regeneration under the updated prompt fingerprint.
