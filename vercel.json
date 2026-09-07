@@ -21,6 +21,7 @@
   ],
   "rewrites": [
     { "source": "/login", "destination": "/index.html" },
+    { "source": "/respond", "destination": "/index.html" },
     { "source": "/api/:path*", "destination": "/api" },
     { "source": "/invite/:path*", "destination": "/index.html" }
   ],

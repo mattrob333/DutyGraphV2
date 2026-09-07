@@ -10,6 +10,8 @@ The [development log](../DEVLOG.md) records changes, reasons, validation and rem
 
 ## Detailed references
 
+[Kickoff and capture](kickoff-capture.md): business-specific meeting coverage, full duty context, private invitations and voice-to-card review.
+
 [Website measurement](website-measurement.md): consent, event contract, Google activation and aggregate pilot reporting.
 
 [Cross-team analysis](team-analysis.md): context contracts, jobs, citations, advisor review and limits.

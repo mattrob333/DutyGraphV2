@@ -102,3 +102,38 @@ test("transcription rejects unsupported uploads and hides provider error bodies"
     /too large/,
   );
 });
+
+test("work and leadership emails explain their own private capture and review sequence", () => {
+  const template = (type: string) =>
+    invitationTemplate({
+      company: "Synthetic",
+      person: {
+        title: "Amina",
+        data: { role: "Coordinator", team: "Service" },
+      },
+      request: {
+        title: "Explain your work",
+        data: { type, questions: ["What do you receive?"] },
+      },
+      url: "https://example.test/invite/synthetic",
+    });
+  const work = template("work"),
+    leadership = template("leadership"),
+    confirmation = template("confirmation");
+  for (const message of [work, leadership]) {
+    assert.match(message.text, /Voice is preferred/);
+    assert.match(message.text, /Save recording/);
+    assert.match(message.text, /If you recorded or uploaded audio/);
+    assert.match(message.text, /Typed answers can go straight to review/);
+    assert.match(message.text, /Send my response/);
+    assert.match(
+      message.html,
+      /href="https:\/\/example.test\/invite\/synthetic"/,
+    );
+  }
+  assert.match(work.text, /Create my task cards/);
+  assert.match(work.text, /Approval records your understanding/);
+  assert.ok(!leadership.text.includes("Create my task cards"));
+  assert.ok(!confirmation.text.includes("Start recording"));
+  assert.match(work.html, /<p style="margin:0 0 14px">If you recorded/);
+});

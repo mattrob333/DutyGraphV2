@@ -1,4 +1,8 @@
 import { granularWorkGuide } from "../../shared/work-granularity.ts";
+import {
+  requestCaptureSteps,
+  voicePreference,
+} from "../../shared/request-capture.ts";
 import { ParticipantCards } from "./ParticipantCards.tsx";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -418,7 +422,9 @@ export function Participant({
   onLogout: () => void;
 }) {
   const [data, setData] = useState<any>(null),
-    [selected, setSelected] = useState(""),
+    [selected, setSelected] = useState(
+      () => new URLSearchParams(window.location.search).get("request") || "",
+    ),
     [error, setError] = useState(""),
     [taskCards, setTaskCards] = useState<any[] | null>(null),
     [text, setText] = useState(""),
@@ -533,7 +539,7 @@ export function Participant({
           {data?.company.name} · {user.name}
         </div>
         <h1>
-          {sentId === request?.id
+          {sentId === request?.id || request?.state === "returned"
             ? "Thank you. Your response is received."
             : request?.data.type === "confirmation"
               ? "Does this describe your work?"
@@ -542,9 +548,11 @@ export function Participant({
                 : "Read the questions. Then just talk."}
         </h1>
         <p className="participant-intro">
-          {request?.data.type === "leadership"
-            ? "Share your goals, your team’s responsibilities and the questions you want this meeting to answer."
-            : "Use a recent example. Explain what you receive, what you do, and who needs the result. Voice is preferred: a real example helps us capture the steps, exceptions, and frustrations. You can type instead."}
+          {sentId === request?.id || (request && request.state !== "sent")
+            ? "Your response is saved. Your advisor will bring the team's accounts together and follow up on any gaps. You can close this page."
+            : request?.data.type === "leadership"
+              ? `Share your goals, business model, departments and team responsibilities. ${voicePreference}`
+              : `Use a recent example. Explain what you receive, what you do, and who needs the result. ${voicePreference}`}
         </p>
         {data?.person && (
           <p className="participant-role">
@@ -557,7 +565,14 @@ export function Participant({
             <select
               disabled={captureBusy || transcriptBusy || busy}
               value={request?.id || ""}
-              onChange={(e) => setSelected(e.target.value)}
+              onChange={(e) => {
+                setSelected(e.target.value);
+                window.history.replaceState(
+                  null,
+                  "",
+                  `/respond?request=${encodeURIComponent(e.target.value)}`,
+                );
+              }}
             >
               {data.requests.map((r: any) => (
                 <option value={r.id} key={r.id}>
@@ -601,6 +616,14 @@ export function Participant({
               </span>
               <span>Due {request.data.dueDate}</span>
             </div>
+            <details className="capture-notice">
+              <summary>How to complete your response</summary>
+              <ol>
+                {requestCaptureSteps(request.data.type).map((step) => (
+                  <li key={step}>{step}</li>
+                ))}
+              </ol>
+            </details>
             {expired && (
               <ErrorBox error="This request is past its due date. Ask your advisor to extend it or send a new request. Your local draft is still saved." />
             )}
@@ -643,7 +666,10 @@ export function Participant({
               </ol>
               {request.data.type === "work" && (
                 <details>
-                  <summary>Cover each task under your duties</summary>
+                  <summary>
+                    For each task: inputs → actions → software → result →
+                    handoff
+                  </summary>
                   <p>
                     Talk through these points for each regular task. There is no
                     required number of tasks.

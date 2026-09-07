@@ -6,6 +6,12 @@ Research gives an initial picture. Leadership supplies goals and structure. Part
 
 Participant extraction should separate duties from tasks and tasks from ordered actions. It must use the person's role and kickoff context without filling gaps with unsupported operational details. Preserve the account from which a draft came.
 
+## Business-specific kickoff and capture
+
+The [kickoff and capture contract](../kickoff-capture.md) connects all 52 operating-model templates and hybrid streams to an eight-part leadership guide. Optional structured notes and a transcript become one saved meeting account. Reviewed duty descriptions carry the actual task examples, dependencies and software into personal interviews and participant extraction. Templates remain questions, never evidence of a procedure or authority.
+
+Branded HTML/text invitations and the participant page share recording, transcription, card review and submission guidance. The participant draft validates cited source IDs and person assignments against the supplied context before returning cards.
+
 ## Industry mapping
 
 Industry mapping can run during early research before kickoff. The supplied detailed industry-mapping instructions were adapted into structured output with fourteen sections and grounding requirements. It is a baseline that can be revisited as evidence improves, not a definitive market truth.

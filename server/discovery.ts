@@ -1,5 +1,9 @@
 import { frameworkInputs, currentFrameworkRuns } from "./frameworks.ts";
 import { taskGranularityInstructions } from "../shared/work-granularity.ts";
+import {
+  kickoffGuide,
+  discoveryPromptVersion,
+} from "../shared/kickoff-guide.ts";
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -47,6 +51,7 @@ export type DiscoveryInput = {
   interviewQuestions?: string[];
   company: string;
   businessProfile?: unknown;
+  captureGuide?: ReturnType<typeof kickoffGuide>;
   contact?: { name: string; email: string; meetingAt: string };
   sources: DiscoverySource[];
   people: {
@@ -228,7 +233,7 @@ export async function discoveryContext(
     title: r.title,
     text: String(r.data.text || reviewedTranscript(r)?.data.text || "").slice(
       0,
-      12000,
+      r.data.originId === "discovery-meeting" ? 20000 : 12000,
     ),
     version: r.version,
     hash:
@@ -384,6 +389,7 @@ export async function discoveryContext(
     ...sources.filter((s) => !internalIds.has(s.id)),
   ].slice(0, limit);
   const fingerprint = hash({
+    promptVersion: discoveryPromptVersion,
     stage,
     company: company.name,
     businessProfile: company.settings?.businessProfile || null,
@@ -399,6 +405,7 @@ export async function discoveryContext(
     company: company.name,
     businessProfile: company.settings?.businessProfile || null,
     contact,
+    captureGuide: kickoffGuide(company.settings?.businessProfile),
     sources: chosen,
     people: ["interviews", "tasks"].includes(stage) ? people : [],
     fingerprint,

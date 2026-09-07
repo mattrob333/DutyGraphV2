@@ -1,4 +1,8 @@
 import { BusinessProfilePanel } from "./BusinessProfilePanel.tsx";
+import {
+  kickoffGuide,
+  composeKickoffNotes,
+} from "../../shared/kickoff-guide.ts";
 import { TeamAnalysis } from "./TeamAnalysis.tsx";
 import { FrameworkWorkspace } from "./FrameworkWorkspace.tsx";
 import { useEffect, useState } from "react";
@@ -95,6 +99,19 @@ export function DiscoveryJourney({
     );
   const [meeting, setMeeting] = useState(""),
     [emailResults, setEmailResults] = useState<Record<string, string>>({});
+  const [meetingAnswers, setMeetingAnswers] = useState<Record<string, string>>(
+    {},
+  );
+  const meetingGuide = kickoffGuide(company.settings.businessProfile);
+  const meetingText = composeKickoffNotes(
+    company.settings.businessProfile,
+    meetingAnswers,
+    meeting,
+  );
+  useEffect(() => {
+    setMeeting("");
+    setMeetingAnswers({});
+  }, [company.id]);
   const base = `/v1/companies/${company.id}/discovery`;
   const load = async () => {
     const r = await api(base);
@@ -1187,9 +1204,60 @@ export function DiscoveryJourney({
       {stage === "agenda" && (
         <Panel
           title="Capture the leadership meeting"
-          subtitle="Paste the transcript or your notes. Include names, emails, departments, responsibilities and agreed goals."
+          subtitle="Use the business-specific guide to capture the context behind the work. Add guided notes, a transcript, or both."
         >
-          <Field label="Meeting notes">
+          <p>
+            The kickoff maps the business and responsibilities. Employees will
+            supply the detailed task procedures in their personal interviews.
+          </p>
+          {meetingGuide.profileMissing ? (
+            <p className="subtle">
+              No operating model selected yet. Confirm how this business
+              delivers value before assuming a process.
+            </p>
+          ) : (
+            meetingGuide.models.map((model, i) => (
+              <section key={i} className="notice kickoff-model">
+                <strong>
+                  {model.name === model.model
+                    ? model.name
+                    : `${model.name} · ${model.model}`}
+                </strong>
+                <p>Proposed flow to validate: {model.stages.join(" → ")}</p>
+                <p>{model.probe}</p>
+              </section>
+            ))
+          )}
+          <div className="stack">
+            {meetingGuide.sections.map((section) => (
+              <details key={section.id}>
+                <summary>
+                  {section.title}
+                  {meetingAnswers[section.id]?.trim() ? " · Notes added" : ""}
+                </summary>
+                <ul>
+                  {section.questions.map((q) => (
+                    <li key={q}>{q}</li>
+                  ))}
+                </ul>
+                <Field label={`${section.title} — meeting notes`}>
+                  <textarea
+                    rows={4}
+                    maxLength={2000}
+                    value={meetingAnswers[section.id] || ""}
+                    onChange={(e) =>
+                      setMeetingAnswers((previous) => ({
+                        ...previous,
+                        [section.id]: e.target.value,
+                      }))
+                    }
+                    placeholder="Record what the team said, named owners, disagreements and follow-up questions. Leave unknown facts unresolved."
+                  />
+                </Field>
+              </details>
+            ))}
+          </div>
+          <Field label="Transcript or additional meeting notes">
             <textarea
               rows={12}
               value={meeting}
@@ -1198,6 +1266,14 @@ export function DiscoveryJourney({
               placeholder="Paste the executive kickoff transcript or write your meeting notes here…"
             />
           </Field>
+          <p className="subtle">
+            {meetingText.length.toLocaleString()} / 20,000 characters. Guided
+            notes are optional when the transcript already covers these topics.
+            Review gaps before saving; missing notes do not prove missing work.
+          </p>
+          {meetingText.length > 20000 && (
+            <ErrorBox error="The combined notes exceed 20,000 characters. Shorten them before saving; nothing will be silently truncated." />
+          )}
           <div className="journey-row">
             <p className="subtle">
               Review these notes before saving. They become the source for the
@@ -1205,14 +1281,20 @@ export function DiscoveryJourney({
             </p>
             <Button
               primary
-              disabled={busy || meeting.trim().length < 20}
+              disabled={
+                busy ||
+                [meeting, ...Object.values(meetingAnswers)].join(" ").trim()
+                  .length < 20 ||
+                meetingText.length > 20000
+              }
               onClick={() =>
                 void perform(async () => {
                   await api(base + "/meeting", "POST", {
                     title: "Executive kickoff notes",
-                    text: meeting,
+                    text: meetingText,
                   });
                   setMeeting("");
+                  setMeetingAnswers({});
                   setNotice(
                     "Meeting notes saved. Build the team dossiers next.",
                   );

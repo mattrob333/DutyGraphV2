@@ -274,7 +274,7 @@ export function createApp({
     );
     if (!first.rows[0])
       fail(410, "INVITATION_EXPIRED", "This invitation is unavailable.");
-    const user = await tx(first.rows[0].tenant_id, async (db) => {
+    const enrolled = await tx(first.rows[0].tenant_id, async (db) => {
       const { rows } = await db.query(
         "SELECT * FROM invitations WHERE token_hash=$1 AND used_at IS NULL AND revoked_at IS NULL AND expires_at>now() FOR UPDATE",
         [token],
@@ -339,9 +339,12 @@ export function createApp({
             "invitation possession plus password; email not independently verified",
         },
       );
-      return publicUser(row);
+      return { user: publicUser(row), requestId: invite.request_id };
     });
-    res.json(await createSession(res, user));
+    res.json({
+      ...(await createSession(res, enrolled.user)),
+      requestId: enrolled.requestId,
+    });
   });
   app.use("/api/v1", authenticate);
   const api = express.Router();
@@ -1257,12 +1260,15 @@ export function createApp({
             duty: card.duty,
             ownerId: "",
             performerId: u.person_id,
-            purpose: "Work described by the participant",
-            trigger: "Not yet recorded",
+            purpose:
+              card.purpose?.trim() || "Work described by the participant",
+            trigger: card.trigger?.trim() || "Not yet recorded",
             inputs: card.inputs || "Not yet recorded",
             instructions: card.instructions || "Not yet recorded",
             output: card.output || "Not yet recorded",
-            humanGate: "Company authority and checkpoints require review",
+            humanGate:
+              card.humanGate?.trim() ||
+              "Company authority and checkpoints require review",
             systems: card.software
               .split(",")
               .map((s: string) => s.trim())

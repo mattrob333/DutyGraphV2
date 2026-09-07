@@ -13,6 +13,7 @@ import { normalizeResearch } from "../server/research.ts";
 let researchCalls = 0,
   aiCalls = 0;
 const emailMessages: any[] = [];
+const participantInputs: import("../server/discovery.ts").DiscoveryInput[] = [];
 let transcriptionCalls = 0;
 let server: Server, base: string;
 type Client = { cookie: string; csrf: string; user: any; company: string };
@@ -734,6 +735,7 @@ async function invite(c: Client, f: any, type = "confirmation") {
     { password: "Synthetic participant password 123!", acknowledged: true },
   );
   assert.equal(enroll.status, 200, JSON.stringify(enroll.data));
+  assert.equal(enroll.data.requestId, req.id);
   const participant = {
     cookie: enroll.cookie,
     csrf: enroll.data.csrf,
@@ -746,27 +748,30 @@ before(async () => {
   const app = createApp({
     authRequestsPerWindow: 1000,
     hostedRouting: true,
-    discoveryProvider: async (input) => ({
-      summary: "Participant extraction",
-      gaps: [],
-      tasks: [
-        {
-          title: "Check packet",
-          duty: "Prepare records",
-          ownerId: "",
-          performerId: input.people[0].id,
-          purpose: "Prepare packet",
-          trigger: "Packet arrives",
-          inputs: "Supplier packet",
-          instructions: "Check required fields",
-          output: "Complete packet",
-          systems: ["Google Sheets"],
-          humanGate: "Unknown",
-          destination: "Finance",
-          sourceIds: [input.sources[0].id],
-        },
-      ],
-    }),
+    discoveryProvider: async (input) => {
+      participantInputs.push(input);
+      return {
+        summary: "Participant extraction",
+        gaps: [],
+        tasks: [
+          {
+            title: "Check packet",
+            duty: "Prepare records",
+            ownerId: "",
+            performerId: input.people[0].id,
+            purpose: "Prepare packet",
+            trigger: "Packet arrives",
+            inputs: "Supplier packet",
+            instructions: "Check required fields",
+            output: "Complete packet",
+            systems: ["Google Sheets"],
+            humanGate: "Unknown",
+            destination: "Finance",
+            sourceIds: [input.sources[0].id],
+          },
+        ],
+      };
+    },
     emailProvider: async (message, key, id) => {
       emailMessages.push({ message, id });
       if (message.subject.includes("UnknownEmail"))
@@ -1464,10 +1469,22 @@ test("private sample is isolated, repeatable and does not send email", async () 
     17,
   );
   assert.ok(workspace.data.records.some((r: any) => r.kind === "duty"));
-  for (const title of ["Access Review Assistant — fictional", "Change Evidence Assistant — fictional", "Supplier Summary Assistant — fictional"]) {
-    const agent = workspace.data.records.find((r: any) => r.kind === "agent" && r.title === title);
+  for (const title of [
+    "Access Review Assistant — fictional",
+    "Change Evidence Assistant — fictional",
+    "Supplier Summary Assistant — fictional",
+  ]) {
+    const agent = workspace.data.records.find(
+      (r: any) => r.kind === "agent" && r.title === title,
+    );
     assert.ok(agent);
-    assert.ok(agent.data.taskIds.some((id: string) => workspace.data.records.some((r: any) => r.id === id && r.data.controlAreas?.length)));
+    assert.ok(
+      agent.data.taskIds.some((id: string) =>
+        workspace.data.records.some(
+          (r: any) => r.id === id && r.data.controlAreas?.length,
+        ),
+      ),
+    );
   }
   const examples = workspace.data.records.filter(
     (r: any) =>
@@ -1950,6 +1967,37 @@ test("participant submits reviewed task descriptions with evidence and no compan
   const c = await register(),
     f = await fixture(c),
     i = await invite(c, f, "work");
+  await create(c, "duty", {
+    title: "Maintain supplier records",
+    ownerId: f.p.id,
+    scope: "Synthetic supplier intake",
+    reviewDue: "2099-01-01",
+    reason: "Synthetic kickoff context",
+    purpose:
+      "Check buyer packets in Sheets and prepare a Finance handoff; a separate human approves updates.",
+  });
+  const template = (
+    await import("../shared/business-types.ts")
+  ).businessTemplates.find((t) => t.id === "wholesale")!;
+  const profile = {
+    industry: "Industrial distribution",
+    status: "advisor_reviewed",
+    rationale: "Synthetic kickoff context",
+    streams: [
+      {
+        id: "wholesale",
+        templateId: template.id,
+        name: "Distribution",
+        stages: template.stages,
+      },
+    ],
+  };
+  await tx(c.user.tenant_id, (db) =>
+    db.query(
+      "UPDATE companies SET settings=jsonb_set(settings,'{businessProfile}',$2::jsonb) WHERE id=$1",
+      [c.company, JSON.stringify(profile)],
+    ),
+  );
   await saveProvider(c, "openai");
   const draft = await request(
     i.participant,
@@ -1963,6 +2011,25 @@ test("participant submits reviewed task descriptions with evidence and no compan
   );
   assert.equal(draft.status, 200, JSON.stringify(draft.data));
   assert.equal(draft.data.cards[0].handoff, "Finance");
+  assert.equal(draft.data.cards[0].trigger, "Packet arrives");
+  assert.equal(draft.data.cards[0].humanGate, "Unknown");
+  const input = participantInputs.at(-1)!;
+  assert.equal(input.company, "Isolated API Test");
+  assert.deepEqual(input.businessProfile, profile);
+  assert.equal(input.captureGuide?.models[0].name, "Distribution");
+  assert.equal(input.people.length, 1);
+  assert.equal(input.people[0].id, f.p.id);
+  assert.equal(input.people[0].email, "");
+  assert.ok(
+    input.people[0].duties.some((d) =>
+      d.includes("Check buyer packets in Sheets"),
+    ),
+  );
+  assert.equal(input.sources.length, 1);
+  assert.equal(input.sources[0].id, i.req.id);
+  assert.equal(input.sources[0].origin, "team");
+  assert.ok(!input.sources.some((source) => source.id === f.e.id));
+
   assert.equal(
     (
       await request(
@@ -1978,6 +2045,9 @@ test("participant submits reviewed task descriptions with evidence and no compan
     {
       title: "Check the packet",
       duty: "Prepare complete records",
+      purpose: "Prepare a Finance handoff",
+      trigger: "The buyer sends a new packet",
+      humanGate: "I ask the coordinator to resolve missing fields",
       inputs: "Supplier packet",
       instructions: "Check required fields",
       output: "Complete packet",
@@ -2023,6 +2093,12 @@ test("participant submits reviewed task descriptions with evidence and no compan
   assert.equal(task.data.ownerId, "");
   assert.equal(task.data.performerId, f.p.id);
   assert.equal(task.data.destination, "Finance");
+  assert.equal(task.data.trigger, "The buyer sends a new packet");
+  assert.equal(task.data.purpose, "Prepare a Finance handoff");
+  assert.equal(
+    task.data.humanGate,
+    "I ask the coordinator to resolve missing fields",
+  );
   assert.deepEqual(task.data.systems, ["Google Sheets"]);
   const source = records.find((r) => r.id === task.data.evidenceIds[0]);
   assert.equal(source.state, "proposed");
@@ -2042,7 +2118,12 @@ test("participant submits reviewed task descriptions with evidence and no compan
     records.filter((r) => r.data.participantResponseId === response.id).length,
     1,
   );
-  assert.equal((await action(c,response,"accept")).status,200);
-  const accepted=await tx(c.user.tenant_id,async db=>(await db.query("SELECT * FROM records WHERE id=$1",[source.id])).rows[0]);
-  assert.equal(accepted.state,"accepted");
+  assert.equal((await action(c, response, "accept")).status, 200);
+  const accepted = await tx(
+    c.user.tenant_id,
+    async (db) =>
+      (await db.query("SELECT * FROM records WHERE id=$1", [source.id]))
+        .rows[0],
+  );
+  assert.equal(accepted.state, "accepted");
 });

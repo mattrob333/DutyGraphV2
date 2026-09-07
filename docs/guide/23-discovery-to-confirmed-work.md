@@ -14,9 +14,9 @@ Edit the subject, message and preliminary questions. **Save contact request** cr
 
 ## 2. Leadership meeting
 
-Choose **Prepare meeting guide**. The guide uses public research and the contact's actual reply, when available. It groups questions for the live discussion: scope, customers and value, goals, people and responsibilities, and next steps. The advisor uses the guide during the meeting.
+Choose **Prepare meeting guide**. The guide uses public research and the contact's actual reply, when available. It follows the selected business model and each stream of a hybrid company. Confirm or correct the proposed stages. The guide covers the offer and customer journey; goals with owners, measures and time horizons; departments and reporting; role duties; a concrete task example; dependencies and delays; software and decision boundaries; and follow-up. The advisor uses the guide during the meeting.
 
-After the meeting, paste the transcript or your notes into **Capture the leadership meeting**. Review the notes, then save them. These notes are accepted as the advisor's account of the meeting and become the source for team dossiers. They do not establish independent proof of every claim. Direct Fireflies import is not connected; paste an authorized transcript here.
+During or after the meeting, use the eight expandable sections in **Capture the leadership meeting** to record notes, or paste an authorized transcript. Guided notes are optional; use them to close gaps rather than copy the whole conversation. Record who supplies each input, who produces the output, where it goes, and who handles exceptions. Leadership establishes context; each employee describes their detailed procedures later. The combined notes and transcript can contain up to 20,000 characters. Review the notes, then save them. These notes are accepted as the advisor's account of the meeting and become the source for team dossiers. They do not establish independent proof of every claim. Direct Fireflies import is not connected; paste an authorized transcript here.
 
 ## 3. Review the team
 
@@ -26,13 +26,13 @@ Review each person's dossier. Correct an email or role, add a stated duty, or re
 
 ## 4. Team interviews
 
-Choose **Create question sets**. AI prepares one tailored interview for every person in the reviewed team. It uses their role, reviewed duties and leadership context. Questions ask about a real example: what starts the work, what is needed, what they do, the tools they use, what they produce, who receives it, and where decisions or delays occur.
+Choose **Create question sets**. AI prepares one tailored interview for every person in the reviewed team. It uses their role, full reviewed duty descriptions, business model and leadership context. Up to eight focused prompts cover all of the person's stated duties, including recurring and exception work. Questions ask about a real example: what starts the work, what is needed, what they do, the tools they use, what they produce, who receives it, and where decisions or delays occur.
 
 Review the questions and email messages, then **Save all personal requests**. **Send pending team invitations** sends each person's private request in sequence. A confirmed email-service receipt is skipped on later batch attempts. An uncertain result stops the batch for review. Open each request to inspect its email preview, delivery attempt and original questions.
 
 The recipient opens the private link and signs in or creates a participant password. Voice is preferred: a real example helps capture steps, exceptions and frustrations. Typing is also available.
 
-After recording, they save the clip, create and check its transcript, and add it to their answer. **Create my task cards** uses the configured AI service to extract their work. They check the input, action, output, destination and software. Each card is marked **This matches my understanding**, **Remove — this is not my task**, or **I'm not sure — ask the advisor**. Edits require another check before sending.
+After recording, they save the clip, create and check its transcript, and add it to their answer. **Create my task cards** uses the configured AI service to extract their work. They check the input, action, output, destination and software. Choose **Approve** or **Edit** on each card. Approval displays a green check; editing clears the approval until the person checks the revised card. Edits require another check before sending.
 
 Their original answer and reviewed descriptions arrive together. This is their understanding of the work, not company approval of ownership or agent permissions. If AI is unavailable, they can send the answer without cards for advisor review. See [Review your task cards before sending](25-participant-review.md).
 
@@ -40,6 +40,6 @@ Their original answer and reviewed descriptions arrive together. This is their u
 
 Start with the descriptions people have already reviewed. Open their returned responses to see their original account, corrections and decisions. Retained cards are proposed tasks, with the participant as performer; accountable ownership still needs review. Removed cards remain in the response history.
 
-Accept the original evidence after reviewing it. Resolve missing owners, overlapping responsibilities and handoff differences with the relevant people. This release does not automatically detect cross-team conflicts. **Draft task cards** remains available for answers sent without cards and for further analysis; check existing cards before saving more to avoid duplicates.
+Accept the original evidence after reviewing it. Resolve missing owners, overlapping responsibilities and handoff differences with the relevant people. Use **Review the work across the team** for recorded gaps and optional AI hypotheses about handoffs, overlapping accounts and candidates for assistance. Validate findings with the team before treating them as established facts. **Draft task cards** remains available for answers sent without cards and for further analysis; check existing cards before saving more to avoid duplicates.
 
 A participant's initial check records their understanding. Company-level task confirmation still uses the existing exact-version owner/performer rules. A changed description may need another check. Agent proposals come afterward; this process does not grant access or deploy an agent.

@@ -351,6 +351,9 @@ button {
 .notice strong {
   color: var(--ink);
 }
+.notice.kickoff-model {
+  display: block;
+}
 .skip-link {
   position: fixed;
   left: 20px;
@@ -2640,6 +2643,12 @@ tbody tr:last-child td {
 }
 .capture-notice > svg {
   color: var(--blue);
+}
+details.capture-notice {
+  display: block;
+}
+details.capture-notice li {
+  margin: 12px 0;
 }
 .capture-notice h3 {
   font-size: 15px;

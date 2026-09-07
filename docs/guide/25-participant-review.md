@@ -8,7 +8,7 @@ Open the [five-person walkthrough](/?demo=discovery). Choose a teammate and foll
 
 ## 1. Open your invitation
 
-Use the private link in your email. Check your name and company. Create a password on your first visit, or sign in. Do not forward your link. Read the notice and questions before answering.
+Use the private link in your email. Check your name and company. Create a password on your first visit, or sign in. Do not forward your link. Read the notice and questions before answering. Once enrolled, the response page keeps its own address so you can refresh or return to your assigned form. If the original invitation has already been used, choose Return to sign in.
 
 ## 2. Describe a real example
 
@@ -16,8 +16,8 @@ Voice is preferred: a real example helps us capture the steps, exceptions and fr
 
 Start by listing your regular duties and the tasks within each one. A duty is an ongoing responsibility. A task produces a specific result; its actions explain how to produce that result. Describe each task using these five points:
 
-- What you receive to start the task.
-- What you do with it, including checks and exceptions.
+- What starts the task, what data or documents you receive, and who supplies them.
+- The ordered actions, checks, decisions and exceptions; say how often you do the task.
 - What the finished result looks like.
 - Which person, team or system receives the result.
 - Which software you use.
@@ -26,13 +26,13 @@ Say when something is unclear or different in practice. Your account can differ 
 
 ## 3. Save and check your answer
 
-Choose Save recording to upload a completed clip. If AI transcription is configured, create a transcript, correct it and add it to your answer. You can also write the answer yourself. Keep the original recording attached.
+Choose **Start recording**, speak through your prompts, then **Finish clip** and **Save recording**. You can pause and resume, or upload an existing audio file. If AI transcription is configured, choose **Create transcript**, correct it and choose **Use this text in my response**. You can also write the answer yourself. Keep the original recording attached.
 
 Text drafts and card edits save on this device when browser storage is available. Use the same device and browser to return. Do not clear browser storage before submitting. A saved draft is not a submitted response.
 
 ## 4. Create and review your cards
 
-Choose Create my task cards. This sends your answer and assigned work context to the company's configured AI service. AI can draft several task cards under one duty. There is no required count. Cards open as readable instructions; use Edit only when needed. Review every description before choosing a response:
+Choose Create my task cards. This sends your answer, personal questions, role, department, recorded duty descriptions and selected business model to the company's configured AI service. The business model guides interpretation; it does not establish unstated procedures. AI can draft several task cards under one duty. There is no required count. Cards preserve the task’s purpose, trigger and stated human checkpoints alongside inputs, actions and results. These checkpoints are your understanding and still need company review. Cards open as readable instructions; use Edit only when needed. Review every description before choosing a response:
 
 - **Approve:** the card describes the work as you understand it.
 - **Edit:** correct the description, save your edits, then approve the card.
@@ -47,7 +47,7 @@ If AI is not connected, or a draft cannot be produced, select Send my answer for
 
 ## What the advisor does next
 
-The advisor opens your returned response, checks the original evidence and sees your card decisions. Retained cards are proposed work records. The advisor resolves missing owners and differences between teams. A changed description or company-level confirmation can require a further check. Automatic cross-team conflict detection is not active in this release.
+The advisor opens your returned response, checks the original evidence and sees your card decisions. Retained cards are proposed work records. The advisor resolves missing owners and differences between teams. A changed description or company-level confirmation can require a further check. The advisor can run a cross-team review for recorded gaps and AI hypotheses about conflicting accounts or missing handoffs. The team must validate those findings.
 
 In the public walkthrough, Maya returns six separate tasks. The advisor sees three prepared AI-assistance recommendations, two human tasks, and an approval-ownership gap. Only approved, unchanged candidate descriptions can enter the simulated governance preview. Edited descriptions need a fresh suitability review. This preview lists requested work and checks still needed; it grants no scopes, issues no agent, and does not save a live governance request.
 

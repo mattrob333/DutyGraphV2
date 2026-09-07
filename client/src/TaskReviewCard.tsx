@@ -4,11 +4,14 @@ import "./task-review-card.css";
 const fields: Record<string, string> = {
   title: "Task name",
   duty: "Responsibility",
+  purpose: "Purpose · why I do this task",
+  trigger: "Trigger · when this task starts",
   inputs: "Inputs · what I receive and from whom",
   instructions: "Actions · how I do the work",
   output: "Output · what complete looks like",
   handoff: "Handoff · who depends on my result",
   software: "Software I use",
+  humanGate: "Checks and approvals · my understanding",
 };
 export function TaskReviewCard({
   card,
@@ -23,6 +26,11 @@ export function TaskReviewCard({
 }) {
   const [editing, setEditing] = useState(false);
   const approved = card.decision === "correct" && !editing;
+  const visibleFields = Object.entries(fields).filter(
+    ([key]) =>
+      !["purpose", "trigger", "humanGate"].includes(key) ||
+      card[key] !== undefined,
+  );
   return (
     <article className={`task-review-card${approved ? " is-approved" : ""}`}>
       <header>
@@ -36,7 +44,7 @@ export function TaskReviewCard({
       </header>
       {editing ? (
         <div className="task-review-fields">
-          {Object.entries(fields).map(([key, label]) => (
+          {visibleFields.map(([key, label]) => (
             <label key={key}>
               {label}
               <textarea
@@ -60,7 +68,7 @@ export function TaskReviewCard({
         </div>
       ) : (
         <dl>
-          {Object.entries(fields)
+          {visibleFields
             .filter(([k]) => k !== "title")
             .map(([key, label]) => (
               <div key={key}>

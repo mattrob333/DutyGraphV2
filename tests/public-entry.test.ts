@@ -27,6 +27,7 @@ test("public root redirects directly while preserving campaign queries and app e
       "/?view=graph",
       "/?demo=",
       "/login",
+      "/respond?request=synthetic-assigned-request",
       "/invite/test",
       "/landing/",
     ]) {
@@ -44,6 +45,12 @@ test("public root redirects directly while preserving campaign queries and app e
     );
     assert.equal(rule.destination, "/landing/");
     assert.equal(rule.permanent, true);
+    assert.ok(
+      config.rewrites.some(
+        (r: { source: string; destination: string }) =>
+          r.source === "/respond" && r.destination === "/index.html",
+      ),
+    );
     assert.deepEqual(
       rule.missing,
       ["demo", "sample", "view"].map((key) => ({ type: "query", key })),

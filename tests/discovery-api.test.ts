@@ -1133,3 +1133,55 @@ test("Reviewed Discovery accepts the source once and generic response acceptance
   );
   assert.equal(current.find((r) => r.id === original.id).hash, original.hash);
 });
+
+test("business-specific kickoff context preserves long meeting notes and invalidates drafts when the model changes", async () => {
+  const c = await register();
+  const templates = (await import("../shared/business-types.ts"))
+    .businessTemplates;
+  const profile = {
+    industry: "Industrial services",
+    status: "advisor_reviewed",
+    rationale: "Synthetic hybrid company",
+    streams: templates
+      .filter((t) => ["manufacturing", "saas"].includes(t.id))
+      .map((t) => ({
+        id: t.id,
+        templateId: t.id,
+        name: t.label,
+        stages: t.stages,
+      })),
+  };
+  await tx(c.user.tenant_id, (db) =>
+    db.query(
+      "UPDATE companies SET settings=jsonb_set(settings,'{businessProfile}',$2::jsonb) WHERE id=$1",
+      [c.company, JSON.stringify(profile)],
+    ),
+  );
+  const text =
+    "Discussed the operating model. ".repeat(470) +
+    "Final handoff: Amina sends the confirmed appointment to the technician in the service calendar.";
+  assert.ok(text.length > 12000 && text.length < 20000);
+  const saved = await request(c, path(c) + "/meeting", "POST", {
+    title: "Hybrid kickoff",
+    text,
+  });
+  assert.equal(saved.status, 200, JSON.stringify(saved.data));
+  const context = await tx(c.user.tenant_id, async (db) =>
+    discoveryContext(db, await company(c), "roster"),
+  );
+  assert.equal(context.captureGuide?.models.length, 2);
+  assert.equal(context.sources.find((s) => s.origin === "meeting")?.text, text);
+  assert.deepEqual(context.businessProfile, profile);
+  const changed = { ...profile, streams: [profile.streams[0]] };
+  await tx(c.user.tenant_id, (db) =>
+    db.query(
+      "UPDATE companies SET settings=jsonb_set(settings,'{businessProfile}',$2::jsonb) WHERE id=$1",
+      [c.company, JSON.stringify(changed)],
+    ),
+  );
+  const updated = await tx(c.user.tenant_id, async (db) =>
+    discoveryContext(db, await company(c), "roster"),
+  );
+  assert.notEqual(updated.fingerprint, context.fingerprint);
+  assert.equal(updated.captureGuide?.models.length, 1);
+});

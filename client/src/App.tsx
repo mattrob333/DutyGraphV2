@@ -337,7 +337,11 @@ function Invitation({
                     "POST",
                     { password: form.get("password"), acknowledged: true },
                   );
-                  window.history.replaceState(null, "", "/");
+                  window.history.replaceState(
+                    null,
+                    "",
+                    `/respond?request=${encodeURIComponent(result.requestId)}`,
+                  );
                   onLogin(result);
                 } catch (e) {
                   setError((e as Error).message);
@@ -367,7 +371,7 @@ function Invitation({
           </>
         )}
         <p>
-          <a href="/">Return to sign in</a>
+          <a href="/login">Return to sign in</a>
         </p>
       </Panel>
     </div>
@@ -392,7 +396,7 @@ export default function App() {
     } finally {
       setUser(null);
       setCsrf("");
-      window.history.replaceState(null, "", "/");
+      window.history.replaceState(null, "", "/login");
     }
   };
   const token = window.location.pathname.match(
