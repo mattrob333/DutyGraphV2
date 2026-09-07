@@ -459,8 +459,8 @@ export function DiscoveryDemo() {
                     describes a result that another person could take over.
                   </p>
                   <p aria-live="polite">
-                    {cards.filter((c) => c.decision).length} of {cards.length}{" "}
-                    reviewed. Review each card before sending.
+                    {cards.filter((c) => c.decision === "correct").length} of {cards.length}{" "}
+                    approved. Approve each card before sending.
                   </p>
                 </div>
                 {cards.map((card, index) => (
@@ -498,7 +498,7 @@ export function DiscoveryDemo() {
                 </p>
                 <button
                   className="dd-primary"
-                  disabled={!cards.length || cards.some((c) => !c.decision)}
+                  disabled={!cards.length || cards.some((c) => c.decision !== "correct")}
                   onClick={submit}
                 >
                   Send my answer and reviewed cards →

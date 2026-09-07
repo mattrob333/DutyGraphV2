@@ -34,9 +34,8 @@ Text drafts and card edits save on this device when browser storage is available
 
 Choose Create my task cards. This sends your answer and assigned work context to the company's configured AI service. AI can draft several task cards under one duty. There is no required count. Cards open as readable instructions; use Edit only when needed. Review every description before choosing a response:
 
-- **Looks good, I approve:** the card describes the work as you understand it.
-- **Not my task:** preserve your rejection without adding the task as your work.
-- **Ask my advisor:** send the uncertainty with the card.
+- **Approve:** the card describes the work as you understand it.
+- **Edit:** correct the description, save your edits, then approve the card.
 
 Changing a card clears its decision so you can check it again. If you change the original answer, create or review the cards again. This is not approval of company policy or permission for an agent to act.
 

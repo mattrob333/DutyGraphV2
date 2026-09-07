@@ -29,14 +29,14 @@ export function ParticipantCards({
     [gaps, setGaps] = useState<string[]>([]),
     [fallback, setFallback] = useState(false);
   useEffect(() => {
-    onChange(cards.length && cards.every((c) => c.decision) ? cards : null);
+    onChange(cards.length && cards.every((c) => c.decision === "correct") ? cards : null);
   }, []);
   function update(next: any[]) {
     try {
       localStorage.setItem(storageKey, JSON.stringify({ text, cards: next }));
     } catch {}
     setCards(next);
-    onChange(next.length && next.every((c) => c.decision) ? next : null);
+    onChange(next.length && next.every((c) => c.decision === "correct") ? next : null);
   }
   return (
     <Panel
@@ -96,8 +96,8 @@ export function ParticipantCards({
       ))}
       {cards.length > 0 && (
         <p>
-          {cards.filter((c) => c.decision).length} of {cards.length} cards
-          reviewed. Approve your understanding, or flag a card for your advisor.
+          {cards.filter((c) => c.decision === "correct").length} of {cards.length} cards
+          approved. Edit anything that needs correcting, then approve each card.
         </p>
       )}
       {gaps.length > 0 && <p>Still unclear: {gaps.join(" ")}</p>}

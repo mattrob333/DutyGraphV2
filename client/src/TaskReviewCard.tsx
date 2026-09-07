@@ -30,11 +30,7 @@ export function TaskReviewCard({
         <strong aria-live="polite">
           {card.decision === "correct"
             ? "Approved — matches my understanding"
-            : card.decision === "not_mine"
-              ? "Marked as not my task"
-              : card.decision === "unsure"
-                ? "Advisor help requested"
-                : "Ready for your review"}
+            : "Ready for your review"}
         </strong>
       </header>
       {editing ? (
@@ -96,7 +92,7 @@ export function TaskReviewCard({
             else onChange({ ...card, decision: "correct" });
           }}
         >
-          {editing ? "Save edits and review" : "Looks good, I approve"}
+          {editing ? "Save edits and review" : "Approve"}
         </button>
         <button
           type="button"
@@ -107,20 +103,6 @@ export function TaskReviewCard({
           }}
         >
           {editing ? "Close editor" : "Edit"}
-        </button>
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() => onChange({ ...card, decision: "not_mine" })}
-        >
-          Not my task
-        </button>
-        <button
-          type="button"
-          disabled={disabled}
-          onClick={() => onChange({ ...card, decision: "unsure" })}
-        >
-          Ask my advisor
         </button>
       </footer>
     </article>
