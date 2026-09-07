@@ -7,7 +7,7 @@
 - Advisor updates are bounded, company-scoped, revision-checked and audited; original AI findings remain immutable and corrections feed matching kickoff context. New research retains but does not automatically apply an older review.
 - Strengthened research prompts for distinct offerings and comparable-size peer evidence; unavailable headcounts remain unknown. Social links must appear on the official website excerpts.
 - Renamed email draft action to Save & continue to send and scroll to the preview/send panel. Saving never sends email.
-- Validation: all 220 tests pass; production build and 91-route contract generation pass; dependency audit reports zero vulnerabilities. Synthetic browser checks confirmed profile rendering and advisor correction persistence across reload. No real emails or paid provider calls used. Hosted release status remains separate.
+- Validation: all 220 tests pass; production build and 91-route contract generation pass; dependency audit reports zero vulnerabilities. Synthetic browser checks confirmed profile rendering and advisor correction persistence across reload. No real emails or paid provider calls used. Release `289461f` passed CI `34171096494` (including synthetic advisor journey and encrypted backup recovery). Vercel deployment `dpl_wGu1Dg8AWETfaXLwrQz8ZYW2Su9r` is READY; dutygraph.com serves `/assets/index-CSET371K.js` with profile, review and send labels. This verifies deployment, not real-provider research quality or email delivery.
 
 ## 2026-09-07 — Complete the pre-kickoff preparation path
 
