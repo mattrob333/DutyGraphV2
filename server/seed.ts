@@ -3,6 +3,7 @@ import { pool, tx, putRecord, setState, fail } from "./db.ts";
 import { passwordHash, publicUser, defaultSettings } from "./auth.ts";
 import { capturePrompts } from "../shared/domain.ts";
 import { populateCobaltExamples } from "./sample-examples.ts";
+import { ensureControlExamples } from "./sample-controls.ts";
 import { sampleCases } from "./sample-cases.ts";
 
 export async function ensureCobaltExamples(
@@ -84,6 +85,7 @@ export async function ensureCobaltExamples(
         "Added a read-only fictional case walkthrough. No work executed.",
       ),
     );
+  await ensureControlExamples(db, user, company);
   return enriched;
 }
 export async function demoUser() {
