@@ -1,89 +1,114 @@
 import { mkdir, writeFile, readFile } from "node:fs/promises";
-import { vendors } from "./learning-content.ts";
+import { validateDirectory } from "../shared/directory-research.ts";
 const root = new URL("../client/public/", import.meta.url);
-const origin = new URL(
-  process.env.MARKETING_ORIGIN || "https://dutygraph-v2.vercel.app",
-).origin;
-const entries = [
-  ...vendors,
-  {
-    name: "SailPoint",
-    category: "Identity & access",
-    description:
-      "Agent identity visibility, human ownership, and access review within its identity security platform.",
-    url: "https://www.sailpoint.com/products/agent-identity-security",
-  },
-  {
-    name: "OneTrust",
-    category: "AI risk & oversight",
-    description:
-      "AI inventory, risk assessment, ownership, and governance workflows across an AI program.",
-    url: "https://www.onetrust.com/solutions/ai-governance/",
-  },
-  {
-    name: "Aembit",
-    category: "Runtime access",
-    description:
-      "Policy-based access for agents and workloads, with identity verification and short-lived credentials.",
-    url: "https://docs.aembit.io/get-started/use-cases/ai-agents/",
-  },
-].sort((a, b) => a.name.localeCompare(b.name));
-const questions: Record<string, string> = {
-  Aembit:
-    "Show how a denied request and a revoked user-agent combination behave in our target system.",
-  "Credo AI":
-    "Show how a policy becomes an assigned review and how the decision retains its supporting evidence.",
-  DutyGraph:
-    "Show how a participant-reviewed task reaches the advisor and how an unresolved handoff stays visible.",
-  "IBM watsonx.governance":
-    "Show which governance and monitoring functions apply to our chosen model, application, and hosting setup.",
-  "Microsoft Entra":
-    "Show the agent objects, access review, and owner lifecycle behavior supported by our tenant and license.",
-  Okta: "Show how agent discovery, identity, and access controls cover the specific agent platform we use.",
-  OneTrust:
-    "Show how our AI inventory, risk review, and technical controls remain linked after a system changes.",
-  SailPoint:
-    "Show how ownership succession, access review, and tool-service accounts are governed in our deployment.",
-  Saviynt:
-    "Show which source systems provide current entitlements and how a conflicting access request is handled.",
-};
-const buyers: Record<string, string> = {
-  "AI risk & oversight": "AI program, risk, and governance teams",
-  "Identity & access": "Identity, access, and security teams",
-  "Runtime access": "Platform engineering and security teams",
-  "Work discovery": "Advisors, business sponsors, and work owners",
-};
+const content = new URL("../content/directory/", import.meta.url);
+const origin = new URL(process.env.MARKETING_ORIGIN || "https://dutygraph.com")
+  .origin;
+const read = async (name: string) =>
+  JSON.parse(await readFile(new URL(name, content), "utf8"));
+const { entries, evidence, taxonomy } = validateDirectory(
+  await read("entries.json"),
+  await read("evidence.json"),
+  await read("taxonomy.json"),
+);
+entries.sort((a, b) => a.name.localeCompare(b.name));
 const esc = (x: string) =>
-  x.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;");
-const slug = (x: string) => x.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-const data = entries.map((e) => ({
-  ...e,
-  question: questions[e.name],
-  reviewed: "2026-09-06",
-}));
-const body = entries
-  .map(
-    (e) =>
-      `<article class="vendor-card directory-card" id="${slug(e.name)}" data-category="${esc(e.category)}" data-search="${esc(`${e.name} ${e.category} ${e.description} ${buyers[e.category]}`.toLowerCase())}"><p class="eyebrow">${e.category}</p><h2>${e.name}</h2>${e.name === "DutyGraph" ? '<p class="small">Directory publisher · Hosted pilot and fictional governance sample</p>' : ""}<p>${e.description}</p><dl><dt>Useful conversation with</dt><dd>${buyers[e.category]}</dd><dt>Ask for a demonstration</dt><dd>${questions[e.name]}</dd></dl><p><a href="${e.url}">${e.name === "DutyGraph" ? "Read the product scope" : "Read the official source"} ↗</a></p><p class="small">Source reviewed September 6, 2026 · <a href="#${slug(e.name)}">Link to entry</a></p></article>`,
+  x
+    .replaceAll("&", "&amp;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+const labels: Record<string, string> = {
+  documented: "Documented by provider",
+  vendor_claim: "Vendor claim",
+  independently_supported: "Independently corroborated",
+  not_found: "Not established in this research",
+};
+const structuredList = JSON.stringify({
+  '@context': 'https://schema.org', '@type': 'ItemList', name: 'AI governance directory',
+  itemListElement: entries.map((e, i) => ({'@type':'ListItem', position:i+1, name:e.name,
+    url: `${origin}/directory/ai-governance/${evidence.find(p=>p.name===e.name)!.id}/`}))
+}).replaceAll('<', '\\u003c');
+const page = (
+  title: string,
+  description: string,
+  path: string,
+  body: string,
+  script = false,
+) =>
+  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(title)} | DutyGraph</title><meta name="description" content="${esc(description)}"><link rel="canonical" href="${origin}${path}"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:type" content="website"><link rel="icon" href="/brand/dutygraph-symbol.svg"><link rel="stylesheet" href="/landing/landing.css"><link rel="stylesheet" href="/learn/learning.css"><link rel="stylesheet" href="/directory/directory.css">${script ? '<script src="/directory/directory.js" defer></script>' : ""}</head><body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="wrap navigation"><a class="wordmark" href="/landing/"><img src="/brand/dutygraph-symbol.svg" width="34" height="33" alt=""><span>DutyGraph</span></a><a href="/directory/ai-governance/">AI governance directory</a></div></header><main id="main" class="wrap learning">${body}</main><footer class="wrap learn-footer"><a href="/landing/">DutyGraph</a><a href="/learn/">Field guides</a><a href="/advisors/">Advisor program</a><a href="mailto:hello@dutygraph.com">Corrections & inquiries</a><span>A Tier 4 Intelligence company</span></footer></body></html>`;
+const dir = new URL("directory/ai-governance/", root);
+await mkdir(dir, { recursive: true });
+const paths = ["/directory/ai-governance/"];
+const cards = [];
+for (const e of entries) {
+  const p = evidence.find((x) => x.name === e.name)!;
+  const tags = [p.primaryCategoryId, ...p.secondaryCategoryIds].map(
+    (id) => taxonomy.find((t) => t.id === id)!.label,
+  );
+  const status = p.claims.some((c) =>
+    ["documented", "independently_supported"].includes(c.support),
   )
-  .join("");
-await mkdir(new URL("directory/ai-governance/", root), { recursive: true });
+    ? "Includes documentation or corroboration"
+    : "Marketing-supported research";
+  const path = `/directory/ai-governance/${p.id}/`;
+  const disclosure =
+    p.id === "dutygraph"
+      ? '<p class="directory-disclosure">Directory publisher · Advisor pilot · Governance examples are fictional; no live integration or customer outcome is implied.</p>'
+      : "";
+  cards.push(
+    `<article class="vendor-card directory-card" id="${p.id}" data-category="${esc(e.category)}" data-categories="${esc(JSON.stringify(tags))}" data-type="${esc(p.productType)}" data-search="${esc([e.name, p.companyName, ...tags, e.description, ...p.buyerRoles, ...p.problemsSolved].join(" ").toLowerCase())}"><p class="eyebrow">${esc(e.category)}</p><h2><a href="${path}">${esc(e.name)}</a></h2>${disclosure}<p>${esc(e.description)}</p><p class="directory-badges">${esc(p.productType)} · ${esc(p.availability.replaceAll("_", " "))}</p><p class="small">${status}</p><dl><dt>Ask for a demonstration</dt><dd>${esc(e.question)}</dd></dl><p><a href="${path}">Read evidence & limitations →</a></p><p class="small">Research snapshot ${esc(e.reviewed)} · <a href="#${p.id}">Link to entry</a></p></article>`,
+  );
+  const sourceList = p.sources
+    .map(
+      (s) =>
+        `<li id="source-${esc(s.id)}"><a href="${esc(s.url)}" rel="noopener noreferrer">${esc(s.title)}</a> · ${esc(s.publisher)} · ${esc(s.type.replaceAll("_", " "))}<br><small>Access date reported by researcher: ${esc(s.accessedAt)}</small></li>`,
+    )
+    .join("");
+  const claims = p.claims
+    .map(
+      (c) =>
+        `<article class="directory-claim"><p class="eyebrow">${labels[c.support]}</p><p>${esc(c.statement)}</p>${c.limitations ? `<p class="small"><strong>Limit:</strong> ${esc(c.limitations)}</p>` : ""}<p>${c.sourceIds.map((id) => `<a href="#source-${esc(id)}">Source ${esc(id)}</a>`).join(" · ")}</p></article>`,
+    )
+    .join("");
+  await mkdir(new URL(`${p.id}/`, dir), { recursive: true });
+  await writeFile(
+    new URL(`${p.id}/index.html`, dir),
+    page(
+      e.name,
+      `Research profile of ${e.name}: capabilities, source evidence, limitations and questions for buyers.`,
+      path,
+      `<div class="learn-hero"><p class="eyebrow">${esc(e.category)}</p><h1>${esc(e.name)}</h1>${disclosure}<p class="lead">${esc(e.description)}</p><p>${esc(p.productType)} · ${esc(p.availability.replaceAll("_", " "))} · Research snapshot ${esc(e.reviewed)}</p><a href="${esc(e.url)}">Visit the official product source ↗</a></div><section class="prose"><h2>Where it fits</h2><p>${tags.map(esc).join(" · ")}</p><p>Useful conversation with: ${p.buyerRoles.map(esc).join(", ")}.</p><h2>Ask for a demonstration</h2><p>${esc(e.question)}</p><h2>Capabilities and evidence</h2><p>Support labels reflect the supplied research. Documentation and vendor claims are not independent product tests. “Not established” means the researcher did not find support; it does not prove a capability is absent.</p>${claims}<h2>Limitations to discuss</h2><ul>${p.limitations.map((l) => `<li>${esc(l)}</li>`).join("") || "<li>No additional limitations recorded; validate fit with the provider.</li>"}</ul><h2>Sources</h2><ol>${sourceList}</ol><p>Listing does not imply partnership, supplier status, a working DutyGraph integration, or a compliance certification.</p><a href="mailto:hello@dutygraph.com?subject=${encodeURIComponent("Directory correction: " + e.name)}">Suggest a correction</a></section>`,
+    ),
+  );
+  paths.push(path);
+}
+const body = `<div class="learn-hero"><p class="eyebrow">AN EDITORIAL DIRECTORY · ${entries.length} PRODUCTS, PROJECTS & SERVICES</p><h1>Find the layer<br>you need.</h1><p class="lead">Explore ${taxonomy.length} parts of AI governance. Understand what each offering addresses, inspect its evidence, and bring a better question to the next conversation.</p><p class="small">Research snapshot September 6, 2026 · Published by DutyGraph · No paid placements</p></div><details class="directory-taxonomy"><summary>Understand the ${taxonomy.length} categories</summary><div>${taxonomy.map((t) => `<article><h2>${esc(t.label)}</h2><p>${esc(t.definition)}</p></article>`).join("")}</div></details><section class="directory-tools" aria-label="Search directory"><label for="directory-search">Search products, roles, or problems</label><input id="directory-search" type="search" placeholder="Try access review, shadow AI, or a company" maxlength="100"><label for="directory-category">Governance category</label><select id="directory-category"><option>All</option>${taxonomy.map((t) => `<option>${esc(t.label)}</option>`).join("")}</select><label for="directory-type">Offering type<select id="directory-type"><option value="All">All types</option>${[...new Set(evidence.map((e) => e.productType))].map((t) => `<option value="${esc(t)}">${esc(t)}</option>`).join("")}</select></label><button type="button" id="directory-reset">Clear filters</button><p role="status" id="directory-count">${entries.length} offerings shown</p></section><p id="directory-empty" hidden>No entries match. Try a broader term or clear the filters.</p><div class="vendor-grid">${cards.join("")}</div><section class="learn-cta"><h2>Understand the work.<br>Then choose the tool.</h2><p>DutyGraph helps advisors connect people, duties, tasks, and proposed AI delegation. Explore our pilot and the work behind an agent request.</p><a class="button" href="/pilot/">Join the advisor-led pilot →</a></section><section class="prose" id="method"><h2>How to use this research</h2><p>This directory imports a source-linked research snapshot supplied on September 6, 2026. Each offering has a separate evidence profile. Support labels distinguish provider documentation, marketing claims, independent corroboration, and unanswered questions. We have not independently tested these products.</p><p>Categories overlap; filters include secondary categories. Commercial software, open-source projects, hybrid offerings and advisory services are labeled separately. Coverage is not exhaustive and English-language research underrepresents some regions.</p><p>DutyGraph publishes this directory and labels its own entry. Alphabetical listing does not imply ranking, partnership, Telarus supplier status, a live integration, or certification. Confirm current availability and licensing with each provider. Research candidates awaiting review are not published.</p><p><a href="mailto:hello@dutygraph.com?subject=Directory%20correction">Suggest a correction</a> · <a href="/directory/ai-governance/entries.json" download>Download entries</a> · <a href="/directory/ai-governance/evidence.json" download>Download evidence</a> · <a href="/directory/ai-governance/taxonomy.json" download>Download categories</a></p></section>`;
 await writeFile(
-  new URL("directory/ai-governance/index.html", root),
-  `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI Governance Directory: Platforms, Roles & Evaluation Questions | DutyGraph</title><meta name="description" content="Search a curated AI governance directory covering risk oversight, agent identity, runtime access, and work discovery. Compare roles with primary sources."><link rel="canonical" href="${origin}/directory/ai-governance/"><meta property="og:title" content="The AI governance directory"><meta property="og:description" content="Find the layer you need. Ask better evaluation questions."><meta property="og:type" content="website"><link rel="icon" href="/brand/dutygraph-symbol.svg"><link rel="stylesheet" href="/landing/landing.css"><link rel="stylesheet" href="/learn/learning.css"><link rel="stylesheet" href="/directory/directory.css"><script src="/directory/directory.js" defer></script><script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@type": "ItemList", name: "AI governance directory", itemListElement: entries.map((e, i) => ({ "@type": "ListItem", position: i + 1, name: e.name, url: origin + "/directory/ai-governance/#" + slug(e.name) })) })}</script></head><body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><div class="wrap navigation"><a class="wordmark" href="/landing/"><img src="/brand/dutygraph-symbol.svg" width="34" height="33" alt=""><span>DutyGraph</span></a><a href="/learn/ai-governance-landscape/">Understand the landscape</a></div></header><main id="main" class="wrap learning"><div class="learn-hero"><p class="eyebrow">AN EDITORIAL DIRECTORY · 9 ORGANIZATIONS</p><h1>Find the layer<br>you need.</h1><p class="lead">AI governance is several jobs. Explore the platforms, understand their focus, and bring a better question to the next conversation.</p><p class="small">Curated by DutyGraph · Reviewed September 6, 2026</p></div><section class="directory-tools" aria-label="Search directory"><label for="directory-search">Search companies, roles, or capabilities</label><input id="directory-search" type="search" placeholder="Try identity, risk, or a company name" maxlength="100"><label for="directory-category">Primary focus</label><select id="directory-category">${["All", "AI risk & oversight", "Identity & access", "Runtime access", "Work discovery"].map((x) => `<option>${x}</option>`).join("")}</select><button type="button" id="directory-reset">Clear filters</button><p role="status" id="directory-count">9 organizations shown</p></section><p id="directory-empty" hidden>No entries match. Try a broader term or clear the filters.</p><div class="vendor-grid">${body}</div><section class="learn-cta"><h2>Start with the problem.<br>Then choose the tool.</h2><p>A useful discovery process helps an advisor understand the work, the people, and the missing information before making a recommendation.</p><div class="learn-actions"><a class="button" href="/advisors/">Explore the advisor method →</a><a class="text-link" href="/pilot/">Bring a company workflow →</a></div></section><section class="prose" id="method"><h2>How this directory is maintained</h2><p>Entries are selected from official product pages and documentation relevant to AI governance. Descriptions summarize the source, not independent performance tests. Categories indicate a primary focus and can overlap. This first edition is not exhaustive; an absent company is not a negative assessment.</p><p>DutyGraph publishes this directory and includes its own product, clearly labeled. Entries are alphabetical and there are no paid placements in this edition. Listing a vendor does not imply a partnership, Telarus supplier status, or a working DutyGraph integration. Confirm availability, licensing, and deployment requirements directly with each provider.</p><p>Our editorial aim is to add verified coverage and review sources quarterly. We will not automatically publish vendor submissions. To suggest a correction, use the inquiry form and name the entry with an official source link.</p><p><a href="/landing/?interest=enterprise#pilot">Suggest a correction →</a> · <a href="/directory/ai-governance/entries.json" download>Download the source-linked directory JSON ↓</a></p></section></main><footer class="wrap learn-footer"><a href="/landing/">DutyGraph</a><a href="/learn/">Field guides</a><a href="/advisors/">Advisor program</a><a href="/newsletter/">The Governance Brief</a></footer></body></html>`,
+  new URL("index.html", dir),
+  page(
+    `AI Governance Directory: ${entries.length} Products, Projects & Services`,
+    "Explore AI governance products by category, offering type, source evidence and buyer questions.",
+    "/directory/ai-governance/",
+    `<script type="application/ld+json">${structuredList}</script>${body}`,
+    true,
+  ),
 );
-await writeFile(
-  new URL("directory/ai-governance/entries.json", root),
-  JSON.stringify(data, null, 2),
-);
+for (const [name, data] of [
+  ["entries.json", entries],
+  ["evidence.json", evidence],
+  ["taxonomy.json", taxonomy],
+] as const)
+  await writeFile(new URL(name, dir), JSON.stringify(data, null, 2));
 const sitemap = new URL("sitemap.xml", root);
 await writeFile(
   sitemap,
-  (await readFile(sitemap, "utf8")).replace(
+  (await readFile(sitemap, "utf8")).replace(/<url><loc>[^<]*\/directory\/ai-governance\/[^<]*<\/loc><\/url>/g, '').replace(
     "</urlset>",
-    `<url><loc>${origin}/directory/ai-governance/</loc></url></urlset>`,
+    paths.map((p) => `<url><loc>${origin}${p}</loc></url>`).join("") +
+      "</urlset>",
   ),
 );
 console.log(
-  "Built searchable AI governance directory with 9 source-linked entries.",
+  `Built directory: ${entries.length} offerings, ${taxonomy.length} categories and ${evidence.length} evidence profiles.`,
 );

@@ -78,7 +78,7 @@ const nav = [
     icon: Mic,
     group: "DISCOVER THE BUSINESS",
   },
-  { id: "graph", name: "Company graph", icon: Network, group: "" },
+  { id: "graph", name: "Company Work Map", icon: Network, group: "" },
   { id: "tasks", name: "Task cards", icon: Layers, group: "" },
   { id: "workflows", name: "Workflows & cases", icon: Network, group: "" },
   {
@@ -603,7 +603,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             <>
               <Button onClick={() => go("graph")}>
                 <Network size={17} />
-                View company graph
+                View company work map
               </Button>
               <Button primary onClick={() => go("discovery")}>
                 <ArrowRight size={17} />
@@ -1126,8 +1126,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
       <>
         <Heading
           eyebrow="THE CONNECTED RECORD"
-          title="See how the company connects."
-          description="Start with the organization. Explore relationships, then follow duties, tasks and handoffs."
+          title="Company Work Map"
+          description="Understand the flows, inspect the work, and prepare the next client decision."
           actions={
             <Button onClick={() => setModal({ type: "roster" })}>
               Import people CSV

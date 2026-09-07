@@ -1,0 +1,242 @@
+[
+  {
+    "id": "work-delegation",
+    "label": "Work discovery & human delegation",
+    "definition": "Products that map organizational work — roles, duties, tasks, ownership — and govern the boundary at which a task is delegated from a human to an agent, including approval and accountability records.",
+    "inclusionRules": [
+      "Records duties, tasks or process steps with a named accountable human owner",
+      "Defines or reviews the boundary and approval conditions for delegating a task to an agent",
+      "Produces an accountability artifact (manifest, delegation record, review queue) tied to specific work"
+    ],
+    "exclusionRules": [
+      "HR systems of record and org-chart tools with no agent delegation artifact",
+      "Task/project management tools with no agent delegation or approval boundary",
+      "Process mining or RPA discovery with no agent-specific delegation evidence"
+    ],
+    "adjacentCategoryIds": [
+      "ai-risk",
+      "identity-access",
+      "agent-discovery"
+    ]
+  },
+  {
+    "id": "agent-building",
+    "label": "Agent building & orchestration",
+    "definition": "Frameworks and platforms for developing, executing and operating agents and agentic workflows. Listed here only with an explicit statement of which governance features (approvals, audit logs, permission scoping, versioning, isolation) are actually documented.",
+    "inclusionRules": [
+      "Provides agent development, orchestration or durable workflow execution as its primary function",
+      "Documents at least one governance-relevant control (human approval, audit log, scoped permissions, versioning, tenant isolation)",
+      "Governance gaps are recorded in limitations rather than implied to exist"
+    ],
+    "exclusionRules": [
+      "Model-serving or inference infrastructure with no agent lifecycle surface",
+      "Prompt playgrounds and chat UIs with no execution or orchestration layer",
+      "Platforms whose governance features exist only as announcements"
+    ],
+    "adjacentCategoryIds": [
+      "runtime-controls",
+      "observability",
+      "evaluation"
+    ]
+  },
+  {
+    "id": "agent-discovery",
+    "label": "Agent discovery & inventory",
+    "definition": "Products that find AI systems and agents in an environment — sanctioned or not — and build an inventory with ownership attribution. Each entry must state what is actually detected and by what mechanism.",
+    "inclusionRules": [
+      "Detects AI/agent usage or deployed agents through a stated mechanism (browser telemetry, OAuth grants, IdP or SaaS logs, network/proxy traffic, cloud or code scanning)",
+      "Produces an inventory or registry record, not just an alert",
+      "Attributes agents or usage to a human or team owner"
+    ],
+    "exclusionRules": [
+      "General CMDB or asset management with no AI/agent-specific detection",
+      "SaaS management tools listed on marketing mention of AI alone",
+      "Vendors that use 'rogue agent' language without documenting a detection scope"
+    ],
+    "adjacentCategoryIds": [
+      "identity-access",
+      "ai-risk",
+      "agent-security"
+    ]
+  },
+  {
+    "id": "identity-access",
+    "label": "Agent identity & access",
+    "definition": "Products that issue and manage identities and credentials for agents and other non-human principals, and govern their entitlements — least privilege, access reviews, delegated authorization and identity lifecycle.",
+    "inclusionRules": [
+      "Issues, brokers or manages an identity or credential for an agent or non-human principal",
+      "Governs entitlements for that identity (reviews, least privilege, joiner-mover-leaver, revocation)",
+      "Documents delegated authorization or on-behalf-of semantics for agents"
+    ],
+    "exclusionRules": [
+      "Human-only IAM, SSO or PAM with no agent/NHI-specific product evidence",
+      "Secrets managers with no agent identity or delegation surface",
+      "Suites listed at company level rather than as a named product"
+    ],
+    "adjacentCategoryIds": [
+      "runtime-controls",
+      "agent-discovery",
+      "work-delegation"
+    ]
+  },
+  {
+    "id": "runtime-controls",
+    "label": "Runtime authorization & controls",
+    "definition": "Products that make and enforce policy decisions at the moment an agent acts — authorizing tool and API calls, mediating MCP and model traffic, requiring human approval, sandboxing execution, and revoking access.",
+    "inclusionRules": [
+      "Sits in the request or execution path and can allow, deny, transform or pause an agent action",
+      "Exposes a policy model for tool, action or data scope",
+      "Documents revocation, kill-switch, approval interception or execution isolation"
+    ],
+    "exclusionRules": [
+      "Detection-only or logging-only products with no enforcement point",
+      "Generic API gateways and WAFs without agent/LLM-specific policy surface",
+      "Enforcement described only as roadmap or announcement"
+    ],
+    "adjacentCategoryIds": [
+      "agent-security",
+      "identity-access",
+      "observability"
+    ]
+  },
+  {
+    "id": "agent-security",
+    "label": "Agent security & threat detection",
+    "definition": "Products focused on adversarial risk to and from agents: prompt injection, tool abuse, agent-mediated data exfiltration, malicious MCP servers, plus adversarial testing, detection and response.",
+    "inclusionRules": [
+      "Detects or blocks an agent-specific or LLM-specific attack technique",
+      "Provides adversarial testing, threat detection or incident response scoped to AI/agent behaviour",
+      "Documents the threat classes covered"
+    ],
+    "exclusionRules": [
+      "Endpoint, network or cloud security with no AI/agent-specific detection content",
+      "Content moderation for consumer safety with no enterprise agent threat scope",
+      "Vendors whose only AI claim is using AI internally"
+    ],
+    "adjacentCategoryIds": [
+      "runtime-controls",
+      "evaluation",
+      "data-governance"
+    ]
+  },
+  {
+    "id": "ai-risk",
+    "label": "AI risk & compliance management",
+    "definition": "Governance-of-record systems for an AI program: use-case inventories, risk assessments, policy and approval workflows, accountability assignment, regulatory framework mapping, and audit evidence collection.",
+    "inclusionRules": [
+      "Maintains an AI use-case or system inventory with risk classification",
+      "Runs assessment, policy or approval workflows with assigned owners",
+      "Maps to named frameworks (EU AI Act, NIST AI RMF, ISO/IEC 42001) or collects audit evidence"
+    ],
+    "exclusionRules": [
+      "General GRC suites with no named, documented AI module",
+      "Regulation trackers and content libraries with no workflow or inventory",
+      "Any entry implying a control mapping demonstrates control effectiveness or establishes certification"
+    ],
+    "adjacentCategoryIds": [
+      "model-governance",
+      "agent-discovery",
+      "services"
+    ]
+  },
+  {
+    "id": "evaluation",
+    "label": "Evaluation & testing",
+    "definition": "Products for measuring model and agent behaviour before and after deployment: dataset-based evals, safety evaluations, red teaming, simulation, benchmarking and regression testing.",
+    "inclusionRules": [
+      "Executes repeatable tests or evaluations against models, prompts or agent trajectories",
+      "Supports scoring, graders, benchmarks or adversarial probe suites",
+      "Documents what is tested (single response, tool call, multi-step trajectory, multi-agent handoff)"
+    ],
+    "exclusionRules": [
+      "Published benchmark results or leaderboards with no usable tooling",
+      "One-off research papers and datasets with no product or maintained repository",
+      "Monitoring products with no test-execution capability (belongs in observability)"
+    ],
+    "adjacentCategoryIds": [
+      "observability",
+      "agent-security",
+      "model-governance"
+    ]
+  },
+  {
+    "id": "observability",
+    "label": "Observability & traceability",
+    "definition": "Products that capture and expose the record of what an AI system did: traces and spans, tool-call and decision logs, provenance, monitoring, replay and incident investigation.",
+    "inclusionRules": [
+      "Captures traces, spans or structured logs of LLM and tool-call activity",
+      "Supports investigation, replay or monitoring over that record",
+      "Governance-relevant properties (retention, access control, immutability, export) are stated or explicitly recorded as unknown"
+    ],
+    "exclusionRules": [
+      "General APM with no LLM/agent-specific instrumentation",
+      "Analytics dashboards with no per-execution trace record",
+      "Developer debug consoles bundled inside a framework with no independent buyer (note as a feature instead)"
+    ],
+    "adjacentCategoryIds": [
+      "evaluation",
+      "agent-building",
+      "ai-risk"
+    ]
+  },
+  {
+    "id": "data-governance",
+    "label": "Data governance & privacy",
+    "definition": "Products that control what data AI systems and agents can reach and reveal: sensitive-data discovery and classification for AI, retrieval permission enforcement, redaction, lineage, consent and AI data leakage prevention.",
+    "inclusionRules": [
+      "Discovers, classifies or restricts sensitive data in an AI or retrieval path",
+      "Enforces document-level or row-level permissions for AI consumption",
+      "Provides redaction, anonymization, consent or lineage evidence for AI use"
+    ],
+    "exclusionRules": [
+      "Legacy DLP or data catalogs with no AI/agent-specific product evidence",
+      "Privacy request automation with no AI data surface",
+      "Encryption or storage products with no AI access-control layer"
+    ],
+    "adjacentCategoryIds": [
+      "agent-security",
+      "runtime-controls",
+      "ai-risk"
+    ]
+  },
+  {
+    "id": "model-governance",
+    "label": "Model lifecycle & governance",
+    "definition": "Products that govern models as controlled assets: registries, approval gates, model risk management and validation, deployment controls, versioning and lifecycle monitoring including drift.",
+    "inclusionRules": [
+      "Maintains a registry or catalog of model versions with lineage",
+      "Gates promotion or deployment on approval, validation or documentation",
+      "Monitors deployed model behaviour over its lifecycle (performance, drift, revalidation)"
+    ],
+    "exclusionRules": [
+      "Training or serving infrastructure with no approval or registry governance",
+      "Experiment tracking alone with no lifecycle control",
+      "AI program governance without model-level artifacts (belongs in ai-risk)"
+    ],
+    "adjacentCategoryIds": [
+      "ai-risk",
+      "evaluation",
+      "observability"
+    ]
+  },
+  {
+    "id": "services",
+    "label": "Advisory & assurance services",
+    "definition": "Human-delivered engagements rather than software: AI governance consulting, implementation, algorithmic audit and assurance, conformity assessment and certification, and training or certification programs.",
+    "inclusionRules": [
+      "Delivery is an engagement, audit, certification or training program, not licensed software",
+      "A named offering or practice is evidenced on an official page",
+      "Accreditation or certification-body scope, where claimed, is narrowly quoted from an official source"
+    ],
+    "exclusionRules": [
+      "Software products with an attached professional services arm (list the software instead)",
+      "Standards bodies and regulators that do not sell an engagement",
+      "Any accreditation, notified-body or certification status that could not be verified on an official page"
+    ],
+    "adjacentCategoryIds": [
+      "ai-risk",
+      "evaluation",
+      "model-governance"
+    ]
+  }
+]

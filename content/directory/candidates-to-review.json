@@ -1,0 +1,1910 @@
+[
+  {
+    "name": "1Password SaaS Manager (Trelica)",
+    "companyUrl": "https://1password.com",
+    "suspectedCategoryIds": [
+      "agent-discovery"
+    ],
+    "reasonHeld": "Discovers sanctioned and unsanctioned SaaS and AI apps through IdP/SSO, finance systems, device agents, vaults and a browser extension, and can revoke risky OAuth tokens. Held as SaaS management rather than AI/agent governance: the evidence describes app-level discovery and spend/licence management with no agent-specific inventory, ownership or capability metadata.",
+    "sourceUrls": [
+      "https://1password.com/features/saas-discovery"
+    ]
+  },
+  {
+    "name": "Accenture Responsible AI (Responsible AI Governance Consulting & Solutions)",
+    "companyUrl": "https://www.accenture.com",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Official page fetched but describes generic responsible-AI consulting activities (assessments, principles, testing) with no distinctly named service offering, deliverable, or assurance standard. Per brief, large SI practices are only included where an official page evidences a named offering.",
+    "sourceUrls": [
+      "https://www.accenture.com/us-en/services/ai-data/responsible-ai"
+    ]
+  },
+  {
+    "name": "AccuKnox Prompt Firewall",
+    "companyUrl": "https://accuknox.com/",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Surfaced in discovery as a prompt-injection defense solution page; not fetched or verified this session and the vendor's primary business is cloud/Kubernetes security, so agent-specific product evidence is unconfirmed.",
+    "sourceUrls": [
+      "https://accuknox.com/solutions/prompt-firewall"
+    ]
+  },
+  {
+    "name": "AI 'agent workforce/recruitment' startups (agnt8x, AgentTeams, Iternal Workforce, NextGen AI Workforce, Emploid)",
+    "companyUrl": "https://agentteams.com",
+    "suspectedCategoryIds": [
+      "work-delegation"
+    ],
+    "reasonHeld": "Held: marketing positions these as hiring, onboarding or managing 'digital employees', which sounds like human/agent delegation, but none had official documentation fetched this session establishing delegation boundaries, approval workflows or accountability records. Most appear to be agent-building or staffing offerings rather than governance products.",
+    "sourceUrls": [
+      "https://agentteams.com/",
+      "https://iternal.ai/iternal-workforce",
+      "https://nextgentechnologies.ai/platform/"
+    ]
+  },
+  {
+    "name": "AI SBOM Generator (aetheris-ai/aibom-generator)",
+    "companyUrl": "https://github.com/aetheris-ai/aibom-generator",
+    "suspectedCategoryIds": [
+      "agent-discovery",
+      "model-governance"
+    ],
+    "reasonHeld": "Legitimate open-source CycloneDX 1.6 AI SBOM generator, but narrow (extracts metadata from Hugging Face-hosted models only, no agent/MCP discovery) and very small (12 stars, no published releases). Listing on the CycloneDX Tool Center was claimed in the README but not confirmed for this specific entry on the fetched tool-center page.",
+    "sourceUrls": [
+      "https://github.com/aetheris-ai/aibom-generator",
+      "https://www.cyclonedx.org/tool-center/"
+    ]
+  },
+  {
+    "name": "AI Verify (AI Verify Foundation)",
+    "companyUrl": "https://aiverifyfoundation.sg/",
+    "suspectedCategoryIds": [
+      "evaluation",
+      "ai-risk"
+    ],
+    "reasonHeld": "Verified as a real Apache-2.0 open-source testing toolkit (release v2.1.0, Aug 2025) governed by the AI Verify Foundation under Singapore's IMDA, and it explicitly states it does not guarantee a tested system is free from risk. However its documented function is standardised testing rather than risk register / lifecycle governance, so it belongs to the evaluation & testing category owned by another researcher.",
+    "sourceUrls": [
+      "https://github.com/aiverify-foundation/aiverify",
+      "https://aiverifyfoundation.sg/what-is-ai-verify/toolkit/"
+    ]
+  },
+  {
+    "name": "aicompliancevendors.com / aigovhub.io / aigovernancestack.com directories",
+    "companyUrl": "https://aicompliancevendors.com/",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "Deliberately excluded as sources and as entries: these are third-party vendor directories and comparison sites, not products, and their vendor pages could not be treated as official evidence under the spec.",
+    "sourceUrls": [
+      "https://aicompliancevendors.com/best/ai-risk-management-software",
+      "https://www.aigovhub.io/vendors/bdo-ai-assurance"
+    ]
+  },
+  {
+    "name": "Aivance (AI governance consulting, Singapore/ASEAN)",
+    "companyUrl": "https://www.aivance.com.sg",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Small consultancy surfaced in discovery; not fetched and no independent corroboration of scale or delivered offerings. Singapore coverage met by Resaro.",
+    "sourceUrls": [
+      "https://www.aivance.com.sg/services/"
+    ]
+  },
+  {
+    "name": "Akamai Firewall for AI",
+    "companyUrl": "https://www.akamai.com/",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Product page documents prompt-injection, jailbreak, output-moderation and data-exfiltration controls for LLM applications, but evidence is a single marketing page and the scope is app/LLM edge protection rather than agent tool-call or MCP behaviour. Hold pending official docs.",
+    "sourceUrls": [
+      "https://www.akamai.com/products/firewall-for-ai"
+    ]
+  },
+  {
+    "name": "Arize Phoenix",
+    "companyUrl": "https://arize.com",
+    "suspectedCategoryIds": [
+      "observability",
+      "evaluation"
+    ],
+    "reasonHeld": "Folded into the Arize AX entry rather than listed separately: only the pricing-page description of Phoenix as an open-source local-first tracing/eval platform was verified this session; no repository or docs page fetched to confirm license and feature scope.",
+    "sourceUrls": [
+      "https://arize.com/pricing/"
+    ]
+  },
+  {
+    "name": "Arkion",
+    "companyUrl": "https://arkion.ai",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Appears in NHI governance discovery results but no official product or documentation page was fetched this session, so no capability, availability or company evidence could be recorded.",
+    "sourceUrls": [
+      "https://arkion.ai/"
+    ]
+  },
+  {
+    "name": "Armilla AI (Armilla Guaranteed / AI insurance)",
+    "companyUrl": "https://www.armilla.ai/",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Offering combines model verification with warranty/insurance placed via Lloyd's coverholder arrangements, which is an assurance service rather than an AI risk management or model governance product. Belongs in the advisory & assurance services category.",
+    "sourceUrls": [
+      "https://www.armilla.ai/",
+      "https://www.gov.uk/ai-assurance-techniques/armilla-armilla-guaranteed-ai-product-verification-and-guarantee"
+    ]
+  },
+  {
+    "name": "Astrix Security",
+    "companyUrl": "https://astrix.security",
+    "suspectedCategoryIds": [
+      "agent-discovery",
+      "identity-access"
+    ],
+    "reasonHeld": "Genuine agent/NHI discovery product (inventories service accounts, tokens, secrets and AI agents across SaaS, cloud, on-prem and secret managers, linking each to its human creator). Held because Astrix's own site states it is now part of Cisco and ended standalone sales of new licences effective 30 June 2026, with capabilities being folded into Cisco over time - so there is no currently purchasable standalone product to review, and no Cisco-branded successor page was verified.",
+    "sourceUrls": [
+      "https://astrix.security/product/discover-non-human-identities/",
+      "https://astrix.security/"
+    ]
+  },
+  {
+    "name": "Azure Machine Learning registries",
+    "companyUrl": "https://azure.microsoft.com/",
+    "suspectedCategoryIds": [
+      "model-governance"
+    ],
+    "reasonHeld": "Documented capability is cross-workspace asset sharing and promotion of models, components and environments for MLOps. No approval workflow, model documentation, risk or control features were documented, so governance framing is weak for this directory.",
+    "sourceUrls": [
+      "https://learn.microsoft.com/en-us/azure/machine-learning/concept-machine-learning-registries-mlops?view=azureml-api-2"
+    ]
+  },
+  {
+    "name": "Boomi Agentstudio (build surface)",
+    "companyUrl": "https://boomi.com",
+    "suspectedCategoryIds": [
+      "agent-building"
+    ],
+    "reasonHeld": "Excluded from this brief's categories: Agentstudio is an agent design/build environment. Its Agent Control Tower registry component was entered separately as the discovery/inventory product.",
+    "sourceUrls": [
+      "https://help.boomi.com/docs/Atomsphere/Platform/Agent_Control_Tower"
+    ]
+  },
+  {
+    "name": "Bureau Veritas ISO 42001 certification",
+    "companyUrl": "https://certification.bureauveritas.com",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Verified this session (certification, audit and training for ISO/IEC 42001) but deliberately excluded to avoid over-representing near-identical ISO 42001 certification bodies; BSI, TÜV SÜD and DNV already cover the pattern. Note: no accreditation body is named for the AI scheme (only '70 international accreditations' generally).",
+    "sourceUrls": [
+      "https://certification.bureauveritas.com/iso-420012023-artificial-intelligence-management-system-aims",
+      "https://certification.bureauveritas.com/newsroom/iso-42001-accredited-certification-artificial-intelligence"
+    ]
+  },
+  {
+    "name": "BytePlus LLM Application Firewall",
+    "companyUrl": "https://www.byteplus.com/",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Regional (APAC) LLM firewall product page found in discovery but not fetched or verified; unclear whether protections extend to agent tool calls. Candidate for a later pass on APAC coverage.",
+    "sourceUrls": [
+      "https://www.byteplus.com/en/product/LLM-FW"
+    ]
+  },
+  {
+    "name": "Cedar policy language / Open Policy Agent / OpenFGA",
+    "companyUrl": "https://docs.cedarpolicy.com",
+    "suspectedCategoryIds": [
+      "runtime-controls",
+      "identity-access"
+    ],
+    "reasonHeld": "General-purpose authorization engines. Agent-specific governance evidence is limited to vendor blog patterns (for example AWS's Cedar multi-agent least-privilege post) rather than agent-specific product documentation, so they were held to avoid forcing generic IAM tooling into AI governance.",
+    "sourceUrls": [
+      "https://docs.cedarpolicy.com/",
+      "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/",
+      "https://openpolicyagent.org/"
+    ]
+  },
+  {
+    "name": "Cerbos",
+    "companyUrl": "https://www.cerbos.dev/",
+    "suspectedCategoryIds": [
+      "runtime-controls",
+      "identity-access"
+    ],
+    "reasonHeld": "Docs landing page lists AI agents and MCP servers among supported authorization targets, but no documented tool-call interception, MCP policy enforcement or agent-specific reference material was found; the agent content sits on a marketing feature page. Strong candidate if Cerbos publishes agent/MCP enforcement docs.",
+    "sourceUrls": [
+      "https://docs.cerbos.dev/",
+      "https://www.cerbos.dev/features-benefits-and-use-cases/ai-gateway-authorization"
+    ]
+  },
+  {
+    "name": "ChillStack (Safia / AI safety solutions)",
+    "companyUrl": "https://chillstack.com/",
+    "suspectedCategoryIds": [
+      "agent-security",
+      "ai-risk"
+    ],
+    "reasonHeld": "Japanese AI-security vendor identified via press releases and a Japanese-language product site; agent-runtime or prompt-injection product capabilities could not be confirmed from official English documentation this session. Japan coverage remains a gap.",
+    "sourceUrls": [
+      "https://safia.chillstack.com/"
+    ]
+  },
+  {
+    "name": "Cloudflare AI Gateway (Guardrails)",
+    "companyUrl": "https://www.cloudflare.com/",
+    "suspectedCategoryIds": [
+      "runtime-controls",
+      "agent-security"
+    ],
+    "reasonHeld": "Docs confirm proxying of model traffic with prompt/response moderation for harmful content, but explicitly no MCP support, no tool-call policy enforcement, no prompt-injection defense and no agent controls on the fetched pages. Content moderation only.",
+    "sourceUrls": [
+      "https://developers.cloudflare.com/ai-gateway/",
+      "https://developers.cloudflare.com/ai-gateway/features/guardrails/"
+    ]
+  },
+  {
+    "name": "Clutch Security",
+    "companyUrl": "https://www.clutch.security",
+    "suspectedCategoryIds": [
+      "identity-access",
+      "agent-discovery"
+    ],
+    "reasonHeld": "Platform page states it inventories every NHI, AI agent and secret with ownership, access reviews and expiration, but the only supporting second source fetched is a 2024 launch blog that predates agent capabilities and no product documentation or dated agent release was verified this session.",
+    "sourceUrls": [
+      "https://www.clutch.security/platform",
+      "https://www.clutch.security/blog/introducing-clutch-revolutionizing-non-human-identity-security"
+    ]
+  },
+  {
+    "name": "Collibra / Atlan / OvalEdge (data catalogs with AI governance modules)",
+    "companyUrl": "https://www.collibra.com",
+    "suspectedCategoryIds": [
+      "data-governance",
+      "model-governance"
+    ],
+    "reasonHeld": "Excluded on this pass as legacy data-catalog vendors whose AI governance offerings were not verified against official documentation. Only third-party blog content appeared in discovery. Requires docs/release evidence of AI-asset-specific governance (model/agent registration, AI lineage) before entry.",
+    "sourceUrls": [
+      "https://www.ovaledge.com/blog/unstructured-data-governance"
+    ]
+  },
+  {
+    "name": "Comet Model Registry",
+    "companyUrl": "https://www.comet.com/",
+    "suspectedCategoryIds": [
+      "model-governance"
+    ],
+    "reasonHeld": "Registry likely exists within Comet's ML platform, but the only pages surfaced were an older comet.ml marketing URL and third-party tutorials; no current official documentation was fetched this session.",
+    "sourceUrls": [
+      "https://www.comet.ml/site/using-comet-model-registry/"
+    ]
+  },
+  {
+    "name": "Community EU AI Act compliance repositories (EuConform, mcp-eu-ai-act, eu-ai-act-toolkit, awesome-eu-ai-act)",
+    "companyUrl": "https://github.com",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "Small unaffiliated hobby projects and link lists with no institutional backing, unclear maintenance and no documentation of legal review; excluded to protect directory quality.",
+    "sourceUrls": [
+      "https://github.com/Hiepler/EuConform",
+      "https://github.com/ark-forge/mcp-eu-ai-act",
+      "https://github.com/GenAI-Gurus/awesome-eu-ai-act"
+    ]
+  },
+  {
+    "name": "Coralogix AI Center",
+    "companyUrl": "https://coralogix.com",
+    "suspectedCategoryIds": [
+      "observability"
+    ],
+    "reasonHeld": "Israeli observability vendor with an AI monitoring offering (and the Aporia acquisition behind it); no page fetched this session, so span capture and governance controls are unverified.",
+    "sourceUrls": [
+      "https://techcrunch.com/2025/06/17/observability-startup-coralogix-becomes-a-unicorn-eyes-india-expansion/"
+    ]
+  },
+  {
+    "name": "Corsha Identity Provider for Machines",
+    "companyUrl": "https://corsha.com",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Machine identity provider with documented cryptographic identity provisioning, automatic rotation and one-time-use credentials, but the only release page fetched is from March 2025 and describes API/machine clients with no AI-agent-specific product evidence. Held pending an agent-specific product or release page.",
+    "sourceUrls": [
+      "https://corsha.com/blog/corsha-adaptive-identity-for-machines",
+      "https://docs.corsha.com/platform-overview/"
+    ]
+  },
+  {
+    "name": "Credal",
+    "companyUrl": "https://www.credal.ai",
+    "suspectedCategoryIds": [
+      "data-governance",
+      "runtime-controls"
+    ],
+    "reasonHeld": "Homepage describes governed MCP servers with permissions inherited from source systems and deployment in Credal's cloud or a customer VPC, which is a plausible permission-aware AI data governance product. Held because only the marketing homepage was fetched; no documentation confirming permission inheritance mechanics, audit logging or availability was obtained.",
+    "sourceUrls": [
+      "https://www.credal.ai/"
+    ]
+  },
+  {
+    "name": "Credo AI Advisory Services",
+    "companyUrl": "https://www.credo.ai",
+    "suspectedCategoryIds": [
+      "services",
+      "ai-risk"
+    ],
+    "reasonHeld": "Advisory attached to a governance software vendor; risk of conflating service and product, and no dedicated official page detailing advisory scope was fetched. Credo AI's platform belongs to a software category researched elsewhere.",
+    "sourceUrls": [
+      "https://www.credo.ai/advisory"
+    ]
+  },
+  {
+    "name": "CrowdStrike AIDR",
+    "companyUrl": "https://www.crowdstrike.com/",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Verified only indirectly: the AIDR documentation page fetched describes the Portkey gateway collector (policy rules, malicious prompt detector, allow/block/redact enforcement, PII detectors). Product-level CrowdStrike pages were not fetched this session, so the entry lacks a primary product/overview source.",
+    "sourceUrls": [
+      "https://aidr-docs.crowdstrike.com/docs/aidr/collectors/gateway/portkey"
+    ]
+  },
+  {
+    "name": "CSA AI Controls Matrix (AICM)",
+    "companyUrl": "https://cloudsecurityalliance.org",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "Standard/framework artefact (247 control objectives, mappings to ISO 42001, EU AI Act, NIST AI RMF), not a product. Retained instead as evidence inside the CSA STAR for AI service entry.",
+    "sourceUrls": [
+      "https://cloudsecurityalliance.org/artifacts/ai-controls-matrix-v1-1"
+    ]
+  },
+  {
+    "name": "Cyberhaven Flow",
+    "companyUrl": "https://www.cyberhaven.com",
+    "suspectedCategoryIds": [
+      "data-governance",
+      "agent-discovery"
+    ],
+    "reasonHeld": "Product page describes agentic data security, shadow AI discovery and lineage-based classification across endpoints, browsers and cloud, but it is a single official product page with an 'Introducing Cyberhaven Flow' framing that does not distinguish announced from generally available. No documentation or release-notes source was obtained to confirm which agent-specific controls ship today.",
+    "sourceUrls": [
+      "https://www.cyberhaven.com/product",
+      "https://www.cyberhaven.com/blog/dspm-for-ai"
+    ]
+  },
+  {
+    "name": "CycloneDX ML-BOM / AI-BOM",
+    "companyUrl": "https://cyclonedx.org",
+    "suspectedCategoryIds": [
+      "model-governance"
+    ],
+    "reasonHeld": "Specification capability, not a product: the mlbom page documents how models, datasets and configurations are represented. Generator support was not verified — cdxgen's README lists SBOM/CBOM/OBOM/SaaSBOM but not ML-BOM, and the GitHub API record could not be retrieved for it.",
+    "sourceUrls": [
+      "https://cyclonedx.org/capabilities/mlbom/",
+      "https://github.com/CycloneDX/cdxgen"
+    ]
+  },
+  {
+    "name": "Datadog Data Privacy, Security and RBAC for Agent Observability",
+    "companyUrl": "https://www.datadoghq.com",
+    "suspectedCategoryIds": [
+      "observability"
+    ],
+    "reasonHeld": "Not a separate product; noted here because the governance sub-page (llm_observability/configure/data_privacy_security_rbac) timed out twice, so the Datadog entry's governance claims rest on navigation labels only and should be re-verified.",
+    "sourceUrls": [
+      "https://docs.datadoghq.com/llm_observability/configure/data_privacy_security_rbac/"
+    ]
+  },
+  {
+    "name": "Dataiku Govern",
+    "companyUrl": "https://www.dataiku.com/",
+    "suspectedCategoryIds": [
+      "model-governance",
+      "ai-risk"
+    ],
+    "reasonHeld": "The governance documentation section fetched described licensing tiers and a GenAI registry page but did not state model registry, versioning, approval workflow, monitoring or framework mapping capabilities. Needs a deeper docs pass (Govern node concepts, project/model governance pages) before verification.",
+    "sourceUrls": [
+      "https://doc.dataiku.com/dss/latest/governance/index.html",
+      "https://developer.dataiku.com/latest/concepts-and-examples/govern/index.html"
+    ]
+  },
+  {
+    "name": "DataRobot AI Governance",
+    "companyUrl": "https://www.datarobot.com/",
+    "suspectedCategoryIds": [
+      "model-governance"
+    ],
+    "reasonHeld": "Marketing page evidences a central registry for models, LLMs, agents, tools, apps and vector databases plus automated compliance documentation, but no approval workflow or control mapping was documented and no product documentation page was fetched. Hold pending docs.datarobot.com registry/governance pages.",
+    "sourceUrls": [
+      "https://www.datarobot.com/product/ai-governance/"
+    ]
+  },
+  {
+    "name": "Defakto (SPIRL)",
+    "companyUrl": "https://www.spirl.com",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Commercial SPIFFE-based workload identity service (agent, signer, spirlctl, Terraform provider) is documented, but no AI-agent-specific capability evidence was found, and the docs domain d.spirl.com is branded 'Defakto' while the company site is branded 'SPIRL' with no official rename statement. Held pending clarification of product name and agent scope.",
+    "sourceUrls": [
+      "https://d.spirl.com/concepts/intro/",
+      "https://www.spirl.com/about"
+    ]
+  },
+  {
+    "name": "Deloitte Algorithmic Assurance / BDO AI Assurance",
+    "companyUrl": "https://www2.deloitte.com/",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Professional-services audit and assurance practices rather than products; no product documentation exists. Excluded from AI risk / model governance product entries.",
+    "sourceUrls": [
+      "https://www2.deloitte.com/ca/en/pages/audit/solutions/algorithmic-assurance.html"
+    ]
+  },
+  {
+    "name": "EleutherAI lm-evaluation-harness",
+    "companyUrl": "https://github.com/EleutherAI/lm-evaluation-harness",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Surfaced in discovery but not fetched this session. Also a research benchmark harness for base-model capability scoring with no agent, tool-call or governance dimension, so low directory value.",
+    "sourceUrls": [
+      "https://github.com/EleutherAI/lm-evaluation-harness"
+    ]
+  },
+  {
+    "name": "Elimity",
+    "companyUrl": "https://elimity.com",
+    "suspectedCategoryIds": [
+      "identity-access",
+      "ai-risk"
+    ],
+    "reasonHeld": "Belgian identity visibility and access review vendor; no agent- or NHI-specific product page was found or fetched, so there is no evidence it belongs in an AI governance directory.",
+    "sourceUrls": [
+      "https://elimity.com/"
+    ]
+  },
+  {
+    "name": "Enkrypt AI",
+    "companyUrl": "https://www.enkryptai.com/",
+    "suspectedCategoryIds": [
+      "agent-security",
+      "evaluation"
+    ],
+    "reasonHeld": "Homepage describes continuous red teaming and real-time guardrails but names prompt injection and jailbreaking only as threats, with no specific control described and no documentation fetched. Agent-specific evidence too thin to verify.",
+    "sourceUrls": [
+      "https://www.enkryptai.com/"
+    ]
+  },
+  {
+    "name": "Entro Security",
+    "companyUrl": "https://entro.security",
+    "suspectedCategoryIds": [
+      "agent-discovery",
+      "identity-access"
+    ],
+    "reasonHeld": "Israeli NHI security vendor that claims to build a contextual inventory of AI agents, map them to machine identities, secrets, entitlements and creators. Held as primarily non-human-identity security rather than agent governance: only a marketing page was fetched, with no documentation establishing which agent platforms are discovered or by what mechanism. Reconsider with docs evidence.",
+    "sourceUrls": [
+      "https://entro.security/platform-ai-agents/"
+    ]
+  },
+  {
+    "name": "Entrust Machine Identity Management",
+    "companyUrl": "https://www.entrust.com",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Excluded: certificate lifecycle and machine identity management with no agent-specific or AI-agent identity product evidence found; a general PKI/machine identity suite should not be classified as agentic AI governance under the spec's exclusion rule.",
+    "sourceUrls": [
+      "https://www.entrust.com/solutions/machine-identity"
+    ]
+  },
+  {
+    "name": "Envoy AI Gateway",
+    "companyUrl": "https://aigateway.envoyproxy.io/",
+    "suspectedCategoryIds": [
+      "runtime-controls"
+    ],
+    "reasonHeld": "Open-source CNCF-based gateway with documented LLM provider routing; agent/MCP authorization evidence is limited to a blog mention of header-forwarded per-user identity for MCP tool calls. No documented tool-call policy engine or guardrails.",
+    "sourceUrls": [
+      "https://aigateway.envoyproxy.io/"
+    ]
+  },
+  {
+    "name": "Eticas (independent AI system evaluations)",
+    "companyUrl": "https://eticas.ai",
+    "suspectedCategoryIds": [
+      "services",
+      "evaluation"
+    ],
+    "reasonHeld": "Homepage describes continuous socio-technical evaluation of production AI including agentic systems, but no second official page documenting methodology, deliverables, or engagement structure was fetched; client/continent counts are unverifiable marketing figures.",
+    "sourceUrls": [
+      "https://eticas.ai/"
+    ]
+  },
+  {
+    "name": "EU AI Act notified bodies (any firm claiming designation)",
+    "companyUrl": "https://ai-act-service-desk.ec.europa.eu",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Excluded category-wide: no firm reviewed evidenced designation as an EU AI Act notified body. BSI explicitly states it is only 'undergoing evaluation' for that designation. Any such claim must be checked against the EU NANDO/notification records before inclusion.",
+    "sourceUrls": [
+      "https://ai-act-service-desk.ec.europa.eu/en/ai-act/article-29",
+      "https://www.bsigroup.com/en-GB/insights-and-media/media-centre/press-releases/2025/november/bsi-becomes-the-first-certification-body-accredited-by-ukas-and-rva-to-deliver-certification-for-isoiec-42001/"
+    ]
+  },
+  {
+    "name": "F5 AI Gateway data leakage detection",
+    "companyUrl": "https://www.f5.com",
+    "suspectedCategoryIds": [
+      "runtime-controls",
+      "data-governance"
+    ],
+    "reasonHeld": "Has AI-specific release content on data leakage detection and prevention, but it is an inline AI gateway feature and belongs primarily in runtime-controls rather than data governance. Excluded here to prevent overlap with the runtime-controls category owner.",
+    "sourceUrls": [
+      "https://www.f5.com/company/blog/ai-gateway-receives-new-data-leakage-detection-and-prevention-functionality"
+    ]
+  },
+  {
+    "name": "F5 AI Red Team",
+    "companyUrl": "https://www.f5.com",
+    "suspectedCategoryIds": [
+      "evaluation",
+      "agent-security"
+    ],
+    "reasonHeld": "Network/security vendor extension into AI red teaming; not fetched this session. Risk of forcing a general security vendor into AI governance without agent-specific evidence.",
+    "sourceUrls": [
+      "https://www.f5.com/products/ai-red-team"
+    ]
+  },
+  {
+    "name": "Fiddler AI / Arthur / Aporia",
+    "companyUrl": "https://www.fiddler.ai/",
+    "suspectedCategoryIds": [
+      "observability"
+    ],
+    "reasonHeld": "Deliberately excluded from these two categories: their evidenced core function is AI/ML observability and guardrails monitoring, which maps to the observability & traceability category owned by another researcher.",
+    "sourceUrls": [
+      "https://www.arthur.ai/column/best-ai-governance-platforms-2026"
+    ]
+  },
+  {
+    "name": "Flowise / Langflow / Mastra / Pydantic AI",
+    "companyUrl": "https://github.com/FlowiseAI/Flowise",
+    "suspectedCategoryIds": [
+      "agent-building"
+    ],
+    "reasonHeld": "Open-source agent-building projects deliberately not entered this pass. Dify and CrewAI already represent the open-source agent-framework segment, and adding more low-governance developer libraries would pad the count without adding governance signal.",
+    "sourceUrls": []
+  },
+  {
+    "name": "ForHumanity Independent Audit of AI Systems (IAAIS)",
+    "companyUrl": "https://forhumanity.center",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Audit-rule scheme with certification language, but the fetched page describes rules and licensing of standards to third-party auditors rather than a service ForHumanity itself delivers; auditor accreditation and current scheme status could not be verified from a second official source.",
+    "sourceUrls": [
+      "https://forhumanity.center/independent-audit-of-ai-systems/"
+    ]
+  },
+  {
+    "name": "Future AGI",
+    "companyUrl": "https://futureagi.com",
+    "suspectedCategoryIds": [
+      "evaluation",
+      "observability"
+    ],
+    "reasonHeld": "India-based eval/observability vendor seen only through its own comparison blog posts in discovery; no product or docs page fetched, so capability evidence is absent.",
+    "sourceUrls": [
+      "https://futureagi.com/blog/ai-agent-testing-simulation-tools-2026/"
+    ]
+  },
+  {
+    "name": "Gemini Enterprise Agent Platform evaluations",
+    "companyUrl": "https://cloud.google.com",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Google announced GA of agent and model evaluations, including simulated-agent evaluation docs, but pages were not fetched this session; it is also a feature of a broader agent platform rather than a standalone product, so it needs dedup with agent-building coverage.",
+    "sourceUrls": [
+      "https://developers.googleblog.com/agent-and-model-evaluations-in-gemini-enterprise-agent-platform-are-now-ga/",
+      "https://docs.cloud.google.com/gemini-enterprise-agent-platform/optimize/evaluation/evaluate-simulated"
+    ]
+  },
+  {
+    "name": "Generic network/API security and WAF vendors marketing AI protection (F5, Zscaler, Netskope, Check Point Quantum WAF, Cequence)",
+    "companyUrl": "https://www.f5.com/",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Deliberately excluded: these appeared only in third-party listicles and comparison pages, with no agent- or MCP-specific product documentation fetched. Per the spec, generic security vendors are not admitted on marketing mentions of AI. Check Point is represented once, via the acquired Lakera product.",
+    "sourceUrls": [
+      "https://www.cequence.ai/learn/ai-gateway/best-enterprise-ai-gateway-solutions/"
+    ]
+  },
+  {
+    "name": "Google Cloud Sensitive Data Protection",
+    "companyUrl": "https://cloud.google.com",
+    "suspectedCategoryIds": [
+      "data-governance"
+    ],
+    "reasonHeld": "Strong candidate for de-identification of data used with models, but not researched to source level this session. Held to avoid a third large-cloud data-governance entry without fetched documentation confirming the AI/LLM-specific usage path.",
+    "sourceUrls": []
+  },
+  {
+    "name": "Google/TensorFlow Model Card Toolkit",
+    "companyUrl": "https://github.com/tensorflow/model-card-toolkit",
+    "suspectedCategoryIds": [
+      "model-governance"
+    ],
+    "reasonHeld": "Legacy transparency-documentation tool; current maintenance status was not verified this session and the TensorFlow Responsible AI toolkit line appears largely dormant, so availability could not be stated honestly.",
+    "sourceUrls": [
+      "https://github.com/tensorflow/model-card-toolkit",
+      "https://research.google/blog/introducing-the-model-card-toolkit-for-easier-model-transparency-reporting/"
+    ]
+  },
+  {
+    "name": "GRACE Governance Launch (2021.AI packaged offering)",
+    "companyUrl": "https://2021.ai/",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "Appears to be a packaged onboarding/launch bundle of the verified GRACE Governance module rather than a distinct product; folded into the GRACE Governance entry to avoid double counting.",
+    "sourceUrls": [
+      "https://2021.ai/products/grace-governance-launch"
+    ]
+  },
+  {
+    "name": "Guardrails AI (guardrails-ai/guardrails)",
+    "companyUrl": "https://www.guardrailsai.com/",
+    "suspectedCategoryIds": [
+      "agent-security",
+      "evaluation"
+    ],
+    "reasonHeld": "Well-known open-source validation library surfaced in discovery, but no official repository or documentation page was fetched this session, so it cannot be listed as verified under the spec's evidence rule.",
+    "sourceUrls": [
+      "https://github.com/guardrails-ai/guardrails"
+    ]
+  },
+  {
+    "name": "Haize Labs",
+    "companyUrl": "https://www.haizelabs.com",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Homepage describes red-teaming, judges and the Verdict library in marketing terms only; no documentation, repository or product reference page was reachable to establish what is tested or captured.",
+    "sourceUrls": [
+      "https://www.haizelabs.com/"
+    ]
+  },
+  {
+    "name": "HashiCorp Vault (AI agent identity pattern)",
+    "companyUrl": "https://www.hashicorp.com",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Excluded as a distinct agent identity product: the agent-related material is a validated architecture pattern for using Vault with agent workloads, not a separate agent identity or NHI governance product with its own buyer and lifecycle features.",
+    "sourceUrls": [
+      "https://developer.hashicorp.com/validated-patterns/vault/ai-agent-identity-with-hashicorp-vault"
+    ]
+  },
+  {
+    "name": "Human-in-the-loop patterns from framework vendors (Temporal, AWS Well-Architected agentic lens, LangChain-style approval recipes)",
+    "companyUrl": "https://docs.temporal.io",
+    "suspectedCategoryIds": [
+      "work-delegation"
+    ],
+    "reasonHeld": "Excluded: these are documentation patterns, cookbooks and best-practice guidance for building approval steps into agent workflows, not products with a delegation-governance buyer. Useful as reference material for the category definition, not as directory entries.",
+    "sourceUrls": [
+      "https://docs.temporal.io/ai/cookbook/human-in-the-loop-python",
+      "https://docs.aws.amazon.com/wellarchitected/latest/agentic-ai-lens/agentsec04-bp02.html"
+    ]
+  },
+  {
+    "name": "HumanLayer",
+    "companyUrl": "https://www.humanlayer.dev",
+    "suspectedCategoryIds": [
+      "work-delegation"
+    ],
+    "reasonHeld": "Originally a human-in-the-loop approval API for AI agents, which would have been a strong work-delegation entry. Held because the current official site presents HumanLayer as a multiplayer coding-agent IDE and cloud (sessions, plans, diffs, comment-driven review) - i.e. an agent development workspace. The approval-API positioning could not be confirmed as the current product on official pages this session.",
+    "sourceUrls": [
+      "https://www.humanlayer.dev/"
+    ]
+  },
+  {
+    "name": "IBM agentic AI identity management",
+    "companyUrl": "https://www.ibm.com",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Only a regional solutions landing page was surfaced; no specific product name (e.g. within Verify) with agent identity capability documentation was verified, so it fails the spec's requirement for agent-specific product evidence.",
+    "sourceUrls": [
+      "https://www.ibm.com/jp-ja/solutions/agentic-ai-identity-management"
+    ]
+  },
+  {
+    "name": "IBM Consulting AI governance services",
+    "companyUrl": "https://www.ibm.com",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Fetched page markets 'AI Governance Consulting' but names no specific offering, methodology, or assurance product; content overlaps heavily with IBM watsonx.governance software marketing, risking service/software conflation.",
+    "sourceUrls": [
+      "https://www.ibm.com/consulting/ai-governance"
+    ]
+  },
+  {
+    "name": "IBM OpenPages with watsonx / ibm-watsonx-gov SDK",
+    "companyUrl": "https://www.ibm.com/",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "Adjacent IBM assets surfaced during discovery (GRC suite and an open-source governance SDK repository). Not fetched or verified this session; kept out to avoid duplicating the verified watsonx.governance entry.",
+    "sourceUrls": [
+      "https://github.com/IBM/ibm-watsonx-gov"
+    ]
+  },
+  {
+    "name": "IBM watsonx Orchestrate",
+    "companyUrl": "https://www.ibm.com",
+    "suspectedCategoryIds": [
+      "agent-building",
+      "agent-discovery"
+    ],
+    "reasonHeld": "The IBM product page describes an agent management platform for building, deploying, orchestrating, managing and governing agents, with an agent inventory showing owners, dependencies, activity and cost, and consistent access controls across agents, tools and workflows. Held because the IBM Docs pages for watsonx Orchestrate returned fetch errors (missing_corpus), leaving only one commercial page and no documentation to separate documented from announced governance features - which this category explicitly requires.",
+    "sourceUrls": [
+      "https://www.ibm.com/products/watsonx-orchestrate"
+    ]
+  },
+  {
+    "name": "Immuta AI / Immuta Copilot",
+    "companyUrl": "https://www.immuta.com",
+    "suspectedCategoryIds": [
+      "data-governance"
+    ],
+    "reasonHeld": "Immuta itself is verified in the main file on the strength of its Data Security for AI product page. The separately announced 'Immuta AI' and 'Copilot' features (AI-assisted access provisioning) were not verified: the announcement is a press release and the SaaS documentation FAQ page was not fetched. Do not add as a separate product without docs evidence.",
+    "sourceUrls": [
+      "https://www.immuta.com/blog/immuta-ai-announcement/",
+      "https://documentation.immuta.com/SaaS/configuration/application-configuration/reference-guides/immuta-ai-faq"
+    ]
+  },
+  {
+    "name": "Infisical agent-vault",
+    "companyUrl": "https://github.com/Infisical/agent-vault",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Open-source HTTP credential proxy and vault for agents surfaced in discovery, but the repository was not fetched and verified this session, so licence, maintenance status and capabilities are unconfirmed. Candidate for a later pass.",
+    "sourceUrls": [
+      "https://github.com/Infisical/agent-vault"
+    ]
+  },
+  {
+    "name": "Inngest / Restate / DBOS (durable execution)",
+    "companyUrl": "https://www.inngest.com",
+    "suspectedCategoryIds": [
+      "agent-building"
+    ],
+    "reasonHeld": "Durable-execution engines adjacent to Temporal, which is already verified. None was fetched this session, and their AI/agent-specific documentation was not confirmed. Held to avoid padding the category with near-duplicate infrastructure entries.",
+    "sourceUrls": []
+  },
+  {
+    "name": "ISACA Advanced in AI Audit (AAIA)",
+    "companyUrl": "https://www.isaca.org",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Verified credential (requires CISA or equivalent designation; positioned for IT auditors) but deliberately excluded to avoid over-representing individual professional credentials; IAPP AIGP is the retained example. No accreditation of the scheme evidenced.",
+    "sourceUrls": [
+      "https://www.isaca.org/credentialing/aaia"
+    ]
+  },
+  {
+    "name": "Kertos",
+    "companyUrl": "https://www.kertos.io",
+    "suspectedCategoryIds": [
+      "data-governance",
+      "ai-risk"
+    ],
+    "reasonHeld": "German privacy-automation startup surfaced in EU AI privacy searches. Not verified; and its likely function (privacy compliance automation, DSAR and records of processing) fits ai-risk/compliance rather than AI-specific data governance. Excluded to avoid forcing a general privacy vendor into an AI governance category.",
+    "sourceUrls": [
+      "https://cispa.de/en/technology-transfer/startups-and-entrepreneurship/blog/blog-post/2023/kertos-seed"
+    ]
+  },
+  {
+    "name": "Keyfactor",
+    "companyUrl": "https://www.keyfactor.com",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Excluded for the same reason as Entrust: PKI and machine identity lifecycle vendor without a verified agent-specific or NHI-governance product page in this session.",
+    "sourceUrls": [
+      "https://www.keyfactor.com/blog/a-look-across-the-machine-identity-management-tool-landscape/"
+    ]
+  },
+  {
+    "name": "KloudMate agentic observability",
+    "companyUrl": "https://kloudmate.com",
+    "suspectedCategoryIds": [
+      "observability"
+    ],
+    "reasonHeld": "Press release claims an agentic observability platform with auto-RCA and self-healing workflows, but the only source found is a syndicated press release and no official product documentation was fetched.",
+    "sourceUrls": [
+      "https://www.business-standard.com/content/press-releases-ani/kloudmate-unveils-india-s-first-agentic-observability-platform-with-auto-rca-and-self-healing-workflows-126082400275_1.html"
+    ]
+  },
+  {
+    "name": "Kosmoy",
+    "companyUrl": "https://www.kosmoy.com/",
+    "suspectedCategoryIds": [
+      "ai-risk",
+      "runtime-controls"
+    ],
+    "reasonHeld": "Discovered mainly via the vendor's own comparison/SEO blog posts about EU AI Act software; product documentation and the specific governance capability set were not verified. Hold pending official product/docs evidence.",
+    "sourceUrls": [
+      "https://www.kosmoy.com/resources/blog/best-eu-ai-act-compliance-software-2026/"
+    ]
+  },
+  {
+    "name": "Kroll AI Risk, Governance and Strategy Services",
+    "companyUrl": "https://www.kroll.com",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Discovery-stage candidate only; page not fetched and named-offering evidence not verified this session.",
+    "sourceUrls": [
+      "https://www.kroll.com/en/services/cyber/cybersecurity-transformation/ai-risk-management"
+    ]
+  },
+  {
+    "name": "LatticeFlow AI",
+    "companyUrl": "https://latticeflow.ai",
+    "suspectedCategoryIds": [
+      "ai-risk",
+      "evaluation"
+    ],
+    "reasonHeld": "Platform (Atlas, Govern, Evaluate, Secure, Discover) documents agentic probes for data leakage, unauthorized actions, privilege abuse and denial-of-wallet plus YAML-specified evaluations, but the homepage is the only source fetched and the product is governance-led, so it should be deduped against the AI risk & compliance category owner before inclusion.",
+    "sourceUrls": [
+      "https://latticeflow.ai/"
+    ]
+  },
+  {
+    "name": "Legiscope / ComplyAI / SetAIComply / aiacttools.com listings",
+    "companyUrl": "https://aiacttools.com/",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "Cluster of small EU AI Act compliance sites and comparison directories found during discovery. Company identity, product substance and operating status could not be established from official documentation; several appear to be SEO or affiliate properties rather than verifiable products.",
+    "sourceUrls": [
+      "https://aiacttools.com/",
+      "https://comply-ai.site/",
+      "https://www.setaicomply.com/"
+    ]
+  },
+  {
+    "name": "Linux Foundation Agent Name Service (ANS)",
+    "companyUrl": "https://www.linuxfoundation.org",
+    "suspectedCategoryIds": [
+      "identity-access",
+      "agent-discovery"
+    ],
+    "reasonHeld": "Announced intent to launch only; no repository or docs establishing a usable implementation at the time of review.",
+    "sourceUrls": [
+      "https://www.linuxfoundation.org/press/linux-foundation-announces-intent-to-launch-agent-name-service-to-establish-trusted-identity-infrastructure-for-ai-agents"
+    ]
+  },
+  {
+    "name": "LiteLLM Proxy guardrails",
+    "companyUrl": "https://www.litellm.ai/",
+    "suspectedCategoryIds": [
+      "runtime-controls",
+      "agent-security"
+    ],
+    "reasonHeld": "Guardrail docs are solid (pre_call/post_call/during_call modes, PII masking/blocking via Presidio, prompt-injection detection hooks) but the enforcement surface is LLM request/response, not agent tool calls or MCP; deferred to keep the verified list focused on agent-specific enforcement and within the count budget.",
+    "sourceUrls": [
+      "https://docs.litellm.ai/docs/proxy/guardrails/quick_start"
+    ]
+  },
+  {
+    "name": "LlamaIndex Workflows / LlamaCloud",
+    "companyUrl": "https://www.llamaindex.ai",
+    "suspectedCategoryIds": [
+      "agent-building"
+    ],
+    "reasonHeld": "Legitimate agent-building framework candidate, but no LlamaIndex page was fetched this session, so no governance-feature evidence exists to satisfy this category's requirement to specify which governance features actually exist. Held rather than padded.",
+    "sourceUrls": []
+  },
+  {
+    "name": "Mend AI / Mend AI-BOM",
+    "companyUrl": "https://www.mend.io",
+    "suspectedCategoryIds": [
+      "agent-discovery",
+      "model-governance"
+    ],
+    "reasonHeld": "Real code-scanning AI component inventory (models, frameworks, MCPs, RAG pipelines, 'shadow AI' components) with docs confirming it is part of the Mend Platform with Core/Premium entitlements. Held only to avoid three near-identical SDLC AI-BOM entries; Checkmarx and Cycode were selected as the code-scanning representatives. Promote if the directory wants fuller AI-BOM coverage - evidence quality is adequate.",
+    "sourceUrls": [
+      "https://docs.mend.io/platform/latest/mend-ai-overview",
+      "https://www.mend.io/ai-bom/"
+    ]
+  },
+  {
+    "name": "Meta Prompt Guard 2 (as separate product)",
+    "companyUrl": "https://ai.meta.com/",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Deduplicated into LlamaFirewall: Prompt Guard 2 is a scanner/model component of that framework rather than a separately marketed product.",
+    "sourceUrls": [
+      "https://meta-llama.github.io/PurpleLlama/LlamaFirewall/docs/documentation/scanners/prompt-guard-2"
+    ]
+  },
+  {
+    "name": "Microsoft 365 admin center Shadow AI page",
+    "companyUrl": "https://learn.microsoft.com",
+    "suspectedCategoryIds": [
+      "agent-discovery"
+    ],
+    "reasonHeld": "Not a separate product: this is a preview page inside the Microsoft 365 admin center that detects unmanaged local AI agents using Defender for Endpoint and Global Secure Access. Deduplicated into the Microsoft Agent 365 entry as a claim, so it is not double-counted.",
+    "sourceUrls": [
+      "https://learn.microsoft.com/en-us/microsoft-365/admin/manage/agent-shadow-ai?view=o365-worldwide"
+    ]
+  },
+  {
+    "name": "Microsoft Agent Framework",
+    "companyUrl": "https://learn.microsoft.com/en-us/agent-framework/overview/",
+    "suspectedCategoryIds": [
+      "agent-building"
+    ],
+    "reasonHeld": "Documented open-source-style framework with Harness Agent tool approval and observability, but deliberately not given its own directory entry: it is the framework layer under Microsoft Foundry Agent Service, which is already listed, and only one page was fetched. Listing both would double-count one Microsoft agent stack. Revisit if the directory wants library-level entries.",
+    "sourceUrls": [
+      "https://learn.microsoft.com/en-us/agent-framework/overview/"
+    ]
+  },
+  {
+    "name": "Microsoft Defender for Endpoint - AI agent runtime protection",
+    "companyUrl": "https://www.microsoft.com/",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Genuinely agent-specific (device-level prompt-injection detection, block or audit the agent action, AiAgentProtection and AiAgentNetworkInspection settings) but documented as Preview with a prerelease disclaimer, and it is a feature of Defender for Endpoint rather than a distinct product. Hold pending GA or separate product identity.",
+    "sourceUrls": [
+      "https://learn.microsoft.com/en-us/defender-endpoint/configure-ai-agent-runtime-protection"
+    ]
+  },
+  {
+    "name": "Microsoft Purview AI hub / Databricks Unity Catalog",
+    "companyUrl": "https://www.microsoft.com/",
+    "suspectedCategoryIds": [
+      "data-governance"
+    ],
+    "reasonHeld": "Deliberately excluded: evidenced positioning is data governance and catalog control over data and AI assets rather than AI risk registers or model lifecycle approval workflows. Better assessed under data governance & privacy.",
+    "sourceUrls": [
+      "https://www.kosmoy.com/resources/blog/kosmoy-vs-databricks-unity-ai-gateway/"
+    ]
+  },
+  {
+    "name": "Mitratech (model risk management content)",
+    "companyUrl": "https://mitratech.com/",
+    "suspectedCategoryIds": [
+      "model-governance"
+    ],
+    "reasonHeld": "Surfaced only through a vendor listicle about MRM software; no Mitratech-branded model risk product page or documentation was verified.",
+    "sourceUrls": [
+      "https://mitratech.com/resource-hub/blog/top-8-model-risk-management-mrm-software-solutions-for-2026/"
+    ]
+  },
+  {
+    "name": "Modulos runtime inspection as standalone",
+    "companyUrl": "https://www.modulos.ai/",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Documented as a module inside the verified Modulos platform (sources, tests, schedules, results, remediation). Not counted separately; tests offered were not enumerated in the docs read.",
+    "sourceUrls": [
+      "https://docs.modulos.ai/platform/overview"
+    ]
+  },
+  {
+    "name": "Natoma",
+    "companyUrl": "https://natoma.ai",
+    "suspectedCategoryIds": [
+      "runtime-controls",
+      "agent-discovery"
+    ],
+    "reasonHeld": "Product is an MCP gateway with identity-aware access policies and Shadow-AI MCP discovery rather than an agent identity system: no identity issuance, credential lifecycle or entitlement review evidence. Also subject to an announced acquisition by Snowflake, so product continuity and naming are uncertain. Better suited to runtime-controls.",
+    "sourceUrls": [
+      "https://natoma.ai/platform",
+      "https://www.hpcwire.com/bigdatawire/this-just-in/snowflake-announces-intent-to-acquire-natoma-providing-secure-connectivity-for-the-agentic-enterprise/"
+    ]
+  },
+  {
+    "name": "NENNA.AI",
+    "companyUrl": "https://www.nenna.ai",
+    "suspectedCategoryIds": [
+      "data-governance"
+    ],
+    "reasonHeld": "German PII-protection startup for enterprise AI use, surfaced through an investor portfolio page and its own funding blog post. Held because no product or API documentation page was fetched and the only evidence seen concerns funding, not shipped capability.",
+    "sourceUrls": [
+      "https://www.nenna.ai/blog/seed-funding-backed-by-groundshift",
+      "https://www.ibbventures.de/en/portfolio/nenna-ai"
+    ]
+  },
+  {
+    "name": "Neptune.ai model registry",
+    "companyUrl": "https://neptune.ai/",
+    "suspectedCategoryIds": [
+      "model-governance"
+    ],
+    "reasonHeld": "The model registry documentation surfaced only on a legacy documentation domain (docs-legacy.neptune.ai) for the 2.x product line, suggesting the capability has been deprecated or repositioned toward large-scale training monitoring. Hold until current docs confirm a supported registry.",
+    "sourceUrls": [
+      "https://docs-legacy.neptune.ai/model_registry/"
+    ]
+  },
+  {
+    "name": "Nightfall AI",
+    "companyUrl": "https://www.nightfall.ai",
+    "suspectedCategoryIds": [
+      "data-governance"
+    ],
+    "reasonHeld": "Appeared in discovery searches as an 'AI data security and DLP platform'. Not researched to source level this session and at risk of being a legacy DLP vendor with AI-flavoured marketing. Requires official docs evidence of AI/LLM-specific controls (for example prompt inspection or agent data policies) before entry.",
+    "sourceUrls": [
+      "https://www.nightfall.ai/"
+    ]
+  },
+  {
+    "name": "Nymiz",
+    "companyUrl": "https://www.nymiz.com",
+    "suspectedCategoryIds": [
+      "data-governance"
+    ],
+    "reasonHeld": "Spanish anonymization vendor with a clear capability set (identification and substitution by synthetic data, tokens or asterisks across 102 languages) and an explicit statement that anonymized files can be shared with LLMs. Held because only one marketing page was fetched, it is dated 2024, and no product documentation or API reference establishing an LLM/agent-facing integration path was reachable.",
+    "sourceUrls": [
+      "https://www.nymiz.com/"
+    ]
+  },
+  {
+    "name": "Okareo",
+    "companyUrl": "https://okareo.com",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Docs landing page states only 'AI/ML Evaluation SDK' with guides for LLM, RAG and agent architectures; no concrete evidence of what is scored, no deployment, licensing or governance detail, and no second source.",
+    "sourceUrls": [
+      "https://docs.okareo.com/"
+    ]
+  },
+  {
+    "name": "One Identity",
+    "companyUrl": "https://www.oneidentity.com",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Excluded: the page surfaced is a vendor-authored market roundup of NHI and agentic tools rather than evidence of its own agent-specific product.",
+    "sourceUrls": [
+      "https://www.oneidentity.com/learn/top-non-human-identity-and-agentic-ai-security-tools.aspx"
+    ]
+  },
+  {
+    "name": "OneTrust / Didomi / Usercentrics / Ketch (consent management)",
+    "companyUrl": "https://www.onetrust.com",
+    "suspectedCategoryIds": [
+      "data-governance"
+    ],
+    "reasonHeld": "Deliberately excluded for this pass. Consent management for AI training data was a required search theme, but no vendor in this group was confirmed via official docs to offer an AI-training-specific consent control (as opposed to general cookie/consent and privacy-program tooling). Including them on marketing alone would breach the legacy-vendor rule. Worth a dedicated pass with docs evidence.",
+    "sourceUrls": [
+      "https://secureprivacy.ai/blog/consent-management-for-ai-training-data"
+    ]
+  },
+  {
+    "name": "Open-source agent registries (agentregistry-dev/agentregistry, agentoperations/agent-registry, a2aregistry.org)",
+    "companyUrl": "https://github.com/agentregistry-dev/agentregistry",
+    "suspectedCategoryIds": [
+      "agent-discovery"
+    ],
+    "reasonHeld": "Held: these are public/community directories or developer-facing registries for publishing and finding agents, not enterprise inventory or shadow-agent discovery tooling. Repository pages were not fetched and verified this session, so ownership, maintenance and enterprise applicability are unestablished.",
+    "sourceUrls": [
+      "https://github.com/agentregistry-dev/agentregistry",
+      "https://a2aregistry.org/"
+    ]
+  },
+  {
+    "name": "OpenAI Evals",
+    "companyUrl": "https://github.com/openai/evals",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Not fetched this session; historically a benchmark registry rather than a maintained enterprise evaluation product. Needs a repository fetch to confirm current maintenance before inclusion.",
+    "sourceUrls": [
+      "https://github.com/openai/evals"
+    ]
+  },
+  {
+    "name": "OpenID Foundation AI Identity Management Community Group",
+    "companyUrl": "https://openid.net",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Standards community group producing drafts; no implementation or tool to review, so held as a standard rather than a product.",
+    "sourceUrls": [
+      "https://openid.net/cg/artificial-intelligence-identity-management-community-group/"
+    ]
+  },
+  {
+    "name": "OpenTelemetry GenAI semantic conventions",
+    "companyUrl": "https://opentelemetry.io",
+    "suspectedCategoryIds": [
+      "observability"
+    ],
+    "reasonHeld": "Excluded deliberately: a specification and blog-documented convention set maintained by the OpenTelemetry project, not a product with a buyer. Relevant as context for vendor interoperability claims (Traceloop, Laminar) but not a directory entry.",
+    "sourceUrls": [
+      "https://opentelemetry.io/blog/2026/genai-observability/"
+    ]
+  },
+  {
+    "name": "Operant MCP Gateway (as separate product)",
+    "companyUrl": "https://www.operant.ai/",
+    "suspectedCategoryIds": [
+      "runtime-controls"
+    ],
+    "reasonHeld": "Deduplicated into the Operant Semantic Firewall entry; the MCP gateway is presented as a solution surface of the same enforcement platform.",
+    "sourceUrls": [
+      "https://www.operant.ai/solutions/mcp-gateway"
+    ]
+  },
+  {
+    "name": "Opsin",
+    "companyUrl": "https://www.opsin.ai",
+    "suspectedCategoryIds": [
+      "data-governance"
+    ],
+    "reasonHeld": "Belgian GenAI data security vendor. Could not be verified: the website returned a robots-disallowed crawler error, so no page was actually fetched this session. Per the spec's rule that only products with pages fetched may be verified, it is excluded from the verified list rather than researched from memory.",
+    "sourceUrls": [
+      "https://www.opsin.ai/"
+    ]
+  },
+  {
+    "name": "ORCAA",
+    "companyUrl": "https://orcaarisk.com/",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Algorithmic auditing consultancy, not a software product. Excluded from these two categories; candidate for advisory & assurance services.",
+    "sourceUrls": [
+      "https://orcaarisk.com/"
+    ]
+  },
+  {
+    "name": "OWASP GenAI Security Project / Agentic Security Initiative",
+    "companyUrl": "https://genai.owasp.org",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Standards-community guidance (top-10 lists, playbooks, initiative repos) rather than a usable tool; no maintained implementation identified that would qualify as a product under the brief.",
+    "sourceUrls": [
+      "https://github.com/OWASP/www-project-top-10-for-large-language-model-applications/tree/main/initiatives/agent_security_initiative",
+      "https://github.com/OWASP/www-project-agentic-skills-top-10"
+    ]
+  },
+  {
+    "name": "Portkey Guardrails",
+    "companyUrl": "https://portkey.ai/",
+    "suspectedCategoryIds": [
+      "runtime-controls",
+      "agent-security"
+    ],
+    "reasonHeld": "Documentation explicitly states the guardrails feature 'is in beta and available to select users', and checks are prompt/response validators (regex, JSON schema, prompt-injection scan) rather than agent action authorization. Hold until GA and agent/MCP-specific enforcement docs exist.",
+    "sourceUrls": [
+      "https://docs.portkey.ai/docs/product/guardrails"
+    ]
+  },
+  {
+    "name": "Prefactor",
+    "companyUrl": "https://prefactor.tech",
+    "suspectedCategoryIds": [
+      "identity-access",
+      "evaluation"
+    ],
+    "reasonHeld": "Content on agent identity lifecycle and agent-to-agent authentication is blog material; the site's own headline positions the product as an 'Agent Evaluation Runtime'. No official product or documentation page evidencing an agent identity product was verified.",
+    "sourceUrls": [
+      "https://prefactor.tech/",
+      "https://prefactor.tech/blog/ai-agent-identity-lifecycle-best-practices"
+    ]
+  },
+  {
+    "name": "Prefect / Apache Airflow / Sinequa / Superblocks",
+    "companyUrl": "https://www.prefect.io",
+    "suspectedCategoryIds": [
+      "agent-building"
+    ],
+    "reasonHeld": "Excluded by scope. Data-pipeline schedulers and general low-code/search platforms surfaced in agent-orchestration searches, but they are not agent development or agent lifecycle products. Do not re-research for this category.",
+    "sourceUrls": []
+  },
+  {
+    "name": "promptfoo / DeepEval / Giskard and similar OSS evaluation tools",
+    "companyUrl": "https://github.com",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Deliberately not researched in depth here: they are commercial-OSS evaluation platforms likely covered by the evaluation-category researcher, and adding them would duplicate that scope.",
+    "sourceUrls": [
+      "https://bestllmscanners.com/posts/automated-llm-red-teaming-in-ci-garak-pyrit-promptfoo/"
+    ]
+  },
+  {
+    "name": "Pydantic Logfire",
+    "companyUrl": "https://logfire.pydantic.dev",
+    "suspectedCategoryIds": [
+      "observability"
+    ],
+    "reasonHeld": "Two pages fetched, but evidence is generic OpenTelemetry logging/spans/metrics plus a Pydantic AI instrumentation call; no documented GenAI span taxonomy, cost/token telemetry, retention, RBAC or audit features, so it reads as a general developer observability SDK rather than an AI governance product.",
+    "sourceUrls": [
+      "https://logfire.pydantic.dev/docs/",
+      "https://logfire.pydantic.dev/docs/integrations/llms/pydanticai/"
+    ]
+  },
+  {
+    "name": "Red Hat MCP Gateway articles",
+    "companyUrl": "https://developers.redhat.com/",
+    "suspectedCategoryIds": [
+      "runtime-controls"
+    ],
+    "reasonHeld": "Developer article on advanced authentication and authorization for an MCP gateway; no distinct Red Hat product page or docs establishing a shipping MCP gateway product was found. Excluded as technical content.",
+    "sourceUrls": [
+      "https://developers.redhat.com/articles/2025/12/12/advanced-authentication-authorization-mcp-gateway"
+    ]
+  },
+  {
+    "name": "Relevance AI / Beam AI / Kore.ai / Cognigy",
+    "companyUrl": "https://relevanceai.com",
+    "suspectedCategoryIds": [
+      "agent-building"
+    ],
+    "reasonHeld": "Non-US agent platform candidates (Australia, Germany, India) identified for geographic balance but not verified: no official pages fetched. Recommended focus for the next pass, since the verified agent-building set is currently weighted toward US hyperscalers plus two German vendors.",
+    "sourceUrls": []
+  },
+  {
+    "name": "Repello AI ARGUS",
+    "companyUrl": "https://repello.ai/",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Product page describes runtime guardrails for LLMs and AI agents with policy enforcement and multi-modal/multi-lingual coverage, but capabilities are stated only in marketing language; the docs site was not fetched, so no documented agent-specific detection or enforcement detail. India-based coverage gap remains open.",
+    "sourceUrls": [
+      "https://repello.ai/argus",
+      "https://docs.repello.ai/"
+    ]
+  },
+  {
+    "name": "Respan",
+    "companyUrl": "https://theaiinsider.tech/2026/03/21/respan-announces-5m-in-funding-from-gradient-y-combinator-and-others/",
+    "suspectedCategoryIds": [
+      "observability"
+    ],
+    "reasonHeld": "Early-stage vendor known only from a funding news item in discovery; no official site or documentation fetched, so nothing verifiable about what is captured.",
+    "sourceUrls": [
+      "https://theaiinsider.tech/2026/03/21/respan-announces-5m-in-funding-from-gradient-y-combinator-and-others/"
+    ]
+  },
+  {
+    "name": "Riptides",
+    "companyUrl": "https://riptides.io",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Marketed as secretless credential injection for AI agents, but only a solutions landing page was found in discovery and no official documentation or release page was fetched to verify the capability. Excluded rather than verified to avoid marketing-only evidence.",
+    "sourceUrls": [
+      "https://riptides.io/solutions/secretless-ai/"
+    ]
+  },
+  {
+    "name": "Root Signals",
+    "companyUrl": "https://www.rootsignals.ai",
+    "suspectedCategoryIds": [
+      "evaluation",
+      "observability"
+    ],
+    "reasonHeld": "Docs intro fetched and describes 30+ built-in evaluators, custom metrics, CI/CD regression gating and guardrail thresholds, but only one page was retrieved this session (no second source, no vendor/company or governance page), so it falls short of the two-source rule.",
+    "sourceUrls": [
+      "https://docs.rootsignals.ai/"
+    ]
+  },
+  {
+    "name": "RSM US AI governance consulting",
+    "companyUrl": "https://rsmus.com",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Discovery-stage candidate only; not fetched, and generic mid-market advisory framing suggests no distinctly named AI governance offering.",
+    "sourceUrls": [
+      "https://rsmus.com/services/digital-transformation/artificial-intelligence/ai-governance.html"
+    ]
+  },
+  {
+    "name": "Salesforce Agentforce / ServiceNow AI Agent Orchestrator",
+    "companyUrl": "https://www.salesforce.com",
+    "suspectedCategoryIds": [
+      "agent-building"
+    ],
+    "reasonHeld": "Large-vendor agent platforms that would need precise separation of documented versus announced governance features. Neither was fetched this session. Held so a follow-up pass can name the specific product surfaces (for example Agentforce Trust Layer, ServiceNow AI Control Tower) with docs evidence.",
+    "sourceUrls": []
+  },
+  {
+    "name": "SAS Model Manager",
+    "companyUrl": "https://www.sas.com/",
+    "suspectedCategoryIds": [
+      "model-governance"
+    ],
+    "reasonHeld": "Product page evidences model tracking, lineage/versioning, model cards and drift monitoring, but the only other official page found (support portal) is a thin support-links page; detailed capability documentation is distributed as PDF user guides that were not read. Hold until a fetched HTML doc confirms registry/approval mechanics.",
+    "sourceUrls": [
+      "https://www.sas.com/en_us/software/model-manager.html",
+      "https://support.sas.com/en/software/model-manager-support.html"
+    ]
+  },
+  {
+    "name": "Saviynt Identity Security Posture Management",
+    "companyUrl": "https://saviynt.com",
+    "suspectedCategoryIds": [
+      "ai-risk",
+      "identity-access"
+    ],
+    "reasonHeld": "The official ISPM product page covers human and non-human identity discovery, over-privilege detection and least privilege, but agent-specific capability is asserted only in blog posts and a gated solution brief; no official product or documentation page establishing an AI-agent identity feature was fetched this session.",
+    "sourceUrls": [
+      "https://saviynt.com/products/identity-security-posture-management",
+      "https://saviynt.com/blog/ispm-for-ai-nhi"
+    ]
+  },
+  {
+    "name": "Scalekit Agent Actions",
+    "companyUrl": "https://www.scalekit.com",
+    "suspectedCategoryIds": [
+      "agent-building",
+      "identity-access"
+    ],
+    "reasonHeld": "India-based developer platform whose docs describe connected accounts and OAuth-based tool execution on behalf of users, but explicitly state nothing about agent identity issuance, credential lifecycle or governance. Evidence supports third-party API connectivity, not agent identity and access governance.",
+    "sourceUrls": [
+      "https://docs.scalekit.com/agent-actions/overview/"
+    ]
+  },
+  {
+    "name": "Scrut Automation NIST AI RMF",
+    "companyUrl": "https://www.scrut.io/",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "GRC automation vendor with a NIST AI RMF solution page; no distinct AI module or product documentation verified. Held to avoid counting framework landing pages as AI governance products.",
+    "sourceUrls": [
+      "https://www.scrut.io/solutions/nist-ai-rmf"
+    ]
+  },
+  {
+    "name": "Scytale ISO 42001 / AI governance",
+    "companyUrl": "https://scytale.ai/",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "Compliance-automation suite marketing an ISO 42001 framework alongside SOC 2/ISO 27001. Not verified this session; no distinct AI module or documentation reviewed. Excluded as a GRC framework add-on unless a named AI governance product with docs appears.",
+    "sourceUrls": [
+      "https://scytale.ai/iso-42001/"
+    ]
+  },
+  {
+    "name": "Securiti Agent Commander",
+    "companyUrl": "https://securiti.ai",
+    "suspectedCategoryIds": [
+      "data-governance",
+      "agent-discovery"
+    ],
+    "reasonHeld": "Promoted across Securiti pages as an integrated Veeam + Securiti solution for scaling safe AI agents, but appears only as a banner/announcement. No product or documentation page establishing capabilities or availability was fetched, so it is recorded as a conflict on the Gencore AI entry rather than a separate product.",
+    "sourceUrls": [
+      "https://securiti.ai/gencore/",
+      "https://securiti.ai/products/ai-security-governance/"
+    ]
+  },
+  {
+    "name": "ServiceNow Agentic Workforce Management",
+    "companyUrl": "https://www.servicenow.com",
+    "suspectedCategoryIds": [
+      "work-delegation",
+      "agent-building"
+    ],
+    "reasonHeld": "July 2025 press release describes employees overseeing, coaching and teaching agentic workforces alongside AI Agent Orchestrator - a strong conceptual fit for human/agent delegation. Held because the product documentation reachable this session (Explore AI agents, AI Agent Studio) covers agent building and agentic workflows generically, with no doc-level evidence of the workforce-management delegation surface, its approval model, or current availability.",
+    "sourceUrls": [
+      "https://newsroom.servicenow.com/press-releases/details/2025/ServiceNow-Extends-End-to-End-AI-Agent-Orchestration-With-Agentic-Workforce-Management/default.aspx",
+      "https://www.servicenow.com/docs/r/intelligent-experiences/exploring-ai-agents.html"
+    ]
+  },
+  {
+    "name": "Shadow AI 'listicle' vendors surfaced in search (Portal26, ShadowIQ, Relyance AI, Reco, Montro, RiskImmune, shadowaidiscovery.com)",
+    "companyUrl": "https://www.reco.ai",
+    "suspectedCategoryIds": [
+      "agent-discovery",
+      "ai-risk"
+    ],
+    "reasonHeld": "Held as unverified: these names appeared mainly through comparison/listicle pages and vendor SEO content. Their official product pages were not fetched and confirmed this session, so detection mechanism, company status and availability are unknown. Re-research individually before adding; several appear to be AI-governance/GRC rather than technical discovery.",
+    "sourceUrls": [
+      "https://www.reco.ai/compare/shadow-ai-detection-tools",
+      "https://montro.io/platform",
+      "https://www.relyance.ai/solutions/shadow-ai-discovery-governance"
+    ]
+  },
+  {
+    "name": "Snowflake enterprise MCP gateway guidance",
+    "companyUrl": "https://www.snowflake.com/",
+    "suspectedCategoryIds": [
+      "runtime-controls"
+    ],
+    "reasonHeld": "The evidence found is an engineering blog on governing AI agents via an MCP gateway pattern, not a named productised gateway with documentation. Excluded as guidance rather than a product.",
+    "sourceUrls": [
+      "https://www.snowflake.com/en/blog/engineering/enterprise-mcp-gateway-ai-agent-governance/"
+    ]
+  },
+  {
+    "name": "Snowflake Horizon Catalog",
+    "companyUrl": "https://www.snowflake.com",
+    "suspectedCategoryIds": [
+      "data-governance",
+      "model-governance"
+    ],
+    "reasonHeld": "Counterpart to the verified Databricks Unity Gateway entry, but no page was fetched this session. Should be verified in a follow-up pass so the directory does not carry an unbalanced view of warehouse-native AI governance.",
+    "sourceUrls": []
+  },
+  {
+    "name": "Solo.io Agent Gateway Enterprise (as separate product)",
+    "companyUrl": "https://www.solo.io/",
+    "suspectedCategoryIds": [
+      "runtime-controls"
+    ],
+    "reasonHeld": "Deduplicated into the agentgateway entry: Solo's enterprise offering is the commercial control plane for the same gateway data plane, not a distinct product with a separate buyer or use case.",
+    "sourceUrls": [
+      "https://www.solo.io/blog/enterprise-sso-and-saas-mcp-servers---how-to-authorize-with-agent-gateway-enterprise"
+    ]
+  },
+  {
+    "name": "SPIFFE / SPIRE for agent workload identity",
+    "companyUrl": "https://spiffe.io",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Mature CNCF workload identity project, but agent-specific use is documented only in third-party blog posts, not in project documentation; held to avoid over-claiming AI-agent scope.",
+    "sourceUrls": [
+      "https://spiffe.io/docs/latest/spire-about/spire-concepts/",
+      "https://next.redhat.com/2026/06/10/wiring-zero-trust-identity-for-ai-agents-spiffe-token-exchange-and-kagenti/"
+    ]
+  },
+  {
+    "name": "Sprinto ISO 42001",
+    "companyUrl": "https://sprinto.com/",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "Same pattern as other compliance-automation suites: framework page for ISO 42001 rather than an evidenced AI governance module. Not fetched or verified this session.",
+    "sourceUrls": [
+      "https://sprinto.com/frameworks/iso-42001/"
+    ]
+  },
+  {
+    "name": "Strac",
+    "companyUrl": "https://www.strac.io",
+    "suspectedCategoryIds": [
+      "data-governance"
+    ],
+    "reasonHeld": "Surfaced via a blog post about securing sensitive data in LLM prompts. Only content-marketing pages were seen in search results; no official product or documentation page was fetched. Excluded pending docs-level AI-specific evidence.",
+    "sourceUrls": [
+      "https://www.strac.io/blog/secure-sensitive-data-in-llm-prompts"
+    ]
+  },
+  {
+    "name": "Stytch Connected Apps",
+    "companyUrl": "https://stytch.com",
+    "suspectedCategoryIds": [
+      "identity-access",
+      "agent-building"
+    ],
+    "reasonHeld": "Docs confirm that an app can become an OAuth provider so AI agents can access user data with scoped tokens, but state no identity issuance for agents, no lifecycle management, no discovery and no access review. Too thin as an agent identity product; overlaps heavily with Descope and Auth0 entries.",
+    "sourceUrls": [
+      "https://stytch.com/docs/connected-apps/overview"
+    ]
+  },
+  {
+    "name": "Sweet Security (AI agent policy enforcement content)",
+    "companyUrl": "https://www.sweet.security/",
+    "suspectedCategoryIds": [
+      "runtime-controls"
+    ],
+    "reasonHeld": "The AI agent policy enforcement material found is educational content on the vendor's site; the underlying product is cloud runtime detection. No agent-specific product page or docs were verified.",
+    "sourceUrls": [
+      "https://www.sweet.security/agent-security/ai-agent-policy-enforcement"
+    ]
+  },
+  {
+    "name": "TCS Responsible AI (5A framework, SAFTI tenets)",
+    "companyUrl": "https://www.tcs.com",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Named framework verified on official page but offering-level detail is thin (no assessment, audit, or certification component described) and Microsoft marketplace listings could not substitute for TCS documentation. Held to avoid padding India coverage already met by Infosys.",
+    "sourceUrls": [
+      "https://www.tcs.com/what-we-do/services/artificial-intelligence/solution/implementing-ethical-responsible-ai",
+      "https://www.crn.com/news/channel-news/2024/tata-consultancy-services-launches-responsible-ai-framework"
+    ]
+  },
+  {
+    "name": "Terra Security",
+    "companyUrl": "https://www.terra.security",
+    "suspectedCategoryIds": [
+      "evaluation",
+      "agent-security"
+    ],
+    "reasonHeld": "AI red-teaming module of an offensive-security platform; not fetched this session and primarily a pentest vendor, so agent-evaluation evidence is unverified.",
+    "sourceUrls": [
+      "https://www.terra.security/terra-platform/ai-red-teaming"
+    ]
+  },
+  {
+    "name": "trail runtime enforcement for AI agents",
+    "companyUrl": "https://www.trail-ml.com/",
+    "suspectedCategoryIds": [
+      "runtime-controls"
+    ],
+    "reasonHeld": "Held as a separate capability claim, not a separate product: the trail blog describes runtime enforcement for AI agents, but no product page or documentation evidences a distinct runtime module, so it was excluded from the verified trail entry's claims.",
+    "sourceUrls": [
+      "https://www.trail-ml.com/blog/ai-agent-governance-runtime-enforcement-with-trail"
+    ]
+  },
+  {
+    "name": "Trilateral Research AI assurance",
+    "companyUrl": "https://www.trilateralresearch.com",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Page fetch timed out (crawler error); no official evidence collected this session, so not verifiable under the spec's fetch requirement.",
+    "sourceUrls": [
+      "https://www.trilateralresearch.com/ai-assurance"
+    ]
+  },
+  {
+    "name": "Trylon AI",
+    "companyUrl": "https://www.trylon.ai",
+    "suspectedCategoryIds": [
+      "data-governance",
+      "runtime-controls"
+    ],
+    "reasonHeld": "Discovery-stage candidate found under 'AI data leakage prevention'. Not verified: no official page fetched, company size and product maturity unknown. Needs docs/product evidence and a check that it is not primarily an AI guardrails/runtime product.",
+    "sourceUrls": [
+      "https://www.trylon.ai/"
+    ]
+  },
+  {
+    "name": "TÜV Rheinland Japan ISO/IEC 42001 certification",
+    "companyUrl": "https://www.tuv.com",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Only evidence found was a third-party press-release syndication claiming Japan's first ISO/IEC 42001 certificate; no official TÜV Rheinland page fetched, so accreditation and scope are unverified.",
+    "sourceUrls": [
+      "https://news.europawire.eu/japans-first-iso-iec-42001-ai-management-systems-certification-granted-to-tuv-rheinland-japan/eu-press-release/2026/01/20/12/56/22/168234/"
+    ]
+  },
+  {
+    "name": "TÜV SÜD AI Quality Certification Program (AIQCP)",
+    "companyUrl": "https://www.tuvsud.com",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Verified training/certificate program for individuals (Level 1 Engineer, Level 2 Practitioner, exam-based certificate) but excluded as a second offering from a vendor already represented by its ISO/IEC 42001 certification entry.",
+    "sourceUrls": [
+      "https://www.tuvsud.com/en/services/training/aiqcp"
+    ]
+  },
+  {
+    "name": "UiPath Task Mining / Process Mining",
+    "companyUrl": "https://www.uipath.com",
+    "suspectedCategoryIds": [
+      "work-delegation"
+    ],
+    "reasonHeld": "Deliberately excluded: process and task discovery products that identify automation candidates from system logs and desktop activity. No evidence reviewed that they govern delegation of work to AI agents or define human approval boundaries. UiPath Maestro was entered instead as the orchestration product that coordinates agents, robots and people.",
+    "sourceUrls": [
+      "https://www.uipath.com/blog/product-and-updates/new-chapter-process-discovery",
+      "https://docs.uipath.com/task-mining/automation-cloud/latest/user-guide/faq"
+    ]
+  },
+  {
+    "name": "Unaffiliated 'AI-Incident-Database' style repositories",
+    "companyUrl": "https://github.com",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "Name-colliding community repositories that are not the Responsible AI Collaborative project; excluded as duplicates with no maintained data pipeline evidenced.",
+    "sourceUrls": [
+      "https://github.com/AISDLC/AI-Incident-Database"
+    ]
+  },
+  {
+    "name": "Unosecur MCP Auth Gateway",
+    "companyUrl": "https://www.unosecur.com",
+    "suspectedCategoryIds": [
+      "runtime-controls",
+      "identity-access"
+    ],
+    "reasonHeld": "Berlin-based vendor with an agent/MCP product page describing per-call authorization and credential brokering, but the evidenced control point is a runtime gateway rather than agent identity lifecycle or entitlement governance; no documentation site was fetched to confirm identity issuance or access review.",
+    "sourceUrls": [
+      "https://www.unosecur.com/agentic-ai-mcp"
+    ]
+  },
+  {
+    "name": "Vals AI",
+    "companyUrl": "https://www.vals.ai",
+    "suspectedCategoryIds": [
+      "evaluation",
+      "services"
+    ],
+    "reasonHeld": "Independent model benchmarking service (public and private benchmarks, Vals Index). Only the marketing homepage was fetched; no documentation or methodology page verified, and the offering is a benchmarking service rather than a product a buyer deploys.",
+    "sourceUrls": [
+      "https://www.vals.ai/"
+    ]
+  },
+  {
+    "name": "Vanta (EU AI Act and ISO 42001 offerings)",
+    "companyUrl": "https://www.vanta.com/",
+    "suspectedCategoryIds": [
+      "ai-risk"
+    ],
+    "reasonHeld": "Vanta publishes framework-specific product pages (EU AI Act, ISO 42001) with AI scoping, risk scenarios and cross-framework evidence reuse, but there is no distinctly named AI governance module and no documentation was fetched. Under the brief's rule on GRC suites bolting on AI capabilities, held until a named AI module with docs is evidenced.",
+    "sourceUrls": [
+      "https://www.vanta.com/products/eu-ai-act",
+      "https://www.vanta.com/products/iso-42001"
+    ]
+  },
+  {
+    "name": "Varonis AI Security",
+    "companyUrl": "https://www.varonis.com",
+    "suspectedCategoryIds": [
+      "data-governance",
+      "agent-discovery"
+    ],
+    "reasonHeld": "AI-specific solution page fetched and it does describe discovery of AI workloads, classification of AI-generated content and revoking excessive permissions, but only one official page was obtained and it is a marketing solution page. Varonis' technical documentation (which would establish whether AI workload discovery is a shipping feature versus positioning of existing DSPM/DLP capabilities) was not fetched. Needs a second official docs or release source before promotion, per the legacy-DLP rule.",
+    "sourceUrls": [
+      "https://www.varonis.com/solutions/ai-security",
+      "https://www.varonis.com/coverage/microsoft-365-copilot"
+    ]
+  },
+  {
+    "name": "Verax AI",
+    "companyUrl": "https://www.verax.ai",
+    "suspectedCategoryIds": [
+      "data-governance",
+      "agent-security"
+    ],
+    "reasonHeld": "Discovery-stage candidate for enterprise AI security / data leakage prevention. No page fetched and no evidence gathered on which controls are shipping. Also likely a better fit for agent-security or ai-risk than data governance.",
+    "sourceUrls": [
+      "https://www.verax.ai/"
+    ]
+  },
+  {
+    "name": "Verint Workforce Management (non-Agent-Factory)",
+    "companyUrl": "https://www.verint.com",
+    "suspectedCategoryIds": [
+      "work-delegation"
+    ],
+    "reasonHeld": "Excluded: traditional contact-centre workforce management (scheduling, forecasting for human agents). Only Agent Factory, which explicitly orchestrates human and AI agents with handoffs, was entered.",
+    "sourceUrls": [
+      "https://www.verint.com/agent-factory/"
+    ]
+  },
+  {
+    "name": "Vertex AI Model Registry",
+    "companyUrl": "https://cloud.google.com/",
+    "suspectedCategoryIds": [
+      "model-governance"
+    ],
+    "reasonHeld": "Official docs confirm a central model repository with versions and aliases, but the fetched page returned an inconsistent product name (extraction surfaced 'Gemini Enterprise Agent Platform Model Registry' while the page title says Vertex AI Model Registry), suggesting a rebrand in progress. Hold until the current canonical product name is confirmed on a Google Cloud page.",
+    "sourceUrls": [
+      "https://cloud.google.com/vertex-ai/docs/model-registry/introduction"
+    ]
+  },
+  {
+    "name": "Virtue AI (VirtueRed)",
+    "companyUrl": "https://www.virtueai.com",
+    "suspectedCategoryIds": [
+      "evaluation",
+      "agent-security"
+    ],
+    "reasonHeld": "Continuous AI red-teaming platform surfaced in discovery search but no page fetched this session; also overlaps heavily with the agent-security category, so needs dedup before adding.",
+    "sourceUrls": [
+      "https://www.virtueai.com/virtuered"
+    ]
+  },
+  {
+    "name": "Wipro Responsible AI and AI Risk Governance and Management",
+    "companyUrl": "https://www.wipro.com",
+    "suspectedCategoryIds": [
+      "services"
+    ],
+    "reasonHeld": "Only substantive description found is a UK G-Cloud service definition PDF on a government procurement portal; no official Wipro product/service page evidencing the named offering was fetched.",
+    "sourceUrls": [
+      "https://www.applytosupply.digitalmarketplace.service.gov.uk/g-cloud/services/603593367117287",
+      "https://www.wipro.com/consulting/services/ai-advisory-and-tech-strategy/"
+    ]
+  },
+  {
+    "name": "WitnessAI",
+    "companyUrl": "https://witness.ai/",
+    "suspectedCategoryIds": [
+      "agent-security",
+      "data-governance"
+    ],
+    "reasonHeld": "Docs confirm network-level observation and identity/intention-based policy over employee AI usage, prompt-injection prevention and guardrail building, but the evidenced focus is workforce AI usage control rather than agent tool-call or MCP threat detection. Better suited to a data-governance/AI-usage entry.",
+    "sourceUrls": [
+      "https://docs.witness.ai/"
+    ]
+  },
+  {
+    "name": "Wiz AI-SPM",
+    "companyUrl": "https://www.wiz.io",
+    "suspectedCategoryIds": [
+      "agent-discovery",
+      "agent-security"
+    ],
+    "reasonHeld": "Agentless cloud discovery of AI services, models, SDKs and MCP connections with an AI-BOM and an agent inventory view. Held because the agent-inventory specifics rest on a vendor blog and a solution page rather than product documentation, and the discovery scope overlaps the cloud/code-scanning entries already verified. Reconsider with Wiz documentation evidence.",
+    "sourceUrls": [
+      "https://www.wiz.io/blog/wiz-ai-spm-secures-ai-agents",
+      "https://www.wiz.io/solutions/ai-spm"
+    ]
+  },
+  {
+    "name": "Workday HCM (core human capital management suite)",
+    "companyUrl": "https://www.workday.com",
+    "suspectedCategoryIds": [
+      "work-delegation"
+    ],
+    "reasonHeld": "Deliberately excluded per brief: an HR system of record for people, jobs and duties supplies useful organisational context (roles, ownership, approval hierarchies) but is not an agent-governance or human/agent delegation product. Only Workday's separately configured Agent System of Record was entered as a verified product.",
+    "sourceUrls": [
+      "https://newsroom.workday.com/2025-02-11-The-Next-Generation-of-Workforce-Management-is-Here-Workday-Unveils-New-Agent-System-of-Record"
+    ]
+  },
+  {
+    "name": "ZeroTrusted.ai AI Firewall",
+    "companyUrl": "https://www.zerotrusted.ai/",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Marketing-only discovery hit for an 'AI firewall' covering LLMs, agents and APIs; no documentation fetched and no verifiable agent-specific capability detail. Held to avoid padding with unverified vendors.",
+    "sourceUrls": [
+      "https://www.zerotrusted.ai/products/ai-firewall"
+    ]
+  },
+  {
+    "name": "Zscaler Continuous Automated Red Teaming",
+    "companyUrl": "https://www.zscaler.com",
+    "suspectedCategoryIds": [
+      "evaluation",
+      "agent-security"
+    ],
+    "reasonHeld": "Excluded as a general security-platform capability page; no AI-agent-specific testing evidence fetched, and the spec warns against forcing generic security vendors into this directory.",
+    "sourceUrls": [
+      "https://www.zscaler.com/products-and-solutions/continuous-automated-red-teaming"
+    ]
+  },
+  {
+    "name": "Mindgard (duplicate record from runtime-security.json)",
+    "companyUrl": "https://mindgard.ai",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Not a separate candidate. The same product was researched in two category passes and merged into a single published entry. Also surfaced in agent-security research; evaluation kept as primary because the evidenced function is automated adversarial testing rather than runtime blocking.",
+    "sourceUrls": [
+      "https://mindgard.ai/"
+    ]
+  },
+  {
+    "name": "Microsoft Entra Agent ID (duplicate record from discovery-delegation.json)",
+    "companyUrl": "https://www.microsoft.com",
+    "suspectedCategoryIds": [
+      "identity-access"
+    ],
+    "reasonHeld": "Not a separate candidate. The same product was researched in two category passes and merged into a single published entry. Also surfaced in agent-discovery research; identity-access kept as primary because the evidenced artifact is an agent identity object, with discovery as a secondary.",
+    "sourceUrls": [
+      "https://learn.microsoft.com/en-us/entra/agent-id/what-are-agent-identities"
+    ]
+  },
+  {
+    "name": "UiPath Maestro (duplicate record from discovery-delegation.json)",
+    "companyUrl": "https://www.uipath.com",
+    "suspectedCategoryIds": [
+      "agent-building"
+    ],
+    "reasonHeld": "Not a separate candidate. The same product was researched in two category passes and merged into a single published entry. Also surfaced in work-delegation research; agent-building kept as primary for the same reason.",
+    "sourceUrls": [
+      "https://docs.uipath.com/maestro/automation-cloud/latest/user-guide/overview"
+    ]
+  },
+  {
+    "name": "Camunda Agentic Orchestration (duplicate record from discovery-delegation.json)",
+    "companyUrl": "https://camunda.com",
+    "suspectedCategoryIds": [
+      "agent-building"
+    ],
+    "reasonHeld": "Not a separate candidate. The same product was researched in two category passes and merged into a single published entry. Also surfaced in work-delegation research; agent-building kept as primary because the evidenced function is BPMN workflow orchestration, not governed duty assignment.",
+    "sourceUrls": [
+      "https://docs.camunda.io/docs/components/agentic-orchestration/agentic-orchestration-overview/"
+    ]
+  },
+  {
+    "name": "Databricks Unity Gateway (duplicate record from data-agentbuilding.json)",
+    "companyUrl": "https://www.databricks.com/",
+    "suspectedCategoryIds": [
+      "runtime-controls"
+    ],
+    "reasonHeld": "Not a separate candidate. The same product was researched in two category passes and merged into a single published entry. Also surfaced in agent-building research; runtime-controls kept as primary because the gateway's evidenced function is mediating and policing model/tool traffic.",
+    "sourceUrls": [
+      "https://www.databricks.com/product/artificial-intelligence/unity-gateway"
+    ]
+  },
+  {
+    "name": "agentgateway (duplicate record from services-oss.json)",
+    "companyUrl": "https://www.solo.io/",
+    "suspectedCategoryIds": [
+      "runtime-controls"
+    ],
+    "reasonHeld": "Not a separate candidate. The same product was researched in two category passes and merged into a single published entry. Also surfaced in the open-source pass; runtime-controls kept as primary.",
+    "sourceUrls": [
+      "https://agentgateway.dev/"
+    ]
+  },
+  {
+    "name": "Inspect AI (duplicate record from services-oss.json)",
+    "companyUrl": "https://www.aisi.gov.uk",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Not a separate candidate. The same product was researched in two category passes and merged into a single published entry. Also surfaced in the open-source pass; evaluation kept as primary.",
+    "sourceUrls": [
+      "https://inspect.aisi.org.uk/"
+    ]
+  },
+  {
+    "name": "garak (duplicate record from services-oss.json)",
+    "companyUrl": "https://www.nvidia.com",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Not a separate candidate. The same product was researched in two category passes and merged into a single published entry. Also surfaced in the open-source pass; evaluation kept as primary.",
+    "sourceUrls": [
+      "https://github.com/NVIDIA/garak"
+    ]
+  },
+  {
+    "name": "PyRIT (duplicate record from services-oss.json)",
+    "companyUrl": "https://www.microsoft.com",
+    "suspectedCategoryIds": [
+      "evaluation"
+    ],
+    "reasonHeld": "Not a separate candidate. The same product was researched in two category passes and merged into a single published entry. Also surfaced in the open-source pass; evaluation kept as primary.",
+    "sourceUrls": [
+      "https://github.com/microsoft/PyRIT"
+    ]
+  },
+  {
+    "name": "NVIDIA NeMo Guardrails (duplicate record from services-oss.json)",
+    "companyUrl": "https://www.nvidia.com/",
+    "suspectedCategoryIds": [
+      "agent-security"
+    ],
+    "reasonHeld": "Not a separate candidate. The same product was researched in two category passes and merged into a single published entry. Also surfaced in the open-source pass; runtime-controls kept as primary.",
+    "sourceUrls": [
+      "https://github.com/NVIDIA/NeMo-Guardrails/"
+    ]
+  }
+]

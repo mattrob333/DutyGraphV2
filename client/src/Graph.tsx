@@ -5,6 +5,7 @@ import type { RecordRow } from "../../shared/domain.ts";
 import { api } from "./api.ts";
 import { Button, Badge, Empty, ErrorBox, State, stateLabel } from "./ui.tsx";
 import { OrgView } from "./OrgView.tsx";
+import { CompanyWorkMap } from "./CompanyWorkMap.tsx";
 import { AuditGraph } from "./AuditGraph.tsx";
 import {
   wrapNodeTitle,
@@ -37,7 +38,7 @@ export function Graph({
       scanTruncated: boolean;
     } | null>(null),
     [error, setError] = useState(""),
-    [view, setView] = useState("org"),
+    [view, setView] = useState("map"),
     [list, setList] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
     [expanded, setExpanded] = useState(false);
@@ -174,7 +175,7 @@ export function Graph({
               ].includes(r.kind) &&
               !["retracted", "withdrawn"].includes(r.state),
           );
-  if (error)
+  if (error && view !== "map")
     return (
       <>
         <ErrorBox error={error} />
@@ -189,7 +190,8 @@ export function Graph({
         </Button>
       </>
     );
-  if (!graph) return <div className="loading">Loading the company graph…</div>;
+  if (!graph && view !== "map")
+    return <div className="loading">Loading the company graph…</div>;
   if (!records.length)
     return (
       <Empty
@@ -214,6 +216,7 @@ export function Graph({
       <div className="toolbar">
         <div className="tabs">
           {[
+            ["map", "Work map"],
             ["network", "Relationships"],
             ["connected", "Connected"],
             ["work", "Work flow"],
@@ -234,7 +237,10 @@ export function Graph({
           ))}
         </div>
         <div className="actions">
-          <Button onClick={() => setList(!list)} disabled={view === "network"}>
+          <Button
+            onClick={() => setList(!list)}
+            disabled={view === "network" || view === "map"}
+          >
             {list ? <Network size={16} /> : <List size={16} />}{" "}
             {list ? "Graph" : "Register"}
           </Button>
@@ -255,53 +261,58 @@ export function Graph({
           </span>
         </div>
       )}
-      {view !== "org" && view !== "audit" && view !== "network" && (
-        <div className="graph-context">
-          <label>
-            {view === "work" ? "Workflow" : "Explore"}{" "}
-            <select
-              aria-label={
-                view === "work" ? "Select workflow" : "Focus on a record"
-              }
-              value={view === "work" ? activeWorkflow : activeFocus}
-              onChange={(e) => {
-                if (view === "work") setWorkflowId(e.target.value);
-                else setFocus(e.target.value);
-                setSelected(null);
-              }}
-            >
-              {view === "work" ? (
-                <>
-                  <option value="*">All recorded handoffs</option>
-                  {workflows.map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.title}
-                    </option>
-                  ))}
-                </>
-              ) : (
-                records
-                  .filter(
-                    (r) =>
-                      ["person", "task", "duty"].includes(r.kind) &&
-                      r.state !== "retracted",
-                  )
-                  .map((r) => (
-                    <option key={r.id} value={r.id}>
-                      {r.title}
-                    </option>
-                  ))
-              )}
-            </select>
-          </label>
-          <span>
-            {view === "work"
-              ? "Recorded task-to-task handoffs, with conditions on each connection."
-              : "People own duties. Duties contain tasks. Each task shows who performs the work."}
-          </span>
-        </div>
-      )}
-      {view === "network" ? (
+      {view !== "org" &&
+        view !== "audit" &&
+        view !== "network" &&
+        view !== "map" && (
+          <div className="graph-context">
+            <label>
+              {view === "work" ? "Workflow" : "Explore"}{" "}
+              <select
+                aria-label={
+                  view === "work" ? "Select workflow" : "Focus on a record"
+                }
+                value={view === "work" ? activeWorkflow : activeFocus}
+                onChange={(e) => {
+                  if (view === "work") setWorkflowId(e.target.value);
+                  else setFocus(e.target.value);
+                  setSelected(null);
+                }}
+              >
+                {view === "work" ? (
+                  <>
+                    <option value="*">All recorded handoffs</option>
+                    {workflows.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.title}
+                      </option>
+                    ))}
+                  </>
+                ) : (
+                  records
+                    .filter(
+                      (r) =>
+                        ["person", "task", "duty"].includes(r.kind) &&
+                        r.state !== "retracted",
+                    )
+                    .map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.title}
+                      </option>
+                    ))
+                )}
+              </select>
+            </label>
+            <span>
+              {view === "work"
+                ? "Recorded task-to-task handoffs, with conditions on each connection."
+                : "People own duties. Duties contain tasks. Each task shows who performs the work."}
+            </span>
+          </div>
+        )}
+      {view === "map" ? (
+        <CompanyWorkMap records={records} open={open} />
+      ) : view === "network" ? (
         <Suspense fallback={<p>Loading Relationships…</p>}>
           <NetworkExplorer company={company} records={records} open={open} />
         </Suspense>
@@ -364,9 +375,9 @@ export function Graph({
                   : "Responsibility, from people to tasks"}
               </span>
               <Badge>
-                {graph.pending
-                  ? `Projection catching up · revision ${graph.sourceRevision}`
-                  : `Revision ${graph.sourceRevision}`}
+                {graph?.pending
+                  ? `Projection catching up · revision ${graph?.sourceRevision}`
+                  : `Revision ${graph?.sourceRevision}`}
               </Badge>
             </div>
             <svg
@@ -754,7 +765,7 @@ export function Graph({
           )}
         </div>
       )}
-      {view !== "network" && (
+      {view !== "network" && view !== "map" && graph && (
         <div className="graph-foot">
           {view === "org" ? (
             <span>Teams organize people. Duties connect them to work.</span>
@@ -771,7 +782,7 @@ export function Graph({
               ? `${layout.nodes.length} of ${registerNodes.length} records in this view`
               : `${registerNodes.length} records`}{" "}
             ·{" "}
-            {graph.pending
+            {graph?.pending
               ? "Projection catching up; current records shown"
               : "Current authoritative records"}
             {graph.truncated ? " · Node budget reached; choose a focus" : ""}
@@ -779,10 +790,9 @@ export function Graph({
           </span>
         </div>
       )}
-      {view !== "org" && view !== "network" && !list && (
+      {view !== "org" && view !== "network" && view !== "map" && !list && (
         <p className="subtle">{layout.note}</p>
       )}
     </div>
   );
 }
-
