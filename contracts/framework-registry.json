@@ -2,7 +2,7 @@
   "schemaVersion": "1.0",
   "sourceFile": "mattrob333/Liveframeworks/lib/frameworks.js",
   "sourceBlobSha": "d2ddacc805d0cea591e52c2f7a32a2c6b0075b6a",
-  "notice": "Configuration snapshot. Reconcile against pinned repo in M0. Listed metadata tools are not executable implementations.",
+  "notice": "Configuration snapshot. Reconcile against pinned repo in M0. Listed metadata tools are not executable implementations. DutyGraph adaptation: Industry Map is a pre-discovery root as of 2026-09-06.",
   "order": [
     "bmc",
     "industrymap",
@@ -32,7 +32,6 @@
       "key": "bmc",
       "name": "Business Model Canvas",
       "feeds": [
-        "industrymap",
         "fiveforces",
         "pestle",
         "swot",
@@ -54,13 +53,11 @@
         "blueocean",
         "threehorizons"
       ],
-      "upstream": [
-        "bmc"
-      ]
+      "upstream": []
     },
     {
       "key": "fiveforces",
-      "name": "Porter’s Five Forces",
+      "name": "Porter\u2019s Five Forces",
       "feeds": [
         "swot",
         "ansoff",

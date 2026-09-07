@@ -113,9 +113,9 @@ test("framework run API saves exact versions, honors dependencies, is idempotent
   );
   assert.equal(
     status.data.frameworks.find((f: any) => f.key === "industrymap").ready,
-    false,
+    true,
   );
-  const blocked = await request(c, p + "/framework-runs/industrymap", "POST", {
+  const blocked = await request(c, p + "/framework-runs/fiveforces", "POST", {
     consent: true,
   });
   assert.equal(blocked.status, 422);

@@ -432,7 +432,9 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
     [error, setError] = useState(""),
     [page, setPage] = useState(window.location.hash.slice(1) || "overview"),
     [tab, setTab] = useState("research"),
-    [discoveryEntry, setDiscoveryEntry] = useState<"contact" | "tasks">("contact"),
+    [discoveryEntry, setDiscoveryEntry] = useState<"contact" | "tasks">(
+      "contact",
+    ),
     [strategyTab, setStrategyTab] = useState("frameworks"),
     [strategyReport, setStrategyReport] = useState<string | null>(null),
     [modal, setModal] = useState<ModalState>(null),
@@ -674,7 +676,17 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               ShieldCheck,
             ],
           ].map(([label, value, sub, detail, to, Icon]: any) => (
-            <button className="stat" key={label} onClick={() => { if(to === "discovery") setDiscoveryEntry(label === "Interview responses" ? "tasks" : "contact"); go(to); }}>
+            <button
+              className="stat"
+              key={label}
+              onClick={() => {
+                if (to === "discovery")
+                  setDiscoveryEntry(
+                    label === "Interview responses" ? "tasks" : "contact",
+                  );
+                go(to);
+              }}
+            >
               <span>
                 {label}
                 <Icon size={16} />
@@ -752,7 +764,16 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                     "governance",
                   ],
                 ].map(([label, description, Icon, to]: any) => (
-                  <button key={label} onClick={() => { if(to === "discovery") setDiscoveryEntry(label === "Interview responses" ? "tasks" : "contact"); go(to); }}>
+                  <button
+                    key={label}
+                    onClick={() => {
+                      if (to === "discovery")
+                        setDiscoveryEntry(
+                          label === "Interview responses" ? "tasks" : "contact",
+                        );
+                      go(to);
+                    }}
+                  >
                     <Icon size={16} />
                     <small>{label}</small>
                     <strong>{description}</strong>
@@ -943,6 +964,9 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <DiscoveryJourney
           key={company.id}
           initialStage={discoveryEntry}
+          writeFramework={(key) =>
+            setModal({ type: "form", kind: "framework", preset: { key } })
+          }
           company={company}
           records={records}
           refresh={refresh}
@@ -1839,7 +1863,6 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             >
               {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
             </button>
-
           </div>
         </header>
         <main id="main" tabIndex={-1}>

@@ -196,8 +196,8 @@ test("all upstream joins are required and a changed root recursively invalidates
   const rerun = structuredClone(prior);
   rerun.find((j: any) => j.input.frameworkKey === "bmc").id = "bmc-new-version";
   const current = currentFrameworkRuns(evidence, [], rerun);
-  assert.equal(current.length, 1);
-  assert.equal(current[0].input.frameworkKey, "bmc");
+  assert.equal(current.length, 2);
+  assert.deepEqual(new Set(current.map(j => j.input.frameworkKey)), new Set(["bmc", "industrymap"]));
   assert.ok(
     frameworkContext(
       evidence,
@@ -218,7 +218,7 @@ test("completed manual upstream analyses can satisfy joins but review-required o
     ),
   ];
   assert.deepEqual(
-    frameworkContext(complete, [], "industrymap").missingUpstream,
+    frameworkContext(complete, [], "jtbd").missingUpstream,
     [],
   );
   assert.deepEqual(
@@ -227,7 +227,7 @@ test("completed manual upstream analyses can satisfy joins but review-required o
         r.id === "bmc" ? { ...r, state: "review_required" } : r,
       ),
       [],
-      "industrymap",
+      "jtbd",
     ).missingUpstream,
     ["bmc"],
   );

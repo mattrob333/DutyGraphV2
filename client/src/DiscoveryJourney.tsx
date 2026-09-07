@@ -1,3 +1,4 @@
+import { FrameworkWorkspace } from "./FrameworkWorkspace.tsx";
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
@@ -63,8 +64,10 @@ export function DiscoveryJourney({
   prepareConfirmation,
   settings,
   initialStage = "contact",
+  writeFramework,
 }: {
   initialStage?: DiscoveryStage;
+  writeFramework: (key: string) => void;
   company: Company;
   records: RecordRow[];
   refresh: () => Promise<void>;
@@ -74,6 +77,7 @@ export function DiscoveryJourney({
   prepareConfirmation: () => void;
   settings: () => void;
 }) {
+  const [industryOpen, setIndustryOpen] = useState(false);
   const [stage, setStage] = useState<DiscoveryStage>(initialStage),
     [jobs, setJobs] = useState<Job[]>([]),
     [configured, setConfigured] = useState(false),
@@ -437,6 +441,35 @@ export function DiscoveryJourney({
           }}
         />
       )}
+      {stage === "contact" && (
+        <Panel
+          title="Map the industry before kickoff"
+          subtitle="Turn collected research into a dated industry baseline: ecosystem, technology, economics, leaders and strategic questions."
+        >
+          <p>
+            Run public research first. Open the map to review sources, generate
+            a structured draft, or revisit a saved version. Later strategy
+            frameworks reuse the current map.
+          </p>
+          <Button onClick={() => setIndustryOpen(true)}>
+            Open industry map
+          </Button>
+        </Panel>
+      )}
+      {industryOpen && (
+        <FrameworkWorkspace
+          companyId={company.id}
+          frameworkKey="industrymap"
+          records={records}
+          close={() => setIndustryOpen(false)}
+          openRecord={open}
+          write={writeFramework}
+          navigate={() => {}}
+          saved={() => {
+            void refresh();
+          }}
+        />
+      )}
       {stage === "agenda" && (
         <Panel
           title="Before the leadership meeting"
@@ -522,7 +555,31 @@ export function DiscoveryJourney({
           title="Returned task cards"
           subtitle="Review each person’s returned cards. Their confirmation records their understanding of the work."
         >
-          {records.filter(r => r.kind === "response" && r.data.taskCards?.length).map(r => <article key={r.id} style={{marginBottom:16}}><Button onClick={() => open(r)}>Review {people.find(p => p.id === r.data.personId)?.title || r.title}</Button>{r.data.taskCards.map((card:any,i:number) => <div key={i} style={{padding:12,borderBottom:"1px solid #555"}}><strong>{card.title}</strong><p>{card.decision === "correct" ? "Confirmed by participant" : "Needs review"} · {card.output || "Output not recorded"}</p></div>)}</article>)}
+          {records
+            .filter((r) => r.kind === "response" && r.data.taskCards?.length)
+            .map((r) => (
+              <article key={r.id} style={{ marginBottom: 16 }}>
+                <Button onClick={() => open(r)}>
+                  Review{" "}
+                  {people.find((p) => p.id === r.data.personId)?.title ||
+                    r.title}
+                </Button>
+                {r.data.taskCards.map((card: any, i: number) => (
+                  <div
+                    key={i}
+                    style={{ padding: 12, borderBottom: "1px solid #555" }}
+                  >
+                    <strong>{card.title}</strong>
+                    <p>
+                      {card.decision === "correct"
+                        ? "Confirmed by participant"
+                        : "Needs review"}{" "}
+                      · {card.output || "Output not recorded"}
+                    </p>
+                  </div>
+                ))}
+              </article>
+            ))}
           {teamRequests.some(responseFor) ? (
             requestRows(teamRequests.filter(responseFor), false)
           ) : (

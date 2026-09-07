@@ -36,6 +36,7 @@ export type FrameworkInput = {
   reasoning?: ReasoningEffort;
   sources: FrameworkSource[];
   omitted: number;
+  previousSnapshot?: unknown;
   background?: { frameworkKey: string; summary: string }[];
 };
 export type FrameworkProvider = (
@@ -580,6 +581,11 @@ export function frameworkRouter(provider: FrameworkProvider = openAiFramework) {
         return {
           configured: (await providerConfig(u.tenant_id, "openai", db))
             .configured,
+          previousSnapshot:
+            key === "industrymap"
+              ? data.prior.find((j: any) => j.input.frameworkKey === key)
+                  ?.result?.output
+              : undefined,
           promptVersion: FRAMEWORK_GUIDE_VERSION,
           sourceCount: context.sources.length,
           missingUpstream: context.missingUpstream,
@@ -717,6 +723,11 @@ export function frameworkRouter(provider: FrameworkProvider = openAiFramework) {
         input = {
           frameworkKey: key,
           company: company.name,
+          previousSnapshot:
+            key === "industrymap"
+              ? data.prior.find((j: any) => j.input.frameworkKey === key)
+                  ?.result?.output
+              : undefined,
           promptVersion: FRAMEWORK_GUIDE_VERSION,
           reasoning: config.config.reasoning,
           sources: context.sources,

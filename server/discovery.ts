@@ -1,3 +1,4 @@
+import { frameworkInputs, currentFrameworkRuns } from "./frameworks.ts";
 import { taskGranularityInstructions } from "../shared/work-granularity.ts";
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
@@ -238,6 +239,23 @@ export async function discoveryContext(
   });
   const sources: DiscoverySource[] = [];
   if (["contact", "agenda"].includes(stage)) {
+    const frameworkData = await frameworkInputs(db, company.id);
+    const industry = currentFrameworkRuns(
+      frameworkData.records,
+      frameworkData.research,
+      frameworkData.prior,
+    ).find((j: any) => j.input.frameworkKey === "industrymap");
+    if (industry)
+      sources.push({
+        id: `industry-map:${industry.id}`,
+        title: "Industry map · AI research interpretation",
+        text: JSON.stringify(industry.result.output).slice(0, 12000),
+        version: industry.input.version || 1,
+        hash: industry.input.fingerprint,
+        kind: "public_research",
+        state: "draft",
+      });
+
     const runs = (
       await db.query(
         "SELECT id,results FROM research_runs WHERE company_id=$1 AND state='complete' ORDER BY created_at DESC,id DESC LIMIT 20",
