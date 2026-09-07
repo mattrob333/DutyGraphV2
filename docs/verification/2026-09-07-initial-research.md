@@ -22,4 +22,6 @@ A local server on port 4339 used an isolated fictional advisor/company and injec
 
 Exa/OpenAI keys and billing must be enabled for real searches/classification. These checks do not establish provider availability, real-company recommendation accuracy, employee task validity, or governance authority. The Industry Map remains a separate deeper analysis with its normal prerequisites. The browser drives the initial sequence; saved work is durable, but its local continuation plan can be lost when browser session storage is cleared.
 
-Publication status will be recorded in the development log after the implementation commit is deployed and checked.
+## Hosted publication
+
+Implementation `736e394f1e554ae594983479e3e2c0052eac16f7` passed [CI 34165840592](https://github.com/mattrob333/DutyGraphV2/actions/runs/34165840592), including the synthetic advisor journey and encrypted backup recovery. Vercel deployment `dpl_DMz8gPC792gKuNMb4Fyy9YEmxFMb` reported READY for that exact commit. Production `/login` returned 200 and referenced `/assets/index-BEmkLZ0C.js`, which contains the new research action, classification route and coverage drawer. The updated discovery handbook returned 200 with the new instructions. Unauthenticated access to the classification endpoint returned 401. No real-account research or classification request was sent in production.
