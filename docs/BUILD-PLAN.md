@@ -1,3 +1,5 @@
+> Historical plan from September 5, 2026. For current priorities use the [project roadmap](wiki/Roadmap.md) and [current state](wiki/Current-State.md).
+
 # Completion plan — September 5, 2026
 
 The owner requested a complete build as far as the available environment permits, unit and integration tests, a professional developer handoff, advisor training, a full manual, a walkthrough, and realistic client output examples. This extends the initial foundation release. It does not supply customer credentials or establish independent production acceptance.

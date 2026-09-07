@@ -1,6 +1,6 @@
 # Hosted pilot operations
 
-The production project is dutygraph-v2 in the owner's Vercel team. The public application URL is https://dutygraph-v2.vercel.app. The project is linked to mattrob333/DutyGraphV2. Node 24 builds the Vite client and one Express-based API function. Authoritative data is in a dedicated Neon PostgreSQL database in IAD1, provisioned through Vercel Marketplace. This is separate from the local Docker database; local accounts are not copied to production.
+The production project is dutygraph-v2 in the owner's Vercel team. The public domain is https://dutygraph.com; https://dutygraph-v2.vercel.app remains the project alias. The project is linked to mattrob333/DutyGraphV2. Node 24 builds the Vite client and one Express-based API function. Authoritative data is in a dedicated Neon PostgreSQL database in IAD1, provisioned through Vercel Marketplace. This is separate from the local Docker database; local accounts are not copied to production.
 
 ## Server configuration
 
@@ -24,6 +24,6 @@ Run npm run contracts, npm run verify and npm audit before release. Confirm gene
 
 The existing backup/restore scripts are deliberately restricted to the local dedicated Docker database. They do not back up or restore Neon. Configure and rehearse hosted database recovery and separate encryption-key custody before relying on this pilot for irreplaceable client records. Provider job snapshots persist under tenant RLS; comprehensive deletion and legal-hold handling are not complete.
 
-Audio uploads use small verified chunks; playback supports bounded byte ranges. Physical-microphone and large-file browser acceptance still need evaluation. Production monitoring, alert routing, load/SLO acceptance, password recovery, SSO/MFA, email delivery webhooks and scheduled reminders are not delivered by this deployment. Neo4j remains unconnected; graph reads use the PostgreSQL projection or current-record fallback.
+Audio uploads use small verified chunks; playback supports bounded byte ranges. Physical-microphone and large-file browser acceptance still need evaluation. Production monitoring, alert routing, load/SLO acceptance, password recovery, SSO/MFA, email delivery webhooks and scheduled reminders are not delivered by this deployment. Neo4j Aura is an optional account-configured projection with PostgreSQL/current-record fallback. Connectivity was verified for a configured account in prior work; check the current account status rather than assuming a global connection.
 
 Never call a sample-data script against an arbitrary database or import the private source handoff into the public repository. Build and live verification use fictional fixtures. API keys belong in the account settings or the server secret store, never logs, issue comments, source files or test output.

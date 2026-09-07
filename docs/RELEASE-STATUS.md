@@ -1,48 +1,28 @@
-# Release 0.3 - hosted advisor pilot
+# Release status
 
-This release adds a Vercel/Neon hosted pilot, private sample workspaces, encrypted account key settings, OpenAI discovery drafts and Resend invitation sending to the human-led advisor journey and training materials. It does **not** complete the full 90-requirement production target in the supplied handoff. Provider adapters need credentials and live acceptance; enterprise authority and live execution remain unimplemented; independent production acceptance remains open.
+Updated September 7, 2026. Application baseline: `97335fd`, version `0.3.0`.
 
-## Delivered behavior
+DutyGraph is a hosted advisor pilot. See the maintained [current-state matrix](wiki/Current-State.md), [roadmap](wiki/Roadmap.md), and [project wiki](wiki/Home.md).
 
-| Area | Implemented in the local application |
-| --- | --- |
-| Scope and kickoff | Five-stage guided discovery, contact preparation email, leadership agenda and notes, reviewed team dossiers, personal interviews, proposed task cards and confirmation handoff |
-| Pre-meeting research | Optional Exa source collection, public query preview, bounded requests, durable replay prevention, source snapshots and unreviewed evidence import; no live key configured |
-| People and organization | CSV preview/quarantine, reported managers, teams, explicit duty claims and task responsibilities |
-| Evidence and capture | Immutable typed/audio originals, private enrollment, resumable uploads up to 25 MB, on-demand OpenAI transcription, participant edits and advisor recovery for audio-only replies, accepted transcript evidence with original lineage, review/retraction and dependent staleness |
-| Work | Versioned tasks, unresolved proposals, exact owner/performer confirmation, conflict handling, duties and handoff contracts |
-| Graph | Focused semantic columns, actual handoff diagrams, team-to-duty maps, recorded-manager chart, register and bounded API; optional encrypted Neo4j Aura metadata projection with current-record fallback |
-| Workflows | Reviewed acyclic definitions, pinned dependencies, manual cases, selected routes, all/any joins, deadlines, failures, retries and history |
-| Strategy | Sixteen specific AI instruction sets and visual canvases, on-demand dependency sequence, exact source/version citations and recursive staleness; advisor analyses, testable hypotheses, measurements, intervention predictions and reviewed outcomes |
-| Weekly review | Evidence/work exceptions, cases needing attention, owner/action/due-date commitments |
-| Client delivery | Frozen executive/weekly/audit reports, explicit audience approval, current binding checks, printable HTML and checksummed ZIPs |
-| Internal handoff | Workspace, confirmed-work and non-operative agent proposal packages with exclusions |
-| Operations | Forced tenant RLS, serialized multi-record commands, immutable history, outbox, versioned migration ledger, encrypted backup and separate-database restore drill |
-| Enablement | Searchable help, eight advisor guides, full manual, A-to-Z playbook, workshop/answers, actual synthetic examples, portable HTML/Markdown and PDF |
+## Delivered in code
 
-## Verified boundaries
+- Authenticated company workspaces with PostgreSQL records, versions, tenant isolation and audit/confirmation semantics.
+- Discovery, roster/reporting charts, invitations, audio/text responses, transcription integration, AI task drafting and participant review.
+- Task/duty/handoff records, workflows/cases, a stable company work map and focused relationship exploration.
+- Optional Neo4j Aura projection with encrypted account settings and PostgreSQL fallback.
+- Sixteen strategy framework specifications/runs and business-type profiles with 52 templates.
+- Review/reporting/export surfaces, user help and training.
+- Fictional discovery and authority demonstrations.
+- Public marketing/intake, governance directory and Perspectives article publishing.
 
-The verification record distinguishes pure tests, real API/database tests, the synthetic advisor journey, browser checks, dependency audit, local performance and backup/restore. Passing these does not certify production security, diagnostic accuracy or customer-system execution. See VERIFICATION.md and docs/verification for exact evidence.
+## Verification boundary
 
-The original Cobalt sample remains unchanged by the training journey. Northstar is a separate synthetic company whose scripted local participant confirmations are clearly labeled training. No real customer approval, email, permission grant or business action was created.
+Prior work recorded 171 passing unit/database/API tests plus scoped browser checks. Dated evidence lives in [verification](verification/). These results do not establish real-client extraction accuracy, live IAM enforcement, physical-device coverage, or enterprise security acceptance. Documentation updates do not rerun or extend that historical evidence.
 
-## Remaining work before production
+Neo4j connectivity was verified for a configured account in earlier work; that is not a statement that every account is configured. Provider configuration, synthetic provider tests, and actual successful paid/delivery requests are separate facts.
 
-| Workstream | Concrete remaining acceptance |
-| --- | --- |
-| Identity and data access | Verified enrollment/recovery, SSO/MFA where required, company memberships, evidence ACLs, administrator lifecycle |
-| Ingestion and analysis | Scanned private storage, document/transcript lineage, provider-backed jobs, reviewed changesets, budgets/cancellation and empirical evaluation |
-| External research | Exa project credential and live acceptance, provider spend limits, research retention/cancellation and wider source evaluation; Firecrawl optional |
-| Core production domains | Full operational-model compiler, authority baseline/control context, complete non-record API request/response contract |
-| Customer authority and runtime | Effective-access/policy adapters, authenticated staged approvals, managed Signet keys, exact target action, revocation, idempotent side effects and reconciliation |
-| Operations | Off-host key/backup custody, full recovery cutover, comprehensive deletion/hold, monitoring/SLOs, large-load and distributed-worker evaluation |
-| Independent release assurance | Full accessibility/browser matrix, physical microphone tests, security review/penetration test, blind diagnostic evaluation and owner acceptance |
-| Enterprise expansion | SSO/SCIM, deployment/isolation choices, permission-safe portfolio reporting and additional adapters |
+## Still open
 
-Exa, OpenAI, Resend and optional Neo4j Aura connections use encrypted account settings. PostgreSQL remains authoritative. Aura is connected for the advisor account: production maintenance copied Cobalt revision 206 with 71 records and 147 relationships on September 6, 2026. The shared graph reader returned a validated Aura snapshot; a repeat rebuild preserved counts without duplicates. See verification/2026-09-06-guided-release.md for the exact acceptance scope and guide/00-hosted-quickstart.md for the current workflow. The 0.2 delivery pack remains a historical local release. The app fails closed for live runtime preflight. INTEGRATIONS.md records other credential needs and live acceptance boundaries.
+Real-client discovery validation; cross-team reasoning quality; enterprise identity/access administration; hosted recovery and operating acceptance; comprehensive data lifecycle controls; real HR/IGA provisioning; managed signing and runtime authority enforcement; measured commercial outcomes and advisor scale.
 
-## Requirement traceability
-
-requirements-status.json maps all 90 supplied requirement IDs to implementation evidence and remaining work. Local subset means part of a requirement has working code. Open means the complete behavior is not implemented. No requirement is marked formally production-accepted by this local development run.
-
-The source audit remains a bounded inspection of predecessor projects, not a claim that those repositories were fully executed or verified. The current source, lockfile and GitHub CI run identify this repository's release.
+The original [90-requirement matrix](requirements-status.json) preserves the supplied acceptance scope. It is not a current exhaustive feature inventory, and no local feature addition establishes formal production acceptance of every requirement.

@@ -1,85 +1,116 @@
-# Duty Graph V2
+# DutyGraph
 
-A PostgreSQL-backed advisor workspace that turns evidence into reviewed work descriptions, human confirmations, testable explanations and client deliverables. React/TypeScript preserves the supplied graphite interface; Express enforces record scope and guarded transitions.
+**Understand the work. Improve the business. Delegate with clear human authority.**
 
-**Release 0.3 is a hosted advisor pilot.** Open [Duty Graph](https://dutygraph-v2.vercel.app), create an account and load your private fictional sample from Workspace settings. Exa research, OpenAI discovery drafts and Resend invitations are wired to encrypted per-account key settings. Provider adapters have simulated-response tests; live provider acceptance requires your keys. Neo4j, transcription, enterprise identity and governed customer-system execution remain unfinished. See the [hosted walkthrough](docs/guide/00-hosted-quickstart.md), [release status](docs/RELEASE-STATUS.md) and [integration decisions](docs/INTEGRATIONS.md).
+DutyGraph is an advisor-led business discovery and strategy application from Tier 4 Intelligence. It turns research, leadership conversations, and employees’ descriptions of their work into a connected record of people, duties, granular tasks, software, and handoffs. Advisors use that record to investigate gaps, prepare findings, and identify bounded candidates for AI assistance.
+
+The ambition is a living map of a business: evidence informs strategy, strategy informs proposed work, and outcomes inform the next decision. This is the direction of the product, not a claim that autonomous business management exists today.
+
+[Website](https://dutygraph.com) · [Discovery demo](https://dutygraph.com/?demo=discovery) · [Project wiki](docs/wiki/Home.md) · [Developer onboarding](docs/wiki/Developer-Onboarding.md) · [Documentation index](docs/README.md)
+
+## Start here
+
+| Goal | Read |
+| --- | --- |
+| Understand the product and customer | [Product vision](docs/wiki/Product-Vision.md) |
+| Follow the advisor and participant experience | [User journeys](docs/wiki/User-Journeys.md) |
+| Know what exists versus what is planned | [Current state](docs/wiki/Current-State.md) |
+| Make your first contribution | [Onboarding](docs/wiki/Developer-Onboarding.md), [contributing](CONTRIBUTING.md) |
+| Understand the technical model | [Architecture and data](docs/wiki/Architecture-and-Data.md) |
+| Understand AI prompts and dependencies | [Discovery and strategy](docs/wiki/Discovery-and-Strategy.md) |
+| Understand authority and integrations | [Governance](docs/wiki/Governance-and-Integrations.md) |
+| Plan the next release | [Roadmap](docs/wiki/Roadmap.md), [operations](docs/wiki/Operations-and-Deployment.md) |
+
+## Current status
+
+Documentation baseline: **September 7, 2026**, application source through `97335fd`. Package version: `0.3.0`. This is a hosted pilot with working application code, fictional demonstrations, and remaining enterprise acceptance work.
+
+Implemented areas include authenticated company workspaces, roster imports/reporting charts, discovery requests, participant audio/text capture, AI task drafts and participant review, task/evidence versioning, workflows/cases, strategy framework runs, company work maps, optional Neo4j projections, reports, training, and public marketing/intake pages.
+
+Important boundaries:
+
+- Public discovery and authority samples are fictional. They do not prove real email, model, identity-provider, or agent-runtime execution.
+- Participant approval confirms the person’s understanding of a task. It does not grant access or establish company policy.
+- Neo4j is a derived graph. PostgreSQL remains the source of truth.
+- Framework outputs are evidence-linked drafts. They do not automatically rewrite responsibilities or execute actions.
+- IAM vendor fixtures demonstrate data shapes; they are not production Okta, Saviynt, Workday, Oracle, or Entra connectors.
+- Enterprise identity, hosted recovery acceptance, runtime enforcement, and independent security/compliance validation remain open.
+
+See [release status](docs/RELEASE-STATUS.md). No statement in this repository establishes SOC 2 compliance or guarantees a customer outcome.
 
 ## Run locally
 
-Requires Node.js 24+, npm, Docker Compose, and free loopback ports 4317 and 55437.
+Prerequisites: Git, **Node.js 24**, npm, Docker with Compose, and available ports `4317` and `55437`.
 
 ```sh
+git clone https://github.com/mattrob333/DutyGraphV2.git
+cd DutyGraphV2
 npm ci
 npm run setup
+npm run dev
+```
+
+Open [localhost:4317](http://localhost:4317). On Windows, use `npm.cmd` if PowerShell blocks the npm shim. Docker must be running before setup.
+
+Setup creates random credentials in an ignored `.env` when none exists, starts the dedicated PostgreSQL container, and applies migrations. **Do not first copy the `CHANGE_ME` values from `.env.example` into `.env`**: setup preserves an existing file. Never point setup, tests, training, or sample scripts at customer production data.
+
+For the compiled local application:
+
+```sh
 npm run build
 npm start
 ```
 
-Open http://localhost:4317. Choose Open sample workspace for the original synthetic Cobalt scenario, or create a separate account/company. The demo account is shared locally and must contain only fictional information. Setup generates ignored database credentials and starts a dedicated PostgreSQL 17 service; it does not reuse another application's database.
+Both local modes bind to `127.0.0.1`. Hosted deployment uses the Vercel API entry point. Local and hosted databases/accounts are separate.
 
-For hot reload, use `npm run dev`. The optimized local build still binds only to 127.0.0.1 and must not be treated as a reviewed Internet deployment.
+## Commands
 
-## Explore the complete training example
-
-```sh
-npm run training
-npm run build
-```
-
-This creates a new Northstar Parts training company and actual application-generated client examples. It uses fictional actors through real local API enrollment and confirmation paths. The original Cobalt company is preserved. No email or external business action occurs.
-
-Open Help & training in the app, or http://localhost:4317/handbook/index.html for the portable learning center. The eight guides include the explainer, walkthrough, full user manual, A-to-Z advisor playbook, workshop exercises, facilitator answers, client deliverables and glossary. Editable sources live in docs/guide. Examples live in docs/examples.
-
-## Working features
-
-- Scoped advisor/participant sessions, forced tenant RLS, CSRF/origin checks and immutable content history.
-- Engagement plans, roster validation, bounded kickoff, private requests, typed/audio capture and source review/retraction.
-- Versioned task cards, exact owner/performer confirmations, explicit duties, receiving handoffs and conflict handling.
-- Readable connected graph, focused neighborhoods, accessible register, team responsibilities and recorded-manager org chart.
-- Reviewed manual workflows with persisted cases, branch joins, deadlines, failures, bounded retries and observer history.
-- Human-authored framework analyses, hypotheses, metrics, interventions and outcome reviews with preserved predictions.
-- Weekly decisions and audience-reviewed client reports, printable HTML, structured registers and checksummed ZIP packages.
-- Non-operative agent proposals and internal confirmed-work exports with explicit exclusions.
-- Versioned/checksummed migrations, encrypted backups, isolated restore drills, bounded performance workload and CI.
-- Searchable in-app help and a complete advisor enablement package.
-
-## Verify and operate
-
-```sh
-npm run contracts
-npm run verify
-npm audit --audit-level=high
-npm run benchmark
-npm run backup
-npm run restore:drill -- work/backups/your-backup.dgbak
-```
-
-Use the actual emitted backup filename. Tests and benchmark create isolated synthetic fixtures. Backup/drill use only this dedicated local database; the drill does not replace it. Read [OPERATIONS](docs/OPERATIONS.md) before recovery or upgrade. Read [VERIFICATION](docs/VERIFICATION.md) for measured evidence and limits.
-
-## Handoff map
-
-| Location | Contents |
+| Command | Purpose |
 | --- | --- |
-| client/src | Workspace, forms, graph, participant capture, cases, help |
-| server | Auth, commands, records, reports, workflows, projection, assets, retention |
-| shared | Runtime schemas and pure domain/layout/document rules |
-| contracts | Preserved registry, generated record schemas and implemented-route inventory |
-| tests | Unit and real PostgreSQL/API regression tests |
-| scripts | Setup, contracts, training, handbook, PDF, benchmark and backup tools |
-| docs/guide | Complete advisor manual and training sources |
-| docs/examples | Fictional application-generated client/internal outputs |
-| docs/verification | Sanitized local performance and recovery evidence |
-| infra | Dedicated local PostgreSQL Compose service |
-| reference | Supplied synthetic visual reference, separate from running code |
+| `npm run dev` | Express API with Vite development middleware |
+| `npm run build` | Generate public content/handbook, check TypeScript, build client |
+| `npm run typecheck` | Check application TypeScript |
+| `npm test` | Unit and database/API tests; local database required |
+| `npm run verify` | Build and test |
+| `npm run contracts` | Regenerate API contracts/reference |
+| `npm run db:migrate` | Apply migrations using the migration connection |
+| `npm run training` | Run fictional training exercise |
+| `npm run benchmark` | Repository benchmark, not accuracy certification |
+| `npm run backup` | Back up dedicated local Docker database |
+| `npm run restore:drill -- <backup-file>` | Rehearse local restore; see runbook |
+| `npm run handbook` | Generate portable help handbook |
 
-See [architecture](docs/ARCHITECTURE.md), [security review](docs/SECURITY.md), [API reference](docs/API-REFERENCE.md), [acceptance checklist](docs/ACCEPTANCE-CHECKLIST.md), and [source audit](docs/SOURCE-AUDIT.md). All 90 supplied requirement IDs remain traceable in docs/requirements-status.json; partial local coverage is not formal production acceptance.
+See [CI](.github/workflows) and [verification](docs/VERIFICATION.md) for release checks. Synthetic tests do not establish real-client extraction accuracy.
 
-The commercial handoff, .env, raw database backups and encryption keys are excluded from this public repository. Embedded source-document instructions do not authorize messaging, customer publication or business-system actions.
+## Repository map
 
-### Agent request example
+| Path | Responsibility |
+| --- | --- |
+| `client/src/` | Advisor app, participant experience, graphs and review UI |
+| `client/public/` | Public site, generated pages, styles and media |
+| `server/` | Routes, auth, records, providers, projections and exports |
+| `server/migrations/` | Ordered database changes |
+| `shared/` | Schemas, work model, framework specifications and view logic |
+| `contracts/` | API, framework registry, graph ontology and design contracts |
+| `content/` | Editorial and directory source content |
+| `scripts/` | Setup, generation, training and operator tooling |
+| `tests/` | Unit and database/API regressions |
+| `api/` | Hosted function entry point |
+| `infra/` | Dedicated local database infrastructure |
+| `docs/wiki/` | Project vision, developer handoff and roadmap |
+| `docs/guide/` | User-facing help/training source |
+| `docs/verification/` | Dated evidence, not evergreen status |
 
-Agent governance now includes a request portal and a Cobalt-only connected authority demo. See [the source mappings and live integration boundary](docs/agent-authority-demo.md). Simulated review and issuance create no signature, identity or permission.
+Edit generated content at its source and regenerate it. Credentials, backups, private handoffs and local working artifacts do not belong in commits.
 
-## Pilot recruitment
+## Configuration and security
 
-See [Pilot recruitment and participant journey](docs/pilot-discovery.md) for the public demo, signup storage, private operator inbox, and actual participant flow.
+Runtime database roles must remain non-superuser and subject to forced row-level security. Migration-owner connections are separate. Hosting uses `APP_DATABASE_URL`; setup supplies local `DATABASE_URL` and `MIGRATION_DATABASE_URL`.
+
+Provider credentials are encrypted with server-only `PROVIDER_ENCRYPTION_KEY`. Preserve secure recovery custody. Account integrations are tenant-specific; another email/account does not inherit them. Pilot lead notifications use separate operator configuration.
+
+Read [integrations](docs/INTEGRATIONS.md), [hosting](docs/HOSTING.md), [security](docs/SECURITY.md) and [domain setup](docs/CUSTOM-DOMAIN.md).
+
+## Contributing
+
+Start with [CONTRIBUTING.md](CONTRIBUTING.md). Keep changes reviewable, preserve tenant isolation/provenance, and document limitations alongside features. The version-controlled wiki is canonical and reviewed with code; a separate GitHub Wiki should be a mirror, not a second independently edited source of truth.

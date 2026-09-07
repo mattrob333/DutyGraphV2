@@ -58,8 +58,9 @@ overflow and the pilot form.
 
 Work interviews now offer voice-first guidance and Create my task cards after a
 checked transcript or typed answer. The configured OpenAI provider extracts
-input, action, output, destination and software. The participant edits and marks
-each card as matching their understanding, not theirs, or uncertain. Local drafts
+input, action, output, destination and software. The participant reviews readable
+cards using Approve or Edit and marks each retained card as matching their
+understanding. Local drafts
 preserve these edits. Changing the original answer starts a new card review.
 The generation attempt saves the original text in a tenant-scoped provider job;
 there is a 60-attempt daily tenant limit and no automatic retry. If the provider

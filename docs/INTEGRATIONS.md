@@ -1,5 +1,9 @@
 # External integrations and credentials
 
+For the September 7 implementation overview, see [current state](wiki/Current-State.md).
+Provider verification statements below refer to their stated dates and accounts;
+they are not a live inspection of the reader's configuration.
+
 Checked September 5, 2026. The application now includes an optional Exa search/content adapter in Discovery → Business research. It is disabled in the delivered local configuration and has been tested with a simulated provider, not a live account. The global search box still searches loaded company records. Release 0.3 adds OpenAI structured discovery drafts and Resend invitation sending through encrypted per-account key settings. OpenAI audio transcription is implemented with participant and advisor review. Customer-system execution remains unimplemented. See [Hosted quickstart](guide/00-hosted-quickstart.md).
 
 ## Public research recommendation
