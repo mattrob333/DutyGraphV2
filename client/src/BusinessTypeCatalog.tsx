@@ -20,7 +20,7 @@ export function BusinessTypeCatalog({
     const example = businessTypeExamples[t.id];
     return (
       (!group || t.group === group) &&
-      `${t.label} ${t.description} ${t.group} ${example.name} ${example.context}`
+      `${t.id} ${t.label} ${t.description} ${t.group} ${example.name} ${example.context}`
         .toLowerCase()
         .includes(search.trim().toLowerCase())
     );
