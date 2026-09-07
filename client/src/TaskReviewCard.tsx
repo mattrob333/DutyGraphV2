@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { CircleCheck } from "lucide-react";
 import "./task-review-card.css";
 const fields: Record<string, string> = {
   title: "Task name",
@@ -21,16 +22,16 @@ export function TaskReviewCard({
   onChange: (c: any) => void;
 }) {
   const [editing, setEditing] = useState(false);
+  const approved = card.decision === "correct" && !editing;
   return (
-    <article className="task-review-card">
+    <article className={`task-review-card${approved ? " is-approved" : ""}`}>
       <header>
         <small>MY WORK · TASK DESCRIPTION</small>
         <h3>{card.title}</h3>
         {person && <p>{person}</p>}
-        <strong aria-live="polite">
-          {card.decision === "correct"
-            ? "Approved — matches my understanding"
-            : "Ready for your review"}
+        <strong className="task-review-status" aria-live="polite">
+          {approved && <CircleCheck size={18} aria-hidden="true" />}
+          {approved ? "Approved — ready to send" : "Ready for your review"}
         </strong>
       </header>
       {editing ? (
@@ -86,13 +87,26 @@ export function TaskReviewCard({
       <footer>
         <button
           type="button"
+          className="task-approve"
           disabled={disabled}
+          aria-disabled={approved || disabled}
           onClick={() => {
             if (editing) setEditing(false);
-            else onChange({ ...card, decision: "correct" });
+            else if (!approved) onChange({ ...card, decision: "correct" });
           }}
         >
-          {editing ? "Save edits and review" : "Approve"}
+          {approved && (
+            <CircleCheck
+              className="task-approval-check"
+              size={20}
+              aria-hidden="true"
+            />
+          )}
+          {editing
+            ? "Save edits and review"
+            : approved
+              ? "Approved"
+              : "Approve"}
         </button>
         <button
           type="button"

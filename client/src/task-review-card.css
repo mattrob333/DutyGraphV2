@@ -1,9 +1,68 @@
 .task-review-card {
+  transition: border-color 180ms ease;
   border: 1px solid #62696b;
   border-radius: 12px;
   margin: 24px 0;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.025);
+}
+.task-review-card.is-approved {
+  border-color: #87b79a;
+}
+.task-review-status,
+.task-review-card .task-approve {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.task-review-card.is-approved .task-review-status {
+  color: #b2dfc2;
+}
+.task-review-card.is-approved footer .task-approve {
+  background: #244635;
+  border-color: #87b79a;
+  color: #c7f0d5;
+  cursor: default;
+}
+.task-review-card .task-approve {
+  min-width: 126px;
+  justify-content: center;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 100ms ease;
+}
+.task-review-card button:active:not(:disabled):not([aria-disabled="true"]) {
+  transform: scale(0.96);
+}
+.task-review-card button:focus-visible {
+  outline: 2px solid #b5cbd5;
+  outline-offset: 3px;
+}
+.task-approval-check {
+  animation: task-check-in 220ms ease-out;
+}
+@keyframes task-check-in {
+  from {
+    opacity: 0;
+    transform: scale(0.65);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .task-review-card,
+  .task-review-card .task-approve {
+    transition: none;
+  }
+  .task-approval-check {
+    animation: none;
+  }
+  .task-review-card button:active:not(:disabled):not([aria-disabled="true"]) {
+    transform: none;
+  }
 }
 .task-review-card header {
   padding: 24px;
