@@ -62,7 +62,9 @@ export function DiscoveryJourney({
   goTasks,
   prepareConfirmation,
   settings,
+  initialStage = "contact",
 }: {
+  initialStage?: DiscoveryStage;
   company: Company;
   records: RecordRow[];
   refresh: () => Promise<void>;
@@ -72,7 +74,7 @@ export function DiscoveryJourney({
   prepareConfirmation: () => void;
   settings: () => void;
 }) {
-  const [stage, setStage] = useState<DiscoveryStage>("contact"),
+  const [stage, setStage] = useState<DiscoveryStage>(initialStage),
     [jobs, setJobs] = useState<Job[]>([]),
     [configured, setConfigured] = useState(false),
     [loading, setLoading] = useState(true),
@@ -517,9 +519,10 @@ export function DiscoveryJourney({
       )}
       {stage === "tasks" && (
         <Panel
-          title="Build from what the team actually said"
-          subtitle="Returned interviews become proposed task cards. Each card keeps its source and needs a human check."
+          title="Returned task cards"
+          subtitle="Review each person’s returned cards. Their confirmation records their understanding of the work."
         >
+          {records.filter(r => r.kind === "response" && r.data.taskCards?.length).map(r => <article key={r.id} style={{marginBottom:16}}><Button onClick={() => open(r)}>Review {people.find(p => p.id === r.data.personId)?.title || r.title}</Button>{r.data.taskCards.map((card:any,i:number) => <div key={i} style={{padding:12,borderBottom:"1px solid #555"}}><strong>{card.title}</strong><p>{card.decision === "correct" ? "Confirmed by participant" : "Needs review"} · {card.output || "Output not recorded"}</p></div>)}</article>)}
           {teamRequests.some(responseFor) ? (
             requestRows(teamRequests.filter(responseFor), false)
           ) : (
