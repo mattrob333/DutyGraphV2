@@ -506,7 +506,7 @@ export async function frameworkInputs(db: any, c: string) {
       title: "Business operating profile · advisor supplied context",
       state: "accepted",
       version: 1,
-      hash: hash(profile),
+      hash: hash({ profile, intake: cRow?.settings?.businessIntake || null }),
       data: {
         bucket: "biz",
         type: "Other document",
@@ -515,6 +515,7 @@ export async function frameworkInputs(db: any, c: string) {
           notice:
             "Operating-model context only. Templates do not prove tasks, metrics, permissions or client approval.",
           ...profile,
+          intake: cRow?.settings?.businessIntake || null,
         }),
       },
       updated_at: "9999",

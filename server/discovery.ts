@@ -245,6 +245,11 @@ export async function discoveryContext(
   });
   const sources: DiscoverySource[] = [];
   if (["contact", "agenda"].includes(stage)) {
+    if (company.settings.businessIntake?.description) sources.push({
+      id: `company-intake:${company.id}`, title: "Business description supplied by the advisor",
+      text: JSON.stringify(company.settings.businessIntake), version: company.revision,
+      hash: hash(company.settings.businessIntake), kind: "public_research", state: "unverified_context",
+    });
     const frameworkData = await frameworkInputs(db, company.id);
     const industry = currentFrameworkRuns(
       frameworkData.records,

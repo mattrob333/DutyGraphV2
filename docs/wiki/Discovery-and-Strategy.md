@@ -1,5 +1,7 @@
 # Discovery and strategy
 
+Initial research now starts with one company/URL/description form. Four selected public-search areas are tucked into a coverage drawer. The saved research pass feeds AI business classification; the advisor reviews the proposed sector, operating model and stages before saving. The Industry Map remains the next deeper research step, and sixteen framework canvases preserve their dedicated layouts with section navigation and responsive labeled data. See [one-form research](../initial-research.md) for limits, configuration and recovery behavior.
+
 ## One evidence base
 
 Research gives an initial picture. Leadership supplies goals and structure. Participants describe work. Advisor review resolves or records disagreements. Frameworks interpret that shared context rather than asking the company to complete sixteen disconnected questionnaires.

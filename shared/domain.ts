@@ -186,6 +186,7 @@ export type Company = {
   goal: string;
   settings: {
     businessProfile?: BusinessProfile;
+    businessIntake?: { name: string; website: string; description: string };
     notice: string;
     retentionDays: number;
     reviewCadence: string;

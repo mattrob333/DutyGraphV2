@@ -78,6 +78,10 @@ for (const [source, prefix] of [
   ["server/reports.ts", "/api/v1/companies/:companyId/reports"],
   ["server/workflows.ts", "/api/v1/companies/:companyId/workflows"],
   ["server/research.ts", "/api/v1/companies/:companyId/research"],
+  [
+    "server/business-classification.ts",
+    "/api/v1/companies/:companyId/business-classification",
+  ],
   ["server/team-analysis.ts", "/api/v1/companies/:companyId/team-analysis"],
   ["server/providers.ts", "/api/v1/companies/:companyId/providers"],
   ["server/invitations.ts", "/api/v1/companies/:companyId/requests"],

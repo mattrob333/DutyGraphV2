@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId } from "react";
 import {
   ArrowRight,
   BookOpen,
@@ -54,7 +54,10 @@ function Finding({ item, cite }: { item: Item; cite: (id: string) => void }) {
         <Badge tone={item.basis === "Missing" ? "amber" : "neutral"}>
           {item.basis}
         </Badge>
-        <span title={item.confidenceReason}>{item.confidence} confidence</span>
+        <details className="framework-confidence">
+          <summary>{item.confidence} confidence</summary>
+          <p>{item.confidenceReason}</p>
+        </details>
       </div>
       <Citations ids={item.sourceIds} cite={cite} />
       {item.nextStep && (
@@ -69,19 +72,36 @@ function CanvasSection({
   definition,
   items,
   cite,
+  sectionId,
+  number,
 }: {
   definition: FrameworkSection;
   items?: Item[];
   cite: (id: string) => void;
+  sectionId: string;
+  number: number;
 }) {
   return (
     <section
       className={`framework-canvas-section section-${definition.id}`}
       aria-label={definition.label}
+      id={sectionId}
+      tabIndex={-1}
     >
       <header>
-        <h3>{definition.label}</h3>
-        {!items && <Badge>Awaiting analysis</Badge>}
+        <h3>
+          <span className="framework-section-number">
+            {String(number).padStart(2, "0")}
+          </span>
+          {definition.label.replace(/^\d{2} · /, "")}
+        </h3>
+        {!items ? (
+          <Badge>Awaiting analysis</Badge>
+        ) : (
+          <Badge>
+            {items.length} {items.length === 1 ? "finding" : "findings"}
+          </Badge>
+        )}
       </header>
       {!items ? (
         <p className="framework-section-placeholder">
@@ -114,20 +134,21 @@ function CanvasSection({
                     )}
                   </th>
                   {definition.columns!.map((c) => (
-                    <td key={c.key}>
+                    <td key={c.key} data-label={c.label}>
                       {item.values.find((v) => v.key === c.key)?.value ||
                         "Missing"}
                     </td>
                   ))}
-                  <td>
+                  <td data-label="Basis & confidence">
                     <Badge
                       tone={item.basis === "Missing" ? "amber" : "neutral"}
                     >
                       {item.basis}
                     </Badge>
-                    <p title={item.confidenceReason}>
-                      {item.confidence} confidence
-                    </p>
+                    <details className="framework-confidence">
+                      <summary>{item.confidence} confidence</summary>
+                      <p>{item.confidenceReason}</p>
+                    </details>
                     <Citations ids={item.sourceIds} cite={cite} />
                   </td>
                 </tr>
@@ -155,19 +176,43 @@ export function FrameworkCanvas({
   cite?: (id: string) => void;
 }) {
   const spec = frameworkSpecs[frameworkKey];
+  const id = useId();
   return (
-    <div
-      className={`framework-canvas layout-${spec.layout} canvas-${frameworkKey}`}
-    >
-      {spec.sections.map((s) => (
-        <CanvasSection
-          key={s.id}
-          definition={s}
-          items={output?.sections.find((v) => v.id === s.id)?.items}
-          cite={cite}
-        />
-      ))}
-    </div>
+    <>
+      <nav
+        className="framework-section-nav"
+        aria-label={`${spec.name} sections`}
+      >
+        {spec.sections.map((s, i) => (
+          <button
+            type="button"
+            key={s.id}
+            onClick={() => {
+              const target = document.getElementById(`${id}-${s.id}`);
+              target?.scrollIntoView({ block: "start", behavior: "auto" });
+              target?.focus({ preventScroll: true });
+            }}
+          >
+            <span>{String(i + 1).padStart(2, "0")}</span>
+            {s.label.replace(/^\d{2} · /, "")}
+          </button>
+        ))}
+      </nav>
+      <div
+        className={`framework-canvas layout-${spec.layout} canvas-${frameworkKey}`}
+      >
+        {spec.sections.map((s, i) => (
+          <CanvasSection
+            key={s.id}
+            definition={s}
+            items={output?.sections.find((v) => v.id === s.id)?.items}
+            cite={cite}
+            sectionId={`${id}-${s.id}`}
+            number={i + 1}
+          />
+        ))}
+      </div>
+    </>
   );
 }
 export function FrameworkWorkspace({
@@ -390,6 +435,34 @@ export function FrameworkWorkspace({
           <div className="eyebrow">What this means</div>
           <h3>{output.scope}</h3>
           <p>{output.summary}</p>
+          <div
+            className="framework-summary-counts"
+            aria-label="Analysis coverage"
+          >
+            <span>
+              <strong>
+                {output.sections.reduce(
+                  (n, s) =>
+                    n + s.items.filter((i) => i.basis !== "Missing").length,
+                  0,
+                )}
+              </strong>{" "}
+              Findings to review
+            </span>
+            <span>
+              <strong>
+                {output.sections.reduce(
+                  (n, s) =>
+                    n + s.items.filter((i) => i.basis === "Missing").length,
+                  0,
+                )}
+              </strong>{" "}
+              Explicit gaps
+            </span>
+            <span>
+              <strong>{output.questions.length}</strong> Questions to resolve
+            </span>
+          </div>
           <span className="muted">
             AI draft. Use the citations and confidence notes to check the
             reasoning.

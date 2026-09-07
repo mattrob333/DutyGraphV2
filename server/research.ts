@@ -193,6 +193,7 @@ export function researchRouter(providerOverride?: ResearchProvider) {
     );
     const reservation: any = await run(req, async (db: any) => {
       await companyCheck(db, actor, companyId);
+      await db.query("SELECT pg_advisory_xact_lock(hashtext($1))", [`research-quota:${actor.tenant_id}`]);
       const used = Number(
         (
           await db.query(

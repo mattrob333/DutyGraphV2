@@ -84,6 +84,7 @@ export function DiscoveryJourney({
   settings: () => void;
 }) {
   const [industryOpen, setIndustryOpen] = useState(false);
+  const [researchVersion, setResearchVersion] = useState(0);
   const [stage, setStage] = useState<DiscoveryStage>(initialStage),
     [jobs, setJobs] = useState<Job[]>([]),
     [configured, setConfigured] = useState(false),
@@ -450,10 +451,13 @@ export function DiscoveryJourney({
           company={company}
           refresh={refresh}
           openIndustry={() => setIndustryOpen(true)}
+          researched={() => setResearchVersion((v) => v + 1)}
         />
       )}
       {stage === "contact" && (
         <BusinessResearch
+          key={company.id + researchVersion}
+          resultsOnly
           company={company}
           create={addSource}
           open={open}

@@ -4,7 +4,11 @@ Discovery has five steps. Each step uses the information collected in the preced
 
 ## 1. Research and contact
 
-Enter the public business name and website. All four research areas are selected by default: company overview, customer communities, competitors and their channels, and industry news and feeds. Each area uses one Exa request and returns up to five pages. The default selection uses four requests from the ten-request daily allowance. Finding a community or feed does not subscribe to it.
+Enter the public business name, website and an optional short description once. Choose **Research this company**. All four research areas are selected inside the collapsed **Research coverage** drawer: company overview, customer communities, competitors and their channels, and industry news and feeds. Uncheck any area you do not need. Each uses one Exa request and returns up to five pages; the default uses four requests from the ten-request rolling daily allowance. AI then reuses these sources to suggest the sector, business type and operating flow. Review the readable recommendation and choose **Use this business profile**. **Edit or choose manually** provides alternatives and custom stages if needed.
+
+Keep the page open while the sequence runs. If interrupted, **Resume research pass** continues with saved command keys; it does not repeat completed searches. A failed step offers an explicit retry. Provider connections must be configured in Workspace settings. Without Exa, provide a description for an AI-only recommendation; without OpenAI, you can still collect public sources.
+
+The **Industry Map** is a separate deeper analysis after this initial pass. It uses the collected context to prepare a structured industry baseline before kickoff. Finding a community or feed does not subscribe to it or start continuous monitoring.
 
 Read the results in Collected sources. Research text is available to the contact email and meeting guide automatically. Import is optional when you also want a page in the evidence history. Public research does not establish internal duties or reporting lines.
 

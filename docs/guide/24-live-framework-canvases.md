@@ -14,6 +14,8 @@ The browser must remain open for the sequence to continue. An individual server 
 
 ## Understand the canvas
 
+Use the numbered section buttons to jump to a part of the framework. The opening summary counts findings to review, explicit gaps and unresolved questions. Open a confidence label to read its explanation. On a phone, table rows become vertical records with their field labels visible.
+
 The opening summary explains the decision-relevant picture. Each finding names its basis:
 
 | Basis | Meaning |

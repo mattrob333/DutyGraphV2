@@ -1,4 +1,6 @@
 import { businessProfileSchema } from "../shared/business-types.ts";
+import { classificationIntake } from "../shared/business-classification.ts";
+import { businessClassificationRouter, type ClassificationProvider } from "./business-classification.ts";
 import { teamAnalysisRouter, type TeamProvider } from "./team-analysis.ts";
 import { newsletterInterest } from "./newsletter.ts";
 import { participantDraft, participantCards } from "./participant-cards.ts";
@@ -97,6 +99,7 @@ export function createApp({
   emailProvider,
   aiProvider,
   discoveryProvider,
+  classificationProvider,
   frameworkProvider,
   teamProvider,
   hostedRouting = !!process.env.VERCEL,
@@ -106,6 +109,7 @@ export function createApp({
   emailProvider?: EmailProvider;
   aiProvider?: AiProvider;
   discoveryProvider?: DiscoveryProvider;
+  classificationProvider?: ClassificationProvider;
   frameworkProvider?: FrameworkProvider;
   teamProvider?: TeamProvider;
   hostedRouting?: boolean;
@@ -504,6 +508,7 @@ export function createApp({
       }),
     ),
   );
+  api.use("/companies/:companyId/business-classification", businessClassificationRouter(classificationProvider, researchProvider));
   api.put("/companies/:companyId/business-profile", advisor, async (req, res) =>
     res.json(
       await run(req, async (db: any) => {
@@ -513,13 +518,14 @@ export function createApp({
           .object({
             expectedRevision: z.number().int(),
             profile: businessProfileSchema,
+            intake: classificationIntake.optional(),
           })
           .strict()
           .parse(req.body);
         const updated = (
           await db.query(
-            "UPDATE companies SET settings=jsonb_set(settings,'{businessProfile}',$1::jsonb),revision=revision+1 WHERE id=$2 AND revision=$3 RETURNING *",
-            [JSON.stringify(d.profile), c.id, d.expectedRevision],
+            "UPDATE companies SET settings=settings || $1::jsonb,revision=revision+1 WHERE id=$2 AND revision=$3 RETURNING *",
+            [JSON.stringify({ businessProfile: d.profile, ...(d.intake ? { businessIntake: d.intake } : {}) }), c.id, d.expectedRevision],
           )
         ).rows[0];
         if (!updated)

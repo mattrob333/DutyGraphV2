@@ -3,6 +3,75 @@
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 8px;
 }
+.business-intake {
+  max-width: 900px;
+}
+.business-intake > label {
+  display: grid;
+  gap: 8px;
+  margin: 18px 0;
+}
+.business-intake textarea {
+  min-height: 90px;
+}
+.business-recommendation {
+  margin: 28px 0;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-top: 3px solid #94b8a4;
+  border-radius: 12px;
+  background: var(--surface);
+}
+.business-recommendation h3 {
+  font-size: 24px;
+  margin: 10px 0;
+}
+.business-recommendation h4 {
+  font-size: 17px;
+  margin: 20px 0 6px;
+}
+.business-recommendation p {
+  max-width: 90ch;
+  line-height: 1.7;
+  white-space: pre-line;
+}
+.business-recommendation article + article {
+  border-top: 1px solid var(--line);
+  margin-top: 24px;
+}
+.business-recommendation .business-flow-preview {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  overflow: visible;
+}
+.business-recommendation .business-flow-preview > span {
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.business-recommendation .business-flow-preview small {
+  margin: 0 0 8px;
+  font-weight: 400;
+}
+.business-manual {
+  border-top: 1px solid var(--line);
+  padding-top: 20px;
+}
+.business-manual > summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+@media (max-width: 800px) {
+  .business-recommendation {
+    padding: 16px;
+  }
+  .business-recommendation .business-flow-preview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .business-fields > label {
+    min-width: min(180px, 100%);
+  }
+}
 .business-backbone > span {
   padding: 12px;
   border-top: 2px solid var(--accent, #b7cbbf);

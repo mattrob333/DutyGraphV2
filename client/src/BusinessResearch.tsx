@@ -42,19 +42,27 @@ export function BusinessResearch({
   open,
   kickoff,
   refresh,
+  resultsOnly = false,
 }: {
   company: Company;
   create: () => void;
   open: (r: RecordRow) => void;
   kickoff: () => void;
   refresh: () => Promise<void>;
+  resultsOnly?: boolean;
 }) {
   const [attempt, setAttempt] = useState<Attempt | null>(() =>
     savedAttempt(company.id),
   );
   const [status, setStatus] = useState<Status | null>(null),
-    [publicName, setPublicName] = useState(attempt?.publicName || company.name),
-    [website, setWebsite] = useState(attempt?.website || ""),
+    [publicName, setPublicName] = useState(
+      attempt?.publicName ||
+        company.settings.businessIntake?.name ||
+        company.name,
+    ),
+    [website, setWebsite] = useState(
+      attempt?.website || company.settings.businessIntake?.website || "",
+    ),
     [focuses, setFocuses] = useState<string[]>(
       attempt
         ? [attempt.focus || "company", ...(attempt.remaining || [])]
@@ -64,6 +72,12 @@ export function BusinessResearch({
     [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const path = `/v1/companies/${company.id}/research`;
+  useEffect(() => {
+    if (!attempt && company.settings.businessIntake) {
+      setPublicName(company.settings.businessIntake.name);
+      setWebsite(company.settings.businessIntake.website);
+    }
+  }, [company.settings.businessIntake]);
   const resuming =
     !!attempt &&
     attempt.publicName === publicName.trim() &&
@@ -172,136 +186,140 @@ export function BusinessResearch({
   return (
     <>
       <ErrorBox error={error} />
-      <div className="two-col research-layout">
-        <Panel
-          title="Research the business"
-          subtitle="Exa searches public sources and retrieves page text. No private interview or workspace evidence is sent."
-        >
-          <Badge tone={status?.configured ? "sage" : "amber"}>
-            {status?.configured
-              ? "Exa configured · operator enabled"
-              : status
-                ? "Exa not configured"
-                : "Checking connection settings…"}
-          </Badge>
-          <form onSubmit={search} className="research-form">
-            <Field label="What should we research?">
-              <div className="discovery-source-list">
-                {researchFocuses.map((f) => (
-                  <label className="discovery-source" key={f.id}>
-                    <input
-                      type="checkbox"
-                      checked={focuses.includes(f.id)}
-                      disabled={busy || !!attempt}
-                      onChange={(e) =>
-                        setFocuses(
-                          e.target.checked
-                            ? [...focuses, f.id]
-                            : focuses.filter((id) => id !== f.id),
-                        )
-                      }
-                    />
-                    <span>{f.label}</span>
-                  </label>
+      {!resultsOnly && (
+        <div className="two-col research-layout">
+          <Panel
+            title="Research the business"
+            subtitle="Exa searches public sources and retrieves page text. No private interview or workspace evidence is sent."
+          >
+            <Badge tone={status?.configured ? "sage" : "amber"}>
+              {status?.configured
+                ? "Exa configured · operator enabled"
+                : status
+                  ? "Exa not configured"
+                  : "Checking connection settings…"}
+            </Badge>
+            <form onSubmit={search} className="research-form">
+              <Field label="What should we research?">
+                <div className="discovery-source-list">
+                  {researchFocuses.map((f) => (
+                    <label className="discovery-source" key={f.id}>
+                      <input
+                        type="checkbox"
+                        checked={focuses.includes(f.id)}
+                        disabled={busy || !!attempt}
+                        onChange={(e) =>
+                          setFocuses(
+                            e.target.checked
+                              ? [...focuses, f.id]
+                              : focuses.filter((id) => id !== f.id),
+                          )
+                        }
+                      />
+                      <span>{f.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </Field>
+              <Field label="Public business name">
+                <input
+                  disabled={busy || !!attempt}
+                  value={publicName}
+                  onChange={(e) => setPublicName(e.target.value)}
+                  minLength={2}
+                  maxLength={160}
+                  required
+                />
+              </Field>
+              <Field label="Official website (optional)">
+                <input
+                  disabled={busy || !!attempt}
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  type="url"
+                  placeholder="https://company.com"
+                  maxLength={500}
+                />
+              </Field>
+              <p className="subtle">
+                Company overview can be limited to the official website.
+                Community, competitor and industry searches use the wider public
+                web. Each run requests up to five sources. Finding a channel
+                does not subscribe to it or start daily monitoring.
+              </p>
+              <div className="research-query">
+                <small>QUERY SENT TO EXA</small>
+                {focuses.map((focus) => (
+                  <p key={focus}>
+                    {researchQuery(publicName, focus, "").query}
+                  </p>
                 ))}
               </div>
-            </Field>
-            <Field label="Public business name">
-              <input
-                disabled={busy || !!attempt}
-                value={publicName}
-                onChange={(e) => setPublicName(e.target.value)}
-                minLength={2}
-                maxLength={160}
-                required
-              />
-            </Field>
-            <Field label="Official website (optional)">
-              <input
-                disabled={busy || !!attempt}
-                value={website}
-                onChange={(e) => setWebsite(e.target.value)}
-                type="url"
-                placeholder="https://company.com"
-                maxLength={500}
-              />
-            </Field>
-            <p className="subtle">
-              Company overview can be limited to the official website.
-              Community, competitor and industry searches use the wider public
-              web. Each run requests up to five sources. Finding a channel does
-              not subscribe to it or start daily monitoring.
-            </p>
-            <div className="research-query">
-              <small>QUERY SENT TO EXA</small>
-              {focuses.map((focus) => (
-                <p key={focus}>{researchQuery(publicName, focus, "").query}</p>
+              <label className="check-line">
+                <input
+                  type="checkbox"
+                  checked={ack}
+                  onChange={(e) => setAck(e.target.checked)}
+                />{" "}
+                This name and website are public, and this research is within
+                the engagement scope.
+              </label>
+              <Button
+                primary
+                type="submit"
+                disabled={
+                  busy ||
+                  !status?.configured ||
+                  !ack ||
+                  !focuses.length ||
+                  (status.limit - status.used < focuses.length && !resuming)
+                }
+              >
+                {busy
+                  ? "Working…"
+                  : resuming
+                    ? "Resume saved request"
+                    : "Collect public sources"}
+              </Button>
+              {resuming && (
+                <p className="subtle">
+                  This browser saved an unfinished request. Resume uses its
+                  original key; a recorded provider call will not be repeated.
+                </p>
+              )}
+              {status && (
+                <p className="subtle">
+                  {status.used} of {status.limit} requests used in the account’s
+                  rolling 24-hour window. This selection uses {focuses.length}{" "}
+                  requests. Provider charges may apply; no automatic retries.
+                </p>
+              )}
+              {status && !status.configured && (
+                <p className="subtle">
+                  Add your Exa API key in Workspace settings. You can also add
+                  public sources manually. OpenAI drafting is available below
+                  once its key is configured.
+                </p>
+              )}
+            </form>
+            <Button onClick={create}>Add a public source manually</Button>
+          </Panel>
+          <Panel
+            title="What the research helps you understand"
+            subtitle="Collected research carries into the contact email and meeting guide automatically. Internal roles and duties come from the leadership meeting."
+          >
+            <div className="research-checklist">
+              {researchChecklist.map(([title, detail]) => (
+                <div key={title}>
+                  <h3>{title}</h3>
+                  <p>{detail}</p>
+                </div>
               ))}
             </div>
-            <label className="check-line">
-              <input
-                type="checkbox"
-                checked={ack}
-                onChange={(e) => setAck(e.target.checked)}
-              />{" "}
-              This name and website are public, and this research is within the
-              engagement scope.
-            </label>
-            <Button
-              primary
-              type="submit"
-              disabled={
-                busy ||
-                !status?.configured ||
-                !ack ||
-                !focuses.length ||
-                (status.limit - status.used < focuses.length && !resuming)
-              }
-            >
-              {busy
-                ? "Working…"
-                : resuming
-                  ? "Resume saved request"
-                  : "Collect public sources"}
-            </Button>
-            {resuming && (
-              <p className="subtle">
-                This browser saved an unfinished request. Resume uses its
-                original key; a recorded provider call will not be repeated.
-              </p>
-            )}
-            {status && (
-              <p className="subtle">
-                {status.used} of {status.limit} requests used in the account’s
-                rolling 24-hour window. This selection uses {focuses.length}{" "}
-                requests. Provider charges may apply; no automatic retries.
-              </p>
-            )}
-            {status && !status.configured && (
-              <p className="subtle">
-                Add your Exa API key in Workspace settings. You can also add
-                public sources manually. OpenAI drafting is available below once
-                its key is configured.
-              </p>
-            )}
-          </form>
-          <Button onClick={create}>Add a public source manually</Button>
-        </Panel>
-        <Panel
-          title="What the research helps you understand"
-          subtitle="Collected research carries into the contact email and meeting guide automatically. Internal roles and duties come from the leadership meeting."
-        >
-          <div className="research-checklist">
-            {researchChecklist.map(([title, detail]) => (
-              <div key={title}>
-                <h3>{title}</h3>
-                <p>{detail}</p>
-              </div>
-            ))}
-          </div>
-          <Button onClick={kickoff}>Prepare the contact email</Button>
-        </Panel>
-      </div>
+            <Button onClick={kickoff}>Prepare the contact email</Button>
+          </Panel>
+        </div>
+      )}
       <div className="discovery-section">
         <Panel
           title="Collected sources"
@@ -317,7 +335,14 @@ export function BusinessResearch({
             </Button>
           }
         >
-          {!status?.runs.length && (
+          {resultsOnly && (
+            <div className="actions">
+              <Button onClick={create}>Add a public source manually</Button>
+              <Button onClick={kickoff}>Prepare the contact email</Button>
+            </div>
+          )}
+          {!status && <p role="status">Loading saved research…</p>}
+          {status && !status.runs.length && (
             <p>
               No research runs yet. Manual sources appear in the Evidence
               library.
