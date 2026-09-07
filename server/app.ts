@@ -1,3 +1,4 @@
+import { businessProfileSchema } from "../shared/business-types.ts";
 import { newsletterInterest } from "./newsletter.ts";
 import { participantDraft, participantCards } from "./participant-cards.ts";
 import { applyForPilot } from "./pilot.ts";
@@ -494,6 +495,38 @@ export function createApp({
             runtime: "not_configured",
           },
         };
+      }),
+    ),
+  );
+  api.put("/companies/:companyId/business-profile", advisor, async (req, res) =>
+    res.json(
+      await run(req, async (db: any) => {
+        const u = actor(req),
+          c = await companyCheck(db, u, param(req, "companyId"));
+        const d = z
+          .object({
+            expectedRevision: z.number().int(),
+            profile: businessProfileSchema,
+          })
+          .strict()
+          .parse(req.body);
+        const updated = (
+          await db.query(
+            "UPDATE companies SET settings=jsonb_set(settings,'{businessProfile}',$1::jsonb),revision=revision+1 WHERE id=$2 AND revision=$3 RETURNING *",
+            [JSON.stringify(d.profile), c.id, d.expectedRevision],
+          )
+        ).rows[0];
+        if (!updated)
+          fail(
+            409,
+            "VERSION_CONFLICT",
+            "The workspace changed. Refresh before saving the business profile.",
+          );
+        await audit(db, u, c.id, "company.business_profile_saved", null, {
+          previous: c.settings.businessProfile || null,
+          profile: d.profile,
+        });
+        return updated;
       }),
     ),
   );

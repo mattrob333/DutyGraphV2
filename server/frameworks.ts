@@ -1,3 +1,4 @@
+import { businessTemplates } from "../shared/business-types.ts";
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -354,6 +355,19 @@ export function validateFrameworkOutput(value: unknown, input: FrameworkInput) {
           "FRAMEWORK_CONFIDENCE",
           "Missing information cannot have high confidence.",
         );
+      if (
+        input.frameworkKey === "industrymap" &&
+        section.id === "business_types" &&
+        item.basis !== "Missing"
+      ) {
+        const id = item.values.find((v) => v.key === "template_id")?.value;
+        if (id !== "custom" && !businessTemplates.some((t) => t.id === id))
+          fail(
+            502,
+            "BUSINESS_TEMPLATE",
+            "The AI returned an unknown business type. No analysis was saved.",
+          );
+      }
       const columns = spec.sections[i].columns?.map((c) => c.key) || [];
       if (
         !exact(
@@ -481,6 +495,30 @@ export async function frameworkInputs(db: any, c: string) {
       [c],
     )
   ).rows;
+  const cRow = (
+    await db.query("SELECT settings FROM companies WHERE id=$1", [c])
+  ).rows[0];
+  const profile = cRow?.settings?.businessProfile;
+  if (profile)
+    records.push({
+      id: `business-profile:${c}`,
+      kind: "evidence",
+      title: "Business operating profile · advisor supplied context",
+      state: "accepted",
+      version: 1,
+      hash: hash(profile),
+      data: {
+        bucket: "biz",
+        type: "Other document",
+        locator: "Company business profile",
+        text: JSON.stringify({
+          notice:
+            "Operating-model context only. Templates do not prove tasks, metrics, permissions or client approval.",
+          ...profile,
+        }),
+      },
+      updated_at: "9999",
+    });
   return { records, research, prior };
 }
 export function frameworkRouter(provider: FrameworkProvider = openAiFramework) {

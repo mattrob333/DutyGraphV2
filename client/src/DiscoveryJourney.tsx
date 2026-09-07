@@ -1,3 +1,4 @@
+import { BusinessProfilePanel } from "./BusinessProfilePanel.tsx";
 import { FrameworkWorkspace } from "./FrameworkWorkspace.tsx";
 import { useEffect, useState } from "react";
 import {
@@ -424,6 +425,14 @@ export function DiscoveryJourney({
           <Check size={18} />
           {notice}
         </div>
+      )}
+      {["contact", "agenda"].includes(stage) && (
+        <BusinessProfilePanel
+          key={company.id + stage}
+          company={company}
+          refresh={refresh}
+          openIndustry={() => setIndustryOpen(true)}
+        />
       )}
       {stage === "contact" && (
         <BusinessResearch

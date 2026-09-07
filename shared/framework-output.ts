@@ -57,7 +57,7 @@ export const frameworkOutputSchema = z
           })
           .strict(),
       )
-      .max(13),
+      .max(14),
     questions: z.array(z.string().min(1).max(400)).max(8),
     warnings: z.array(z.string().min(1).max(600)).max(8),
   })

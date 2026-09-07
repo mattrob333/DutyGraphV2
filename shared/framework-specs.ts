@@ -1,3 +1,4 @@
+import { businessClassificationInstructions } from "./business-types.ts";
 import { industryMapMethod } from "./industry-map-prompt.ts";
 import {
   frameworkGuides,
@@ -179,6 +180,18 @@ export const frameworkSpecs: Record<string, FrameworkSpec> = {
     ],
     sections: [
       section(
+        "business_types",
+        "Operating models & business flows",
+        "Propose up to six distinct operating models supported by evidence. Use an exact template ID from the business classification instructions, or custom. Explain the business stream, why it fits and a question for leadership. Classify how the business operates separately from its industry. A diversified company may need multiple rows.",
+        [
+          "Template ID",
+          "Business stream",
+          "Why it fits",
+          "Leadership question",
+        ],
+      ),
+
+      section(
         "classification",
         "Company, arena & battlefield",
         "Distinguish stated category, actual competitive arena, and realistic strategic battlefield. Do not accept a marketing category uncritically.",
@@ -245,6 +258,7 @@ export const frameworkSpecs: Record<string, FrameworkSpec> = {
       ),
     ],
     instructions: [
+      businessClassificationInstructions,
       industryMapMethod,
       "Integration rules override any incompatible output instructions in the methodology: use the required JSON sections and allowed sources only. Research is performed separately; do not claim live searches. Treat this as one shared model: reuse exact entity names across sections; state relationship endpoints and provenance in detail. Use sourceIds for evidence. Put publication/evidence dates, quality and freshness in confidenceReason when known; explicitly state when unknown. FACT maps to Reported, INFERENCE to Inferred, ESTIMATE and FORECAST must be explicitly labeled in titles and use Inferred or Assumed; UNKNOWN maps to Missing. The previous snapshot is historical context, not evidence: revalidate retained claims against current sourceIds. Never manufacture acquisitions, market shares, source links or certainty to fill a section.",
     ],

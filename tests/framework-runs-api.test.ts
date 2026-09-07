@@ -260,3 +260,52 @@ test("framework API records rejected model output without accepting a forged sou
   assert.equal(job.result, null);
   assert.match(job.message, /valid source/);
 });
+
+test("business profile saves with tenant isolation, optimistic locking and current framework context", async () => {
+  const c = await register(),
+    other = await register(),
+    p = prefix(c);
+  const company = (await request(c, "/api/v1/companies")).data.find(
+    (r: any) => r.id === c.company,
+  );
+  const profile = {
+    industry: "Industrial products",
+    status: "proposed",
+    rationale: "Proposed hybrid",
+    streams: [
+      {
+        id: "products",
+        templateId: "manufacturing",
+        name: "Physical products",
+        stages: [{ id: "build", name: "Make products", functionIds: ["do"] }],
+      },
+    ],
+  };
+  const payload = { expectedRevision: company.revision, profile };
+  assert.equal(
+    (await request(other, p + "/business-profile", "PUT", payload)).status,
+    404,
+  );
+  const saved = await request(c, p + "/business-profile", "PUT", payload);
+  assert.equal(saved.status, 200, JSON.stringify(saved.data));
+  assert.equal(
+    saved.data.settings.businessProfile.streams[0].templateId,
+    "manufacturing",
+  );
+  assert.equal(
+    (await request(c, p + "/business-profile", "PUT", payload)).status,
+    409,
+  );
+  const context = (await request(c, p + "/framework-runs/industrymap")).data;
+  assert.ok(
+    context.sources.some((s: any) => s.id === `business-profile:${c.company}`),
+  );
+  const invalid = await request(c, p + "/business-profile", "PUT", {
+    expectedRevision: saved.data.revision,
+    profile: {
+      ...profile,
+      streams: [{ ...profile.streams[0], templateId: "unknown" }],
+    },
+  });
+  assert.equal(invalid.status, 422);
+});

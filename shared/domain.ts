@@ -1,3 +1,4 @@
+import type { BusinessProfile } from "./business-types.ts";
 import { z } from "zod";
 import { workSchemas } from "./work-model.ts";
 import { workflowSchema } from "./workflow.ts";
@@ -184,6 +185,7 @@ export type Company = {
   scope: string;
   goal: string;
   settings: {
+    businessProfile?: BusinessProfile;
     notice: string;
     retentionDays: number;
     reviewCadence: string;

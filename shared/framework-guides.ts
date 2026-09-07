@@ -1,4 +1,4 @@
-export const FRAMEWORK_GUIDE_VERSION = "2026-09-06.3";
+export const FRAMEWORK_GUIDE_VERSION = "2026-09-06.4";
 export type FrameworkGuide = {
   group: string;
   question: string;

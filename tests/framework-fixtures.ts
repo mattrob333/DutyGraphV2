@@ -31,7 +31,7 @@ export function syntheticFramework(input: FrameworkInput): FrameworkOutput {
           sourceIds: source ? [source] : [],
           values: (s.columns || []).map((c) => ({
             key: c.key,
-            value: "Missing",
+            value: c.key === "template_id" ? "generic" : "Missing",
           })),
           nextStep: "Ask the company to confirm the account.",
         },
