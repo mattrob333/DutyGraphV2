@@ -4,7 +4,7 @@ import {
   granularWorkGuide,
   type DemoTask,
 } from "../../shared/discovery-demo-tasks.ts";
-import { DemoDelegationReview } from "./DemoDelegationReview.tsx";
+import { AdvisorDemoInbox } from "./AdvisorDemoInbox.tsx";
 import { TaskReviewCard } from "./TaskReviewCard.tsx";
 import { useEffect, useRef, useState } from "react";
 import "./DiscoveryDemo.css";
@@ -459,8 +459,8 @@ export function DiscoveryDemo() {
                     describes a result that another person could take over.
                   </p>
                   <p aria-live="polite">
-                    {cards.filter((c) => c.decision === "correct").length} of {cards.length}{" "}
-                    approved. Approve each card before sending.
+                    {cards.filter((c) => c.decision === "correct").length} of{" "}
+                    {cards.length} approved. Approve each card before sending.
                   </p>
                 </div>
                 {cards.map((card, index) => (
@@ -498,7 +498,9 @@ export function DiscoveryDemo() {
                 </p>
                 <button
                   className="dd-primary"
-                  disabled={!cards.length || cards.some((c) => c.decision !== "correct")}
+                  disabled={
+                    !cards.length || cards.some((c) => c.decision !== "correct")
+                  }
                   onClick={submit}
                 >
                   Send my answer and reviewed cards →
@@ -523,110 +525,39 @@ export function DiscoveryDemo() {
               </div>
             )}
             {step === 6 && (
-              <>
-                <p className="dd-lead">
-                  Each return stays connected to its person and request. The
-                  advisor can read the original account before checking any
-                  draft duties or task cards.
-                </p>
-                <div className="dd-inbox-stats">
-                  <div>
-                    <strong>5</strong>
-                    <span>Sample requests</span>
-                  </div>
-                  <div>
-                    <strong>{returned.length} / 5</strong>
-                    <span>Responses returned</span>
-                  </div>
-                  <div>
-                    <strong>{returned.length}</strong>
-                    <span>Awaiting advisor review</span>
-                  </div>
-                </div>
-                <div className="dd-inbox-grid">
-                  <div className="dd-inbox-list">
-                    {people.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => select(item.id)}
-                        aria-pressed={selected === item.id}
-                        className={selected === item.id ? "selected" : ""}
-                      >
-                        <strong>{item.name}</strong>
-                        <span>{item.team}</span>
-                        <small>
-                          {returned.includes(item.id)
-                            ? "Response returned · Review needed"
-                            : "Waiting for response"}
-                        </small>
-                      </button>
-                    ))}
-                  </div>
-                  <article className="dd-evidence">
-                    <p className="dd-eyebrow">
-                      {returned.includes(selected)
-                        ? "ORIGINAL RESPONSE · SAMPLE"
-                        : "REQUEST · SAMPLE"}
-                    </p>
-                    <h3>{person.name}</h3>
-                    <p>{person.duty}</p>
-                    {returned.includes(selected) ? (
-                      <>
-                        <blockquote>{submittedAnswers[selected]}</blockquote>
-                        <span className="dd-chip">
-                          Participant review received
-                        </span>
-                        {(submittedCards[selected] || []).map((c, i) => (
-                          <div key={i}>
-                            <h4>{c.title}</h4>
-                            <p>
-                              {c.decision === "correct"
-                                ? "Matches their understanding"
-                                : c.decision === "not_mine"
-                                  ? "Not their task"
-                                  : "Needs clarification"}
-                            </p>
-                            <p>Output: {c.output}</p>
-                            <p>Goes to: {c.handoff}</p>
-                          </div>
-                        ))}
-                        <DemoDelegationReview
-                          key={selected}
-                          cards={submittedCards[selected] || []}
-                          person={person}
-                        />
-                        <p className="dd-note">
-                          The participant has reviewed their description. The
-                          advisor now checks gaps, overlapping responsibilities
-                          and handoffs across the team. A material change may
-                          need the person to check it again.
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p className="dd-note">
-                          This teammate has not returned a sample response yet.
-                        </p>
-                        <button
-                          className="dd-secondary"
-                          onClick={() => setStep(1)}
-                        >
-                          Follow this teammate's invitation →
-                        </button>
-                      </>
-                    )}
-                  </article>
-                </div>
-                <div className="dd-actions">
-                  <span>
-                    A shared view of progress. A personal experience for each
-                    teammate.
-                  </span>
-                  <a className="dd-primary" href="/landing/#pilot">
-                    Join the pilot →
-                  </a>
-                </div>
-              </>
+              <AdvisorDemoInbox
+                people={people}
+                returned={returned}
+                cards={submittedCards}
+                answers={submittedAnswers}
+                selected={selected}
+                onSelect={select}
+                onInvite={() => setStep(1)}
+                onComplete={() => {
+                  const missing = people.filter(
+                    (p) => !returned.includes(p.id),
+                  );
+                  setSubmittedCards((existing) => ({
+                    ...existing,
+                    ...Object.fromEntries(
+                      missing.map((p) => [
+                        p.id,
+                        sampleTasks(p.id).map((c) => ({
+                          ...c,
+                          decision: "correct",
+                        })),
+                      ]),
+                    ),
+                  }));
+                  setSubmittedAnswers((existing) => ({
+                    ...existing,
+                    ...Object.fromEntries(
+                      missing.map((p) => [p.id, sampleTranscript(p.id)]),
+                    ),
+                  }));
+                  setReturned(people.map((p) => p.id));
+                }}
+              />
             )}
           </div>
           <footer className="dd-stage-footer">

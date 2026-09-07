@@ -1,0 +1,226 @@
+.advisor-demo {
+  min-width: 0;
+}
+.advisor-demo p {
+  line-height: 1.65;
+}
+.ad-next {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid var(--dd-line);
+  border-left: 3px solid #9bb9b1;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.ad-next p {
+  margin: 6px 0 0;
+}
+.ad-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.ad-disclosure {
+  font-size: 12px;
+  color: var(--dd-muted);
+}
+.ad-tabs,
+.ad-filters {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+.ad-tabs button,
+.ad-filters button {
+  padding: 10px 14px;
+  background: transparent;
+  border: 1px solid var(--dd-line);
+  border-radius: 6px;
+  color: var(--dd-ink);
+}
+.ad-tabs [aria-pressed="true"],
+.ad-filters [aria-pressed="true"] {
+  background: #3b4445;
+  border-color: #a1babb;
+}
+.advisor-demo button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.advisor-demo summary {
+  cursor: pointer;
+  font-weight: 500;
+  line-height: 1.5;
+  padding: 10px 0;
+}
+.advisor-demo summary:focus-visible,
+.advisor-demo button:focus-visible {
+  outline: 2px solid #aecbd0;
+  outline-offset: 3px;
+}
+.ad-transcript {
+  border-bottom: 1px solid var(--dd-line);
+  padding-bottom: 8px;
+  margin: 14px 0;
+}
+.ad-task-grid,
+.ad-findings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.ad-task {
+  border: 1px solid var(--dd-line);
+  border-top: 2px solid #aeb7bc;
+  border-radius: 8px;
+  padding: 18px;
+  min-width: 0;
+}
+.ad-task-candidate {
+  border-top-color: #8fbdad;
+}
+.ad-task-gap {
+  border-top-color: #d3b98b;
+}
+.ad-task h4,
+.ad-team-findings h4 {
+  font-size: 16px;
+  line-height: 1.45;
+  margin: 12px 0;
+}
+.ad-task p {
+  font-size: 13px;
+}
+.ad-task dl {
+  font-size: 13px;
+  margin: 0;
+}
+.ad-task dt {
+  font-weight: 600;
+  margin: 14px 0 5px;
+  color: #b4cbd0;
+}
+.ad-task dd {
+  margin: 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.ad-task ol {
+  padding-left: 20px;
+}
+.ad-governance {
+  margin-top: 22px;
+  border-top: 1px solid var(--dd-line);
+  padding-top: 10px;
+}
+.ad-findings-grid > article,
+.ad-readout > article {
+  border: 1px solid var(--dd-line);
+  border-radius: 8px;
+  padding: 22px;
+  margin-bottom: 16px;
+}
+.ad-findings-grid > article:first-child {
+  border-top: 2px solid #d3b98b;
+}
+.ad-findings-grid label {
+  display: block;
+  margin-top: 18px;
+}
+.ad-findings-grid input {
+  width: auto;
+  margin-right: 8px;
+}
+.ad-findings-grid details button {
+  display: block;
+  text-align: left;
+  line-height: 1.6;
+  margin: 6px 0;
+}
+.ad-handoff {
+  border: 1px solid var(--dd-line);
+  border-radius: 8px;
+  padding: 18px;
+  margin: 18px 0;
+}
+.ad-handoff > div {
+  display: flex;
+  gap: 14px;
+}
+.ad-handoff > div > div {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+.ad-handoff button {
+  display: grid;
+  gap: 10px;
+  min-height: 105px;
+  width: 100%;
+  text-align: left;
+  border: 1px solid #627c80;
+  background: transparent;
+  border-radius: 8px;
+  color: var(--dd-ink);
+  padding: 14px;
+}
+.ad-handoff small {
+  color: #b4cbd0;
+}
+.ad-readout {
+  max-width: 900px;
+}
+.ad-readout > label {
+  display: grid;
+  gap: 10px;
+}
+.ad-readout textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px;
+  background: transparent;
+  color: var(--dd-ink);
+  border: 1px solid var(--dd-line);
+  border-radius: 6px;
+  font: inherit;
+}
+.ad-readout ol {
+  line-height: 1.8;
+  padding-left: 22px;
+}
+@media (max-width: 1000px) {
+  .ad-task-grid {
+    grid-template-columns: 1fr;
+  }
+  .advisor-demo .dd-inbox-grid {
+    grid-template-columns: 210px minmax(0, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .ad-next {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .ad-findings-grid,
+  .advisor-demo .dd-inbox-grid {
+    grid-template-columns: 1fr;
+  }
+  .ad-handoff > div {
+    flex-direction: column;
+  }
+  .ad-handoff > div > div > span {
+    display: none;
+  }
+  .ad-tabs button {
+    flex: 1;
+  }
+  .advisor-demo .dd-evidence {
+    padding: 16px;
+  }
+}

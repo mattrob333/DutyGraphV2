@@ -689,7 +689,10 @@ export function Detail({
         <>
           <Badge tone="blue">Original participant submission</Badge>
           {r.data.text && (
-            <blockquote className="source-text">{r.data.text}</blockquote>
+            <details>
+              <summary>Open original transcript</summary>
+              <blockquote className="source-text">{r.data.text}</blockquote>
+            </details>
           )}
           {r.data.assetId && (
             <audio
@@ -719,12 +722,25 @@ export function Detail({
                     : "Participant needs help reviewing"
               }
             >
-              <p>{card.duty}</p>
-              <p>{card.inputs}</p>
-              <p>{card.instructions}</p>
-              <p>{card.output}</p>
-              <p>{card.handoff}</p>
+              <p>
+                <strong>Output:</strong> {card.output}
+              </p>
               <p>Software: {card.software || "Not recorded"}</p>
+              <details>
+                <summary>View task card</summary>
+                <dl className="details">
+                  <dt>Duty</dt>
+                  <dd>{card.duty}</dd>
+                  <dt>Inputs & dependencies</dt>
+                  <dd>{card.inputs}</dd>
+                  <dt>Actions</dt>
+                  <dd style={{ whiteSpace: "pre-line" }}>
+                    {card.instructions}
+                  </dd>
+                  <dt>Handoff</dt>
+                  <dd>{card.handoff}</dd>
+                </dl>
+              </details>
             </Panel>
           ))}
           {Object.entries(r.data.decisions || {}).map(([id, decision]) => (

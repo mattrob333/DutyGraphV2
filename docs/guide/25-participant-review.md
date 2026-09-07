@@ -50,3 +50,11 @@ If AI is not connected, or a draft cannot be produced, select Send my answer for
 The advisor opens your returned response, checks the original evidence and sees your card decisions. Retained cards are proposed work records. The advisor resolves missing owners and differences between teams. A changed description or company-level confirmation can require a further check. Automatic cross-team conflict detection is not active in this release.
 
 In the public walkthrough, Maya returns six separate tasks. The advisor sees three prepared AI-assistance recommendations, two human tasks, and an approval-ownership gap. Only approved, unchanged candidate descriptions can enter the simulated governance preview. Edited descriptions need a fresh suitability review. This preview lists requested work and checks still needed; it grants no scopes, issues no agent, and does not save a live governance request.
+
+## Review the team in the public walkthrough
+
+The advisor inbox starts with people and compact task cards. Select a returned teammate, filter for AI candidates or gaps, and expand a card for its inputs, actions, handoffs and software. The original transcript stays closed until you open it.
+
+Choose **Load remaining sample responses** to complete the fictional five-person team without replacing responses you already reviewed. Then choose **Review sample team findings**. Prepared examples highlight an unresolved approval owner, a possible missing handoff account, and a shared-software process worth investigating. These are not results of a live AI analysis, confirmed conflicts, measured bottlenecks, or proof of duplicate software spending. Edited source cards are excluded from prepared findings until a fresh review.
+
+The handoff view shows selected sample paths, not a complete company graph. Click a task to inspect its source card. Select the findings to discuss, choose **Prepare all-hands readout**, add notes, and download the meeting draft before leaving the screen. The readout includes an agenda, decision questions and proposed actions for the client meeting. Downloading does not send invitations or client messages.
