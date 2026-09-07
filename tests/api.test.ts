@@ -1461,9 +1461,14 @@ test("private sample is isolated, repeatable and does not send email", async () 
   assert.equal(flows.length, 2);
   assert.equal(
     workspace.data.records.filter((r: any) => r.kind === "handoff").length,
-    16,
+    17,
   );
   assert.ok(workspace.data.records.some((r: any) => r.kind === "duty"));
+  for (const title of ["Access Review Assistant — fictional", "Change Evidence Assistant — fictional", "Supplier Summary Assistant — fictional"]) {
+    const agent = workspace.data.records.find((r: any) => r.kind === "agent" && r.title === title);
+    assert.ok(agent);
+    assert.ok(agent.data.taskIds.some((id: string) => workspace.data.records.some((r: any) => r.id === id && r.data.controlAreas?.length)));
+  }
   const examples = workspace.data.records.filter(
     (r: any) =>
       r.kind === "case" && r.data.executionMode === "illustrative_snapshot",
