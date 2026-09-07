@@ -14,7 +14,7 @@ Use the private link in your email. Check your name and company. Create a passwo
 
 Voice is preferred: a real example helps us capture the steps, exceptions and frustrations. You can type instead.
 
-Talk about these five things:
+Start by listing your regular duties and the tasks within each one. A duty is an ongoing responsibility. A task produces a specific result; its actions explain how to produce that result. Describe each task using these five points:
 
 - What you receive to start the task.
 - What you do with it, including checks and exceptions.
@@ -32,11 +32,11 @@ Text drafts and card edits save on this device when browser storage is available
 
 ## 4. Create and review your cards
 
-Choose Create my task cards. This sends your answer to the company's configured AI service. Review every description. Correct the input, action, output, destination and software before choosing a response:
+Choose Create my task cards. This sends your answer and assigned work context to the company's configured AI service. AI can draft several task cards under one duty. There is no required count. Cards open as readable instructions; use Edit only when needed. Review every description before choosing a response:
 
-- **This matches my understanding:** the card describes the work as you understand it.
-- **Remove — this is not my task:** preserve your rejection without adding the task as your work.
-- **I'm not sure — ask the advisor:** send the uncertainty with the card.
+- **Looks good, I approve:** the card describes the work as you understand it.
+- **Not my task:** preserve your rejection without adding the task as your work.
+- **Ask my advisor:** send the uncertainty with the card.
 
 Changing a card clears its decision so you can check it again. If you change the original answer, create or review the cards again. This is not approval of company policy or permission for an agent to act.
 
@@ -49,3 +49,5 @@ If AI is not connected, or a draft cannot be produced, select Send my answer for
 ## What the advisor does next
 
 The advisor opens your returned response, checks the original evidence and sees your card decisions. Retained cards are proposed work records. The advisor resolves missing owners and differences between teams. A changed description or company-level confirmation can require a further check. Automatic cross-team conflict detection is not active in this release.
+
+In the public walkthrough, Maya returns six separate tasks. The advisor sees three prepared AI-assistance recommendations, two human tasks, and an approval-ownership gap. Only approved, unchanged candidate descriptions can enter the simulated governance preview. Edited descriptions need a fresh suitability review. This preview lists requested work and checks still needed; it grants no scopes, issues no agent, and does not save a live governance request.

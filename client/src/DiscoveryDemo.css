@@ -701,3 +701,25 @@
   border: 1px solid #687273;
   border-radius: 6px;
 }
+
+.dd-delegation {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #697476;
+}
+.dd-delegation > article {
+  border-left: 2px solid #afc8cd;
+  padding: 12px 18px;
+  margin: 18px 0;
+}
+.dd-delegation input[type="checkbox"] {
+  width: auto;
+  margin-right: 8px;
+}
+.dd-delegation label {
+  display: block;
+  line-height: 1.6;
+}
+.dd-delegation button {
+  margin-top: 16px;
+}

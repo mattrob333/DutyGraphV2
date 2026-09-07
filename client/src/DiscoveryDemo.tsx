@@ -1,3 +1,10 @@
+import {
+  sampleTasks,
+  sampleTranscript,
+  granularWorkGuide,
+  type DemoTask,
+} from "../../shared/discovery-demo-tasks.ts";
+import { DemoDelegationReview } from "./DemoDelegationReview.tsx";
 import { TaskReviewCard } from "./TaskReviewCard.tsx";
 import { useEffect, useRef, useState } from "react";
 import "./DiscoveryDemo.css";
@@ -78,8 +85,10 @@ export function DiscoveryDemo() {
   const [submittedAnswers, setSubmittedAnswers] = useState<
     Record<string, string>
   >({});
-  const [card, setCard] = useState<any>(null);
-  const [submittedCards, setSubmittedCards] = useState<Record<string, any>>({});
+  const [cards, setCards] = useState<DemoTask[]>([]);
+  const [submittedCards, setSubmittedCards] = useState<
+    Record<string, DemoTask[]>
+  >({});
   const [saved, setSaved] = useState(false);
   const [voiceExample, setVoiceExample] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -94,13 +103,14 @@ export function DiscoveryDemo() {
     setAnswers({});
     setSubmittedAnswers({});
     setSubmittedCards({});
-    setCard(null);
+    setCards([]);
     setReturned([]);
     setSaved(false);
     setVoiceExample(false);
   }
   function select(id: string) {
     setSelected(id);
+    setCards([]);
     setSaved(false);
     setVoiceExample(false);
   }
@@ -109,7 +119,10 @@ export function DiscoveryDemo() {
     setReturned((items) =>
       items.includes(selected) ? items : [...items, selected],
     );
-    setSubmittedCards((items) => ({ ...items, [selected]: { ...card } }));
+    setSubmittedCards((items) => ({
+      ...items,
+      [selected]: cards.map((c) => ({ ...c })),
+    }));
     setStep(5);
   }
   return (
@@ -353,25 +366,16 @@ export function DiscoveryDemo() {
                 <div className="dd-response-grid">
                   <div>
                     <h3>Use these points to guide you</h3>
+                    <p>
+                      Leadership identified this duty:{" "}
+                      <strong>{person.duty}</strong>. Describe the separate
+                      tasks that make it happen. There is no required task
+                      count.
+                    </p>
                     <ol className="dd-prompts">
-                      <li>{person.question}</li>
-                      <li>
-                        What starts the task? Name the person or team supplying
-                        the data, the documents or fields you receive, and what
-                        must be complete.
-                      </li>
-                      <li>
-                        Describe each action in order. Name the software you use
-                        at each step and the checks you make.
-                      </li>
-                      <li>
-                        What does the finished output contain? Who receives it,
-                        how do you send it, and what do they do next?
-                      </li>
-                      <li>
-                        Who do you depend on? Who depends on you? Describe
-                        missing information, exceptions, and who resolves them.
-                      </li>
+                      {granularWorkGuide.map((q) => (
+                        <li key={q}>{q}</li>
+                      ))}
                     </ol>
                     <div className="dd-note">
                       In the working participant page, voice capture requires
@@ -392,14 +396,15 @@ export function DiscoveryDemo() {
                         }));
                         setSaved(false);
                         setVoiceExample(false);
+                        setCards([]);
                       }}
-                      placeholder="Try a short answer, or load the fictional voice example below."
+                      placeholder="Describe several regular tasks, or load the detailed fictional voice example below."
                     />
                     <button
                       onClick={() => {
                         setAnswers((a) => ({
                           ...a,
-                          [selected]: person.example,
+                          [selected]: sampleTranscript(selected),
                         }));
                         setVoiceExample(true);
                         setSaved(false);
@@ -427,102 +432,76 @@ export function DiscoveryDemo() {
                         disabled={!answer.trim()}
                         className="dd-primary"
                         onClick={() => {
-                          const examples: any = {
-                            maya: {
-                              inputs:
-                                "Supplier packet from the buyer, including company details, required documents, and bank details.",
-                              instructions:
-                                "Receive the supplier packet from the buyer.\nCheck company details and required documents.\nSend bank details to Finance for verification.\nTrack the handoff in the shared sheet.\nWhen final approval ownership is unclear, keep the item pending and raise the ownership question.",
-                              output:
-                                "Checked supplier packet and a recorded Finance handoff.",
-                              handoff:
-                                "Finance receives the bank details. Supplier approval depends on the verification result; the final approval owner is unresolved.",
-                              software:
-                                "Shared spreadsheet; product name not stated.",
-                            },
-                            dana: {
-                              inputs:
-                                "Supplier bank details and supporting documents from Procurement.",
-                              instructions:
-                                "Compare bank details with the supporting documents.\nFollow the bank verification procedure.\nStop on a mismatch and ask Procurement to resolve it.\nRecord the verification result.",
-                              output:
-                                "Recorded verification result or unresolved mismatch.",
-                              handoff:
-                                "Procurement resolves mismatches. The supplier approval step depends on this result.",
-                              software: "Not named in the sample account.",
-                            },
-                            jordan: {
-                              inputs:
-                                "Customer order and warehouse stock confirmation.",
-                              instructions:
-                                "Check the customer order.\nAsk the warehouse to confirm stock.\nIf stock is short, ask Procurement for a delivery date.\nWait for that date before making a delivery promise.",
-                              output:
-                                "A delivery promise supported by stock or replenishment information.",
-                              handoff:
-                                "The customer receives the delivery promise. Sales depends on Warehouse and Procurement.",
-                              software: "Not named in the sample account.",
-                            },
-                            riley: {
-                              inputs:
-                                "Released picking list, stock reservation, delivery address, and shipping instructions.",
-                              instructions:
-                                "Receive the released picking list and reservation.\nHave a teammate pick the order.\nHave another teammate check quantities.\nCheck the delivery address and shipping instructions before dispatch.",
-                              output: "Checked shipment ready for dispatch.",
-                              handoff:
-                                "Dispatch depends on the checked shipment and complete shipping information.",
-                              software: "Not named in the sample account.",
-                            },
-                            karl: {
-                              inputs: "Checked shipment and carrier booking.",
-                              instructions:
-                                "Check the shipment has passed its checks.\nCheck that the carrier booking is ready.\nIf blocked, contact the owner of the missing information.\nRecord the carrier reference.\nSend the reference to Sales.",
-                              output:
-                                "Recorded carrier reference and dispatch information.",
-                              handoff:
-                                "Sales receives the carrier reference. Dispatch depends on completed shipment checks and carrier booking.",
-                              software: "Not named in the sample account.",
-                            },
-                          };
-                          setCard({
-                            title: person.duty,
-                            duty: person.duty,
-                            ...examples[selected],
-                            decision: "",
-                          });
+                          setCards(sampleTasks(selected));
                           setStep(4);
                         }}
                       >
-                        Create my sample task card →
+                        Create my sample task cards →
                       </button>
                     </div>
                   </div>
                 </div>
               </>
             )}
-            {step === 4 && card && (
+            {step === 4 && cards.length > 0 && (
               <div className="dd-answer">
                 <p>
-                  Prepared example based on this person’s sample account. This
-                  public simulation does not analyze custom text. In the real
-                  flow, AI drafts cards from your transcript and assigned work
-                  context. Read the card, approve it, or edit only what needs
-                  correcting.
+                  Prepared task breakdown based on this person’s detailed sample
+                  account. This public simulation does not analyze custom text.
+                  In the real flow, AI drafts cards from your transcript and
+                  assigned work context. Read the card, approve it, or edit only
+                  what needs correcting.
                 </p>
-                <TaskReviewCard
-                  card={card}
-                  person={person.name + " · " + person.role}
-                  onChange={setCard}
-                />
+                <div className="dd-note">
+                  <strong>{person.duty}</strong>
+                  <p>
+                    One duty → {cards.length} repeatable tasks. Each card
+                    describes a result that another person could take over.
+                  </p>
+                  <p aria-live="polite">
+                    {cards.filter((c) => c.decision).length} of {cards.length}{" "}
+                    reviewed. Review each card before sending.
+                  </p>
+                </div>
+                {cards.map((card, index) => (
+                  <TaskReviewCard
+                    key={selected + index}
+                    card={card}
+                    person={person.name + " · " + person.role}
+                    onChange={(next) =>
+                      setCards((cs) =>
+                        cs.map((c, i) =>
+                          i === index
+                            ? {
+                                ...next,
+                                edited:
+                                  c.edited ||
+                                  [
+                                    "title",
+                                    "duty",
+                                    "inputs",
+                                    "instructions",
+                                    "output",
+                                    "handoff",
+                                    "software",
+                                  ].some((f) => (c as any)[f] !== next[f]),
+                              }
+                            : c,
+                        ),
+                      )
+                    }
+                  />
+                ))}
                 <p>
                   This records your understanding. Differences between teammates
                   can be resolved after their cards return.
                 </p>
                 <button
                   className="dd-primary"
-                  disabled={!card.decision}
+                  disabled={!cards.length || cards.some((c) => !c.decision)}
                   onClick={submit}
                 >
-                  Send my answer and reviewed card →
+                  Send my answer and reviewed cards →
                 </button>
               </div>
             )}
@@ -597,17 +576,25 @@ export function DiscoveryDemo() {
                         <span className="dd-chip">
                           Participant review received
                         </span>
-                        <p>
-                          Task: {submittedCards[selected]?.title} ·{" "}
-                          {submittedCards[selected]?.decision === "correct"
-                            ? "Matches their understanding"
-                            : submittedCards[selected]?.decision === "not_mine"
-                              ? "Removed by participant"
-                              : "Needs clarification"}
-                        </p>
-                        <p>Output: {submittedCards[selected]?.output}</p>
-                        <p>Goes to: {submittedCards[selected]?.handoff}</p>
-                        <p>Software: {submittedCards[selected]?.software}</p>
+                        {(submittedCards[selected] || []).map((c, i) => (
+                          <div key={i}>
+                            <h4>{c.title}</h4>
+                            <p>
+                              {c.decision === "correct"
+                                ? "Matches their understanding"
+                                : c.decision === "not_mine"
+                                  ? "Not their task"
+                                  : "Needs clarification"}
+                            </p>
+                            <p>Output: {c.output}</p>
+                            <p>Goes to: {c.handoff}</p>
+                          </div>
+                        ))}
+                        <DemoDelegationReview
+                          key={selected}
+                          cards={submittedCards[selected] || []}
+                          person={person}
+                        />
                         <p className="dd-note">
                           The participant has reviewed their description. The
                           advisor now checks gaps, overlapping responsibilities

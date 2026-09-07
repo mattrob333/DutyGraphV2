@@ -1,3 +1,4 @@
+import { granularWorkGuide } from "../../shared/work-granularity.ts";
 import { ParticipantCards } from "./ParticipantCards.tsx";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -640,6 +641,20 @@ export function Participant({
                   </li>
                 ))}
               </ol>
+              {request.data.type === "work" && (
+                <details>
+                  <summary>Cover each task under your duties</summary>
+                  <p>
+                    Talk through these points for each regular task. There is no
+                    required number of tasks.
+                  </p>
+                  <ol>
+                    {granularWorkGuide.map((q) => (
+                      <li key={q}>{q}</li>
+                    ))}
+                  </ol>
+                </details>
+              )}
             </Panel>
             {request.data.type === "confirmation" ? (
               <div className="stack">
@@ -774,7 +789,9 @@ export function Participant({
               <ParticipantCards
                 key={request.id + text}
                 request={request}
-                person={[user.name,data?.person?.role].filter(Boolean).join("  ·  ")}
+                person={[user.name, data?.person?.role]
+                  .filter(Boolean)
+                  .join("  ·  ")}
                 text={text}
                 disabled={
                   !ack || busy || captureBusy || transcriptBusy || expired
