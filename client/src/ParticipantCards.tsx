@@ -1,13 +1,16 @@
+import { TaskReviewCard } from "./TaskReviewCard.tsx";
 import { useState, useEffect } from "react";
 import { api } from "./api.ts";
 import { Button, Panel, Field, ErrorBox } from "./ui.tsx";
 export function ParticipantCards({
   request,
+  person,
   text,
   disabled,
   onChange,
 }: {
   request: any;
+  person?: string;
   text: string;
   disabled: boolean;
   onChange: (cards: any[] | null) => void;
@@ -81,75 +84,22 @@ export function ParticipantCards({
         </p>
       )}
       {cards.map((card, index) => (
-        <article key={index} className="participant-task-card">
-          <h3>Task {index + 1}</h3>
-          {(
-            [
-              "title",
-              "duty",
-              "inputs",
-              "instructions",
-              "output",
-              "handoff",
-              "software",
-            ] as const
-          ).map((field) => (
-            <Field
-              key={field}
-              label={
-                {
-                  title: "Task name",
-                  duty: "Responsibility",
-                  inputs: "What I receive",
-                  instructions: "What I do",
-                  output: "What I produce",
-                  handoff: "Where the output goes",
-                  software: "Software I use",
-                }[field]
-              }
-            >
-              <textarea
-                disabled={disabled}
-                maxLength={
-                  field === "title" || field === "duty"
-                    ? 200
-                    : field === "software"
-                      ? 1000
-                      : 3000
-                }
-                value={card[field]}
-                onChange={(e) =>
-                  update(
-                    cards.map((c, i) =>
-                      i === index
-                        ? { ...c, [field]: e.target.value, decision: "" }
-                        : c,
-                    ),
-                  )
-                }
-              />
-            </Field>
-          ))}
-          <Field label="Does this describe your work?">
-            <select
-              disabled={disabled}
-              value={card.decision}
-              onChange={(e) =>
-                update(
-                  cards.map((c, i) =>
-                    i === index ? { ...c, decision: e.target.value } : c,
-                  ),
-                )
-              }
-            >
-              <option value="">Choose after reviewing</option>
-              <option value="correct">This matches my understanding</option>
-              <option value="not_mine">Remove — this is not my task</option>
-              <option value="unsure">I'm not sure — ask the advisor</option>
-            </select>
-          </Field>
-        </article>
+        <TaskReviewCard
+          key={index}
+          card={card}
+          person={person}
+          disabled={disabled}
+          onChange={(next) =>
+            update(cards.map((c, i) => (i === index ? next : c)))
+          }
+        />
       ))}
+      {cards.length > 0 && (
+        <p>
+          {cards.filter((c) => c.decision).length} of {cards.length} cards
+          reviewed. Approve your understanding, or flag a card for your advisor.
+        </p>
+      )}
       {gaps.length > 0 && <p>Still unclear: {gaps.join(" ")}</p>}
       {!cards.length && (
         <label>

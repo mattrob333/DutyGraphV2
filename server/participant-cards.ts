@@ -85,7 +85,13 @@ export function participantDraft(
           }),
         ],
       );
-      return { c, p, fingerprint };
+      const duties = (
+        await db.query(
+          "SELECT title FROM records WHERE company_id=$1 AND kind='duty' AND data->>'ownerId'=$2 AND state NOT IN ('retracted','withdrawn') ORDER BY created_at LIMIT 30",
+          [u.company_id, u.person_id],
+        )
+      ).rows.map((row) => row.title);
+      return { c, p, fingerprint, duties, questions: r.data.questions };
     });
     try {
       const result = participantTaskExtraction.parse(
@@ -93,6 +99,7 @@ export function participantDraft(
           {
             stage: "tasks",
             participantReview: true,
+            interviewQuestions: context.questions,
             company: "Participant work interview",
             sources: [
               {
@@ -113,7 +120,7 @@ export function participantDraft(
                 email: "",
                 role: context.p.data.role,
                 department: context.p.data.team,
-                duties: [],
+                duties: context.duties,
               },
             ],
             fingerprint: context.fingerprint,

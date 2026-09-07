@@ -1,3 +1,4 @@
+import { TaskReviewCard } from "./TaskReviewCard.tsx";
 import { useEffect, useRef, useState } from "react";
 import "./DiscoveryDemo.css";
 
@@ -266,7 +267,19 @@ export function DiscoveryDemo() {
                       <strong>Here is what to talk about</strong>
                       <ol>
                         <li>{person.question}</li>
-                        <li>What information and software do you use?</li>
+                        <li>
+                          What starts the task? Name the person or team
+                          supplying the data, the documents or fields you
+                          receive, and what must be complete.
+                        </li>
+                        <li>
+                          Describe each action in order. Name the software you
+                          use at each step and the checks you make.
+                        </li>
+                        <li>
+                          What does the finished output contain? Who receives
+                          it, how do you send it, and what do they do next?
+                        </li>
                         <li>
                           Where does work wait, and who helps you move it
                           forward?
@@ -342,9 +355,22 @@ export function DiscoveryDemo() {
                     <h3>Use these points to guide you</h3>
                     <ol className="dd-prompts">
                       <li>{person.question}</li>
-                      <li>What information and software do you use?</li>
                       <li>
-                        Where does work wait, and who helps you move it forward?
+                        What starts the task? Name the person or team supplying
+                        the data, the documents or fields you receive, and what
+                        must be complete.
+                      </li>
+                      <li>
+                        Describe each action in order. Name the software you use
+                        at each step and the checks you make.
+                      </li>
+                      <li>
+                        What does the finished output contain? Who receives it,
+                        how do you send it, and what do they do next?
+                      </li>
+                      <li>
+                        Who do you depend on? Who depends on you? Describe
+                        missing information, exceptions, and who resolves them.
                       </li>
                     </ol>
                     <div className="dd-note">
@@ -401,15 +427,66 @@ export function DiscoveryDemo() {
                         disabled={!answer.trim()}
                         className="dd-primary"
                         onClick={() => {
+                          const examples: any = {
+                            maya: {
+                              inputs:
+                                "Supplier packet from the buyer, including company details, required documents, and bank details.",
+                              instructions:
+                                "Receive the supplier packet from the buyer.\nCheck company details and required documents.\nSend bank details to Finance for verification.\nTrack the handoff in the shared sheet.\nWhen final approval ownership is unclear, keep the item pending and raise the ownership question.",
+                              output:
+                                "Checked supplier packet and a recorded Finance handoff.",
+                              handoff:
+                                "Finance receives the bank details. Supplier approval depends on the verification result; the final approval owner is unresolved.",
+                              software:
+                                "Shared spreadsheet; product name not stated.",
+                            },
+                            dana: {
+                              inputs:
+                                "Supplier bank details and supporting documents from Procurement.",
+                              instructions:
+                                "Compare bank details with the supporting documents.\nFollow the bank verification procedure.\nStop on a mismatch and ask Procurement to resolve it.\nRecord the verification result.",
+                              output:
+                                "Recorded verification result or unresolved mismatch.",
+                              handoff:
+                                "Procurement resolves mismatches. The supplier approval step depends on this result.",
+                              software: "Not named in the sample account.",
+                            },
+                            jordan: {
+                              inputs:
+                                "Customer order and warehouse stock confirmation.",
+                              instructions:
+                                "Check the customer order.\nAsk the warehouse to confirm stock.\nIf stock is short, ask Procurement for a delivery date.\nWait for that date before making a delivery promise.",
+                              output:
+                                "A delivery promise supported by stock or replenishment information.",
+                              handoff:
+                                "The customer receives the delivery promise. Sales depends on Warehouse and Procurement.",
+                              software: "Not named in the sample account.",
+                            },
+                            riley: {
+                              inputs:
+                                "Released picking list, stock reservation, delivery address, and shipping instructions.",
+                              instructions:
+                                "Receive the released picking list and reservation.\nHave a teammate pick the order.\nHave another teammate check quantities.\nCheck the delivery address and shipping instructions before dispatch.",
+                              output: "Checked shipment ready for dispatch.",
+                              handoff:
+                                "Dispatch depends on the checked shipment and complete shipping information.",
+                              software: "Not named in the sample account.",
+                            },
+                            karl: {
+                              inputs: "Checked shipment and carrier booking.",
+                              instructions:
+                                "Check the shipment has passed its checks.\nCheck that the carrier booking is ready.\nIf blocked, contact the owner of the missing information.\nRecord the carrier reference.\nSend the reference to Sales.",
+                              output:
+                                "Recorded carrier reference and dispatch information.",
+                              handoff:
+                                "Sales receives the carrier reference. Dispatch depends on completed shipment checks and carrier booking.",
+                              software: "Not named in the sample account.",
+                            },
+                          };
                           setCard({
                             title: person.duty,
-                            inputs: "Describe what starts this task.",
-                            instructions: answer,
-                            output:
-                              "Describe what a finished result looks like.",
-                            handoff:
-                              "Name the person, team or system that receives it.",
-                            software: "Name the software you use.",
+                            duty: person.duty,
+                            ...examples[selected],
                             decision: "",
                           });
                           setStep(4);
@@ -425,59 +502,17 @@ export function DiscoveryDemo() {
             {step === 4 && card && (
               <div className="dd-answer">
                 <p>
-                  Illustrative extraction. In the real flow, AI uses your
-                  response to prepare cards. Edit the details, then confirm your
-                  best understanding.
+                  Prepared example based on this person’s sample account. This
+                  public simulation does not analyze custom text. In the real
+                  flow, AI drafts cards from your transcript and assigned work
+                  context. Read the card, approve it, or edit only what needs
+                  correcting.
                 </p>
-                {[
-                  "title",
-                  "inputs",
-                  "instructions",
-                  "output",
-                  "handoff",
-                  "software",
-                ].map((field) => (
-                  <label key={field}>
-                    {
-                      (
-                        {
-                          title: "Task name",
-                          inputs: "What I receive",
-                          instructions: "What I do",
-                          output: "What I produce",
-                          handoff: "Where the output goes",
-                          software: "Software I use",
-                        } as any
-                      )[field]
-                    }
-                    <textarea
-                      value={card[field]}
-                      onChange={(e) =>
-                        setCard({
-                          ...card,
-                          [field]: e.target.value,
-                          decision: "",
-                        })
-                      }
-                    />
-                  </label>
-                ))}
-                <label>
-                  Does this match your understanding?
-                  <select
-                    value={card.decision}
-                    onChange={(e) =>
-                      setCard({ ...card, decision: e.target.value })
-                    }
-                  >
-                    <option value="">Choose after reviewing</option>
-                    <option value="correct">
-                      This matches my understanding
-                    </option>
-                    <option value="not_mine">Remove — not my task</option>
-                    <option value="unsure">I'm not sure</option>
-                  </select>
-                </label>
+                <TaskReviewCard
+                  card={card}
+                  person={person.name + " · " + person.role}
+                  onChange={setCard}
+                />
                 <p>
                   This records your understanding. Differences between teammates
                   can be resolved after their cards return.

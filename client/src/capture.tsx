@@ -774,6 +774,7 @@ export function Participant({
               <ParticipantCards
                 key={request.id + text}
                 request={request}
+                person={[user.name,data?.person?.role].filter(Boolean).join("  ·  ")}
                 text={text}
                 disabled={
                   !ack || busy || captureBusy || transcriptBusy || expired

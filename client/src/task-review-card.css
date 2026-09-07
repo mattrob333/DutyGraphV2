@@ -1,0 +1,84 @@
+.task-review-card {
+  border: 1px solid #62696b;
+  border-radius: 12px;
+  margin: 24px 0;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.025);
+}
+.task-review-card header {
+  padding: 24px;
+  border-bottom: 1px solid #62696b;
+}
+.task-review-card header small,
+.task-review-card dt {
+  color: #b5cbd5;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.task-review-card h3 {
+  font-size: 24px;
+  margin: 12px 0;
+}
+.task-review-card dl {
+  margin: 0;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.task-review-card dl > div:nth-child(3) {
+  grid-column: 1/-1;
+}
+.task-review-card dd {
+  margin: 8px 0 0;
+  line-height: 1.65;
+  white-space: pre-line;
+}
+.task-review-card ol {
+  padding-left: 22px;
+  margin: 0;
+}
+.task-review-card li {
+  margin-bottom: 10px;
+}
+.task-review-card footer {
+  padding: 20px 24px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  border-top: 1px solid #62696b;
+}
+.task-review-card button {
+  padding: 10px 16px;
+  border: 1px solid #727a7e;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.task-review-card footer button:first-child {
+  background: #e1e0d9;
+  color: #242728;
+}
+.task-review-fields {
+  padding: 24px;
+  display: grid;
+  gap: 16px;
+}
+.task-review-fields label {
+  display: grid;
+  gap: 8px;
+}
+.task-review-fields textarea {
+  width: 100%;
+  min-height: 70px !important;
+  box-sizing: border-box;
+}
+@media (max-width: 600px) {
+  .task-review-card dl {
+    grid-template-columns: 1fr;
+  }
+  .task-review-card dl > div:nth-child(3) {
+    grid-column: auto;
+  }
+}
