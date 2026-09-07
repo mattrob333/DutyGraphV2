@@ -1,0 +1,3 @@
+name,email,title,department,manager_email
+Alex Example,alex@example.com,CEO,Leadership,
+Sam Example,sam@example.com,Operations manager,Operations,alex@example.com

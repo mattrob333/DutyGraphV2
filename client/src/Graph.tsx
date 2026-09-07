@@ -1,5 +1,5 @@
 import { linksFor } from "../../shared/record-links.ts";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Expand, Focus, Minus, Plus, List, Network } from "lucide-react";
 import type { RecordRow } from "../../shared/domain.ts";
 import { api } from "./api.ts";
@@ -16,6 +16,7 @@ import {
   workflowScene,
   defaultGraphFocus,
 } from "./graph-scene.ts";
+const NetworkExplorer = lazy(() => import("./NetworkExplorer.tsx"));
 export function Graph({
   company,
   revision,
@@ -36,14 +37,7 @@ export function Graph({
       scanTruncated: boolean;
     } | null>(null),
     [error, setError] = useState(""),
-    [view, setView] = useState(() =>
-      records.some(
-        (r) =>
-          r.kind === "workflow" && r.data.sampleKey === "supplier-workflow",
-      )
-        ? "work"
-        : "connected",
-    ),
+    [view, setView] = useState("org"),
     [list, setList] = useState(false),
     [selected, setSelected] = useState<string | null>(null),
     [expanded, setExpanded] = useState(false);
@@ -220,6 +214,7 @@ export function Graph({
       <div className="toolbar">
         <div className="tabs">
           {[
+            ["network", "3D explorer"],
             ["connected", "Connected"],
             ["work", "Work flow"],
             ["org", "Org & duties"],
@@ -239,7 +234,7 @@ export function Graph({
           ))}
         </div>
         <div className="actions">
-          <Button onClick={() => setList(!list)}>
+          <Button onClick={() => setList(!list)} disabled={view === "network"}>
             {list ? <Network size={16} /> : <List size={16} />}{" "}
             {list ? "Graph" : "Register"}
           </Button>
@@ -260,7 +255,7 @@ export function Graph({
           </span>
         </div>
       )}
-      {view !== "org" && view !== "audit" && (
+      {view !== "org" && view !== "audit" && view !== "network" && (
         <div className="graph-context">
           <label>
             {view === "work" ? "Workflow" : "Explore"}{" "}
@@ -306,7 +301,13 @@ export function Graph({
           </span>
         </div>
       )}
-      {view === "audit" ? <AuditGraph company={company} records={records} open={open}/> : list ? (
+      {view === "network" ? (
+        <Suspense fallback={<p>Loading 3D explorer…</p>}>
+          <NetworkExplorer company={company} records={records} open={open} />
+        </Suspense>
+      ) : view === "audit" ? (
+        <AuditGraph company={company} records={records} open={open} />
+      ) : list ? (
         <div className="table-wrap">
           <table>
             <thead>
@@ -753,30 +754,34 @@ export function Graph({
           )}
         </div>
       )}
-      <div className="graph-foot">
-        {view === "org" ? (
-          <span>Teams organize people. Duties connect them to work.</span>
-        ) : (
-          <div className="legend">
-            <span className="dot blue" />
-            Human <span className="dot violet" />
-            AI <span className="dot amber" />
-            AI + human review · AI modes are proposed
-          </div>
-        )}
-        <span>
-          {view === "connected" && !list
-            ? `${layout.nodes.length} of ${registerNodes.length} records in this view`
-            : `${registerNodes.length} records`}{" "}
-          ·{" "}
-          {graph.pending
-            ? "Projection catching up; current records shown"
-            : "Current authoritative records"}
-          {graph.truncated ? " · Node budget reached; choose a focus" : ""}
-          {graph.scanTruncated ? " · Large workspace: partial scan" : ""}
-        </span>
-      </div>
-      {view !== "org" && !list && <p className="subtle">{layout.note}</p>}
+      {view !== "network" && (
+        <div className="graph-foot">
+          {view === "org" ? (
+            <span>Teams organize people. Duties connect them to work.</span>
+          ) : (
+            <div className="legend">
+              <span className="dot blue" />
+              Human <span className="dot violet" />
+              AI <span className="dot amber" />
+              AI + human review · AI modes are proposed
+            </div>
+          )}
+          <span>
+            {view === "connected" && !list
+              ? `${layout.nodes.length} of ${registerNodes.length} records in this view`
+              : `${registerNodes.length} records`}{" "}
+            ·{" "}
+            {graph.pending
+              ? "Projection catching up; current records shown"
+              : "Current authoritative records"}
+            {graph.truncated ? " · Node budget reached; choose a focus" : ""}
+            {graph.scanTruncated ? " · Large workspace: partial scan" : ""}
+          </span>
+        </div>
+      )}
+      {view !== "org" && view !== "network" && !list && (
+        <p className="subtle">{layout.note}</p>
+      )}
     </div>
   );
 }

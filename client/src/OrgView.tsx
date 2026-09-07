@@ -1,3 +1,4 @@
+import { OrgChartCanvas } from "./OrgChartCanvas.tsx";
 import { useState } from "react";
 import type { RecordRow } from "../../shared/domain.ts";
 import { Badge, Button, Empty, State } from "./ui.tsx";
@@ -14,9 +15,8 @@ export function OrgView({
   select: (id: string | null) => void;
   open: (record: RecordRow) => void;
 }) {
-  const [mode, setMode] = useState("duties");
+  const [mode, setMode] = useState("reporting");
   const [department, setDepartment] = useState("");
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const people = records.filter((r) => r.kind === "person");
   const tasks = records.filter((r) => r.kind === "task");
   const dutyRecords = records.filter((r) => r.kind === "duty");
@@ -29,7 +29,6 @@ export function OrgView({
       (manager) => manager.id === p.data.managerId && manager.id !== p.id,
     ),
   );
-  const linkedIds = new Set(reports.flatMap((p) => [p.id, p.data.managerId]));
   const relatedTasks = (id: string) =>
     tasks.filter((t) => t.data.ownerId === id || t.data.performerId === id);
   const role = (task: RecordRow, personId: string) =>
@@ -72,53 +71,6 @@ export function OrgView({
       </button>
     );
   };
-  // A cyclic or incomplete roster must still render every person safely.
-  const rendered = new Set<string>();
-  const branch = (
-    person: RecordRow,
-    ancestors = new Set<string>(),
-  ): React.ReactNode => {
-    if (ancestors.has(person.id) || rendered.has(person.id)) return null;
-    rendered.add(person.id);
-    const next = new Set([...ancestors, person.id]);
-    const children = reports.filter(
-      (p) => p.data.managerId === person.id && !next.has(p.id),
-    );
-    const childTrees = children.map((p) => branch(p, next));
-    const root = !reports.some((p) => p.id === person.id);
-    const showChildren = root || expanded.has(person.id);
-    return (
-      <li key={person.id}>
-        {personCard(person)}
-        {!!children.length && !root && (
-          <button
-            className="org-expand"
-            aria-expanded={showChildren}
-            onClick={() =>
-              setExpanded((previous) => {
-                const next = new Set(previous);
-                if (next.has(person.id)) next.delete(person.id);
-                else next.add(person.id);
-                return next;
-              })
-            }
-          >
-            {showChildren ? "Hide" : "Show"} {children.length} direct{" "}
-            {children.length === 1 ? "report" : "reports"}
-          </button>
-        )}
-        {!!children.length && showChildren && <ul>{childTrees}</ul>}
-      </li>
-    );
-  };
-  const roots = people.filter(
-    (p) => linkedIds.has(p.id) && !reports.some((r) => r.id === p.id),
-  );
-  const trees = roots.map((p) => branch(p));
-  const cycles = people.filter(
-    (p) => linkedIds.has(p.id) && !rendered.has(p.id),
-  );
-  const cycleTrees = cycles.map((p) => branch(p));
   const work = current ? relatedTasks(current.id) : [];
   const duties = [
     ...new Set(work.map((t) => t.data.duty || "Duty not recorded")),
@@ -129,11 +81,18 @@ export function OrgView({
         <div>
           <h2>Who owns the work?</h2>
           <p>
-            Explore the teams, then select a person to see their duties and task
-            responsibilities.
+            Explore the reporting chart, then select a person to see their
+            duties and task responsibilities.
           </p>
         </div>
         <div className="tabs" aria-label="Organization view">
+          <button
+            className={mode === "reporting" ? "active" : ""}
+            onClick={() => setMode("reporting")}
+          >
+            Reporting chart
+          </button>
+
           <button
             className={mode === "duties" ? "active" : ""}
             onClick={() => {
@@ -148,12 +107,6 @@ export function OrgView({
             onClick={() => setMode("teams")}
           >
             By team
-          </button>
-          <button
-            className={mode === "reporting" ? "active" : ""}
-            onClick={() => setMode("reporting")}
-          >
-            Reporting chart
           </button>
         </div>
       </div>
@@ -204,62 +157,8 @@ export function OrgView({
                 );
               })}
             </div>
-          ) : reports.length ? (
-            <>
-              <p className="subtle">
-                Managers appear above their recorded direct reports. Select any
-                person to inspect their work.
-              </p>
-              <div
-                className="org-departments"
-                aria-label="Explore department duties"
-              >
-                {teams.map((team) => (
-                  <Button
-                    key={team}
-                    onClick={() => {
-                      setDepartment(team);
-                      setMode("duties");
-                      select(null);
-                    }}
-                  >
-                    {team} duties
-                  </Button>
-                ))}
-              </div>
-              <ul className="org-tree">
-                {trees}
-                {cycleTrees}
-              </ul>
-              {!!cycles.length && (
-                <p className="org-scope-note">
-                  Some reporting lines form a loop. Review the manager fields in
-                  the people records.
-                </p>
-              )}
-              {!!people.filter((p) => !linkedIds.has(p.id)).length && (
-                <section className="org-unlinked">
-                  <h3>No reporting connection recorded</h3>
-                  <div className="org-unlinked-people">
-                    {people
-                      .filter((p) => !linkedIds.has(p.id))
-                      .map((p) => (
-                        <div key={p.id}>{personCard(p)}</div>
-                      ))}
-                  </div>
-                </section>
-              )}
-            </>
           ) : (
-            <Empty
-              title="A reporting chart needs reporting relationships"
-              detail="Open a person’s record and set their manager, or import a roster with manager emails. The chart will connect only the relationships you record."
-              action={
-                <Button onClick={() => setMode("teams")}>
-                  Explore teams & duties
-                </Button>
-              }
-            />
+            <OrgChartCanvas people={people} tasks={tasks} select={select} />
           )}
         </div>
         {current && (

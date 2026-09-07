@@ -1,3 +1,4 @@
+import { OrgChartCanvas } from "./OrgChartCanvas.tsx";
 import { AgentRequests, TeamAgentPortal } from "./AgentRequests.tsx";
 import { DiscoveryDemo } from "./DiscoveryDemo.tsx";
 import { StrategyWorkspace } from "./StrategyWorkspace.tsx";
@@ -928,9 +929,14 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           title="From first conversation to clear work."
           description="Research the business. Meet the leaders. Hear from the team. Build the work record."
           actions={
-            <Button onClick={() => create("engagement")}>
-              Engagement scope
-            </Button>
+            <>
+              <Button onClick={() => setModal({ type: "roster" })}>
+                Import people CSV
+              </Button>
+              <Button onClick={() => create("engagement")}>
+                Engagement scope
+              </Button>
+            </>
           }
         />
         <DiscoveryJourney
@@ -1095,7 +1101,12 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <Heading
           eyebrow="THE CONNECTED RECORD"
           title="See how the company connects."
-          description="See who owns each duty and who performs each task. Switch to Work flow to follow the handoffs."
+          description="Start with the organization. Explore the 3D network, then follow duties, tasks and handoffs."
+          actions={
+            <Button onClick={() => setModal({ type: "roster" })}>
+              Import people CSV
+            </Button>
+          }
         />
         <Graph
           key={companyId}
@@ -1967,7 +1978,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             onDone={async () => {
               await refresh();
               setModal(null);
-              setToast("Valid roster rows imported.");
+              setToast("Roster imported. Explore the reporting chart.");
+              go("graph");
             }}
           />
         </Modal>
@@ -2127,9 +2139,16 @@ function RosterImport({
   return (
     <div>
       <p>
-        Headers: name, email, role, team, manager_email, external_id. The last
-        two are optional. Duplicate, ambiguous, and cyclic rows are held for
-        correction.
+        Request this roster from your client before or just after the leadership
+        call: names, email addresses, job titles, departments, and manager email
+        addresses. Blank manager means no manager is supplied. Duplicate,
+        unresolved, and cyclic rows are held for correction; they are not
+        silently imported.
+      </p>
+      <p>
+        <a href="/examples/people-roster-template.csv" download>
+          Download people CSV template
+        </a>
       </p>
       <label className="btn file-button">
         <Upload size={16} />
@@ -2188,6 +2207,26 @@ function RosterImport({
             {preview.validCount} valid rows ·{" "}
             {preview.rows.length - preview.validCount} held for correction
           </p>
+          {preview.validCount > 0 && (
+            <OrgChartCanvas
+              people={preview.rows
+                .filter((r: any) => !r.issues.length)
+                .map(
+                  (r: any) =>
+                    ({
+                      id: r.data.email,
+                      title: r.data.name,
+                      kind: "person",
+                      data: {
+                        role: r.data.role,
+                        team: r.data.team,
+                        managerId: r.data.managerEmail,
+                      },
+                    }) as RecordRow,
+                )}
+              select={() => {}}
+            />
+          )}
           <div className="table-wrap">
             <table>
               <thead>

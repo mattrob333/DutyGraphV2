@@ -1,0 +1,107 @@
+.roster-canvas {
+  height: 600px;
+  min-width: 0;
+  border: 1px solid #454b50;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.roster-node {
+  width: 224px;
+  min-height: 160px;
+  background: #292d30;
+  border: 1px solid #50575d;
+  border-top: 3px solid;
+  padding: 16px;
+  border-radius: 9px;
+  color: #eee;
+  display: grid;
+  gap: 6px;
+  box-sizing: border-box;
+}
+.roster-node span,
+.roster-node small {
+  font-size: 12px;
+}
+.roster-avatar {
+  border: 1px solid #596168;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+}
+.visual-toolbar {
+  display: flex;
+  gap: 16px;
+  align-items: end;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+.visual-toolbar label {
+  display: grid;
+  gap: 6px;
+  min-width: 160px;
+}
+.visual-results {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+.network-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 16px;
+}
+.network-canvas {
+  height: 600px;
+  min-width: 0;
+  overflow: hidden;
+  background: #202426;
+  border: 1px solid #454b50;
+  border-radius: 10px;
+}
+.network-detail {
+  padding: 18px;
+  background: #292d30;
+  border: 1px solid #454b50;
+  border-radius: 10px;
+}
+.network-detail button {
+  margin: 5px 0;
+  max-width: 100%;
+  text-align: left;
+}
+.network-legend {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  margin: 12px 0;
+}
+.network-legend i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.network-fallback {
+  padding: 30px;
+}
+.org-content {
+  min-width: 0;
+}
+@media (max-width: 800px) {
+  .network-layout {
+    grid-template-columns: 1fr;
+  }
+  .network-canvas,
+  .roster-canvas {
+    height: 460px;
+  }
+  .react-flow__minimap {
+    display: none;
+  }
+}

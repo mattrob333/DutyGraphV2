@@ -2,6 +2,8 @@ import Papa from "papaparse";
 export function previewRoster(csv: string, existing: any[] = []) {
   const aliases: Record<string, string> = {
     full_name: "name",
+    person: "name",
+    reports_to: "manager_email",
     job_title: "role",
     title: "role",
     department: "team",
