@@ -189,6 +189,11 @@
     },
     {
       "method": "PUT",
+      "path": "/api/v1/companies/{companyId}/business-classification/review",
+      "source": "server/business-classification.ts"
+    },
+    {
+      "method": "PUT",
       "path": "/api/v1/companies/{companyId}/business-profile",
       "source": "server/app.ts"
     },

@@ -277,8 +277,13 @@ export async function discoveryContext(
 
     const briefingJobs = (
       await db.query(
-        "SELECT id,input,result,created_at FROM provider_jobs WHERE company_id=$1 AND kind='business_classification' AND state='complete' ORDER BY created_at DESC LIMIT 5",
-        [company.id],
+        "SELECT id,input,result,created_at FROM provider_jobs WHERE company_id=$1 AND kind='business_classification' AND state='complete' AND input->>'name'=$2 AND input->>'website'=$3 AND input->>'description'=$4 ORDER BY created_at DESC LIMIT 1",
+        [
+          company.id,
+          company.settings.businessIntake?.name || "",
+          company.settings.businessIntake?.website || "",
+          company.settings.businessIntake?.description || "",
+        ],
       )
     ).rows;
     const briefing = briefingJobs.find(
@@ -296,6 +301,10 @@ export async function discoveryContext(
       );
       const text = JSON.stringify({
         asOf: briefing.created_at,
+        advisorUpdates:
+          company.settings.companyResearchReview?.jobId === briefing.id
+            ? company.settings.companyResearchReview
+            : null,
         summary: briefing.result.draft.summary,
         facts,
         questions: briefing.result.draft.questions,

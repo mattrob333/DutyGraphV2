@@ -446,3 +446,49 @@ test("classification reuses a completed research pass without a fifth search and
     422,
   );
 });
+
+test("company profile survives newer incomplete jobs and advisor updates are isolated and versioned", async () => {
+  const c = await account();
+  const made = await request(c, path(c), "POST", body(c));
+  assert.equal(made.status, 200);
+  const jobId = made.data.id;
+  await tx(c.user.tenant_id, async (db) => {
+    for (let i = 0; i < 6; i++)
+      await db.query(
+        "INSERT INTO provider_jobs (id,tenant_id,company_id,kind,state,input) SELECT $1,tenant_id,company_id,kind,'failed',input FROM provider_jobs WHERE id=$2",
+        [randomUUID(), jobId],
+      );
+  });
+  const loaded = await request(c, path(c));
+  assert.equal(loaded.data.latestBrief.id, jobId);
+  const review = {
+    expectedRevision: c.revision,
+    jobId,
+    summary: "Advisor confirmed consulting and custom delivery.",
+    industry: "Business advisory",
+    updates:
+      "Leadership reports 12 employees as of kickoff; confirm payroll roster.",
+  };
+  const saved = await request(c, path(c) + "/review", "PUT", review);
+  assert.equal(saved.status, 200, JSON.stringify(saved.data));
+  assert.equal(
+    saved.data.settings.companyResearchReview.updates,
+    review.updates,
+  );
+  assert.equal(
+    (await request(c, path(c) + "/review", "PUT", review)).status,
+    409,
+  );
+  const other = await account();
+  assert.equal(
+    (
+      await request(other, path(other) + "/review", "PUT", {
+        ...review,
+        expectedRevision: other.revision,
+      })
+    ).status,
+    404,
+  );
+  const reloaded = await request(c, path(c));
+  assert.equal(reloaded.data.latestBrief.result.draft.summary, draft.summary);
+});

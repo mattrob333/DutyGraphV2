@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import { companyProfileReviewSchema } from "../shared/company-profile.ts";
 import { advisor, type AuthRequest } from "./auth.ts";
 import {
   tx,
@@ -122,10 +123,70 @@ export function businessClassificationRouter(
             !!researchOverride ||
             (await providerConfig(actor(req).tenant_id, "exa", db)).configured,
           jobs,
+          latestBrief:
+            (
+              await db.query(
+                "SELECT id,state,input,result,created_at FROM provider_jobs WHERE company_id=$1 AND kind='business_classification' AND state='complete' AND result->'draft'->'brief' IS NOT NULL ORDER BY created_at DESC LIMIT 1",
+                [company.id],
+              )
+            ).rows[0] || null,
         };
       }),
     ),
   );
+  router.put("/review", async (req, res) => {
+    const body = companyProfileReviewSchema
+      .extend({ expectedRevision: z.number().int().min(0) })
+      .strict()
+      .parse(req.body);
+    res.json(
+      await command(
+        actor(req),
+        req.header("Idempotency-Key"),
+        { path: req.originalUrl, method: req.method, body },
+        async (db) => {
+          const company = await companyCheck(db, actor(req), companyId(req));
+          const job = (
+            await db.query(
+              "SELECT id FROM provider_jobs WHERE id=$1 AND company_id=$2 AND kind='business_classification' AND state='complete' AND result->'draft'->'brief' IS NOT NULL",
+              [body.jobId, company.id],
+            )
+          ).rows[0];
+          if (!job) fail(404, "NOT_FOUND", "Company research not found.");
+          const { expectedRevision, ...fields } = body;
+          const review = { ...fields, reviewedAt: new Date().toISOString() };
+          const updated = (
+            await db.query(
+              "UPDATE companies SET settings=settings || $1::jsonb,revision=revision+1 WHERE id=$2 AND revision=$3 RETURNING *",
+              [
+                JSON.stringify({ companyResearchReview: review }),
+                company.id,
+                expectedRevision,
+              ],
+            )
+          ).rows[0];
+          if (!updated)
+            fail(
+              409,
+              "VERSION_CONFLICT",
+              "The company changed. Refresh before saving your review.",
+            );
+          await audit(
+            db,
+            actor(req),
+            company.id,
+            "company.research_review_saved",
+            null,
+            {
+              previous: company.settings.companyResearchReview || null,
+              review,
+            },
+          );
+          return updated;
+        },
+      ),
+    );
+  });
   router.post("/", async (req, res) => {
     const body = classificationIntake
       .extend({
@@ -252,7 +313,7 @@ export function businessClassificationRouter(
           website: body.website,
           description: body.description,
           revision: company.revision,
-          promptVersion: "business-brief-v2",
+          promptVersion: "business-profile-v3",
           sources: collected,
           websiteRead:
             !!body.website &&

@@ -1,5 +1,14 @@
 # DutyGraph development log
 
+## 2026-09-07 — Reusable company profile and clearer email handoff
+
+- Added a company identity header, official-site social links, size/market highlights, and sourced HTML profile export including primary/supporting streams. Automatic logo extraction remains deferred; initials provide a placeholder.
+- Retrieve the latest completed brief independently of the five-job history; changed inputs show a dated prior profile with a notice rather than silently hiding it. Legacy operating-only profiles explicitly request research.
+- Advisor updates are bounded, company-scoped, revision-checked and audited; original AI findings remain immutable and corrections feed matching kickoff context. New research retains but does not automatically apply an older review.
+- Strengthened research prompts for distinct offerings and comparable-size peer evidence; unavailable headcounts remain unknown. Social links must appear on the official website excerpts.
+- Renamed email draft action to Save & continue to send and scroll to the preview/send panel. Saving never sends email.
+- Validation: all 220 tests pass; production build and 91-route contract generation pass; dependency audit reports zero vulnerabilities. Synthetic browser checks confirmed profile rendering and advisor correction persistence across reload. No real emails or paid provider calls used. Hosted release status remains separate.
+
 ## 2026-09-07 — Complete the pre-kickoff preparation path
 
 - Clarified the research/profile/email sequence, reduced the type catalog to an information disclosure, removed the evidence-library email shortcut, and grouped optional industry research.

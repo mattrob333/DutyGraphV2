@@ -1,4 +1,5 @@
 import type { BusinessProfile } from "./business-types.ts";
+import type { CompanyProfileReview } from "./company-profile.ts";
 import { z } from "zod";
 import { workSchemas } from "./work-model.ts";
 import { workflowSchema } from "./workflow.ts";
@@ -186,6 +187,7 @@ export type Company = {
   goal: string;
   settings: {
     businessProfile?: BusinessProfile;
+    companyResearchReview?: CompanyProfileReview;
     businessIntake?: { name: string; website: string; description: string };
     notice: string;
     retentionDays: number;

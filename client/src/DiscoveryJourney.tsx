@@ -161,6 +161,7 @@ export function DiscoveryJourney({
       });
       await load();
     });
+  const [showSend, setShowSend] = useState(false);
   const apply = () =>
     perform(async () => {
       await api(
@@ -169,6 +170,7 @@ export function DiscoveryJourney({
         { reviewed: true, draft, dueDate },
         `discovery-apply:${job!.id}`,
       );
+      if (stage === "contact") setShowSend(true);
       setNotice(
         stage === "contact"
           ? "The contact request is ready. Preview the email below, then send it."
@@ -222,6 +224,16 @@ export function DiscoveryJourney({
   );
   const contactResponse = contactRequests.some(responseFor);
   const applied = !!job?.result?.applied;
+  useEffect(() => {
+    if (showSend && stage === "contact" && applied) {
+      setShowSend(false);
+      requestAnimationFrame(() =>
+        document
+          .getElementById("kickoff-contact-requests")
+          ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+      );
+    }
+  }, [applied, stage, showSend]);
   const savedTasks = records.filter(
     (r) => r.kind === "task" && job?.result?.applied?.recordIds?.includes(r.id),
   );
@@ -1208,8 +1220,8 @@ export function DiscoveryJourney({
                     />
                   </Field>
                   <p>
-                    Saving records your review of this draft and the source
-                    material. Requests are saved before any email is sent.
+                    Save your reviewed draft to open the email preview and send
+                    controls. This step does not send an email.
                   </p>
                   <Button
                     primary
@@ -1219,7 +1231,7 @@ export function DiscoveryJourney({
                     onClick={() => void apply()}
                   >
                     {stage === "contact"
-                      ? "Save contact request"
+                      ? "Save & continue to send"
                       : stage === "roster"
                         ? "Save reviewed team"
                         : stage === "interviews"
@@ -1281,7 +1293,7 @@ export function DiscoveryJourney({
       {stage === "contact" && contactRequests.length > 0 && (
         <div id="kickoff-contact-requests">
           <Panel
-            title="Contact requests"
+            title="Preview & send kickoff request"
             subtitle="Preview the message, then send the private response link to your contact."
           >
             {requestRows(contactRequests, true)}

@@ -1,5 +1,7 @@
 # DutyGraph
 
+Company research now opens a reusable profile with identity, website/social links, scale and market highlights, sourced offers and comparable-company findings. Advisor updates preserve original citations and feed kickoff context; a standalone HTML report includes operating streams. The latest completed profile survives later failed jobs. Email preparation now says “Save & continue to send.” See [company profiles](docs/company-profiles.md).
+
 Discovery now follows [business brief → kickoff package → two-hour agenda](docs/kickoff-preparation.md). One clear stream-confirmation action leads to branded email preparation. The private contact page collects a validated team CSV, separate executive/pilot selections and leadership context; advisor review imports reporting lines atomically. Ambiguous same-title duty changes require an explicit existing-duty selection. Optional industry research and business-type examples are secondary. Implementation `b325651` passed all 217 tests and CI, is READY on Vercel, and serves the updated capture/import/agenda code on dutygraph.com. See [verification](docs/verification/2026-09-07-kickoff-preparation.md).
 
 **Understand the work. Improve the business. Delegate with clear human authority.**

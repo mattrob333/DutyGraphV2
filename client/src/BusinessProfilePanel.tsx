@@ -105,7 +105,7 @@ export function BusinessProfilePanel({
                 ],
             ),
         );
-        if (savedBrief) setBriefJob(savedBrief);
+        setBriefJob(savedBrief || data.latestBrief || null);
         const latest = data.jobs?.[0];
         if (latest?.input && !company.settings.businessIntake && !plan)
           setIntake({
@@ -473,20 +473,32 @@ export function BusinessProfilePanel({
       </div>
       <ErrorBox error={error} />
       {notice && <p role="status">{notice}</p>}
-      {briefJob &&
-        ["name", "website", "description"].every(
-          (k) => briefJob.input[k] === intake[k as keyof typeof intake],
-        ) && (
-          <BusinessBrief
-            job={briefJob}
-            busy={busy}
-            prepare={() =>
-              document
-                .getElementById("business-stream-review")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" })
-            }
-          />
-        )}
+      {briefJob && (
+        <BusinessBrief
+          key={briefJob.id}
+          job={briefJob}
+          company={company}
+          refresh={refresh}
+          reviewDisabled={dirty}
+          reviewed={setBaseRevision}
+          changed={["name", "website", "description"].some(
+            (k) => briefJob.input[k] !== intake[k as keyof typeof intake],
+          )}
+          busy={busy}
+          prepare={() =>
+            document
+              .getElementById("business-stream-review")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" })
+          }
+        />
+      )}
+      {!briefJob && !!profile.streams.length && (
+        <p className="notice">
+          This saved operating profile has no business research brief yet.
+          Select “Research this company” above to build the company overview,
+          size, offerings and comparable-company evidence.
+        </p>
+      )}
       {!!profile.streams.length && (
         <section
           id="business-stream-review"
