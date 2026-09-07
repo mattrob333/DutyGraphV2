@@ -11,6 +11,7 @@ import type pg from "pg";
 import type { RecordRow, User } from "../shared/domain.ts";
 import {
   discoverySchemas,
+  discoveryGenerationSchemas,
   participantTaskExtraction,
   discoveryStages,
   discoveryInstructions,
@@ -128,7 +129,7 @@ export const openAiDiscovery: DiscoveryProvider = async (input, key, model) => {
   const schema = z.toJSONSchema(
     input.participantReview
       ? participantTaskExtraction
-      : discoverySchemas[input.stage],
+      : discoveryGenerationSchemas[input.stage],
   );
   delete schema.$schema;
   const response = await fetch("https://api.openai.com/v1/responses", {
@@ -233,7 +234,9 @@ export async function discoveryContext(
     title: r.title,
     text: String(r.data.text || reviewedTranscript(r)?.data.text || "").slice(
       0,
-      r.data.originId === "discovery-meeting" ? 20000 : 12000,
+      r.data.originId === "discovery-meeting" || r.data.kickoffPreparation
+        ? 40000
+        : 12000,
     ),
     version: r.version,
     hash:
@@ -888,6 +891,26 @@ export function discoveryRouter(provider: DiscoveryProvider = openAiDiscovery) {
             dueDate: d.dueDate || period(),
             notice: c.settings.notice,
           });
+          await putRecord(
+            db,
+            u,
+            c.id,
+            "request",
+            r.title,
+            {
+              ...r.data,
+              kickoffBusinessStreams: (
+                c.settings.businessProfile?.streams || []
+              ).map((s: any, i: number) => ({
+                id: s.id,
+                name: s.name,
+                focus: i === 0 ? "primary" : "supporting",
+              })),
+            },
+            r.state,
+            r,
+            "Snapshot proposed streams for kickoff preparation",
+          );
           applied.requestIds.push(r.id);
         } else if (stage === "roster") {
           if (!draft.people.length)
@@ -1007,7 +1030,8 @@ export function discoveryRouter(provider: DiscoveryProvider = openAiDiscovery) {
               }
             }
             const bound = await evidenceIds(p.sourceIds),
-              titles = new Set<string>();
+              titles = new Set<string>(),
+              resolvedDutyIds = new Set<string>();
             for (const duty of p.duties) {
               const normalized = duty.title.trim().toLowerCase();
               if (titles.has(normalized))
@@ -1021,9 +1045,37 @@ export function discoveryRouter(provider: DiscoveryProvider = openAiDiscovery) {
                 (r) =>
                   r.kind === "duty" &&
                   r.data.ownerId === person.id &&
-                  r.title.trim().toLowerCase() === normalized &&
+                  (duty.existingDutyId
+                    ? r.id === duty.existingDutyId
+                    : r.title.trim().toLowerCase() === normalized) &&
                   !["retracted", "withdrawn"].includes(r.state),
               );
+              if (duty.existingDutyId && !existing)
+                fail(
+                  422,
+                  "DUTY_REFERENCE",
+                  "The selected existing duty must belong to this person and company.",
+                );
+              if (
+                existing &&
+                !duty.existingDutyId &&
+                existing.data.purpose.trim().toLowerCase() !==
+                  (duty.description || duty.title).trim().toLowerCase()
+              )
+                fail(
+                  422,
+                  "DUTY_SCOPE_AMBIGUOUS",
+                  `The duty "${duty.title}" already exists for ${p.name} with a different description. Explicitly select the existing duty to confirm a correction, or give a distinct stream-specific duty a clear name. No roster changes were applied.`,
+                );
+              if (existing) {
+                if (resolvedDutyIds.has(existing.id))
+                  fail(
+                    422,
+                    "DUPLICATE_DUTY_REFERENCE",
+                    "Two proposed duties cannot resolve to the same existing duty.",
+                  );
+                resolvedDutyIds.add(existing.id);
+              }
               // Preserve reviewed work and its links when the dossier repeats an established duty.
               const record =
                 existing &&

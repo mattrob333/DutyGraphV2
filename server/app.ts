@@ -1,6 +1,15 @@
+import {
+  kickoffPreparationSchema,
+  validateKickoffPreparation,
+  kickoffPreparationText,
+} from "../shared/kickoff-preparation.ts";
+import { importKickoffRoster } from "./kickoff-roster.ts";
 import { businessProfileSchema } from "../shared/business-types.ts";
 import { classificationIntake } from "../shared/business-classification.ts";
-import { businessClassificationRouter, type ClassificationProvider } from "./business-classification.ts";
+import {
+  businessClassificationRouter,
+  type ClassificationProvider,
+} from "./business-classification.ts";
 import { teamAnalysisRouter, type TeamProvider } from "./team-analysis.ts";
 import { newsletterInterest } from "./newsletter.ts";
 import { participantDraft, participantCards } from "./participant-cards.ts";
@@ -508,7 +517,10 @@ export function createApp({
       }),
     ),
   );
-  api.use("/companies/:companyId/business-classification", businessClassificationRouter(classificationProvider, researchProvider));
+  api.use(
+    "/companies/:companyId/business-classification",
+    businessClassificationRouter(classificationProvider, researchProvider),
+  );
   api.put("/companies/:companyId/business-profile", advisor, async (req, res) =>
     res.json(
       await run(req, async (db: any) => {
@@ -525,7 +537,14 @@ export function createApp({
         const updated = (
           await db.query(
             "UPDATE companies SET settings=settings || $1::jsonb,revision=revision+1 WHERE id=$2 AND revision=$3 RETURNING *",
-            [JSON.stringify({ businessProfile: d.profile, ...(d.intake ? { businessIntake: d.intake } : {}) }), c.id, d.expectedRevision],
+            [
+              JSON.stringify({
+                businessProfile: d.profile,
+                ...(d.intake ? { businessIntake: d.intake } : {}),
+              }),
+              c.id,
+              d.expectedRevision,
+            ],
           )
         ).rows[0];
         if (!updated)
@@ -1089,6 +1108,10 @@ export function createApp({
             state: r.state,
             data: {
               questions: r.data.questions,
+              kickoffPreparation: String(
+                r.data.questionPlanVersion || "",
+              ).startsWith("discovery-contact:"),
+              kickoffBusinessStreams: r.data.kickoffBusinessStreams || [],
               notice: r.data.notice,
               type: r.data.type,
               dueDate: r.data.dueDate,
@@ -1150,6 +1173,7 @@ export function createApp({
               )
               .default({}),
             taskCards: participantCards.optional(),
+            kickoffPreparation: kickoffPreparationSchema.optional(),
             note: z.string().max(10000).default(""),
           })
           .strict()
@@ -1167,6 +1191,30 @@ export function createApp({
             "REQUEST_EXPIRED",
             "This request is past its due date. Ask your advisor for a new request.",
           );
+        if (d.kickoffPreparation) {
+          if (
+            r.data.type !== "leadership" ||
+            !String(r.data.questionPlanVersion || "").startsWith(
+              "discovery-contact:",
+            )
+          )
+            fail(
+              422,
+              "KICKOFF_ONLY",
+              "Team uploads belong to your assigned kickoff preparation request.",
+            );
+          try {
+            validateKickoffPreparation(d.kickoffPreparation);
+          } catch (e) {
+            fail(422, "KICKOFF_INVALID", (e as Error).message);
+          }
+          d.text = [
+            kickoffPreparationText(d.kickoffPreparation),
+            d.text ? `Additional response\n${d.text}` : "",
+          ]
+            .filter(Boolean)
+            .join("\n\n");
+        }
         if (d.assetId) {
           const asset = (
             await db.query(
@@ -1227,6 +1275,9 @@ export function createApp({
             decisions: d.decisions,
             note: d.note,
             taskCards: d.taskCards || [],
+            ...(d.kickoffPreparation
+              ? { kickoffPreparation: d.kickoffPreparation }
+              : {}),
           },
           "returned",
         );
@@ -1327,6 +1378,23 @@ export function createApp({
         return { ok: true, responseId: response.id };
       }),
     ),
+  );
+  api.post(
+    "/companies/:companyId/responses/:recordId/kickoff-roster",
+    advisor,
+    async (req, res) =>
+      res.json(
+        await run(req, async (db: any) => {
+          const c = await companyCheck(db, actor(req), param(req, "companyId"));
+          return importKickoffRoster(
+            db,
+            actor(req),
+            c.id,
+            param(req, "recordId"),
+            req.body,
+          );
+        }),
+      ),
   );
   api.post("/companies/:companyId/roster/preview", advisor, async (req, res) =>
     res.json(

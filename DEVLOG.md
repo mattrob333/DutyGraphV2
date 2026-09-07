@@ -1,5 +1,13 @@
 # DutyGraph development log
 
+## 2026-09-07 — Complete the pre-kickoff preparation path
+
+- Clarified the research/profile/email sequence, reduced the type catalog to an information disclosure, removed the evidence-library email shortcut, and grouped optional industry research.
+- Added structured private kickoff capture: bounded CSV validation, explicit executive/pilot selections, goals, departments, stream boundaries, handoffs, systems and logistics. Existing voice/text and branded email delivery remain. Snapshot proposed streams in the contact request.
+- Added advisor-only atomic roster import with request provenance, company/actor isolation, version checks, duplicate replay handling and conflict rollback. Returned packages feed agenda context; deterministic timeboxes total two hours. No automatic invitations to uploaded people.
+- Strengthened discovery prompts around shared versus stream-specific work and prohibited silent changed-description duty merges without an explicit advisor selection. Kept the reviewed interview roster separate from the full uploaded org roster.
+- Documentation: README, initial-research guide, discovery handbook and new kickoff-preparation reference. No migration. Local production build and all 217 tests passed; 90-route inventory regenerated; audit reports zero vulnerabilities. Fictional browser round trip covered email preview, private capture, advisor import, three-person/two-edge org chart and 120-minute agenda. See [verification](docs/verification/2026-09-07-kickoff-preparation.md). CI/hosted publication follows the implementation commit.
+
 ## 2026-09-07 — Polish the business-stream review cards
 
 - Open operating stages by default for the primary stream and keep supporting streams collapsed. Promoting a stream updates the expanded primary view.

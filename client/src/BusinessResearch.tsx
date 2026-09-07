@@ -316,7 +316,6 @@ export function BusinessResearch({
                 </div>
               ))}
             </div>
-            <Button onClick={kickoff}>Prepare the contact email</Button>
           </Panel>
         </div>
       )}
@@ -338,7 +337,6 @@ export function BusinessResearch({
           {resultsOnly && (
             <div className="actions">
               <Button onClick={create}>Add a public source manually</Button>
-              <Button onClick={kickoff}>Prepare the contact email</Button>
             </div>
           )}
           {!status && <p role="status">Loading saved research…</p>}
@@ -348,64 +346,68 @@ export function BusinessResearch({
               library.
             </p>
           )}
-          <details><summary>Inspect retrieved pages · {status?.runs.length || 0} searches</summary>
-          {status?.runs.map((run) => (
-            <details className="research-run" key={run.id}>
-              <summary>
-                {run.query} <Badge>{run.state}</Badge>
-                <small>
-                  {new Date(run.created_at).toLocaleString()} ·{" "}
-                  {run.results.length} sources
-                </small>
-              </summary>
-              {run.message && <p className="notice">{run.message}</p>}
-              {["reserved", "running"].includes(run.state) && (
-                <p>
-                  The request is in progress. Refresh to check its saved result;
-                  starting another search creates a separate request.
-                </p>
-              )}
-              {run.state === "complete" && !run.results.length && (
-                <p>
-                  No usable page text returned. Try a more precise public name
-                  or add a source manually.
-                </p>
-              )}
-              {run.results.map((source, index) => (
-                <article className="research-source" key={source.url}>
-                  <h3>{source.title}</h3>
-                  <a
-                    href={source.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    Open original source ↗
-                  </a>
-                  <p className="subtle">
-                    Collected {new Date(source.retrievedAt).toLocaleString()}
-                    {source.publishedDate
-                      ? ` · Published ${source.publishedDate}`
-                      : ""}
-                    {source.excerpted
-                      ? " · First 6,000 characters retained"
-                      : ""}
+          <details>
+            <summary>
+              Inspect retrieved pages · {status?.runs.length || 0} searches
+            </summary>
+            {status?.runs.map((run) => (
+              <details className="research-run" key={run.id}>
+                <summary>
+                  {run.query} <Badge>{run.state}</Badge>
+                  <small>
+                    {new Date(run.created_at).toLocaleString()} ·{" "}
+                    {run.results.length} sources
+                  </small>
+                </summary>
+                {run.message && <p className="notice">{run.message}</p>}
+                {["reserved", "running"].includes(run.state) && (
+                  <p>
+                    The request is in progress. Refresh to check its saved
+                    result; starting another search creates a separate request.
                   </p>
-                  <details>
-                    <summary>Inspect captured text</summary>
-                    <pre>{source.text}</pre>
-                  </details>
-                  <Button
-                    disabled={busy}
-                    onClick={() => importSource(run, index)}
-                  >
-                    {source.importedId
-                      ? "Open imported evidence"
-                      : "Import as unreviewed evidence"}
-                  </Button>
-                </article>
-              ))}
-            </details>
-          ))}</details>
+                )}
+                {run.state === "complete" && !run.results.length && (
+                  <p>
+                    No usable page text returned. Try a more precise public name
+                    or add a source manually.
+                  </p>
+                )}
+                {run.results.map((source, index) => (
+                  <article className="research-source" key={source.url}>
+                    <h3>{source.title}</h3>
+                    <a
+                      href={source.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Open original source ↗
+                    </a>
+                    <p className="subtle">
+                      Collected {new Date(source.retrievedAt).toLocaleString()}
+                      {source.publishedDate
+                        ? ` · Published ${source.publishedDate}`
+                        : ""}
+                      {source.excerpted
+                        ? " · First 6,000 characters retained"
+                        : ""}
+                    </p>
+                    <details>
+                      <summary>Inspect captured text</summary>
+                      <pre>{source.text}</pre>
+                    </details>
+                    <Button
+                      disabled={busy}
+                      onClick={() => importSource(run, index)}
+                    >
+                      {source.importedId
+                        ? "Open imported evidence"
+                        : "Import as unreviewed evidence"}
+                    </Button>
+                  </article>
+                ))}
+              </details>
+            ))}
+          </details>
         </Panel>
       </div>
     </>

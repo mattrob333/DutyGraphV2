@@ -110,11 +110,11 @@ export function BusinessBrief({
           ))}
         </ol>
         <Button disabled={busy} onClick={prepare}>
-          Use this brief &amp; prepare kickoff email →
+          Review business streams →
         </Button>
         <small>
-          Saves your selected business streams and company details, then opens
-          email preparation. You review the email before sending.
+          Next, confirm the primary and supporting streams. The kickoff request
+          uses all retained streams.
         </small>
       </div>
       <details className="brief-monitoring">
@@ -143,10 +143,16 @@ export function BusinessBrief({
                 <p>
                   <strong>Watch for:</strong> {channel.signal}
                 </p>
-                {channel.feedUrl && <p>
-                  <a href={channel.feedUrl} target="_blank" rel="noreferrer">Published RSS / Atom address ↗</a>
-                  <small>Address found in source text; connectivity not tested.</small>
-                </p>}
+                {channel.feedUrl && (
+                  <p>
+                    <a href={channel.feedUrl} target="_blank" rel="noreferrer">
+                      Published RSS / Atom address ↗
+                    </a>
+                    <small>
+                      Address found in source text; connectivity not tested.
+                    </small>
+                  </p>
+                )}
                 <details>
                   <summary>Why this source</summary>
                   <blockquote>{channel.quote}</blockquote>

@@ -1,0 +1,45 @@
+.kickoff-package {
+  display: grid;
+  gap: 32px;
+}
+.kickoff-package section {
+  display: grid;
+  gap: 16px;
+}
+.kickoff-package h3,
+.kickoff-package p {
+  margin: 0;
+}
+.kickoff-roster-scroll {
+  overflow: auto;
+  max-height: 440px;
+}
+.kickoff-roster-scroll table {
+  width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+.kickoff-roster-scroll th,
+.kickoff-roster-scroll td {
+  padding: 14px;
+  border-bottom: 1px solid var(--border, #45494a);
+  min-width: 150px;
+}
+.kickoff-roster-scroll input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+}
+.discovery-supporting {
+  padding: 14px 0;
+}
+.discovery-supporting > summary {
+  color: var(--muted, #aeb6bb);
+  cursor: pointer;
+}
+.discovery-supporting[open] > summary {
+  margin-bottom: 20px;
+}
+.kickoff-return {
+  display: grid;
+  gap: 20px;
+}

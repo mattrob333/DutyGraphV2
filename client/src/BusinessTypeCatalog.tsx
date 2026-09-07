@@ -28,8 +28,7 @@ export function BusinessTypeCatalog({
   return (
     <details className="business-catalog">
       <summary>
-        <span>Browse all {businessTemplates.length} business types</span>
-        <small>Names, descriptions and familiar examples</small>
+        <span>About business types · examples and alternatives</span>
       </summary>
       <div className="business-catalog-content">
         <p>
@@ -72,8 +71,8 @@ export function BusinessTypeCatalog({
           )}
         </div>
         <p className="subtle">
-          Examples illustrate part of each organization’s business; these are not
-          customer claims or endorsements. Their actual processes can differ
+          Examples illustrate part of each organization’s business; these are
+          not customer claims or endorsements. Their actual processes can differ
           from these starting templates.
         </p>
         <p role="status" className="business-catalog-notice">

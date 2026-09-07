@@ -1,3 +1,5 @@
+import { KickoffReturns } from "./KickoffReturns.tsx";
+import { kickoffTimeboxes } from "../../shared/kickoff-preparation.ts";
 import { BusinessProfilePanel } from "./BusinessProfilePanel.tsx";
 import {
   kickoffGuide,
@@ -445,7 +447,7 @@ export function DiscoveryJourney({
           {notice}
         </div>
       )}
-      {["contact", "agenda"].includes(stage) && (
+      {stage === "contact" && (
         <BusinessProfilePanel
           key={company.id + stage}
           company={company}
@@ -455,37 +457,42 @@ export function DiscoveryJourney({
         />
       )}
       {stage === "contact" && (
-        <BusinessResearch
-          key={company.id + researchVersion}
-          resultsOnly
-          company={company}
-          create={addSource}
-          open={open}
-          refresh={refresh}
-          kickoff={() => {
-            document
-              .getElementById("journey-draft")
-              ?.scrollIntoView({ behavior: "smooth", block: "start" });
-            document
-              .getElementById("discovery-contact-name")
-              ?.focus({ preventScroll: true });
-          }}
-        />
+        <details className="discovery-supporting">
+          <summary>
+            Supporting research · evidence and deeper industry mapping
+            (optional)
+          </summary>
+          <BusinessResearch
+            key={company.id + researchVersion}
+            resultsOnly
+            company={company}
+            create={addSource}
+            open={open}
+            refresh={refresh}
+            kickoff={() => {}}
+          />
+          <Panel
+            title="Deeper industry map"
+            subtitle="Optional analysis after the business brief. It is not required to prepare the kickoff request."
+          >
+            <p>
+              Review existing industry research, then choose whether to generate
+              a deeper map. Opening this workspace does not run research. Saved
+              maps are reused by later strategy frameworks.
+            </p>
+            <Button onClick={() => setIndustryOpen(true)}>
+              Review or build industry map
+            </Button>
+          </Panel>
+        </details>
       )}
-      {stage === "contact" && (
-        <Panel
-          title="Map the industry before kickoff"
-          subtitle="Turn collected research into a dated industry baseline: ecosystem, technology, economics, leaders and strategic questions."
-        >
-          <p>
-            Run public research first. Open the map to review sources, generate
-            a structured draft, or revisit a saved version. Later strategy
-            frameworks reuse the current map.
-          </p>
-          <Button onClick={() => setIndustryOpen(true)}>
-            Open industry map
-          </Button>
-        </Panel>
+      {["contact", "agenda"].includes(stage) && (
+        <KickoffReturns
+          companyId={company.id}
+          records={records}
+          refresh={refresh}
+          agenda={() => setStage("agenda")}
+        />
       )}
       {industryOpen && (
         <FrameworkWorkspace
@@ -634,7 +641,7 @@ export function DiscoveryJourney({
         <Panel
           title={
             stage === "contact"
-              ? "Prepare the contact email"
+              ? "Prepare the kickoff request"
               : stage === "agenda"
                 ? "Your meeting guide"
                 : stage === "roster"
@@ -645,7 +652,7 @@ export function DiscoveryJourney({
           }
           subtitle={
             stage === "contact"
-              ? "Ask your contact to bring the right leaders, the team list and their goals."
+              ? "AI drafts a branded email from your saved business brief and streams. Your contact uses the private link to upload the team, choose attendees and share leadership context. Review the email before sending."
               : "DutyGraph carries forward the relevant information from the previous steps."
           }
         >
@@ -794,22 +801,31 @@ export function DiscoveryJourney({
               )}
               {stage === "agenda" && (
                 <div className="journey-agenda">
-                  {draft.sections.map((s: any, i: number) => (
-                    <section key={i}>
-                      <span className="eyebrow">
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <div>
-                        <h3>{s.title}</h3>
-                        <p>{s.purpose}</p>
-                        <ol>
-                          {s.questions.map((q: string, k: number) => (
-                            <li key={k}>{q}</li>
-                          ))}
-                        </ol>
-                      </div>
-                    </section>
-                  ))}
+                  <p>
+                    Two-hour executive kickoff ·{" "}
+                    {contactResponse
+                      ? "Contact preparation received"
+                      : "Provisional: awaiting contact preparation"}
+                  </p>
+                  {kickoffTimeboxes(draft.sections).map((slot, i: number) => {
+                    const section = draft.sections[i];
+                    return (
+                      <section key={i}>
+                        <span className="eyebrow">
+                          {slot.start}–{slot.start + slot.minutes} min
+                        </span>
+                        <div>
+                          <h3>{section.title}</h3>
+                          <p>{section.purpose}</p>
+                          <ol>
+                            {section.questions.map((q: string, k: number) => (
+                              <li key={k}>{q}</li>
+                            ))}
+                          </ol>
+                        </div>
+                      </section>
+                    );
+                  })}
                 </div>
               )}
               {stage === "roster" && (
@@ -892,6 +908,58 @@ export function DiscoveryJourney({
                               )
                             }
                           />
+                          {!applied &&
+                            records.some(
+                              (r) =>
+                                r.kind === "duty" &&
+                                r.data.ownerId ===
+                                  people.find(
+                                    (person) => person.data.email === p.email,
+                                  )?.id,
+                            ) && (
+                              <Field label="If correcting the same duty, explicitly link it">
+                                <select
+                                  value={d.existingDutyId || ""}
+                                  onChange={(e) =>
+                                    updateItem(
+                                      "people",
+                                      i,
+                                      "duties",
+                                      p.duties.map((x: any, n: number) =>
+                                        n === k
+                                          ? {
+                                              ...x,
+                                              existingDutyId: e.target.value,
+                                            }
+                                          : x,
+                                      ),
+                                    )
+                                  }
+                                >
+                                  <option value="">
+                                    New duty or unchanged exact match
+                                  </option>
+                                  {records
+                                    .filter(
+                                      (r) =>
+                                        r.kind === "duty" &&
+                                        r.data.ownerId ===
+                                          people.find(
+                                            (person) =>
+                                              person.data.email === p.email,
+                                          )?.id &&
+                                        !["withdrawn", "retracted"].includes(
+                                          r.state,
+                                        ),
+                                    )
+                                    .map((r) => (
+                                      <option key={r.id} value={r.id}>
+                                        {r.title} — {r.data.purpose}
+                                      </option>
+                                    ))}
+                                </select>
+                              </Field>
+                            )}
                           {!applied && (
                             <Button
                               onClick={() =>
@@ -1163,7 +1231,20 @@ export function DiscoveryJourney({
               {applied && (
                 <div className="journey-row">
                   <Badge tone="sage">Saved</Badge>
-                  {stage !== "tasks" ? (
+                  {stage === "contact" ? (
+                    <Button
+                      onClick={() =>
+                        document
+                          .getElementById("kickoff-contact-requests")
+                          ?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          })
+                      }
+                    >
+                      Review email & send request <ArrowRight size={15} />
+                    </Button>
+                  ) : stage !== "tasks" ? (
                     <Button onClick={next}>
                       Continue to{" "}
                       {stages[
@@ -1198,12 +1279,14 @@ export function DiscoveryJourney({
         </Panel>
       </div>
       {stage === "contact" && contactRequests.length > 0 && (
-        <Panel
-          title="Contact requests"
-          subtitle="Preview the message, then send the private response link to your contact."
-        >
-          {requestRows(contactRequests, true)}
-        </Panel>
+        <div id="kickoff-contact-requests">
+          <Panel
+            title="Contact requests"
+            subtitle="Preview the message, then send the private response link to your contact."
+          >
+            {requestRows(contactRequests, true)}
+          </Panel>
+        </div>
       )}
       {stage === "agenda" && (
         <Panel

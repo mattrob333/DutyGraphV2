@@ -1,5 +1,7 @@
 # Current state
 
+September 7 update: [pre-kickoff preparation](../kickoff-preparation.md) now connects the business brief and retained streams to a branded contact request, private CSV/attendee/leadership capture, advisor-reviewed org import and a two-hour agenda. Supporting research is optional. Same-title duties with changed descriptions require explicit advisor resolution; typed stream membership on every work unit remains future work.
+
 Baseline: September 7, 2026, application source through `97335fd`. “Implemented” means code exists, not that every provider is configured or the workflow has passed enterprise/customer acceptance.
 
 | Area | Present implementation | Boundary |

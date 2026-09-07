@@ -1,5 +1,7 @@
 # Discovery and strategy
 
+September 7 update: [pre-kickoff preparation](../kickoff-preparation.md) now connects the business brief and retained streams to a branded contact request, private CSV/attendee/leadership capture, advisor-reviewed org import and a two-hour agenda. Supporting research is optional. Same-title duties with changed descriptions require explicit advisor resolution; typed stream membership on every work unit remains future work.
+
 Initial research now starts with one company/URL/description form. Four selected public-search areas are tucked into a coverage drawer. The saved research pass feeds AI business classification; the advisor reviews the proposed sector, operating model and stages before saving. The Industry Map remains the next deeper research step, and sixteen framework canvases preserve their dedicated layouts with section navigation and responsive labeled data. See [one-form research](../initial-research.md) for limits, configuration and recovery behavior.
 
 ## One evidence base

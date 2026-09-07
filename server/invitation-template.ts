@@ -58,11 +58,20 @@ export function invitationTemplate({
   const due = request.data.dueDate
     ? `Please respond by ${request.data.dueDate}.`
     : "";
-  const how = [
-    "Open your private page.",
-    ...(confirmation ? [] : [voicePreference]),
-    ...requestCaptureSteps(request.data.type),
-  ].join("\n\n");
+  const how = (
+    contact
+      ? [
+          "Open your private kickoff preparation page. Upload the team CSV using the downloadable template: name, email, role, department, manager_email.",
+          "Select executive kickoff attendees (sponsor, executives, department heads and relevant board representatives) separately from pilot discovery participants. This does not send invitations to them.",
+          "Share vision and measurable goals, department responsibilities, business streams and shared work, known handoff problems, key systems and meeting logistics. State unknowns and who can resolve them.",
+          "Review and send the package. Your advisor checks the roster before it populates the org chart and uses your answers to prepare the two-hour executive kickoff agenda. You can add a voice response.",
+        ]
+      : [
+          "Open your private page.",
+          ...(confirmation ? [] : [voicePreference]),
+          ...requestCaptureSteps(request.data.type),
+        ]
+  ).join("\n\n");
   const security =
     "Your private link expires in 7 days. On your first visit, create a password to protect your responses. If you already have an account, sign in. Do not forward this link. Your assigned advisor will review your response.";
   const context = [person.data.role, person.data.team]
@@ -76,11 +85,11 @@ export function invitationTemplate({
     )
     .join(
       "",
-    )}<div style="margin:28px 0;padding:22px;background:#f6f6f3;border:1px solid #e5e5df;border-radius:8px"><h2 style="margin:0 0 8px;font-size:17px">${escape(request.title)}</h2><p style="margin:0 0 16px;font-size:13px;color:#626869">${escape(due)}</p><ol style="margin:0;padding-left:21px">${questions.map((q: string) => `<li style="padding:0 0 12px 4px">${escape(q)}</li>`).join("")}</ol></div><p style="font-size:11px;letter-spacing:1px;color:#566e74">01 READ THE PROMPTS · 02 RECORD OR TYPE · 03 REVIEW &amp; SEND</p>${how
+    )}<div style="margin:28px 0;padding:22px;background:#f6f6f3;border:1px solid #e5e5df;border-radius:8px"><h2 style="margin:0 0 8px;font-size:17px">${escape(request.title)}</h2><p style="margin:0 0 16px;font-size:13px;color:#626869">${escape(due)}</p><ol style="margin:0;padding-left:21px">${questions.map((q: string) => `<li style="padding:0 0 12px 4px">${escape(q)}</li>`).join("")}</ol></div><p style="font-size:11px;letter-spacing:1px;color:#566e74">${contact ? "01 UPLOAD TEAM · 02 SHARE CONTEXT · 03 REVIEW &amp; SEND" : "01 READ THE PROMPTS · 02 RECORD OR TYPE · 03 REVIEW &amp; SEND"}</p>${how
     .split(/\n\s*\n/)
     .map((step) => `<p style="margin:0 0 14px">${escape(step)}</p>`)
     .join(
       "",
-    )}<table role="presentation" cellspacing="0" cellpadding="0" style="margin:24px 0"><tr><td style="border-radius:6px;background:#242829"><a href="${escape(url)}" style="display:inline-block;padding:14px 22px;color:#fff;font-size:14px;font-weight:bold;text-decoration:none">Open your private response page →</a></td></tr></table><p style="font-size:12px;color:#656b6d">${escape(security)}</p><p style="font-size:12px;color:#656b6d">If you were not expecting this invitation, contact your advisor before continuing.</p></td></tr><tr><td style="padding:20px 32px;border-top:1px solid #e7e6e1;font-size:11px;color:#717576">DutyGraph · A clearer view of the work.<br>If the button does not open, copy this private link:<br><a href="${escape(url)}" style="color:#526b72;word-break:break-all">${escape(url)}</a></td></tr></table></td></tr></table></body></html>`;
+    )}<table role="presentation" cellspacing="0" cellpadding="0" style="margin:24px 0"><tr><td style="border-radius:6px;background:#242829"><a href="${escape(url)}" style="display:inline-block;padding:14px 22px;color:#fff;font-size:14px;font-weight:bold;text-decoration:none">${contact ? "Prepare our executive kickoff" : "Open your private response page"} →</a></td></tr></table><p style="font-size:12px;color:#656b6d">${escape(security)}</p><p style="font-size:12px;color:#656b6d">If you were not expecting this invitation, contact your advisor before continuing.</p></td></tr><tr><td style="padding:20px 32px;border-top:1px solid #e7e6e1;font-size:11px;color:#717576">DutyGraph · A clearer view of the work.<br>If the button does not open, copy this private link:<br><a href="${escape(url)}" style="color:#526b72;word-break:break-all">${escape(url)}</a></td></tr></table></td></tr></table></body></html>`;
   return { subject, text, html };
 }

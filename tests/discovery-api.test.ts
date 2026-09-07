@@ -1,3 +1,5 @@
+import { createOrEdit } from "../server/records.ts";
+import { emptyKickoffPreparation } from "../shared/kickoff-preparation.ts";
 import "dotenv/config";
 import test, { before, after, beforeEach } from "node:test";
 import assert from "node:assert/strict";
@@ -272,6 +274,7 @@ async function enrollAndSubmit(
   text: string,
   email = false,
   audio = false,
+  extra: any = {},
 ) {
   let token: string;
   if (email) {
@@ -354,7 +357,13 @@ async function enrollAndSubmit(
     participant,
     "/api/v1/participant/requests/" + req.id + "/submit",
     "POST",
-    { expectedVersion: req.version, text, assetId, acknowledged: true },
+    {
+      expectedVersion: req.version,
+      text,
+      assetId,
+      acknowledged: true,
+      ...extra,
+    },
   );
   assert.equal(submitted.status, 200, JSON.stringify(submitted.data));
   return { participant, responseId: submitted.data.responseId, assetId };
@@ -662,6 +671,16 @@ test("Revised dossiers reuse duties, clear changed managers, preserve exact team
   edited.people[1].managerEmail = "";
   edited.people[1].duties[0].description =
     "Confirm each visit with the customer.";
+  assert.equal(
+    (await apply(c, second, edited)).data.code,
+    "DUTY_SCOPE_AMBIGUOUS",
+  );
+  assert.equal(
+    (await records(c)).find((r) => r.id === amina.id).data.managerId,
+    alex.id,
+    "ambiguous merge rolls back person edits",
+  );
+  edited.people[1].duties[0].existingDutyId = originalDuty.id;
   const [a, b] = await Promise.all([
     apply(c, second, edited),
     apply(c, second, edited),
@@ -1184,4 +1203,183 @@ test("business-specific kickoff context preserves long meeting notes and invalid
   );
   assert.notEqual(updated.fingerprint, context.fingerprint);
   assert.equal(updated.captureGuide?.models.length, 1);
+});
+
+test("kickoff package survives private capture, imports a reviewed org roster atomically and informs agenda", async () => {
+  const c = await register();
+  await publicResearch(c);
+  const applied = await apply(c, await draft(c, "contact"));
+  const req = (await records(c)).find(
+    (r) => r.id === applied.data.requestIds[0],
+  );
+  const pack = emptyKickoffPreparation();
+  pack.csv = `name,email,role,department,manager_email\n${contact.name},${execEmail},Managing director,Leadership,\nAmina Operations,${staffEmail},Service coordinator,Service,${execEmail}\n`;
+  pack.executiveEmails = [execEmail];
+  pack.participantEmails = [staffEmail];
+  pack.answers.goals =
+    "Grow service throughput 20%; baseline unknown; Alex owns validation.";
+  pack.answers.departments =
+    "Leadership sets direction. Service schedules repair work.";
+  pack.answers.streams =
+    "Advisory and repair remain separate; Finance supports both.";
+  const { participant, responseId } = await enrollAndSubmit(
+    c,
+    req,
+    "",
+    false,
+    false,
+    { kickoffPreparation: pack },
+  );
+  let all = await records(c),
+    response = all.find((r) => r.id === responseId);
+  assert.equal(
+    all.filter((r) => r.kind === "person").length,
+    1,
+    "upload does not silently import",
+  );
+  assert.equal(
+    response.data.kickoffPreparation.participantEmails[0],
+    staffEmail,
+  );
+  const endpoint = prefix(c) + "/responses/" + responseId + "/kickoff-roster";
+  assert.equal(
+    (
+      await request(participant, endpoint, "POST", {
+        expectedVersion: response.version,
+      })
+    ).status,
+    403,
+  );
+  const other = await register();
+  assert.notEqual(
+    (
+      await request(other, endpoint, "POST", {
+        expectedVersion: response.version,
+      })
+    ).status,
+    200,
+  );
+  assert.equal(
+    (await request(c, endpoint, "POST", { expectedVersion: 99 })).status,
+    409,
+  );
+  const imported = await request(c, endpoint, "POST", {
+    expectedVersion: response.version,
+  });
+  assert.equal(imported.status, 200, JSON.stringify(imported.data));
+  all = await records(c);
+  response = all.find((r) => r.id === responseId);
+  const leader = all.find(
+    (r) => r.kind === "person" && r.data.email === execEmail,
+  );
+  const staff = all.find(
+    (r) => r.kind === "person" && r.data.email === staffEmail,
+  );
+  assert.equal(staff.data.managerId, leader.id);
+  assert.equal(leader.data.role, "Managing director");
+  assert.equal(response.data.kickoffPersonIds.length, 2);
+  assert.equal(
+    (await request(c, endpoint, "POST", { expectedVersion: response.version }))
+      .data.alreadyImported,
+    true,
+  );
+  const agenda = await draft(c, "agenda");
+  assert.ok(agenda);
+  const context = inputs.at(-1)!;
+  assert.ok(
+    context.sources.some(
+      (s) =>
+        s.origin === "contact" &&
+        s.text.includes("Advisory and repair remain separate") &&
+        s.text.includes(staffEmail),
+    ),
+  );
+  assert.equal(
+    (await records(c)).filter((r) => r.kind === "request").length,
+    1,
+    "roster selections do not send or create interviews",
+  );
+});
+
+test("conflicting kickoff CSV leaves every person unchanged", async () => {
+  const c = await register();
+  await publicResearch(c);
+  const applied = await apply(c, await draft(c, "contact"));
+  const req = (await records(c)).find(
+    (r) => r.id === applied.data.requestIds[0],
+  );
+  const pack = emptyKickoffPreparation();
+  pack.csv = `name,email,role,department,manager_email\nChanged name,${execEmail},CEO,Leadership,\nNew person,${staffEmail},Analyst,Service,${execEmail}\n`;
+  pack.executiveEmails = [execEmail];
+  pack.participantEmails = [staffEmail];
+  pack.answers.goals =
+    pack.answers.departments =
+    pack.answers.streams =
+      "Unknown; contact to confirm at kickoff.";
+  const { responseId } = await enrollAndSubmit(c, req, "", false, false, {
+    kickoffPreparation: pack,
+  });
+  await tx(c.user.tenant_id, async (db) => {
+    const person = (
+      await db.query("SELECT * FROM records WHERE id=$1", [req.data.personId])
+    ).rows[0];
+    await putRecord(
+      db,
+      c.user,
+      c.company,
+      "person",
+      person.title,
+      { ...person.data, role: "Reviewed director", team: "Leadership" },
+      person.state,
+      person,
+    );
+  });
+  const response = (await records(c)).find((r) => r.id === responseId);
+  const result = await request(
+    c,
+    prefix(c) + "/responses/" + responseId + "/kickoff-roster",
+    "POST",
+    { expectedVersion: response.version },
+  );
+  assert.equal(result.status, 409, JSON.stringify(result.data));
+  assert.equal(result.data.code, "ROSTER_CONFLICT");
+  assert.equal((await records(c)).filter((r) => r.kind === "person").length, 1);
+});
+
+test("saved kickoff requests are immutable and retain their stream snapshot", async () => {
+  const c = await register();
+  await publicResearch(c);
+  const applied = await apply(c, await draft(c, "contact"));
+  const req = (await records(c)).find(
+    (r) => r.id === applied.data.requestIds[0],
+  );
+  await assert.rejects(
+    () =>
+      tx(c.user.tenant_id, (db) =>
+        createOrEdit(
+          db,
+          c.user,
+          c.company,
+          "request",
+          {
+            title: req.title,
+            personId: req.data.personId,
+            type: "leadership",
+            questions: req.data.questions,
+            emailSubject: "Revised kickoff subject",
+            emailBody: "Revised message.",
+            dueDate: req.data.dueDate,
+            notice: req.data.notice,
+          },
+          req,
+        ),
+      ),
+    (e: any) => e.code === "IMMUTABLE_SOURCE",
+  );
+  const saved = (await records(c)).find((r) => r.id === req.id);
+  assert.equal(saved.data.questionPlanVersion, req.data.questionPlanVersion);
+  assert.deepEqual(
+    saved.data.kickoffBusinessStreams,
+    req.data.kickoffBusinessStreams,
+  );
 });

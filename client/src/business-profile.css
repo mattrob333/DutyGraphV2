@@ -316,3 +316,16 @@
     grid-template-columns: 1fr;
   }
 }
+
+.business-catalog {
+  border: 0;
+  background: transparent;
+  padding: 4px 0;
+  margin: 8px 0;
+}
+.business-catalog > summary {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--muted, #aeb6bb);
+  padding: 4px 0;
+}

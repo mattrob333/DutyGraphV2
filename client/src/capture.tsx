@@ -1,3 +1,9 @@
+import { KickoffPreparation } from "./KickoffPreparation.tsx";
+import {
+  emptyKickoffPreparation,
+  validateKickoffPreparation,
+  kickoffPreparationSchema,
+} from "../../shared/kickoff-preparation.ts";
 import { granularWorkGuide } from "../../shared/work-granularity.ts";
 import {
   requestCaptureSteps,
@@ -421,6 +427,8 @@ export function Participant({
   user: User;
   onLogout: () => void;
 }) {
+  const [kickoff, setKickoff] = useState(emptyKickoffPreparation);
+  const [kickoffSaved, setKickoffSaved] = useState("");
   const [data, setData] = useState<any>(null),
     [selected, setSelected] = useState(
       () => new URLSearchParams(window.location.search).get("request") || "",
@@ -452,6 +460,14 @@ export function Participant({
   useEffect(() => {
     let active = true;
     if (request) {
+      setKickoff(emptyKickoffPreparation());
+      setKickoffSaved("");
+      try {
+        const saved = kickoffPreparationSchema.safeParse(
+          JSON.parse(localStorage.getItem(draftKey + ":kickoff") || "null"),
+        );
+        if (saved.success) setKickoff(saved.data);
+      } catch {}
       setTaskCards(null);
       setDecisions({});
       setNote("");
@@ -520,12 +536,14 @@ export function Participant({
             DutyGraph<small>YOUR WORK, IN YOUR WORDS</small>
           </span>
         </div>
-        <Button
-          disabled={captureBusy || transcriptBusy || busy}
-          onClick={() => window.location.assign("/?view=agent-requests")}
-        >
-          Request an agent
-        </Button>
+        {!request?.data.kickoffPreparation && (
+          <Button
+            disabled={captureBusy || transcriptBusy || busy}
+            onClick={() => window.location.assign("/?view=agent-requests")}
+          >
+            Request an agent
+          </Button>
+        )}
         <Button
           disabled={captureBusy || transcriptBusy || busy}
           onClick={onLogout}
@@ -550,9 +568,11 @@ export function Participant({
         <p className="participant-intro">
           {sentId === request?.id || (request && request.state !== "sent")
             ? "Your response is saved. Your advisor will bring the team's accounts together and follow up on any gaps. You can close this page."
-            : request?.data.type === "leadership"
-              ? `Share your goals, business model, departments and team responsibilities. ${voicePreference}`
-              : `Use a recent example. Explain what you receive, what you do, and who needs the result. ${voicePreference}`}
+            : request?.data.kickoffPreparation
+              ? "Upload the team list, select the people for each conversation, and share your goals and responsibilities. Short bullets are enough; voice is optional."
+              : request?.data.type === "leadership"
+                ? `Share your goals, business model, departments and team responsibilities. ${voicePreference}`
+                : `Use a recent example. Explain what you receive, what you do, and who needs the result. ${voicePreference}`}
         </p>
         {data?.person && (
           <p className="participant-role">
@@ -601,10 +621,16 @@ export function Participant({
           <>
             <div className="participant-steps" aria-label="Response steps">
               <span>
-                <b>01</b> Read your questions
+                <b>01</b>{" "}
+                {request.data.kickoffPreparation
+                  ? "Team and attendees"
+                  : "Read your questions"}
               </span>
               <span>
-                <b>02</b> Record or write
+                <b>02</b>{" "}
+                {request.data.kickoffPreparation
+                  ? "Leadership context"
+                  : "Record or write"}
               </span>
               <span>
                 <b>03</b> Review and send
@@ -682,6 +708,37 @@ export function Participant({
                 </details>
               )}
             </Panel>
+            {request.data.kickoffPreparation && (
+              <>
+                <p className="notice">
+                  Proposed streams:{" "}
+                  {(request.data.kickoffBusinessStreams || [])
+                    .map((stream: any) => `${stream.name} (${stream.focus})`)
+                    .join("; ") ||
+                    "Confirm the business streams with your advisor"}
+                  . Confirm or correct them in your response.
+                </p>
+                <KickoffPreparation
+                  key={request.id}
+                  value={kickoff}
+                  change={(value) => {
+                    setKickoff(value);
+                    try {
+                      localStorage.setItem(
+                        draftKey + ":kickoff",
+                        JSON.stringify(value),
+                      );
+                      setKickoffSaved("Kickoff draft saved on this device.");
+                    } catch {
+                      setKickoffSaved(
+                        "Draft could not be saved on this device. Keep this page open until you send it.",
+                      );
+                    }
+                  }}
+                />
+                <p role="status">{kickoffSaved}</p>
+              </>
+            )}
             {request.data.type === "confirmation" ? (
               <div className="stack">
                 {request.data.taskSnapshots.map((s: any) => (
@@ -828,12 +885,16 @@ export function Participant({
             <div className="submit-bar">
               <div>
                 <strong>
-                  Review your answer and task descriptions before sending.
+                  {request.data.kickoffPreparation
+                    ? "Review your kickoff package before sending."
+                    : "Review your answer and task descriptions before sending."}
                 </strong>
                 <p>
-                  {asset
-                    ? "Your saved recording and any text above will be sent to your advisor."
-                    : "Your written answer will be sent to your advisor."}
+                  {request.data.kickoffPreparation
+                    ? "Your team list, attendee selections and leadership context will be sent to your advisor."
+                    : asset
+                      ? "Your saved recording and any text above will be sent to your advisor."
+                      : "Your written answer will be sent to your advisor."}
                 </p>
               </div>
               <Button
@@ -846,6 +907,7 @@ export function Participant({
                   transcriptBusy ||
                   expired ||
                   (request.data.type !== "confirmation" &&
+                    !request.data.kickoffPreparation &&
                     !asset &&
                     !text.trim()) ||
                   (request.data.type === "confirmation" &&
@@ -857,11 +919,16 @@ export function Participant({
                   setBusy(true);
                   setError("");
                   try {
+                    if (request.data.kickoffPreparation)
+                      validateKickoffPreparation(kickoff);
                     await api(
                       "/v1/participant/requests/" + request.id + "/submit",
                       "POST",
                       {
                         expectedVersion: request.version,
+                        ...(request.data.kickoffPreparation
+                          ? { kickoffPreparation: kickoff }
+                          : {}),
                         text,
                         assetId: asset,
                         acknowledged: true,
@@ -876,6 +943,7 @@ export function Participant({
                     setSelected(request.id);
                     try {
                       localStorage.removeItem(draftKey);
+                      localStorage.removeItem(draftKey + ":kickoff");
                       localStorage.removeItem("dg-task-review:" + request.id);
                       localStorage.removeItem(draftKey + ":upload");
                       localStorage.removeItem(draftKey + ":review");
@@ -900,7 +968,11 @@ export function Participant({
                 }}
               >
                 <Check size={17} />
-                {busy ? "Sending response…" : "Send my response"}
+                {busy
+                  ? "Sending response…"
+                  : request.data.kickoffPreparation
+                    ? "Send kickoff package"
+                    : "Send my response"}
               </Button>
             </div>
           </>

@@ -1,6 +1,6 @@
 import { businessProfileSchema, businessTemplates } from "./business-types.ts";
 
-export const discoveryPromptVersion = "discovery-context-v3";
+export const discoveryPromptVersion = "discovery-context-v4";
 const groupProbes: Record<string, string> = {
   General:
     "Identify the customer or beneficiary, the unit of work, the promise made and how completion is recognized.",
@@ -26,6 +26,8 @@ const groupProbes: Record<string, string> = {
     "Trace a service or program from need and eligibility through funding, delivery and outcome reporting. Use beneficiary and mission outcomes, not an assumed sales funnel.",
 };
 const modelProbes: Record<string, string> = {
+  "custom-software":
+    "Trace a commissioned build from requirements and scope through estimation, client approval, development, testing, release acceptance and maintenance. Separate advisory recommendations from an authorized build; identify the scope, acceptance criteria and owner of that handoff. Do not assume subscription billing or SaaS provisioning.",
   saas: "What happens at signup, onboarding, provisioning, support escalation, release approval, usage billing and renewal? Which tasks belong to customer success versus engineering?",
   "managed-it":
     "Follow a service ticket, access request and change request separately. What are the triage rules, service commitments, escalation owners and approval checkpoints?",
@@ -41,9 +43,11 @@ const modelProbes: Record<string, string> = {
 export function kickoffGuide(profile: unknown) {
   const parsed = businessProfileSchema.safeParse(profile);
   const streams = parsed.success ? parsed.data.streams : [];
-  const models = streams.map((stream) => {
+  const models = streams.map((stream, index) => {
     const template = businessTemplates.find((t) => t.id === stream.templateId);
     return {
+      id: stream.id,
+      engagementFocus: index === 0 ? "primary" : "supporting",
       name: stream.name,
       model: template?.label || "Custom operating model",
       stages: stream.stages.map((s) => s.name),

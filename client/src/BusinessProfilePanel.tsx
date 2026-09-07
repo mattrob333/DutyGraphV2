@@ -480,19 +480,16 @@ export function BusinessProfilePanel({
           <BusinessBrief
             job={briefJob}
             busy={busy}
-            prepare={async () => {
-              if (dirty && !(await save("proposed"))) return;
+            prepare={() =>
               document
-                .getElementById("journey-draft")
-                ?.scrollIntoView({ behavior: "smooth", block: "start" });
-              document
-                .getElementById("discovery-contact-name")
-                ?.focus({ preventScroll: true });
-            }}
+                .getElementById("business-stream-review")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
           />
         )}
       {!!profile.streams.length && (
         <section
+          id="business-stream-review"
           className="business-recommendation"
           aria-label="Suggested business profile"
         >
@@ -529,7 +526,10 @@ export function BusinessProfilePanel({
                     </span>
                   </p>
                 )}
-                <details className="business-stream-stages" open={streamIndex === 0}>
+                <details
+                  className="business-stream-stages"
+                  open={streamIndex === 0}
+                >
                   <summary>View the operating stages</summary>
                   <div className="business-flow-preview">
                     {stream.stages.map((s, i) => (
@@ -642,17 +642,25 @@ export function BusinessProfilePanel({
           <div className="actions business-profile-actions">
             <Button
               primary
-              disabled={busy || !dirty}
-              onClick={() => void save("proposed")}
+              disabled={busy}
+              onClick={async () => {
+                if (dirty && !(await save("proposed"))) return;
+                document
+                  .getElementById("journey-draft")
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" });
+                document
+                  .getElementById("discovery-contact-name")
+                  ?.focus({ preventScroll: true });
+              }}
             >
               {dirty ? <ArrowRight size={15} /> : <Check size={15} />}
-              {dirty ? "Use this business profile" : "Profile saved"}
+              {`Confirm ${profile.streams.length > 1 ? `${profile.streams.length} streams` : "stream"} & prepare kickoff request`}
             </Button>
-            <Button onClick={openIndustry}>Explore the industry</Button>
           </div>
           <p className="subtle">
-            A starting hypothesis to confirm with leadership. Saving it adapts
-            the kickoff questions; it does not assign employee duties.
+            All retained streams inform the kickoff; the primary stream sets the
+            starting focus. This saves your selection and opens email
+            preparation. It does not run more research or send an email.
           </p>
         </section>
       )}

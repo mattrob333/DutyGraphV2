@@ -19,7 +19,15 @@ export const dossierSchema = z
     department: z.string().max(200),
     managerEmail: z.string().max(254),
     duties: z
-      .array(z.object({ title: short, description: optional }).strict())
+      .array(
+        z
+          .object({
+            title: short,
+            description: optional,
+            existingDutyId: z.union([z.uuid(), z.literal("")]).default(""),
+          })
+          .strict(),
+      )
       .max(12),
     sourceIds: sources,
   })
@@ -104,6 +112,23 @@ export const discoverySchemas = {
     })
     .strict(),
 };
+// Existing-duty resolution is an advisor control, never a model-generated choice.
+export const discoveryGenerationSchemas = {
+  ...discoverySchemas,
+  roster: discoverySchemas.roster.extend({
+    people: z
+      .array(
+        dossierSchema.extend({
+          duties: z
+            .array(
+              dossierSchema.shape.duties.element.omit({ existingDutyId: true }),
+            )
+            .max(12),
+        }),
+      )
+      .max(60),
+  }),
+};
 export const discoveryInstructions: Record<DiscoveryStage, string> = {
   contact:
     "Prepare the point of contact for a FIRST executive kickoff. Use public research only to describe the industry, offer and likely customer context, clearly qualifying uncertainty. Never assume an internal workflow, department, employee or supplier process. Write a warm, concise email asking this contact to invite executives who must contribute and provide a roster of participating people, emails, departments and responsibilities. Ask goals for one month, six months and one year, vision, current problems and meeting logistics. Explain that their private response page helps the advisor prepare. Do not invent a meeting date or private URL. Questions should be easy to answer in bullets or by voice. This is preparation for a meeting, not the full employee work interview.",
@@ -135,3 +160,18 @@ discoveryInstructions.roster +=
   " Preserve distinct duties across each person's stated responsibilities, including supporting and exception work. In duty descriptions retain the stated outcome, regular task examples, input supplier, recipient and systems where given so personal interviews inherit useful context. A department leader is not automatically the performer of every departmental task. Record ambiguous performer or owner assignments in gaps for review.";
 discoveryInstructions.interviews +=
   " Use up to eight concise prompts when needed to cover the person's duties. Tie prompts to named duties and software only when the supplied internal context establishes them. Include repeat frequency or volume, required input fields and source, ordered actions, completion checks, output artifact and destination, exception/approval boundaries and upstream/downstream dependencies. Leaders describe their own leadership work, not all subordinate tasks. Ask for anonymized examples rather than confidential documents or credentials. Explain that after recording they save the audio, create and check the transcript, create task cards, approve or edit each card, and send them together.";
+
+const streamBoundaries =
+  " Keep business streams, organizational departments, reporting lines, roles, duties, tasks and ordered actions distinct. The first selected stream is primary for engagement focus; every retained supporting stream remains in scope. Walk through each stream separately. A department may serve multiple streams. Describe a genuinely shared duty or task once and explicitly name the streams it serves. Same person or same task title does not establish the same work: keep different triggers, outputs, approvals and recipients distinct. Qualify duty/task names by stream where needed to avoid ambiguity. Never assign work from a job title, reporting line, template stage or public website. Do not infer a sequence from stage order: identify the exact upstream output, downstream required input, acceptance check and exception owner. Record absent or disputed links as unresolved, not as facts. Bottleneck claims need timing, throughput, queue or rework evidence; otherwise label a hypothesis.";
+for (const stage of discoveryStages)
+  discoveryInstructions[stage] += streamBoundaries;
+discoveryInstructions.contact +=
+  " The private page includes CSV upload (name, email, role, department, manager_email), separate executive-attendee and pilot-participant checkboxes, and structured leadership context. Ask for C-suite, VPs, department heads, sponsor and relevant board representatives for a two-hour kickoff; do not imply all staff attend. Explain that selections do not automatically invite anyone. Ask for vision, goals with baseline/target/owner/date, department purposes and duties, separate business streams and shared work, known handoff problems, key software/SOPs and meeting logistics. Use the supplied business brief's concrete offers and market context, qualify unknown size or facts, and request corrections. Do not ask the contact to fill a full task inventory before kickoff.";
+discoveryInstructions.agenda +=
+  " This is a TWO-HOUR executive kickoff. The UI assigns consecutive timeboxes totaling 120 minutes to your sections. Start from the returned preparation package including selected executive attendees, pilot participants and missing-roster follow-up. Distinguish people on the roster from selected discovery participants. Cover decisions to confirm: scope and streams; goals and KPIs; departments, roles and ongoing duties; a representative task and explicit handoffs per stream; shared services; gaps and owners for follow-up. Public research is background, never evidence of internal responsibilities. When preparation is missing, mark this as a provisional agenda and list what must still be obtained.";
+
+discoveryInstructions.roster +=
+  " Leave existingDutyId empty in generated dossiers. The advisor can explicitly select an existing duty during review when correcting that same responsibility; never resolve same-title duties by guessing.";
+
+discoveryInstructions.roster +=
+  " When a preparation package names pilot participants, use that selection as the starting interview scope. A person listed only for the org chart or executive meeting is not automatically a work-interview participant. Include additional people only when the internal meeting account explicitly brings them into discovery scope; make the change clear for advisor review.";

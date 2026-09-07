@@ -369,6 +369,11 @@
     },
     {
       "method": "POST",
+      "path": "/api/v1/companies/{companyId}/responses/{recordId}/kickoff-roster",
+      "source": "server/app.ts"
+    },
+    {
+      "method": "POST",
       "path": "/api/v1/companies/{companyId}/roster/apply",
       "source": "server/app.ts"
     },
