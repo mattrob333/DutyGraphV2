@@ -28,4 +28,4 @@ Local app `http://127.0.0.1:4339`, fictional Preview AI Advisory. Injected resea
 
 Fixtures prove the transport and rendering, not real-company reasoning or inbox delivery. CSV import is an advisor review action. The package is a contact account, not independently confirmed duties. Company-wide uploaded roster and the later reviewed interview roster remain distinct. Prompt rules and the same-duty ambiguity guard do not replace future first-class stream foreign keys on every work unit. Complete package data is retained; AI receives a bounded text context.
 
-CI and hosted release status are recorded in the development log after the implementation commit.
+Implementation `b325651` passed CI 34170070728, including the synthetic advisor journey and encrypted-backup drill. Vercel marked deployment dpl_4cudK85eRWGW21BvVbFKfApVqazb READY. A read-only check of dutygraph.com/login fetched /assets/index-DWXXvh23.js and found the new capture, roster import, supporting-research and two-hour agenda actions. This verifies publication of the implementation, not real-provider acceptance.

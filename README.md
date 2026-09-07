@@ -1,6 +1,6 @@
 # DutyGraph
 
-Discovery now follows [business brief → kickoff package → two-hour agenda](docs/kickoff-preparation.md). One clear stream-confirmation action leads to branded email preparation. The private contact page collects a validated team CSV, separate executive/pilot selections and leadership context; advisor review imports reporting lines atomically. Ambiguous same-title duty changes require an explicit existing-duty selection. Optional industry research and business-type examples are secondary. Local build and 217 tests passed; see [verification](docs/verification/2026-09-07-kickoff-preparation.md) and DEVLOG for release status.
+Discovery now follows [business brief → kickoff package → two-hour agenda](docs/kickoff-preparation.md). One clear stream-confirmation action leads to branded email preparation. The private contact page collects a validated team CSV, separate executive/pilot selections and leadership context; advisor review imports reporting lines atomically. Ambiguous same-title duty changes require an explicit existing-duty selection. Optional industry research and business-type examples are secondary. Implementation `b325651` passed all 217 tests and CI, is READY on Vercel, and serves the updated capture/import/agenda code on dutygraph.com. See [verification](docs/verification/2026-09-07-kickoff-preparation.md).
 
 **Understand the work. Improve the business. Delegate with clear human authority.**
 
