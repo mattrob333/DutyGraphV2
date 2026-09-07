@@ -17,19 +17,29 @@ These are intent hypotheses, not measured keyword volume estimates. The guides a
 
 ## Next editorial priorities
 
-1. Agent request and approval workflow: a worked example with explicit source, scope, and review states.
-2. AI governance readiness checklist: people, process, inventory, access, evidence, lifecycle.
-3. AI agent separation of duties: a prepare-versus-approve example reviewed by a security specialist.
-4. Advisor-led process discovery: a real pilot case study when we have permission and measured results.
-5. Agent governance audit evidence: records an auditor can inspect; no promise of SOC 2 compliance.
+The approval workflow, readiness checklist and separation-of-duties guides are now published, bringing the field-guide collection to seven. Specialist review is still a separate requirement before presenting guidance as assurance.
+
+1. Advisor-led process discovery: a real pilot case study when we have permission and measured results.
+2. Agent governance audit evidence: records an auditor can inspect; no promise of SOC 2 compliance.
+3. Distinct task-pattern worksheets informed by real discovery, with confidential details removed and publication permission.
 
 Do not publish thin industry or vendor-alternative pages by replacing names in one template. Add pages only when we can provide a distinct example, evidence, or useful tool. A future dataset of task patterns could support substantive pages by workflow, each with inputs, outputs, handoffs, software boundaries, and review questions.
+
+## Programmatic publishing added September 7, 2026
+
+The directory has 160 source-linked offering profiles, plus 12 crawlable category buyer guides at `/directory/ai-governance/categories/{category-id}/`. These are different governance layers, not keyword-swapped industry pages. Each guide adds a distinct evaluation scenario, four buyer questions, evidence to request, boundaries, related categories and an ungated Markdown evaluation worksheet. Primary and secondary category membership are labeled and counted separately.
+
+The hub links to every category; profiles link back to their categories; category pages link to relevant profiles and adjacent layers. CollectionPage, ItemList and BreadcrumbList JSON-LD describe visible content. Vendor research dates stay September 6; new editorial guidance is dated September 7. No fake ratings, rankings, customer outcomes or unsupported integration claims are added.
+
+Publishing workflow and validation details: [programmatic SEO](programmatic-seo.md). The deterministic final sitemap includes 190 public pages at this release; it excludes application, invitation and handbook surfaces.
 
 ## Conversion and measurement
 
 All Join the Pilot links reach /landing/#pilot. The public form saves name, email, company, role, team size, goal, and contact consent. A successful receipt means saved, not booked. Duplicate emails do not create duplicate applications. The original record stays stored even if notification delivery fails.
 
-Once a domain is chosen: attach it to Vercel, set MARKETING_ORIGIN to its HTTPS origin, rebuild, and redirect the old public marketing URLs to the new domain. Verify the property in Google Search Console and submit /sitemap.xml. Canonicals currently use the live Vercel origin. Do not redirect private invitation URLs without testing them.
+All static publishers now share `scripts/marketing-origin.ts`, defaulting to `https://dutygraph.com`. An explicit `MARKETING_ORIGIN` overrides that default and must be HTTPS. The root URL redirects directly to `/landing/`; demo/sample/view queries continue to the app, and known legacy workspace fragments return to `/login`. No blanket cross-host redirect has been added for old private invitations.
+
+Google Search Console property verification and sitemap submission remain operational steps to verify in the owner account. Submit `https://dutygraph.com/sitemap.xml` after verification. A sitemap and crawlable HTML do not establish that Google has indexed or ranked the pages.
 
 Next analytics setup requires the selected GA4 property/measurement ID and an agreed consent configuration. Track guide views, manifest downloads, walkthrough entry, pilot form start, and successful saved application. Never include names, emails, company names, answers, private-link tokens, or form contents in analytics. No GA tracking is active in this change.
 

@@ -1,11 +1,10 @@
+import { marketingOrigin } from "./marketing-origin.ts";
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { articles as originalArticles, vendors } from "./learning-content.ts";
 import { nextArticles } from "./learning-next.ts";
 const articles = [...originalArticles, ...nextArticles];
 const root = new URL("../client/public/", import.meta.url);
-const origin = new URL(
-  process.env.MARKETING_ORIGIN || "https://dutygraph-v2.vercel.app",
-).origin;
+const origin = marketingOrigin;
 const escape = (s: string) =>
   s.replace(
     /[&<>"']/g,
@@ -114,14 +113,6 @@ await writeFile(
     2,
   ),
 );
-await writeFile(
-  new URL("sitemap.xml", root),
-  `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${["/landing/", "/learn/", ...articles.map((a) => `/learn/${a.slug}/`)].map((p) => `<url><loc>${origin}${p}</loc></url>`).join("")}</urlset>`,
-);
-await writeFile(
-  new URL("robots.txt", root),
-  `User-agent: *\nDisallow: /api/\nDisallow: /invite/\nSitemap: ${origin}/sitemap.xml\n`,
-);
 // This source file is copied by Vite after the build generator runs.
 const landing = new URL("landing/index.html", root);
 let html = await readFile(landing, "utf8");
@@ -133,5 +124,5 @@ html = html
   );
 await writeFile(landing, html);
 console.log(
-  "Built 7 field guides, resource hub, manifest worksheet, sitemap, and robots.txt",
+  "Built 7 field guides, resource hub, manifest worksheet and landing canonical",
 );

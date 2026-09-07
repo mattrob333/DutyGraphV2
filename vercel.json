@@ -7,6 +7,18 @@
   "functions": {
     "api/index.ts": { "maxDuration": 120, "includeFiles": "contracts/**" }
   },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/landing/",
+      "permanent": true,
+      "missing": [
+        { "type": "query", "key": "demo" },
+        { "type": "query", "key": "sample" },
+        { "type": "query", "key": "view" }
+      ]
+    }
+  ],
   "rewrites": [
     { "source": "/login", "destination": "/index.html" },
     { "source": "/api/:path*", "destination": "/api" },

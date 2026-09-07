@@ -6,6 +6,8 @@ DutyGraph is a hosted advisor pilot. See the maintained [current-state matrix](w
 
 ## Delivered in code
 
+- Programmatic SEO expanded September 7: 12 category buyer guides and worksheets, 190 validated public pages, unified dutygraph.com canonicals and direct root redirect. See [publishing workflow](programmatic-seo.md) and [185-test verification](verification/2026-09-07-programmatic-seo.md). GA4/Search Console connection remains a separate operational step.
+
 - Cross-team work analysis added September 7: structural checks, evidence-cited AI hypotheses, durable attempts and advisor review. See [implementation and limits](team-analysis.md) and [183-test verification](verification/2026-09-07-team-analysis.md).
 
 - Authenticated company workspaces with PostgreSQL records, versions, tenant isolation and audit/confirmation semantics.

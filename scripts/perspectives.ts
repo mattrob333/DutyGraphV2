@@ -1,8 +1,8 @@
+import { marketingOrigin } from "./marketing-origin.ts";
 import { mkdir, readFile, writeFile, access } from "node:fs/promises";
 import { perspectives } from "../content/perspectives.ts";
 const root = new URL("../client/public/", import.meta.url);
-const origin = new URL(process.env.MARKETING_ORIGIN || "https://dutygraph.com")
-  .origin;
+const origin = marketingOrigin;
 const esc = (s: string) =>
   s.replace(
     /[&<>"']/g,
@@ -48,39 +48,32 @@ for (const a of perspectives) {
   await mkdir(new URL(`${a.slug}/`, destination), { recursive: true });
   await writeFile(
     new URL(`${a.slug}/index.html`, destination),
-    shell(
-      a.seoTitle || a.title,
-      a.description,
-      url(a.slug),
-      body,
-      a.image,
-      {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        headline: a.title,
-        description: a.description,
-        image: [origin + a.image],
-        datePublished: a.published,
-        dateModified: a.updated || a.published,
-        author: {
-          "@type": "Organization",
-          name: "DutyGraph editorial",
-          url: origin + "/perspectives/",
-        },
-        publisher: {
-          "@type": "Organization",
-          name: "DutyGraph",
-          url: origin,
-          logo: {
-            "@type": "ImageObject",
-            url: origin + "/brand/dutygraph-symbol.svg",
-          },
-        },
-        mainEntityOfPage: origin + url(a.slug),
-        wordCount: words,
-        articleSection: a.category,
+    shell(a.seoTitle || a.title, a.description, url(a.slug), body, a.image, {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: a.title,
+      description: a.description,
+      image: [origin + a.image],
+      datePublished: a.published,
+      dateModified: a.updated || a.published,
+      author: {
+        "@type": "Organization",
+        name: "DutyGraph editorial",
+        url: origin + "/perspectives/",
       },
-    ),
+      publisher: {
+        "@type": "Organization",
+        name: "DutyGraph",
+        url: origin,
+        logo: {
+          "@type": "ImageObject",
+          url: origin + "/brand/dutygraph-symbol.svg",
+        },
+      },
+      mainEntityOfPage: origin + url(a.slug),
+      wordCount: words,
+      articleSection: a.category,
+    }),
   );
 }
 const featured = perspectives[0];
@@ -118,18 +111,6 @@ await writeFile(
 await writeFile(
   new URL("feed.xml", destination),
   `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>DutyGraph Perspectives</title><link>${origin}/perspectives/</link><description>AI, strategy and the adaptive business.</description><language>en-us</language>${perspectives.map((a) => `<item><title>${esc(a.title)}</title><link>${origin}${url(a.slug)}</link><guid>${origin}${url(a.slug)}</guid><description>${esc(a.description)}</description><pubDate>${new Date(a.published + "T12:00:00Z").toUTCString()}</pubDate></item>`).join("")}</channel></rss>`,
-);
-const sitemap = new URL("sitemap.xml", root);
-await writeFile(
-  sitemap,
-  (await readFile(sitemap, "utf8"))
-    .replace(/<url><loc>[^<]*\/perspectives\/[^<]*<\/loc><\/url>/g, "")
-    .replace(
-      "</urlset>",
-      ["/perspectives/", ...perspectives.map((a) => url(a.slug))]
-        .map((p) => `<url><loc>${origin}${p}</loc></url>`)
-        .join("") + "</urlset>",
-    ),
 );
 console.log(
   `Built Perspectives hub, ${perspectives.length} articles and RSS feed.`,

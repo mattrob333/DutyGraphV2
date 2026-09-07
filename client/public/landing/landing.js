@@ -1,4 +1,11 @@
 (() => {
+  // A root HTTP redirect preserves its fragment. Keep old /#graph-style
+  // workspace bookmarks usable without redirecting normal marketing anchors.
+  const workspacePages = ['overview', 'discovery', 'graph', 'tasks', 'workflows', 'strategy', 'governance', 'weekly', 'deliverables', 'system', 'settings', 'help'];
+  if (workspacePages.includes(window.location.hash.slice(1))) {
+    window.location.replace('/login' + window.location.search + window.location.hash);
+    return;
+  }
   const gallery = document.querySelector('.product-gallery');
   const tabs = [...gallery.querySelectorAll('[role="tab"]')];
   const panels = [...gallery.querySelectorAll('[role="tabpanel"]')];

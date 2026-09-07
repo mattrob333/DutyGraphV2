@@ -1,8 +1,7 @@
-import { mkdir, writeFile, readFile } from "node:fs/promises";
+import { marketingOrigin } from "./marketing-origin.ts";
+import { mkdir, writeFile } from "node:fs/promises";
 const root = new URL("../client/public/", import.meta.url);
-const origin = new URL(
-  process.env.MARKETING_ORIGIN || "https://dutygraph-v2.vercel.app",
-).origin;
+const origin = marketingOrigin;
 const pages = [
   {
     slug: "pilot",
@@ -175,13 +174,4 @@ for (const p of pages) {
   await mkdir(new URL(`${p.slug}/`, root), { recursive: true });
   await writeFile(new URL(`${p.slug}/index.html`, root), html);
 }
-const sitemap = new URL("sitemap.xml", root);
-await writeFile(
-  sitemap,
-  (await readFile(sitemap, "utf8")).replace(
-    "</urlset>",
-    pages.map((p) => `<url><loc>${origin}/${p.slug}/</loc></url>`).join("") +
-      "</urlset>",
-  ),
-);
 console.log("Built pilot, advisor, enterprise, and team pages.");

@@ -1,4 +1,4 @@
 User-agent: *
 Disallow: /api/
 Disallow: /invite/
-Sitemap: https://dutygraph-v2.vercel.app/sitemap.xml
+Sitemap: https://dutygraph.com/sitemap.xml

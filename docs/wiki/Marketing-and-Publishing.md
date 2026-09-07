@@ -17,7 +17,7 @@ Do not market unverified leadership in the category, guaranteed speed, establish
 | Newsletter | Launch-list foundations and editorial operations |
 | Discovery demo | Fictional explanation of the participant/advisor loop |
 
-Directory research currently publishes 160 offerings across 12 categories; that is not a count of unique companies. Held candidates are not published listings. Preserve source dates, evidence labels, and vendor-claim versus independent-verification distinctions. See [directory import](../directory-research-import.md).
+Directory research currently publishes 160 offerings across 12 categories, with a buyer guide and evaluation worksheet for each category; that is not a count of unique companies. Held candidates are not published listings. Preserve source dates, evidence labels, and vendor-claim versus independent-verification distinctions. See [directory import](../directory-research-import.md).
 
 Perspectives includes “Inside the adaptive business,” a thought-leadership vision piece. The reusable generator provides article metadata, schema, social image references, RSS, and sitemap integration. See [editorial template](../perspectives-editorial-template.md). Future-state writing must not imply the application already implements autonomous strategy.
 
@@ -29,7 +29,9 @@ Use the private operator tooling described in [pilot discovery](../pilot-discove
 
 ## Publishing checklist
 
-- Edit source content/generators and regenerate.
+- Edit source content/generators and regenerate with `npm run build`.
+- Run `npm run verify:seo` to check the 190-page public sitemap, unique metadata, canonicals, local links, anchors and JSON-LD.
+- See [programmatic publishing](../programmatic-seo.md) for category authoring and the indexing boundary.
 - Check claims, citations, images, canonical URLs, and schema.
 - Check desktop/mobile layout and actual CTA destination.
 - Keep demo, form submission, and notification claims separate.

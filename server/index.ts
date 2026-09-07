@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { publicEntry } from "./public-entry.ts";
 import { createApp, errorHandler } from "./app.ts";
 import { assetsRouter } from "./assets.ts";
 import { projectAll } from "./projection.ts";
@@ -7,6 +8,7 @@ import { runRetention } from "./retention.ts";
 import express from "express";
 import path from "node:path";
 const app = createApp();
+app.use(publicEntry);
 app.use("/api/v1/companies/:companyId/assets", assetsRouter());
 app.use("/api", (_req, res) =>
   res.status(404).json({

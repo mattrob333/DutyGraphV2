@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "tsx scripts/learning.ts && tsx scripts/programs.ts && tsx scripts/directory.ts && tsx scripts/newsletter.ts && tsx scripts/perspectives.ts && tsx scripts/handbook.ts && tsc --noEmit && vite build",
+    "build": "tsx scripts/learning.ts && tsx scripts/programs.ts && tsx scripts/directory.ts && tsx scripts/newsletter.ts && tsx scripts/perspectives.ts && tsx scripts/handbook.ts && tsx scripts/verify-seo.ts --write && tsc --noEmit && vite build",
     "start": "tsx server/index.ts --production",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
@@ -22,7 +22,8 @@
     "training": "tsx scripts/training.ts",
     "handbook": "tsx scripts/handbook.ts",
     "benchmark": "tsx scripts/benchmark.ts",
-    "package:release": "node scripts/package-release.mjs"
+    "package:release": "node scripts/package-release.mjs",
+    "verify:seo": "tsx scripts/verify-seo.ts"
   },
   "dependencies": {
     "@fontsource/dm-sans": "5.3.0",
