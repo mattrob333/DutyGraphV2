@@ -24,6 +24,8 @@ If startup fails, check Docker, database readiness, port ownership, Node version
 
 `npm run dev` includes both API and Vite. A standalone static preview cannot exercise authenticated API behavior on its own.
 
+Run `npm run verify:clean-install` to check a clean database installation and repeat migration. It creates its own temporary, loopback-only Docker database and removes that container afterward; it does not reset your working database. The September 7 migration-order fix creates the restricted runtime role before migrations reference it in grants and policies.
+
 ## First PR checklist
 
 - Reproduce the issue with fictional inputs.

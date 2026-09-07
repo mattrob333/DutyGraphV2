@@ -69,4 +69,3 @@ See `shared/team-analysis.ts`, `server/team-analysis.ts`, `client/src/TeamAnalys
 No paid provider run or real-client quality acceptance was performed during implementation. Regression tests use injected providers with a real local PostgreSQL API. Browser checks use fictional API fixtures.
 
 Next: evaluate representative accounts for useful versus false findings, measure advisor correction effort, test larger-company scope needs, integrate selected findings into audience-reviewed client reports, and decide whether sustained workloads require a background queue.
-

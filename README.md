@@ -72,6 +72,7 @@ Both local modes bind to `127.0.0.1`. Hosted deployment uses the Vercel API entr
 | `npm run typecheck` | Check application TypeScript |
 | `npm test` | Unit and database/API tests; local database required |
 | `npm run verify` | Build and test |
+| `npm run verify:clean-install` | Rehearse migrations in an isolated empty Docker database |
 | `npm run contracts` | Regenerate API contracts/reference |
 | `npm run db:migrate` | Apply migrations using the migration connection |
 | `npm run training` | Run fictional training exercise |

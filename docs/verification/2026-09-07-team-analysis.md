@@ -16,7 +16,8 @@ A real company analysis endpoint, bounded context/output contracts, structural c
 
 ## Limits
 
+Additional release check: isolated fresh PostgreSQL setup exposed and verified a fix for runtime-role creation order. All ten migrations and a second no-op migration run passed; restricted role, forced RLS, immutable-version permissions and notification-function grants checked. No existing local or hosted database was reset.
+
 Provider responses were synthetic. Browser API responses were mocked; database/API tests were separate. These tests are not evidence that the model accurately finds operational conflicts, that a live paid provider succeeds, or that a suggested AI task is authorized.
 
 The existing build still reports a large application chunk warning. No new production migration is required. The job ledger is durable; execution is still request-driven, with uncertain outcomes retained for deliberate follow-up.
-

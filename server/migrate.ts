@@ -19,6 +19,15 @@ try {
   await db.query(
     "CREATE TABLE IF NOT EXISTS schema_migrations(id text PRIMARY KEY, checksum text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now())",
   );
+  // Later migrations name this role in policies and function grants.
+  // Create it transactionally before applying any migration on a fresh database.
+  const exists = await db.query(
+    "SELECT 1 FROM pg_roles WHERE rolname='dutygraph_app'",
+  );
+  if (!exists.rowCount)
+    await db.query(
+      `CREATE ROLE dutygraph_app LOGIN PASSWORD '${password}' NOSUPERUSER NOBYPASSRLS`,
+    );
   const files = [
     { id: "0001-baseline", url: new URL("./schema.sql", import.meta.url) },
     ...(await readdir(new URL("./migrations/", import.meta.url)))
@@ -60,13 +69,6 @@ try {
     ]);
     console.log("Applied migration", file.id);
   }
-  const exists = await db.query(
-    "SELECT 1 FROM pg_roles WHERE rolname='dutygraph_app'",
-  );
-  if (!exists.rowCount)
-    await db.query(
-      `CREATE ROLE dutygraph_app LOGIN PASSWORD '${password}' NOSUPERUSER NOBYPASSRLS`,
-    );
   await db.query("GRANT USAGE ON SCHEMA public TO dutygraph_app");
   await db.query(
     "GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO dutygraph_app",

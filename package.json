@@ -15,6 +15,7 @@
     "setup": "node scripts/setup.mjs",
     "db:migrate": "tsx server/migrate.ts",
     "verify": "npm run build && npm test",
+    "verify:clean-install": "node scripts/verify-clean-install.mjs",
     "contracts": "tsx scripts/contracts.ts",
     "backup": "node scripts/backup.mjs create",
     "restore:drill": "node scripts/backup.mjs drill",
