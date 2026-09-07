@@ -1101,7 +1101,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <Heading
           eyebrow="THE CONNECTED RECORD"
           title="See how the company connects."
-          description="Start with the organization. Explore the 3D network, then follow duties, tasks and handoffs."
+          description="Start with the organization. Explore relationships, then follow duties, tasks and handoffs."
           actions={
             <Button onClick={() => setModal({ type: "roster" })}>
               Import people CSV

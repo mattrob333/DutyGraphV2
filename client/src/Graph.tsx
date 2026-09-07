@@ -214,7 +214,7 @@ export function Graph({
       <div className="toolbar">
         <div className="tabs">
           {[
-            ["network", "3D explorer"],
+            ["network", "Relationships"],
             ["connected", "Connected"],
             ["work", "Work flow"],
             ["org", "Org & duties"],
@@ -302,7 +302,7 @@ export function Graph({
         </div>
       )}
       {view === "network" ? (
-        <Suspense fallback={<p>Loading 3D explorer…</p>}>
+        <Suspense fallback={<p>Loading Relationships…</p>}>
           <NetworkExplorer company={company} records={records} open={open} />
         </Suspense>
       ) : view === "audit" ? (
@@ -785,3 +785,4 @@ export function Graph({
     </div>
   );
 }
+

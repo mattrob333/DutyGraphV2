@@ -105,3 +105,72 @@
     display: none;
   }
 }
+.relationship-questions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 20px 0;
+}
+.relationship-questions button {
+  padding: 16px;
+  text-align: left;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+}
+.relationship-questions button[aria-pressed="true"],
+.relationship-list button[aria-pressed="true"] {
+  border-color: #b9d3c4;
+  background: #35413d;
+}
+.relationship-workspace {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 24px;
+}
+.relationship-list {
+  display: grid;
+  gap: 8px;
+  max-height: 550px;
+  overflow: auto;
+  margin-top: 14px;
+}
+.relationship-list button {
+  padding: 12px;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  border: 1px solid #555;
+  border-radius: 8px;
+}
+.relationship-list small,
+.relationship-list strong {
+  display: block;
+}
+.relationship-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.relationship-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 18px 0;
+}
+@media (max-width: 800px) {
+  .relationship-questions {
+    grid-template-columns: 1fr 1fr;
+  }
+  .relationship-workspace {
+    grid-template-columns: 1fr;
+  }
+  .relationship-list {
+    max-height: 180px;
+  }
+  .relationship-facts {
+    grid-template-columns: 1fr;
+  }
+}
