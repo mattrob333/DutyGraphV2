@@ -24,7 +24,8 @@
 }
 .business-recommendation h3 {
   font-size: 24px;
-  margin: 10px 0;
+  margin: 14px 0 16px;
+  line-height: 1.35;
 }
 .business-recommendation h4 {
   font-size: 17px;
@@ -39,10 +40,55 @@
   border-top: 1px solid var(--line);
   margin-top: 24px;
 }
+.business-recommendation > .business-stream-card {
+  padding: 28px 0 24px;
+}
+.business-recommendation > .business-stream-card + .business-stream-card {
+  margin-top: 0;
+}
+.business-recommendation .business-stream-card h4 {
+  margin: 0 0 10px;
+  font-size: 19px;
+  line-height: 1.4;
+}
+.business-recommendation .business-stream-card .stream-role {
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+.business-recommendation .business-stream-card p {
+  margin: 0 0 18px;
+}
+.business-stream-confidence {
+  display: block;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.business-stream-stages > summary {
+  padding: 12px 0;
+  cursor: pointer;
+  line-height: 1.5;
+  font-weight: 600;
+}
+.business-recommendation .business-stream-actions {
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+.business-recommendation > details {
+  margin-top: 20px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+.business-recommendation .business-profile-actions {
+  margin: 20px 0 18px;
+  gap: 12px;
+}
 .business-recommendation .business-flow-preview {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   overflow: visible;
+  gap: 12px;
+  margin: 8px 0 0;
 }
 .business-recommendation .business-flow-preview > span {
   min-width: 0;
@@ -176,6 +222,12 @@
   }
 }
 @media (max-width: 800px) {
+  .business-recommendation .business-flow-preview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .business-recommendation .business-stream-actions {
+    flex-wrap: wrap;
+  }
   .business-recommendation {
     padding: 16px;
   }

@@ -23,7 +23,7 @@ The ambition is a living map of a business: evidence informs strategy, strategy 
 
 ## Current status
 
-Initial discovery now produces a six-section **sourced business brief**, with explicit unknowns, cited excerpts and a separate monitoring-channel drawer. Contextual searches use the description and official-site evidence; primary/supporting streams can be changed before saving. Kickoff preparation consumes the matching brief rather than an unfiltered search list. See [initial research](docs/initial-research.md) for provenance checks, legacy behavior and acceptance limits.
+Initial discovery now produces a six-section **sourced business brief**, with explicit unknowns, cited excerpts and a separate monitoring-channel drawer. Contextual searches use the description and official-site evidence; primary/supporting streams can be changed before saving. The primary flow opens its stages automatically; supporting flows stay collapsed, with stream controls grouped at the bottom right. Kickoff preparation consumes the matching brief rather than an unfiltered search list. See [initial research](docs/initial-research.md) for provenance checks, legacy behavior and acceptance limits.
 
 
 Current documentation updated: **September 7, 2026**, including one-form research, AI business classification, framework readability, and business-specific kickoff and participant capture improvements. Package version: `0.3.0`. This is a hosted pilot with working application code, fictional demonstrations, and remaining enterprise acceptance work. The [development log](DEVLOG.md) records subsequent changes and their verification boundaries.

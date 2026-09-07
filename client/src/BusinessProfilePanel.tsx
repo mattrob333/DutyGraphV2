@@ -514,14 +514,33 @@ export function BusinessProfilePanel({
               (r: any) => r.templateId === stream.templateId,
             );
             return (
-              <article key={stream.id}>
+              <article className="business-stream-card" key={stream.id}>
                 <h4>{stream.name}</h4>
                 <span className="stream-role">
                   {streamIndex === 0
                     ? "Primary for this engagement"
                     : "Supporting business stream"}
                 </span>
-                <div className="actions">
+                {recommendation && (
+                  <p>
+                    {recommendation.reason}{" "}
+                    <span className="subtle business-stream-confidence">
+                      {recommendation.confidence} confidence
+                    </span>
+                  </p>
+                )}
+                <details className="business-stream-stages" open={streamIndex === 0}>
+                  <summary>View the operating stages</summary>
+                  <div className="business-flow-preview">
+                    {stream.stages.map((s, i) => (
+                      <span key={s.id}>
+                        <small>{i + 1}</small>
+                        {s.name}
+                      </span>
+                    ))}
+                  </div>
+                </details>
+                <div className="actions business-stream-actions">
                   {streamIndex > 0 && (
                     <Button
                       disabled={busy}
@@ -556,25 +575,6 @@ export function BusinessProfilePanel({
                     </Button>
                   )}
                 </div>
-                {recommendation && (
-                  <p>
-                    {recommendation.reason}{" "}
-                    <span className="subtle">
-                      {recommendation.confidence} confidence
-                    </span>
-                  </p>
-                )}
-                <details>
-                  <summary>View the operating stages</summary>
-                  <div className="business-flow-preview">
-                    {stream.stages.map((s, i) => (
-                      <span key={s.id}>
-                        <small>{i + 1}</small>
-                        {s.name}
-                      </span>
-                    ))}
-                  </div>
-                </details>
               </article>
             );
           })}
@@ -639,7 +639,7 @@ export function BusinessProfilePanel({
                 ))}
             </details>
           )}
-          <div className="actions">
+          <div className="actions business-profile-actions">
             <Button
               primary
               disabled={busy || !dirty}

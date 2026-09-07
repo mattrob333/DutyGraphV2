@@ -1,5 +1,11 @@
 # DutyGraph development log
 
+## 2026-09-07 — Polish the business-stream review cards
+
+- Open operating stages by default for the primary stream and keep supporting streams collapsed. Promoting a stream updates the expanded primary view.
+- Move Make primary / Remove this stream beneath the stages, aligned right, and separate titles, role labels, descriptions, confidence, disclosures and profile actions with consistent spacing. Stage tiles stack in two columns on narrow screens.
+- Updated README and initial-research guide. Verification: production build and all 209 tests passed, 89-route contracts unchanged, dependency audit clean. Desktop and 390px mobile checks confirmed primary/supporting expansion, promotion behavior, bottom-right actions and no horizontal overflow using saved fictional preview data. No provider calls or emails are needed for this presentation change.
+
 ## 2026-09-07 — Business briefing instead of a search-results dump
 
 - Reworked the bounded four-search pass to use public description and official-site context for competitor, market/scale and monitoring-channel discovery. Cross-company run references are rejected before searching; existing durable keys, quotas and resume behavior remain.
