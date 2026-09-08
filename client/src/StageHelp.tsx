@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Info } from "lucide-react";
 import {
@@ -15,7 +15,7 @@ export function StageHelp({
   stream: { templateId?: string; id?: string; name?: string; label?: string };
 }) {
   const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState({ left: 0, top: 0 });
+  const [position, setPosition] = useState({ left: 0, top: 0, maxHeight: 360 });
   const pinned = useRef(false),
     timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const trigger = useRef<HTMLButtonElement>(null),
@@ -32,21 +32,46 @@ export function StageHelp({
   };
   const show = () => {
     cancel();
-    const rect = trigger.current?.getBoundingClientRect();
-    if (rect)
-      setPosition({
-        left: Math.max(12, Math.min(rect.left, window.innerWidth - 344)),
-        top: Math.max(12, Math.min(rect.bottom + 8, window.innerHeight - 300)),
-      });
     setOpen(true);
   };
   const leave = () => {
-    if (!pinned.current) timer.current = setTimeout(() => setOpen(false), 160);
+    cancel();
+    if (!pinned.current)
+      timer.current = setTimeout(() => {
+        const node =
+          trigger.current?.closest(
+            ".snapshot-flow li, .swm-stage-picker li, .business-flow-preview > span",
+          ) || trigger.current;
+        if (node?.matches(":hover") || tip.current?.matches(":hover")) return;
+        setOpen(false);
+      }, 200);
   };
+  useLayoutEffect(() => {
+    if (!open || !trigger.current || !tip.current) return;
+    const rect = trigger.current.getBoundingClientRect();
+    const gap = 8,
+      edge = 12;
+    const below = Math.max(0, window.innerHeight - rect.bottom - gap - edge);
+    const above = Math.max(0, rect.top - gap - edge);
+    const height = Math.min(360, tip.current.scrollHeight);
+    const useBelow = below >= height || below >= above;
+    const maxHeight = Math.min(360, useBelow ? below : above);
+    setPosition({
+      left: Math.max(
+        edge,
+        Math.min(rect.left, window.innerWidth - tip.current.offsetWidth - edge),
+      ),
+      top: useBelow
+        ? rect.bottom + gap
+        : rect.top - gap - Math.min(height, maxHeight),
+      maxHeight,
+    });
+  }, [open, stage.name]);
   useEffect(() => {
-    const node = trigger.current?.closest(
-      ".snapshot-flow li, .swm-stage-picker li, .business-flow-preview > span",
-    );
+    const node =
+      trigger.current?.closest(
+        ".snapshot-flow li, .swm-stage-picker li, .business-flow-preview > span",
+      ) || trigger.current;
     node?.addEventListener("mouseenter", show);
     node?.addEventListener("mouseleave", leave);
     return () => {
@@ -90,8 +115,6 @@ export function StageHelp({
         aria-label={`About ${stage.name || "this business stage"}`}
         aria-expanded={open}
         aria-describedby={open ? id : undefined}
-        onMouseEnter={show}
-        onMouseLeave={leave}
         onFocus={show}
         onBlur={leave}
         onClick={(e) => {
@@ -112,10 +135,7 @@ export function StageHelp({
             id={id}
             role="tooltip"
             className="stage-help-popover"
-            style={{
-              ...position,
-              maxHeight: `calc(100vh - ${position.top + 12}px)`,
-            }}
+            style={position}
             onMouseEnter={cancel}
             onMouseLeave={leave}
           >
