@@ -49,10 +49,19 @@ export function StageHelp({
   useLayoutEffect(() => {
     if (!open || !trigger.current || !tip.current) return;
     const rect = trigger.current.getBoundingClientRect();
+    // Keep help outside the whole stage. Anchoring to the small info icon
+    // can cover the next stage and intercept a click across the ribbon.
+    const anchor = trigger.current.closest(
+      ".snapshot-flow li, .swm-stage-picker li, .business-flow-preview > span",
+    );
+    const stageRect = anchor?.getBoundingClientRect() || rect;
     const gap = 8,
       edge = 12;
-    const below = Math.max(0, window.innerHeight - rect.bottom - gap - edge);
-    const above = Math.max(0, rect.top - gap - edge);
+    const below = Math.max(
+      0,
+      window.innerHeight - stageRect.bottom - gap - edge,
+    );
+    const above = Math.max(0, stageRect.top - gap - edge);
     const height = Math.min(360, tip.current.scrollHeight);
     const useBelow = below >= height || below >= above;
     const maxHeight = Math.min(360, useBelow ? below : above);
@@ -62,8 +71,8 @@ export function StageHelp({
         Math.min(rect.left, window.innerWidth - tip.current.offsetWidth - edge),
       ),
       top: useBelow
-        ? rect.bottom + gap
-        : rect.top - gap - Math.min(height, maxHeight),
+        ? stageRect.bottom + gap
+        : stageRect.top - gap - Math.min(height, maxHeight),
       maxHeight,
     });
   }, [open, stage.name]);

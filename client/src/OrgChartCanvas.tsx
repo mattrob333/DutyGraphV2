@@ -1,4 +1,5 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Scan, Search } from "lucide-react";
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -66,7 +67,7 @@ function PersonNode({ data }: NodeProps) {
       {neutral ? (
         <div className="roster-person-heading">
           {avatar}
-          <strong>{p.title}</strong>
+          <strong title={p.title}>{p.title}</strong>
         </div>
       ) : (
         <>
@@ -114,7 +115,33 @@ export function OrgChartCanvas({
 }) {
   const [search, setSearch] = useState("");
   const [instance, setInstance] = useState<any>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const geometryKey = people
+    .map((p) => `${p.id}:${p.data.managerId}`)
+    .join("|");
+  useEffect(() => {
+    if (!stableViewport || !instance || !canvasRef.current) return;
+    let frame = 0;
+    const fit = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        frame = requestAnimationFrame(
+          () =>
+            void instance.fitView({ padding: 0.08, maxZoom: 1, duration: 0 }),
+        );
+      });
+    };
+    const observer = new ResizeObserver(fit);
+    observer.observe(canvasRef.current);
+    fit();
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [instance, stableViewport, geometryKey]);
   const model = useMemo(() => {
+    const nodeWidth = neutral ? 200 : 224;
+    const columnGap = neutral ? 24 : 32;
     const ids = new Set(people.map((p) => p.id));
     const parent = new Map(
       people.map((p) => [
@@ -145,19 +172,19 @@ export function OrgChartCanvas({
       if (widths.has(id)) return widths.get(id)!;
       const cs = children(id);
       const w = Math.max(
-        224,
-        cs.reduce((n, p) => n + width(p.id) + 32, 0) - 32,
+        nodeWidth,
+        cs.reduce((n, p) => n + width(p.id) + columnGap, 0) - columnGap,
       );
       widths.set(id, w);
       return w;
     };
     const positions = new Map<string, { x: number; y: number }>();
     const place = (p: RecordRow, x: number, y: number) => {
-      positions.set(p.id, { x: x + (width(p.id) - 224) / 2, y });
+      positions.set(p.id, { x: x + (width(p.id) - nodeWidth) / 2, y });
       let next = x;
       for (const c of children(p.id)) {
-        place(c, next, y + 220);
-        next += width(c.id) + 32;
+        place(c, next, y + (neutral ? 180 : 220));
+        next += width(c.id) + columnGap;
       }
     };
     let x = 0;
@@ -187,7 +214,7 @@ export function OrgChartCanvas({
         })),
       warnings,
     };
-  }, [people, tasks]);
+  }, [people, tasks, neutral]);
   const activate = (id: string) => {
     select(id);
     const node = model.nodes.find((node) => node.id === id);
@@ -216,16 +243,30 @@ export function OrgChartCanvas({
     <div className={neutral ? "org-chart-neutral" : undefined}>
       <div className="visual-toolbar">
         <label>
-          Find a person
+          <span className={neutral ? "sr-only" : undefined}>Find a person</span>
+          {neutral && (
+            <Search size={14} className="org-search-icon" aria-hidden="true" />
+          )}
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Name, role or department"
+            placeholder={neutral ? "Find a person" : "Name, role or department"}
           />
         </label>
         <span>
           {people.length} people · {model.edges.length} reporting lines
         </span>
+        {neutral && (
+          <button
+            className="org-fit"
+            onClick={() =>
+              void instance?.fitView({ padding: 0.08, maxZoom: 1, duration: 0 })
+            }
+          >
+            <Scan size={14} />
+            Fit team
+          </button>
+        )}
       </div>
       {search && (
         <div className="visual-results">
@@ -249,7 +290,7 @@ export function OrgChartCanvas({
       {model.warnings.map((w) => (
         <p key={w}>{w} — correct the manager record.</p>
       ))}
-      <div className="roster-canvas">
+      <div className="roster-canvas" ref={canvasRef}>
         <ReactFlowProvider>
           <ReactFlow
             nodes={nodes}
@@ -264,32 +305,41 @@ export function OrgChartCanvas({
             onInit={setInstance}
             onNodeClick={(_, n) => activate(n.id)}
             fitView
-            fitViewOptions={{ padding: 0.15, maxZoom: 1 }}
+            fitViewOptions={{ padding: neutral ? 0.08 : 0.15, maxZoom: 1 }}
+            zoomOnScroll={!neutral}
+            preventScrolling={!neutral}
             minZoom={0.05}
             maxZoom={2}
             colorMode="dark"
           >
-            <Background color={neutral ? "#363638" : "#41474b"} />
-            <Controls showInteractive={false} />
-            <MiniMap
-              pannable
-              zoomable
-              nodeColor={(n) =>
-                neutral
-                  ? focus === undefined || focus[n.id]
-                    ? "#b9b5ac"
-                    : "#424244"
-                  : departmentColor(
-                      (n.data.person as RecordRow).data.team || "",
-                    )
-              }
+            <Background
+              color={neutral ? "#34373b" : "#41474b"}
+              gap={neutral ? 24 : 20}
+              size={1}
             />
+            <Controls showInteractive={false} />
+            {(!neutral || people.length > 24) && (
+              <MiniMap
+                pannable
+                zoomable
+                nodeColor={(n) =>
+                  neutral
+                    ? focus === undefined || focus[n.id]
+                      ? "#b9b5ac"
+                      : "#424244"
+                    : departmentColor(
+                        (n.data.person as RecordRow).data.team || "",
+                      )
+                }
+              />
+            )}
           </ReactFlow>
         </ReactFlowProvider>
       </div>
-      <p className="subtle">
-        Scroll to zoom · Drag the background to pan · Select a person to see
-        their work. Lines reflect recorded manager relationships.
+      <p className={neutral ? "org-caption" : "subtle"}>
+        {neutral
+          ? "Drag to pan · Pinch or use + / − to zoom · Lines show who reports to whom."
+          : "Scroll to zoom · Drag the background to pan · Select a person to see their work. Lines reflect recorded manager relationships."}
       </p>
     </div>
   );

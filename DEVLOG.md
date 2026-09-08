@@ -1,5 +1,13 @@
 # DutyGraph development log
 
+## 2026-09-08 — Work Map visual refinement
+
+Compressed the page heading and stage ribbon, removed the duplicate introduction and selected-card top stripe, and combined stage context, reporting chart and person details into one workspace. The chart fits the remaining desktop height, has a compact laptop layout and preserves its camera during stage/person selection. Added Fit team, quieter neutral person cards, and matching light-theme surfaces. Mobile details stack below the chart. Older graph views remain available; the disabled map Register control is omitted.
+
+Moved the old-work AI prompt into the unassigned-work panel and the existing assignment disclosure. Fixed stage help placement so popovers stay outside the stage row and cannot intercept neighboring stage clicks. Expanded mode now scrolls to lower task flows; normal wheel scrolling over the chart is available alongside pinch and zoom controls. Updated the Work Map guide and handbook source.
+
+Validation: 263 tests passed; build, 97-route contract generation and dependency audit passed (zero vulnerabilities). Synthetic browser checks cover the full 12-person Cobalt chart at 1366×768, 1440×900, 1920×1080 and 3429×1264; mobile checks use 390×844. Stage selection, keyboard person selection, search, scoped duties/tasks, hover stability, fit controls and expanded/page scrolling pass, with no browser errors. Light-theme checks and a long-name layout check passed. See [verification](docs/verification/2026-09-08-work-map-refinement.md). No emails, paid providers or customer records were used. Hosted release verification follows the implementation commit.
+
 ## 2026-09-08 - Demo intake to discovery and automatic work mapping
 
 Added a URL field and optional goal to public intake, a restricted advisor demo inbox with status/follow-up edits, and idempotent conversion to a company/contact. Research starts from the inbox action; the company snapshot and proposed stages save automatically while existing custom/reviewed stages survive re-research. Contact details carry into kickoff preparation. Migration 0011 uses a provisioned account/tenant mapping plus an email allowlist; ordinary advisor registration cannot read global leads.

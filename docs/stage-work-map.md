@@ -4,6 +4,8 @@ Business stages are broader than duties: a stage groups work across roles; a dut
 
 The default view starts with the saved business stream and its stages. Select a stage to highlight the people whose recorded work belongs there. The chart preserves reporting positions as selections change. Its lines mean “reports to”; the task flows below mean work passes between people.
 
+The compact ribbon leaves the remaining desktop height for the chart and person details. Shorter laptop screens use tighter spacing; phones stack the details below the chart. **Fit team** restores the complete organization after panning or zooming. Drag to pan; pinch or use +/− to zoom. Normal wheel scrolling reaches the flows below, including in **Expand**. Stage help opens outside the stage row so it cannot cover a neighboring stage.
+
 Select a person on the chart or in the list to inspect duties and tasks in the current selection. “Owns work” comes from duty/task owner fields; “Does the work” comes from task performer fields. Neither label grants approval or agent authority. Open a task, duty or full flow for its record.
 
 ## Assigning work
@@ -25,6 +27,8 @@ The guarded legacy fallback can still show a labeled read-only illustration if n
 Task cards uses the same projection and saved stages. Choose one or more streams, then filter by workflow, recorded owner/performer, review state, search or operating mode. A task can appear in multiple stages; unique task counts and placements remain distinct. Unassigned work stays visible. The cards show role, duty and task, and the full duty/handoff registers stay available in a disclosure below the board. Horizontal lanes support keyboard scrolling and narrow screens.
 
 ## Automatic proposals
+
+Select the unassigned-work count above the chart, or open **Assign work to business stages** below it, to find **Connect existing work with AI**.
 
 Onboarding can save the first AI result immediately. Duties carry proposed stage links and recorded owners; tasks carry proposed stage links, owners/performers and explicit duty membership. Open a record to read the AI rationale and confidence. Use Assign stages for corrections. A company stage is a category of work, never approval authority.
 

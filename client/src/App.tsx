@@ -1282,11 +1282,10 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
     );
   else if (page === "graph")
     body = (
-      <>
+      <div className="work-map-page">
         <Heading
-          eyebrow="THE CONNECTED RECORD"
           title="Company Work Map"
-          description="Understand the flows, inspect the work, and prepare the next client decision."
+          description="Select a business stage. See the people, duties and tasks behind it."
           actions={
             <Button onClick={() => setModal({ type: "roster" })}>
               Import people CSV
@@ -1303,7 +1302,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           records={records}
           open={open}
         />
-      </>
+      </div>
     );
   else if (page === "strategy")
     body = (

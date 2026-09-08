@@ -244,13 +244,15 @@ export function Graph({
           ))}
         </div>
         <div className="actions">
-          <Button
-            onClick={() => setList(!list)}
-            disabled={view === "network" || view === "map"}
-          >
-            {list ? <Network size={16} /> : <List size={16} />}{" "}
-            {list ? "Graph" : "Register"}
-          </Button>
+          {view !== "map" && (
+            <Button
+              onClick={() => setList(!list)}
+              disabled={view === "network" || view === "map"}
+            >
+              {list ? <Network size={16} /> : <List size={16} />}{" "}
+              {list ? "Graph" : "Register"}
+            </Button>
+          )}
           <Button onClick={() => setExpanded(!expanded)}>
             <Expand size={16} />
             {expanded ? "Close expanded" : "Expand"}
@@ -319,6 +321,7 @@ export function Graph({
         )}
       {view === "map" ? (
         <StageWorkMap
+          expanded={expanded}
           companyId={company}
           profile={profile}
           sandbox={sandbox}

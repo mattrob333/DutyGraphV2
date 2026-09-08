@@ -1,5 +1,5 @@
 import { StageHelp } from "./StageHelp.tsx";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, X, Check } from "lucide-react";
 import { schemas, type RecordRow } from "../../shared/domain.ts";
 import type { BusinessProfile } from "../../shared/business-types.ts";
@@ -20,6 +20,7 @@ export function StageWorkMap({
   open,
   refresh,
   openFlow,
+  expanded = false,
 }: {
   companyId: string;
   profile?: BusinessProfile;
@@ -28,6 +29,7 @@ export function StageWorkMap({
   open: (record: RecordRow) => void;
   refresh?: () => Promise<void>;
   openFlow: (id: string) => void;
+  expanded?: boolean;
 }) {
   const [streamId, setStreamId] = useState("");
   const [stageId, setStageId] = useState("");
@@ -46,6 +48,40 @@ export function StageWorkMap({
     () => stageWorkMap(example.records, example.profile),
     [example],
   );
+  const exploreRef = useRef<HTMLDivElement>(null);
+  // Measure the space above the chart, not a guessed fixed header height.
+  // Scrolling and stage selection must not move or resize the organization.
+  useLayoutEffect(() => {
+    const element = exploreRef.current;
+    if (!element) return;
+    let frame = 0;
+    const measure = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const overlay = element.closest<HTMLElement>(".graph-expanded");
+        const top =
+          element.getBoundingClientRect().top +
+          (overlay?.scrollTop ?? window.scrollY);
+        const height = Math.min(
+          940,
+          Math.max(340, window.innerHeight - top - 24),
+        );
+        element.style.setProperty(
+          "--swm-explore-height",
+          `${Math.round(height)}px`,
+        );
+      });
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(element.parentElement!);
+    window.addEventListener("resize", measure);
+    measure();
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [expanded]);
   const canAssign = !!refresh && !example.illustrative;
   const stream =
     model.streams.find((s) => s.id === streamId) || model.streams[0];
@@ -221,70 +257,34 @@ export function StageWorkMap({
   return (
     <section className="stage-work-map" aria-label="Work stages and people">
       <ErrorBox error={error} />
-      {canAssign &&
-        model.streams.length > 0 &&
-        model.unmapped.duties.length + model.unmapped.tasks.length > 0 && (
-          <div className="swm-notice">
-            <div>
-              <strong>Connect the work already collected</strong>
-              <p>
-                AI can place duties and tasks into these stages. Existing
-                assignments stay in place. Uses your configured AI provider.
-              </p>
-            </div>
-            <Button
-              primary
-              disabled={busy || linkJob?.state === "running"}
-              onClick={() => void connectWork()}
-            >
-              {busy ? "Connecting…" : "Connect existing work with AI"}
-            </Button>
-          </div>
-        )}
-      {!!inferredCount && (
-        <p className="subtle">
-          {inferredCount} work{" "}
-          {inferredCount === 1 ? "record has" : "records have"} AI-inferred
-          stage links. Open a duty or task to inspect the basis; use Assign
-          stages to correct a link.
-        </p>
-      )}
-      <header className="swm-intro">
-        <div>
-          <p className="eyebrow">FROM BUSINESS STAGES TO PEOPLE</p>
-          <h2>Who makes the work happen?</h2>
-          <p>
-            Select a stage. See the people involved. Explore their duties and
-            tasks.
-          </p>
-        </div>
-      </header>
       {example.illustrative && (
         <p className="swm-example">
           Illustrative stage assignments · Cobalt sample. No company records are
           changed.
         </p>
       )}
-      <div className="swm-streams" aria-label="Business streams">
-        {model.streams.length > 1 &&
-          model.streams.map((s, i) => (
-            <button
-              key={s.id}
-              aria-pressed={stream?.id === s.id}
-              onClick={() => {
-                setStreamId(s.id);
-                choose("");
-              }}
-            >
-              <strong>{s.name}</strong>
-              <small>{i === 0 ? "Primary stream" : "Supporting stream"}</small>
-            </button>
-          ))}
-      </div>
       {stream ? (
         <div className="swm-stage-picker">
           <div className="swm-stage-heading">
-            <span>{stream.name}</span>
+            {model.streams.length > 1 ? (
+              <div className="swm-streams" aria-label="Business streams">
+                {model.streams.map((s, i) => (
+                  <button
+                    key={s.id}
+                    aria-pressed={stream.id === s.id}
+                    onClick={() => {
+                      setStreamId(s.id);
+                      choose("");
+                    }}
+                  >
+                    <strong>{s.name}</strong>
+                    <small>{i === 0 ? "Primary" : "Supporting"}</small>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <span className="swm-stream-name">{stream.name}</span>
+            )}
             <button
               aria-pressed={!stage && !unmapped}
               onClick={() => choose("")}
@@ -299,10 +299,12 @@ export function StageWorkMap({
                   aria-pressed={stage?.id === s.id && !unmapped}
                   onClick={() => choose(s.id)}
                 >
-                  <span className="swm-step">
-                    {String(i + 1).padStart(2, "0")}
+                  <span className="swm-stage-label">
+                    <span className="swm-step">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <strong>{s.name}</strong>
                   </span>
-                  <strong>{s.name}</strong>
                   <small>
                     {s.people.length}{" "}
                     {s.people.length === 1 ? "person" : "people"} ·{" "}
@@ -337,50 +339,46 @@ export function StageWorkMap({
           </a>
         </div>
       )}
-      <div className="swm-scope">
-        <div aria-live="polite">
-          <h3>{title}</h3>
-          <p>
-            {scope.people.length}{" "}
-            {scope.people.length === 1 ? "person" : "people"} involved ·{" "}
-            {scope.duties.length}{" "}
-            {scope.duties.length === 1 ? "duty" : "duties"}·{" "}
-            {scope.tasks.length} {scope.tasks.length === 1 ? "task" : "tasks"}
-          </p>
-        </div>
-        {(model.unmapped.tasks.length > 0 ||
-          model.unmapped.duties.length > 0) && (
-          <button
-            className={unmapped ? "active" : ""}
-            aria-pressed={unmapped}
-            onClick={() => {
-              setUnmapped(!unmapped);
-              setSelected("");
-            }}
-          >
-            {model.unmapped.tasks.length}{" "}
-            {model.unmapped.tasks.length === 1 ? "task" : "tasks"} /{" "}
-            {model.unmapped.duties.length}{" "}
-            {model.unmapped.duties.length === 1 ? "duty" : "duties"} not
-            assigned <ArrowRight size={14} />
-          </button>
-        )}
-      </div>
-      <span className="sr-only" role="status">
-        {selectedPerson ? `Showing ${selectedPerson.title} in ${title}` : ""}
-      </span>
       {notice && (
         <p role="status" className="swm-notice">
           <Check size={16} />
           {notice}
         </p>
       )}
-      <div className="swm-explore">
-        <div className="swm-chart">
-          <div className="swm-chart-heading">
-            <strong>The people</strong>
-            <span>Lines show who reports to whom.</span>
+      <div className="swm-explore" ref={exploreRef}>
+        <div className="swm-scope">
+          <div aria-live="polite">
+            <h3>{title}</h3>
+            <p>
+              {scope.people.length}{" "}
+              {scope.people.length === 1 ? "person" : "people"} involved ·{" "}
+              {scope.duties.length}{" "}
+              {scope.duties.length === 1 ? "duty" : "duties"} ·{" "}
+              {scope.tasks.length} {scope.tasks.length === 1 ? "task" : "tasks"}
+            </p>
           </div>
+          {(model.unmapped.tasks.length > 0 ||
+            model.unmapped.duties.length > 0) && (
+            <button
+              className={unmapped ? "active" : ""}
+              aria-pressed={unmapped}
+              onClick={() => {
+                setUnmapped(!unmapped);
+                setSelected("");
+              }}
+            >
+              {model.unmapped.tasks.length}{" "}
+              {model.unmapped.tasks.length === 1 ? "task" : "tasks"} /{" "}
+              {model.unmapped.duties.length}{" "}
+              {model.unmapped.duties.length === 1 ? "duty" : "duties"} not
+              assigned <ArrowRight size={14} />
+            </button>
+          )}
+        </div>
+        <span className="sr-only" role="status">
+          {selectedPerson ? `Showing ${selectedPerson.title} in ${title}` : ""}
+        </span>
+        <div className="swm-chart">
           {people.length ? (
             <OrgChartCanvas
               people={people}
@@ -516,6 +514,23 @@ export function StageWorkMap({
                   ? "Choose a highlighted person to see their work here."
                   : "Assign duties or tasks to this stage. People appear from the owners and performers recorded on that work."}
               </p>
+              {unmapped && canAssign && model.streams.length > 0 && (
+                <div className="swm-connect">
+                  <p>
+                    Let AI place the remaining work into stages. You can edit
+                    the result afterward.
+                  </p>
+                  <Button
+                    disabled={busy || linkJob?.state === "running"}
+                    onClick={() => void connectWork()}
+                  >
+                    {busy || linkJob?.state === "running"
+                      ? "Connecting…"
+                      : "Connect existing work with AI"}
+                  </Button>
+                  <small>Uses your configured AI provider.</small>
+                </div>
+              )}
               <div className="swm-person-list">
                 {scope.people.map((p) => (
                   <button
@@ -539,6 +554,19 @@ export function StageWorkMap({
           )}
         </aside>
       </div>
+      {!!inferredCount && (
+        <details className="swm-inference">
+          <summary>
+            {inferredCount}{" "}
+            {inferredCount === 1 ? "record has" : "records have"} AI-inferred
+            stage links
+          </summary>
+          <p>
+            Open a duty or task to inspect the basis. Use Assign stages to
+            correct a link.
+          </p>
+        </details>
+      )}
       {(scope.unownedTaskIds.length > 0 || scope.unownedDutyIds.length > 0) && (
         <details className="swm-gaps">
           <summary>
@@ -572,6 +600,22 @@ export function StageWorkMap({
             unless a task has its own stages. Work can belong to more than one
             stage.
           </p>
+          {canAssign && model.streams.length > 0 && (
+            <div className="swm-connect">
+              <Button
+                disabled={busy || linkJob?.state === "running"}
+                onClick={() => void connectWork()}
+              >
+                {busy || linkJob?.state === "running"
+                  ? "Connecting…"
+                  : "Connect existing work with AI"}
+              </Button>
+              <small>
+                Uses your configured AI provider. Existing assignments stay in
+                place.
+              </small>
+            </div>
+          )}
           {[...model.unmapped.duties, ...model.unmapped.tasks].map((r) => (
             <div className="swm-assign-row" key={r.id}>
               <span>

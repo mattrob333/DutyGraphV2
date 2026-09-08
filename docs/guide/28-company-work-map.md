@@ -6,10 +6,12 @@ Open **Company Work Map** in the sidebar. The default path is simple: choose a b
 
 ## Follow the work
 
-1. Select a stream. The first saved stream is marked **Primary stream**; the others are **Supporting stream**.
+1. Select a stream. The first saved stream is marked **Primary**; the others are **Supporting**.
 2. Select a stage, or choose **All company work**. Stage names come from the saved business profile.
 3. Select a person in the highlighted organization. The person’s labels distinguish **Owns work** from **Does the work**.
 4. Open a duty, task or flow to inspect its record, inputs, output, evidence, handoffs and human decision boundary.
+
+The chart uses the available screen height and stays in position when you switch stages. Drag to pan. Pinch or use +/− to zoom. **Fit team** brings everyone back into view; **Expand** provides more room. Scroll down to reach the task flows. On phones, person details appear below the chart. Stage help opens outside the stage row so you can keep clicking through the stages.
 
 The organization is highlighted from recorded task owners and performers in the selected stage. Reporting lines remain manager relationships from the roster. The map does not infer work from a title, department, reporting line, task name or old `valueStage` field. Owners and performers describe accountability and performance; neither role is an approval.
 
@@ -27,4 +29,4 @@ The former **Connected**, **Work flow**, **Org & duties** and **Agents & control
 
 ## Get the first connected map
 
-Discovery saves proposed stage links with AI-created duties and task cards. Open Company Work Map to explore the result, then correct the work or its stage assignments. For older unassigned work, choose **Connect existing work with AI**. Open a duty or task to inspect the inference basis and confidence. These links do not grant authority or count as a person confirming the work.
+Discovery saves proposed stage links with AI-created duties and task cards. Open Company Work Map to explore the result, then correct the work or its stage assignments. For older unassigned work, select the unassigned-work count above the chart, then choose **Connect existing work with AI**. This action also appears under **Assign work to business stages** below the chart. Open a duty or task to inspect the inference basis and confidence. These links do not grant authority or count as a person confirming the work.
