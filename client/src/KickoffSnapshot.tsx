@@ -64,7 +64,7 @@ export function KickoffSnapshot({ context: c }: { context: any }) {
             <span>Proposed stages · confirm with the team</span>
           </div>
           {c.streams.map((s: any, i: number) => (
-            <details className="snapshot-flow" key={s.id || i} open={i === 0}>
+            <details className="snapshot-flow" data-primary={i === 0} key={s.id || i} open={i === 0}>
               <summary>
                 <strong>{s.name}</strong>
                 <span>{i === 0 ? "Primary stream" : "Supporting stream"}</span>

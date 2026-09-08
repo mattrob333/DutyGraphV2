@@ -142,3 +142,8 @@ Added token-scoped work interview capture and transcription without creating acc
 The first reported hosted roster attempt lasted 105.076 seconds, matching the configured provider timeout; its retry completed in 33.385 seconds. Prior error handling discarded the exception identity, so exact cause cannot be proved retrospectively. New errors identify timeout versus lost connection, and UI polling checks saved outcomes without automatic paid retries. New interview prompts use short complete plain-language questions inspired by ASD-STE100; no formal conformity claim. Existing saved questions are preserved; regenerate and review to change them.
 
 Validation: all 230 tests and build pass; contracts pass and dependency audit reports zero vulnerabilities. Browser verified an unchecked recipient list, full-page form preview, collapsed research/email history, shared snapshot with primary flow open, and successful synthetic password-free submission. Transcription tests use mocked providers; no live microphone or paid provider test. A contact identity notice explains email-based roster matching without merging records. No client records have been changed by this work.
+
+
+## 2026-09-08 — Restore neutral discovery styling
+
+Removed sage accents that came from the reused client snapshot stylesheet, including profile borders, monogram, labels, response controls and arrival indicator. Expanded primary stages across the row with directional arrows and larger labels; narrow screens stack the flow vertically. Supporting streams remain collapsed by default. CSS and presentation only. Validation: build and all 230 tests passed; contracts regenerated; dependency audit found zero vulnerabilities. Browser checked with a fictional company fixture.

@@ -17,7 +17,7 @@
 @media(max-width:650px){.journey-steps{display:flex;overflow-x:auto;}.journey-steps button{min-width:145px;}.journey-metrics{grid-template-columns:1fr;}.journey-dossier{padding:16px;}}
 
 /* State-aware discovery: the next action leads; completed work remains available. */
-.journey-arrival { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:24px 28px; border:1px solid var(--sage, #9cbcab); border-left:5px solid #a7c9b5; border-radius:12px; background:rgba(136,175,151,.10); margin:20px 0; }
+.journey-arrival { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:24px 28px; border:1px solid #77746d; border-left:5px solid #d5d0c5; border-radius:12px; background:rgba(210,205,193,.06); margin:20px 0; }
 .journey-arrival h2 { font-size:22px; margin:8px 0; }
 .journey-arrival p { margin:0; max-width:65ch; }
 #returned-kickoff { scroll-margin-top:24px; }
