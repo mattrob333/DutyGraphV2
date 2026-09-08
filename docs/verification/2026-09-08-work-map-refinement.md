@@ -24,4 +24,8 @@ These checks cover a 12-person sample, not every organization size or physical t
 - Dependency audit: zero vulnerabilities.
 - Source diff check passed.
 
-The visual reference contains synthetic Cobalt data only. Hosted release status is recorded in the release follow-up; local browser results do not establish production acceptance of customer data or provider output.
+## Hosted release
+
+Implementation `1f48b7b` passed [CI 34231128872](https://github.com/mattrob333/DutyGraphV2/actions/runs/34231128872), including the synthetic advisor journey and encrypted backup recovery. Vercel deployment `dpl_5BUeH4fn8P7Hcy5b1wrnbbhotkfr` is READY. The app at dutygraph.com serves `/assets/index-CMmITn7M.css` and `/assets/index-TnOx_ysl.js`, both HTTP 200. The CSS matches the verified local build byte-for-byte; new fit, scroll and help behavior is present in the JavaScript.
+
+The visual reference contains synthetic Cobalt data only. Authenticated interactions were checked locally, not against the advisor's hosted company. These checks do not establish customer-data or provider-output acceptance.
