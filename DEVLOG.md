@@ -7,7 +7,7 @@
 - Invitation links use PUBLIC_APP_ORIGIN when configured; the legacy production alias dutygraph-v2.vercel.app maps to dutygraph.com. Local/custom origins remain unchanged. Prior emails cannot be rewritten.
 - Invalid invitation copy explains using the newest email. Advisor-account conflicts explain preview testing; enrollment isolation remains intact. Actual cause of any individual invalid token is not exposed publicly.
 - Added an advisor-only UI preview using the actual KickoffPreparation component; edits remain in component memory with no submission or enrollment. This previews structured fields, not microphone/enrollment behavior.
-- Validation: all 222 tests and production build pass; 91-route contract generation and dependency audit pass (zero vulnerabilities). Browser checked the email layout and actual kickoff form preview under the synthetic advisor account. No real email sends initiated; hosted release pending.
+- Validation: all 222 tests and production build pass; 91-route contract generation and dependency audit pass (zero vulnerabilities). Browser checked the email layout and actual kickoff form preview under the synthetic advisor account. No real email sends initiated. Release `2d3009c` passed CI `34173321591`, including the synthetic advisor journey and encrypted backup recovery. Vercel deployment `dpl_BeRoVf8Jo1vLCkkwWMEYcG5zDJxy` is READY; dutygraph.com serves `/assets/index-D-2fVpwr.js` with the new preview, success and history controls. Gmail/Outlook rendering and a new real invitation remain separate acceptance checks.
 
 ## 2026-09-07 — Reusable company profile and clearer email handoff
 

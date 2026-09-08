@@ -1,6 +1,6 @@
 # DutyGraph
 
-Invitation delivery now emphasizes the latest result, collapses historical failures and requires an explicit replacement choice after success. Kickoff emails use an 800px responsive layout with labeled sections and branded links. Advisors can open the actual kickoff fields through **Preview response form**, without enrollment or submission. See [kickoff preparation](docs/kickoff-preparation.md).
+Invitation delivery now emphasizes the latest result, collapses historical failures and requires an explicit replacement choice after success. Kickoff emails use an 800px responsive layout with labeled sections and branded links. Advisors can open the actual kickoff fields through **Preview response form**, without enrollment or submission. See [kickoff preparation](docs/kickoff-preparation.md). Release `2d3009c` passed 222 tests and CI, is READY on Vercel, and its preview/status controls are served on dutygraph.com.
 
 Company research now opens a reusable profile with identity, website/social links, scale and market highlights, sourced offers and comparable-company findings. Advisor updates preserve original citations and feed kickoff context; a standalone HTML report includes operating streams. The latest completed profile survives later failed jobs. Email preparation now says “Save & continue to send.” See [company profiles](docs/company-profiles.md). Release `289461f` passed 220 tests and CI, is READY on Vercel, and its profile/review/send controls were verified in the dutygraph.com bundle.
 
