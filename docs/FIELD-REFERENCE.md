@@ -32,6 +32,7 @@ Generated from the same runtime schemas that validate saved records. Required fi
 | purpose | Yes | string; min 1 characters; max 20000 characters |
 | scope | Yes | string; min 1 characters; max 20000 characters |
 | taskIds | No | array; max 150 items; default [] |
+| businessStageLinks | No | array; max 128 items; default [] |
 | evidenceIds | No | array; max 150 items; default [] |
 | reviewDue | Yes | string; date |
 | reason | Yes | string; min 1 characters; max 200 characters |
@@ -125,6 +126,7 @@ Generated from the same runtime schemas that validate saved records. Required fi
 | aiPrompt | No | string; max 20000 characters; default "" |
 | destination | No | string; max 20000 characters; default "" |
 | valueStage | No | receive, prepare, check, decide, deliver, unmapped; default "unmapped" |
+| businessStageLinks | No | array; max 128 items; default [] |
 | output | Yes | string; min 1 characters; max 20000 characters |
 | systems | No | array; max 80 items; default [] |
 | controlAreas | No | array; max 3 items; default [] |

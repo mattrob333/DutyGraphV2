@@ -1,0 +1,506 @@
+.stage-work-map {
+  --swm-ivory: #e3dfd5;
+  --swm-muted: #acaba6;
+  --swm-line: #494a4c;
+  color: var(--text);
+  margin-top: 24px;
+}
+.stage-work-map button {
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+.swm-intro h2 {
+  font-size: 28px;
+  letter-spacing: -0.7px;
+  margin: 6px 0;
+}
+.swm-intro p {
+  color: var(--swm-muted);
+  margin: 8px 0 24px;
+}
+.swm-streams {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.swm-streams button {
+  padding: 13px 18px;
+  background: transparent;
+  border: 1px solid var(--swm-line);
+  border-radius: 7px;
+  text-align: left;
+}
+.swm-streams small {
+  display: block;
+  font-size: 11px;
+  color: var(--swm-muted);
+  margin-top: 4px;
+}
+.swm-streams [aria-pressed="true"] {
+  border-color: var(--swm-ivory);
+  background: #303133;
+}
+.swm-stage-picker {
+  border: 1px solid var(--swm-line);
+  border-radius: 10px;
+  padding: 22px;
+  background: var(--panel, #28292b);
+}
+.swm-stage-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+.swm-stage-heading button,
+.swm-scope > button {
+  background: transparent;
+  border: 1px solid var(--swm-line);
+  border-radius: 6px;
+  padding: 9px 13px;
+  font-size: 12px;
+}
+.swm-stage-heading [aria-pressed="true"] {
+  color: var(--swm-ivory);
+  border-color: var(--swm-ivory);
+}
+.swm-stage-picker ol {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(140px, 1fr);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 24px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+.swm-stage-picker li {
+  position: relative;
+}
+.swm-stage-picker li:not(:last-child):after {
+  content: "\2192";
+  position: absolute;
+  right: -21px;
+  top: 47%;
+  color: var(--swm-muted);
+  pointer-events: none;
+}
+.swm-stage-picker li button {
+  height: 100%;
+  min-height: 130px;
+  width: 100%;
+  padding: 17px 14px;
+  border: 1px solid #5b5b59;
+  background: #212224;
+  border-radius: 7px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.swm-stage-picker li button:hover {
+  border-color: var(--swm-ivory);
+}
+.swm-stage-picker li [aria-pressed="true"] {
+  background: var(--swm-ivory);
+  color: #202123;
+  border-color: var(--swm-ivory);
+}
+.swm-step {
+  font-size: 11px;
+  opacity: 0.7;
+}
+.swm-stage-picker strong {
+  font-size: 15px;
+  line-height: 1.4;
+}
+.swm-stage-picker small {
+  font-size: 11px;
+  opacity: 0.75;
+  margin-top: auto;
+}
+.swm-scope {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: center;
+  margin: 28px 0 16px;
+}
+.swm-scope h3 {
+  font-size: 21px;
+  margin: 0 0 6px;
+}
+.swm-scope p {
+  font-size: 13px;
+  color: var(--swm-muted);
+  margin: 0;
+}
+.swm-scope > button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.swm-scope .active {
+  border-color: var(--swm-ivory);
+}
+.swm-explore {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  border: 1px solid var(--swm-line);
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: 560px;
+}
+.swm-chart {
+  padding: 20px;
+  min-width: 0;
+}
+.swm-chart-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+.swm-chart-heading span {
+  font-size: 11px;
+  color: var(--swm-muted);
+}
+.swm-chart .roster-canvas {
+  height: 490px;
+}
+.swm-detail {
+  border-left: 1px solid var(--swm-line);
+  padding: 22px;
+  background: #252628;
+  max-height: 690px;
+  overflow: auto;
+}
+.swm-detail h3 {
+  font-size: 21px;
+  margin: 0 0 8px;
+}
+.swm-detail p {
+  font-size: 13px;
+  color: var(--swm-muted);
+  line-height: 1.6;
+}
+.swm-detail-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.swm-detail-heading > button {
+  background: transparent;
+  border: 0;
+  padding: 5px;
+}
+.swm-detail-heading .eyebrow {
+  font-size: 10px;
+}
+.swm-person-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 22px;
+}
+.swm-person-list button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: #2c2d2f;
+  border: 1px solid #444547;
+  border-radius: 6px;
+  text-align: left;
+  padding: 12px;
+  font-size: 13px;
+}
+.swm-person-list small {
+  display: block;
+  font-size: 11px;
+  color: var(--swm-muted);
+  margin-top: 4px;
+}
+.swm-duty {
+  border-top: 1px solid var(--swm-line);
+  padding: 15px 0;
+}
+.swm-duty summary {
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1.5;
+}
+.swm-duty > small {
+  font-size: 11px;
+  color: var(--swm-muted);
+}
+.swm-duty ul {
+  list-style: none;
+  margin: 12px 0;
+  padding: 0;
+}
+.swm-task {
+  padding: 10px 0;
+  border-bottom: 1px solid #3b3c3e;
+}
+.swm-task > button:first-child {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: 0;
+  text-align: left;
+  padding: 0;
+  font-size: 13px;
+  width: 100%;
+}
+.swm-task small {
+  display: block;
+  color: var(--swm-muted);
+  font-size: 10px;
+  margin: 5px 0;
+}
+.swm-text {
+  font-size: 11px !important;
+  background: transparent;
+  border: 0;
+  padding: 4px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  color: var(--swm-muted) !important;
+}
+.swm-duty-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+.swm-duty-actions > button {
+  background: transparent;
+  border: 1px solid var(--swm-line);
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 11px;
+}
+.swm-gaps,
+.swm-legacy {
+  margin-top: 24px;
+  border-top: 1px solid var(--swm-line);
+  padding: 18px 0;
+}
+.swm-gaps summary,
+.swm-legacy summary {
+  font-size: 13px;
+  cursor: pointer;
+}
+.swm-gaps > p {
+  font-size: 13px;
+  color: var(--swm-muted);
+  max-width: 75ch;
+}
+.swm-gaps > button,
+.swm-assign-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px 0;
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid var(--swm-line);
+  background: transparent;
+  text-align: left;
+  font-size: 13px;
+}
+.swm-assign-row small {
+  display: block;
+  text-transform: uppercase;
+  font-size: 9px;
+  color: var(--swm-muted);
+  margin-bottom: 4px;
+}
+.swm-assign-row button {
+  background: transparent;
+  border: 1px solid var(--swm-line);
+  border-radius: 5px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+.swm-flows {
+  margin: 28px 0;
+}
+.swm-flows h3 {
+  font-size: 21px;
+  margin: 5px 0;
+}
+.swm-flows p {
+  font-size: 13px;
+  color: var(--swm-muted);
+}
+.swm-flow-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.swm-flow-list button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+  text-align: left;
+  background: var(--panel, #28292b);
+  border: 1px solid var(--swm-line);
+  border-radius: 8px;
+}
+.swm-flow-list span {
+  font-size: 12px;
+  color: var(--swm-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.swm-empty {
+  padding: 20px;
+  color: var(--swm-muted);
+  font-size: 13px;
+}
+.swm-empty a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.swm-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  padding: 12px;
+  border-left: 2px solid var(--swm-ivory);
+}
+.swm-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: #0009;
+  display: grid;
+  place-items: center;
+  z-index: 1100;
+  padding: 24px;
+}
+.swm-assignment {
+  width: min(600px, 100%);
+  max-height: 85vh;
+  overflow: auto;
+  background: #262729;
+  border: 1px solid #66645f;
+  padding: 24px;
+  border-radius: 12px;
+}
+.swm-assignment fieldset {
+  margin: 16px 0;
+  border: 1px solid var(--swm-line);
+  border-radius: 6px;
+}
+.swm-assignment label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 12px 0;
+  font-size: 13px;
+}
+.swm-assignment input {
+  width: auto;
+  accent-color: var(--swm-ivory);
+}
+.stage-work-map button:focus-visible {
+  outline: 2px solid var(--swm-ivory);
+  outline-offset: 4px;
+}
+@media (max-width: 1000px) {
+  .swm-explore {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+  .swm-stage-picker {
+    padding: 16px;
+  }
+  .swm-chart {
+    padding: 14px;
+  }
+}
+@media (max-width: 760px) {
+  .swm-explore {
+    grid-template-columns: 1fr;
+  }
+  .swm-detail {
+    border-left: 0;
+    border-top: 1px solid var(--swm-line);
+    max-height: 500px;
+  }
+  .swm-chart .roster-canvas {
+    height: 420px;
+  }
+  .swm-scope {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .swm-flow-list {
+    grid-template-columns: 1fr;
+  }
+  .swm-chart-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .swm-intro h2 {
+    font-size: 25px;
+  }
+  .swm-stage-picker ol {
+    grid-auto-columns: 165px;
+  }
+  .swm-assignment {
+    padding: 18px;
+  }
+  .swm-modal-backdrop {
+    padding: 12px;
+  }
+}
+
+dialog.swm-assignment {
+  color: var(--text);
+  padding: 0;
+  width: min(640px, 94vw);
+}
+dialog.swm-assignment .modal-body {
+  padding: 24px;
+}
+dialog.swm-assignment::backdrop {
+  background: #000a;
+}
+
+.swm-example {
+  font-size: 12px;
+  color: var(--swm-muted);
+  border-left: 2px solid #928b7d;
+  padding: 8px 12px;
+}
+.stage-work-map .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -6,6 +6,33 @@ const optionalId = z.union([z.uuid(), z.literal("")]).default("");
 const ids = z.array(z.uuid()).max(150).default([]);
 const lines = z.array(z.string().max(1000)).max(80).default([]);
 
+const businessStageId = z
+  .string()
+  .regex(/^[a-z0-9-]+$/)
+  .max(100);
+export const businessStageLinksSchema = z
+  .array(
+    z.object({ streamId: businessStageId, stageId: businessStageId }).strict(),
+  )
+  .max(128)
+  .superRefine((links, ctx) => {
+    const pairs = new Set<string>();
+    links.forEach((link, index) => {
+      const key = `${link.streamId}:${link.stageId}`;
+      if (pairs.has(key))
+        ctx.addIssue({
+          code: "custom",
+          message: "Each business stage link must be unique",
+          path: [index],
+        });
+      pairs.add(key);
+    });
+  })
+  .default([]);
+export type BusinessStageLink = z.infer<
+  typeof businessStageLinksSchema
+>[number];
+
 export const kickoffQuestions = [
   {
     id: "value",
@@ -97,6 +124,7 @@ export const workSchemas = {
       purpose: text,
       scope: text,
       taskIds: ids,
+      businessStageLinks: businessStageLinksSchema,
       evidenceIds: ids,
       reviewDue: z.iso.date(),
       reason: short,

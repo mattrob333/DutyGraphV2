@@ -1,7 +1,7 @@
 import type { BusinessProfile } from "./business-types.ts";
 import type { CompanyProfileReview } from "./company-profile.ts";
 import { z } from "zod";
-import { workSchemas } from "./work-model.ts";
+import { businessStageLinksSchema, workSchemas } from "./work-model.ts";
 import { workflowSchema } from "./workflow.ts";
 export const evidenceLabels = [
   "Known",
@@ -65,6 +65,7 @@ export const schemas = {
       valueStage: z
         .enum(["receive", "prepare", "check", "decide", "deliver", "unmapped"])
         .default("unmapped"),
+      businessStageLinks: businessStageLinksSchema,
       output: text,
       systems: lines,
       controlAreas: z.array(z.enum(['Access review', 'Change review', 'Confidential data'])).max(3).default([]),

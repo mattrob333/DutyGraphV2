@@ -7,6 +7,48 @@ import {
 } from "../shared/domain.ts";
 import { fail, getRecord, putRecord, setState } from "./db.ts";
 import { validateFlow } from "../shared/workflow.ts";
+import type { BusinessStageLink } from "../shared/work-model.ts";
+
+async function validateBusinessStageLinks(
+  db: pg.PoolClient,
+  user: User,
+  company: string,
+  links: BusinessStageLink[],
+  existing?: RecordRow,
+) {
+  // A profile can change after work was mapped. Keep retained links visible for
+  // review, while allowing ordinary edits and removals. New links must resolve.
+  const previous = new Set(
+    (existing?.data.businessStageLinks || []).map(
+      (link: BusinessStageLink) => `${link.streamId}:${link.stageId}`,
+    ),
+  );
+  const added = links.filter(
+    (link) => !previous.has(`${link.streamId}:${link.stageId}`),
+  );
+  if (!added.length) return;
+  const result = await db.query(
+    "SELECT settings FROM companies WHERE id=$1 AND tenant_id=$2",
+    [company, user.tenant_id],
+  );
+  if (!result.rows.length) fail(404, "NOT_FOUND", "Workspace not found.");
+  const streams = result.rows[0].settings?.businessProfile?.streams || [];
+  if (
+    added.some(
+      (link) =>
+        !streams.some(
+          (stream: any) =>
+            stream.id === link.streamId &&
+            stream.stages?.some((stage: any) => stage.id === link.stageId),
+        ),
+    )
+  )
+    fail(
+      422,
+      "INVALID_BUSINESS_STAGE",
+      "A selected business stage is no longer available in this workspace. Refresh the work map and choose a current stage.",
+    );
+}
 export async function validateReferences(
   db: pg.PoolClient,
   company: string,
@@ -79,7 +121,19 @@ export async function createOrEdit(
 ) {
   if (!(kind in schemas))
     fail(422, "INVALID_KIND", "This record type cannot be edited directly.");
-  const d: any = schemas[kind as keyof typeof schemas].parse(input);
+  const hasStageLinks = kind === "task" || kind === "duty";
+  // Older edit forms do not know this field. Omission preserves saved links;
+  // an explicit empty array clears them. New records still default to [].
+  const normalizedInput =
+    hasStageLinks &&
+    existing &&
+    input &&
+    typeof input === "object" &&
+    !Array.isArray(input) &&
+    !("businessStageLinks" in input)
+      ? { ...input, businessStageLinks: existing.data.businessStageLinks || [] }
+      : input;
+  const d: any = schemas[kind as keyof typeof schemas].parse(normalizedInput);
   // Internal fixture identity survives normal edits, including title changes.
   // It is copied only from the existing server record, never accepted as input.
   if (existing?.data.sampleKey) {
@@ -87,6 +141,14 @@ export async function createOrEdit(
     d.sampleVersion = existing.data.sampleVersion;
   }
   await validateReferences(db, company, kind, d);
+  if (hasStageLinks)
+    await validateBusinessStageLinks(
+      db,
+      user,
+      company,
+      d.businessStageLinks,
+      existing,
+    );
   if (existing && existing.kind !== kind)
     fail(422, "INVALID_KIND", "A record cannot change type.");
   if (kind === "person") {

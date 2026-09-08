@@ -1,5 +1,7 @@
 # DutyGraph
 
+The default Company Work Map connects business stages to a stable reporting chart. Select a stage to highlight recorded owners and performers, then a person to see scoped duties/tasks and open related task flows. Advisors can assign duties/tasks to one or more stages; tasks inherit explicit duty links unless given their own. Unassigned, ownerless and removed-stage work remains visible. Existing graph views and the detailed task map remain available. The Cobalt fallback is a labeled read-only illustration; it does not write stage assignments. See [the stage work map](docs/stage-work-map.md).
+
 Company snapshots and response pages use charcoal and ivory styling. Each value stream fills the available row with larger stages and directional arrows; on phones, stages stack with downward arrows.
 
 Discovery leads with the work for the selected step. Value streams stay in the company snapshot; later steps focus on the meeting, team, questions or task cards. Public facts use compact bullets, potential competitors use saved website links, and original research stays in a collapsed evidence view. Completed research and kickoff email forms collapse. Work interviews use private links without accounts, typed or transcribed responses, and a no-send form preview. Team emails require explicit recipient selection. New questions use short, complete, plain-language prompts inspired by ASD-STE100; this is not a formal compliance claim. AI timeout results are explicit and the page checks saved job status without retrying paid calls.

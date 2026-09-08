@@ -1,5 +1,11 @@
 # DutyGraph development log
 
+## 2026-09-08 — Stage-based Company Work Map
+
+Added the default stage → people → duties/tasks experience with a stable org canvas, neutral highlights, scoped counts, person detail, and relevant flow links. Preserved all older graph views and the detailed task map. Added explicit task/duty businessStageLinks with server validation, version checks, duty inheritance and task overrides. No title, department, reporting line or task-level valueStage is treated as business-stage membership. Owners and performers are separate; approval rights are not inferred. Assignment UI preserves unchanged records, supports removed-stage repair and orphan work, and uses the shared accessible dialog. Cobalt can show a guarded read-only illustration when it has no saved business profile.
+
+Validation: build and all 245 tests passed; contracts regenerated and dependency audit found zero vulnerabilities. Browser checked the actual component using fictional Cobalt data: stage selection, scoped highlights and person tasks, flow callback, assignment modal with unchanged save disabled, and a 390px responsive fixture. API tests cover real local persistence, stale links, version checks and tenant isolation. No client data, emails or paid providers used.
+
 ## 2026-09-07 — Manual kickoff roster entry
 
 - Added manual participant rows with name/email/role/department/reports-to, executive/pilot checkboxes, repeat add, edit and remove. CSV remains the preferred full discovery-roster path.

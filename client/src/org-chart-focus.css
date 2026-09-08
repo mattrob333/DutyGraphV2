@@ -1,0 +1,106 @@
+.roster-node[role="button"] {
+  cursor: pointer;
+}
+.roster-node[role="button"]:focus-visible {
+  outline: 3px solid #e5e0d5;
+  outline-offset: 5px;
+}
+.org-chart-neutral .roster-canvas {
+  background: #202122;
+  border-color: #444446;
+}
+.roster-node.roster-node-neutral {
+  height: 190px;
+  min-height: 190px;
+  padding: 14px;
+  background: #292a2c;
+  border: 1px solid #66635e;
+  border-top: 3px solid #9d988d;
+  color: #ede9e0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  transition:
+    opacity 150ms ease,
+    border-color 150ms ease,
+    background 150ms ease;
+}
+.roster-person-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 34px;
+}
+.roster-person-heading strong {
+  font-size: 14px;
+  line-height: 1.3;
+}
+.roster-node-neutral .roster-avatar {
+  flex: 0 0 30px;
+  border-color: #66635e;
+  color: #d9d4c9;
+  background: #333436;
+}
+.roster-node-neutral > span,
+.roster-node-neutral .roster-department {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.roster-node-neutral .roster-department {
+  color: #b6b2a9;
+}
+.roster-node-neutral .roster-work-count {
+  margin-top: auto;
+  padding-top: 8px;
+  border-top: 1px solid #454446;
+  color: #e4dfd4;
+  font-weight: 600;
+}
+.roster-node-neutral .roster-work-roles {
+  min-height: 15px;
+  color: #c4beb2;
+  font-size: 11px;
+  line-height: 1.3;
+}
+.roster-node.roster-node-match {
+  border-color: #ddd7ca;
+  border-top-color: #eee8da;
+  background: #343435;
+  box-shadow: 0 0 0 1px rgb(222 216 203 / 12%);
+}
+.roster-node.roster-node-muted {
+  opacity: 0.42;
+  border-color: #4b4b4d;
+  border-top-color: #5d5c59;
+}
+.roster-node.roster-node-muted:hover,
+.roster-node.roster-node-muted:focus-visible {
+  opacity: 0.8;
+}
+.roster-node.roster-node-active {
+  opacity: 1;
+  border-color: #f5eedf;
+  outline: 2px solid #f5eedf;
+  outline-offset: 3px;
+}
+.org-chart-neutral .react-flow__handle {
+  background: #9b968d;
+  border-color: #292a2c;
+}
+.org-chart-neutral .react-flow__controls-button {
+  background: #2a2b2d;
+  border-color: #454547;
+  color: #ded9cf;
+}
+.org-chart-neutral .react-flow__minimap {
+  background: #292a2c;
+}
+.org-chart-neutral .react-flow__minimap-mask {
+  fill: rgb(25 25 26 / 55%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .roster-node.roster-node-neutral {
+    transition: none;
+  }
+}

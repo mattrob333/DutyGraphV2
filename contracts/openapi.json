@@ -239,6 +239,31 @@
                               "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
                             }
                           },
+                          "businessStageLinks": {
+                            "default": [],
+                            "maxItems": 128,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "streamId": {
+                                  "type": "string",
+                                  "maxLength": 100,
+                                  "pattern": "^[a-z0-9-]+$"
+                                },
+                                "stageId": {
+                                  "type": "string",
+                                  "maxLength": 100,
+                                  "pattern": "^[a-z0-9-]+$"
+                                }
+                              },
+                              "required": [
+                                "streamId",
+                                "stageId"
+                              ],
+                              "additionalProperties": false
+                            }
+                          },
                           "evidenceIds": {
                             "default": [],
                             "maxItems": 150,
@@ -829,6 +854,31 @@
                               "deliver",
                               "unmapped"
                             ]
+                          },
+                          "businessStageLinks": {
+                            "default": [],
+                            "maxItems": 128,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "streamId": {
+                                  "type": "string",
+                                  "maxLength": 100,
+                                  "pattern": "^[a-z0-9-]+$"
+                                },
+                                "stageId": {
+                                  "type": "string",
+                                  "maxLength": 100,
+                                  "pattern": "^[a-z0-9-]+$"
+                                }
+                              },
+                              "required": [
+                                "streamId",
+                                "stageId"
+                              ],
+                              "additionalProperties": false
+                            }
                           },
                           "output": {
                             "type": "string",
@@ -1618,6 +1668,31 @@
               "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
             }
           },
+          "businessStageLinks": {
+            "default": [],
+            "maxItems": 128,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "streamId": {
+                  "type": "string",
+                  "maxLength": 100,
+                  "pattern": "^[a-z0-9-]+$"
+                },
+                "stageId": {
+                  "type": "string",
+                  "maxLength": 100,
+                  "pattern": "^[a-z0-9-]+$"
+                }
+              },
+              "required": [
+                "streamId",
+                "stageId"
+              ],
+              "additionalProperties": false
+            }
+          },
           "evidenceIds": {
             "default": [],
             "maxItems": 150,
@@ -2130,6 +2205,31 @@
               "deliver",
               "unmapped"
             ]
+          },
+          "businessStageLinks": {
+            "default": [],
+            "maxItems": 128,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "streamId": {
+                  "type": "string",
+                  "maxLength": 100,
+                  "pattern": "^[a-z0-9-]+$"
+                },
+                "stageId": {
+                  "type": "string",
+                  "maxLength": 100,
+                  "pattern": "^[a-z0-9-]+$"
+                }
+              },
+              "required": [
+                "streamId",
+                "stageId"
+              ],
+              "additionalProperties": false
+            }
           },
           "output": {
             "type": "string",

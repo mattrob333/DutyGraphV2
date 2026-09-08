@@ -1196,6 +1196,9 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <Graph
           key={companyId}
           company={companyId}
+          profile={company.settings.businessProfile}
+          sandbox={company.sandbox}
+          refresh={refresh}
           revision={company.revision}
           records={records}
           open={open}

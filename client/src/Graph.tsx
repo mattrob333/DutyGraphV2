@@ -1,11 +1,12 @@
 import { linksFor } from "../../shared/record-links.ts";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Expand, Focus, Minus, Plus, List, Network } from "lucide-react";
+import type { BusinessProfile } from "../../shared/business-types.ts";
+import { StageWorkMap } from "./StageWorkMap.tsx";
 import type { RecordRow } from "../../shared/domain.ts";
 import { api } from "./api.ts";
 import { Button, Badge, Empty, ErrorBox, State, stateLabel } from "./ui.tsx";
 import { OrgView } from "./OrgView.tsx";
-import { CompanyWorkMap } from "./CompanyWorkMap.tsx";
 import { AuditGraph } from "./AuditGraph.tsx";
 import {
   wrapNodeTitle,
@@ -20,11 +21,17 @@ import {
 const NetworkExplorer = lazy(() => import("./NetworkExplorer.tsx"));
 export function Graph({
   company,
+  profile,
+  sandbox,
+  refresh,
   revision,
   records,
   open,
 }: {
   company: string;
+  profile?: BusinessProfile;
+  sandbox?: boolean;
+  refresh?: () => Promise<void>;
   revision: number;
   records: RecordRow[];
   open: (r: RecordRow) => void;
@@ -192,7 +199,7 @@ export function Graph({
     );
   if (!graph && view !== "map")
     return <div className="loading">Loading the company graph…</div>;
-  if (!records.length)
+  if (!records.length && view !== "map")
     return (
       <Empty
         title="Your work graph starts with people and evidence"
@@ -311,7 +318,19 @@ export function Graph({
           </div>
         )}
       {view === "map" ? (
-        <CompanyWorkMap records={records} open={open} />
+        <StageWorkMap
+          companyId={company}
+          profile={profile}
+          sandbox={sandbox}
+          records={records}
+          open={open}
+          refresh={refresh}
+          openFlow={(id) => {
+            setWorkflowId(id);
+            setView("work");
+            setList(false);
+          }}
+        />
       ) : view === "network" ? (
         <Suspense fallback={<p>Loading Relationships…</p>}>
           <NetworkExplorer company={company} records={records} open={open} />
