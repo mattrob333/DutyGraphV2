@@ -21,4 +21,8 @@ Stage provenance tests separate company evidence from peer examples, reject unkn
 
 ## Hosted release
 
-Pending publication. Migration 0012 adds durable worker cursors and unique reply/outreach indexes. Real inbox delivery, research quality and customer acceptance remain separate from local injected-provider verification. No real emails or paid provider calls were used in these checks.
+Implementation `e4aedfb` passed [CI 34237031178](https://github.com/mattrob333/DutyGraphV2/actions/runs/34237031178), including synthetic training and encrypted restore. Hosted migration 0012 applied successfully; runtime tenant RLS remains forced. Vercel deployment `dpl_29okn2JzKn8Bn4sNQPKbWnsBa2dd` is READY and aliased to dutygraph.com.
+
+Hosted `/login` and `/api/health` return 200. The app serves `/assets/index-VSepu8m9.css` and `/assets/index-CZDc1E74.js`; CSS matches the local build. JavaScript contains the gap actions, saved-reply history, short voice form and stage evidence help. Anonymous access to the gap and maintenance routes returns 401. These are read-only hosted checks; authenticated customer interactions were exercised locally with fictional records.
+
+Migration 0012 adds durable worker cursors and unique reply/outreach indexes. Real inbox delivery, research quality and customer acceptance remain separate from local injected-provider verification. No real emails or paid provider calls were used in these checks.
