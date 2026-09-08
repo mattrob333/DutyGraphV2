@@ -1,5 +1,7 @@
 # Company Work Map
 
+Business stages are broader than duties: a stage groups work across roles; a duty is an ongoing responsibility; a task is a specific piece of work. There is no universal stage count. Templates are suggested starting points, and saved streams support 1-16 stages. Hover a stage or focus/tap its info button for an explanation and typical work. Company descriptions take precedence; renamed/custom stages ask for a description instead of inheriting unrelated examples. Edit descriptions in Discovery > Edit the profile and stages.
+
 Open **Company Work Map** in the sidebar. The default path is simple: choose a business stream, choose a stage, select a highlighted person, then inspect that person’s duties, tasks and task flows. The map connects the saved business model to recorded work. A business template alone never creates company evidence.
 
 ## Follow the work

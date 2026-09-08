@@ -1,5 +1,7 @@
 # Company Work Map: stages and people
 
+Business stages are broader than duties: a stage groups work across roles; a duty is an ongoing responsibility; a task is a specific piece of work. There is no universal stage count. Templates are suggested starting points, and saved streams support 1-16 stages. Hover a stage or focus/tap its info button for an explanation and typical work. Company descriptions take precedence; renamed/custom stages ask for a description instead of inheriting unrelated examples. Edit descriptions in Discovery > Edit the profile and stages.
+
 The default view starts with the saved business stream and its stages. Select a stage to highlight the people whose recorded work belongs there. The chart preserves reporting positions as selections change. Its lines mean “reports to”; the task flows below mean work passes between people.
 
 Select a person on the chart or in the list to inspect duties and tasks in the current selection. “Owns work” comes from duty/task owner fields; “Does the work” comes from task performer fields. Neither label grants approval or agent authority. Open a task, duty or full flow for its record.

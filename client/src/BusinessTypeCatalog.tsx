@@ -1,3 +1,4 @@
+import { StageHelp } from "./StageHelp.tsx";
 import { useState } from "react";
 import { Check, Plus } from "lucide-react";
 import { businessTemplates } from "../../shared/business-types.ts";
@@ -33,7 +34,8 @@ export function BusinessTypeCatalog({
       <div className="business-catalog-content">
         <p>
           Find a business that works like yours. These are operating patterns,
-          not industries: a company can use more than one.
+          not industries: a company can use more than one. Stage counts vary.
+          These are suggested starting points; add, combine or remove stages to fit the company.
         </p>
         <div className="business-fields">
           <label>
@@ -112,10 +114,10 @@ export function BusinessTypeCatalog({
                   <p>{example.context}</p>
                 </div>
                 <details>
-                  <summary>Preview the {t.stages.length} stages</summary>
+                  <summary>Preview suggested stages · {t.stages.length}</summary>
                   <ol>
                     {t.stages.map((stage) => (
-                      <li key={stage.id}>{stage.name}</li>
+                      <li key={stage.id}>{stage.name} <StageHelp stage={stage} stream={t} /></li>
                     ))}
                   </ol>
                 </details>

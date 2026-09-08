@@ -1,3 +1,4 @@
+import { StageHelp } from "./StageHelp.tsx";
 import { BusinessBrief } from "./BusinessBrief.tsx";
 import { CobaltCompanyProfile } from "./CobaltCompanyProfile.tsx";
 import { isKnownCobaltSample } from "../../shared/cobalt-company-example.ts";
@@ -612,6 +613,7 @@ export function BusinessProfilePanel({
                       <span key={s.id}>
                         <small>{i + 1}</small>
                         {s.name}
+                        <StageHelp stage={s} stream={stream} />
                       </span>
                     ))}
                   </div>
@@ -850,6 +852,12 @@ export function BusinessProfilePanel({
                           })
                         }
                       />
+                    </label>
+                    <label>
+                      What happens in this stage?
+                      <textarea value={stage.description || ""} maxLength={600} rows={2}
+                        placeholder="Explain the purpose and typical work in plain language."
+                        onChange={(e) => changeStream(i, { stages: stream.stages.map((s, k) => j === k ? { ...s, description: e.target.value } : s) })} />
                     </label>
                     <label>
                       Common function

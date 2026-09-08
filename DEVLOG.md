@@ -1,5 +1,9 @@
 # DutyGraph development log
 
+## 2026-09-08 - Explain business stages without a fixed count
+
+Added hover, keyboard-focus and tap explanations to snapshot, Work Map, saved-profile and template stage nodes. Specific starting guidance covers wholesale, advisory and custom software; other templates use explicitly general guidance. Saved descriptions override examples. Added optional stage descriptions, variable-count regression coverage, honest template wording and neutral stream-review borders. Existing stage IDs and assignments are preserved.
+
 ## 2026-09-08 — Shared business stages, complete Cobalt context and current training
 
 Task cards now uses the same saved stream/stage projection as Company Work Map, with multiple stream selection, owner/performer filtering, explicit Unassigned work and role → duty → task labels. Duplicate stage placements have separate counts. Secondary duty/handoff registers collapse below the board. Added keyboard scrolling, concise empty states and readable selected-stage counts.
@@ -168,3 +172,5 @@ Removed sage accents that came from the reused client snapshot stylesheet, inclu
 ## 2026-09-08 — Focus Discovery on the current task
 
 Both streams use full-width stages and arrows. Removed repeated value-chain banners from later Discovery steps. Meeting preparation keeps returned contact material collapsed; existing drafts make regeneration secondary to review/save. Company facts use short bullets with reported counts, places, offer names and potential competitor links from saved sources. Original qualifications and citations remain in one expandable evidence section; no saved research is rewritten. Validation: build and 233 tests passed; contracts passed; audit found zero vulnerabilities. Browser checked the actual snapshot component with synthetic facts, a linked potential competitor and both expanded streams. Reviewed rendering and action conditions across all five Discovery steps; no real client data or provider calls were used.
+
+Validation: build, all 255 tests and 92-route contract generation passed; production dependency audit found zero vulnerabilities. Local browser verification confirmed the stage explanation opens without changing the Work Map selection. Template counts and existing saved assignments remain unchanged.

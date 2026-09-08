@@ -1,0 +1,81 @@
+.snapshot-flow li,
+.business-flow-preview > span,
+.swm-stage-picker li {
+  position: relative;
+}
+.snapshot-flow li,
+.business-flow-preview > span {
+  padding-right: 34px;
+}
+button.stage-help-trigger,
+.swm-stage-picker li button.stage-help-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0;
+  margin: 0 0 0 4px;
+  color: var(--muted);
+  background: transparent;
+  border: 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.snapshot-flow .stage-help-trigger,
+.business-flow-preview .stage-help-trigger,
+.swm-stage-picker .stage-help-trigger {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+}
+.stage-help-trigger:hover,
+.stage-help-trigger:focus-visible {
+  color: var(--ink);
+  background: var(--surface);
+  outline: 1px solid var(--muted);
+}
+.stage-help-popover {
+  position: fixed;
+  z-index: 12000;
+  width: min(332px, calc(100vw - 24px));
+  max-height: min(360px, calc(100vh - 24px));
+  overflow: auto;
+  padding: 18px;
+  box-sizing: border-box;
+  background: var(--surface, #252629);
+  color: var(--ink, #e3dfd5);
+  border: 1px solid var(--line, #555);
+  border-radius: 9px;
+  box-shadow: 0 12px 40px #0005;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.stage-help-popover small {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 6px;
+}
+.stage-help-popover strong {
+  display: block;
+  font-size: 17px;
+}
+.stage-help-popover p {
+  margin: 10px 0;
+}
+.stage-help-popover ul {
+  margin: 8px 0;
+  padding-left: 18px;
+}
+.stage-help-popover li {
+  margin: 6px 0;
+}
+.stage-help-popover footer {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 11px;
+}

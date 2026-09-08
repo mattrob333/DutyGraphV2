@@ -15,6 +15,7 @@ export type BusinessTemplate = {
   stages: {
     id: string;
     name: string;
+    description?: string;
     functionIds: (typeof backbone)[number]["id"][];
   }[];
 };
@@ -2075,6 +2076,7 @@ export const businessProfileSchema = z
                       .regex(/^[a-z0-9-]+$/)
                       .max(100),
                     name: z.string().trim().min(1).max(100),
+                    description: z.string().trim().max(600).optional(),
                     functionIds: z.array(functionSchema).min(1).max(6),
                   })
                   .strict(),

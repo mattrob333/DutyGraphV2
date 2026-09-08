@@ -1,3 +1,4 @@
+import { StageHelp } from "./StageHelp.tsx";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, X, Check } from "lucide-react";
 import { schemas, type RecordRow } from "../../shared/domain.ts";
@@ -222,6 +223,7 @@ export function StageWorkMap({
                     {s.tasks.length} {s.tasks.length === 1 ? "task" : "tasks"}
                   </small>
                 </button>
+                <StageHelp stage={example.profile?.streams.find((item) => item.id === stream.id)?.stages.find((item) => item.id === s.id) || s} stream={example.profile?.streams.find((item) => item.id === stream.id) || stream} />
               </li>
             ))}
           </ol>

@@ -1,5 +1,7 @@
 # Classify the business and shape its operating flows
 
+Business stages are broader than duties: a stage groups work across roles; a duty is an ongoing responsibility; a task is a specific piece of work. There is no universal stage count. Templates are suggested starting points, and saved streams support 1-16 stages. Hover a stage or focus/tap its info button for an explanation and typical work. Company descriptions take precedence; renamed/custom stages ask for a description instead of inheriting unrelated examples. Edit descriptions in Discovery > Edit the profile and stages.
+
 In Discovery, Research & contact and Leadership meeting both include **What kind of business is this?** The library contains 52 proposed operating models across services, technology, commerce, production, the built environment, transport, consumer services, care and education, financial services, and public/mission delivery.
 
 An industry describes the market. An operating model describes how work delivers value. A company can therefore be an industrial supplier with distribution, manufacturing and service flows. Choose one or several templates, or create a custom flow. Eight flows per company and sixteen stages per flow are currently supported.

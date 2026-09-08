@@ -1,3 +1,4 @@
+import { StageHelp } from "./StageHelp.tsx";
 import {
   snapshotFactText,
   snapshotCompanyLink,
@@ -102,6 +103,7 @@ export function KickoffSnapshot({
                   <li key={j}>
                     <span>{j + 1}</span>
                     {stage.name || stage.label || stage.title}
+                    <StageHelp stage={stage} stream={s} />
                   </li>
                 ))}
               </ol>
