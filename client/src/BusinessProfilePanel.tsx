@@ -25,11 +25,13 @@ export function BusinessProfilePanel({
   refresh,
   openIndustry,
   researched,
+  contactComplete = false,
 }: {
   company: Company;
   refresh: () => Promise<void>;
   openIndustry: () => void;
   researched?: () => void;
+  contactComplete?: boolean;
 }) {
   const [plan, setPlan] = useState<ResearchPlan | null>(() =>
     readResearchPlan(company.id),
@@ -337,9 +339,11 @@ export function BusinessProfilePanel({
   };
   return (
     <Panel
-      title="Start with the company. We’ll build the research brief."
+      title={briefJob ? "Company profile" : "Start with the company. We’ll build the research brief."}
       subtitle="Enter the company once. Get a sourced business overview, competitive context and the questions to take into your first meeting."
     >
+      <details className="research-intake-disclosure" key={briefJob?.id || "new"} open={!briefJob || !!plan}>
+        <summary>{briefJob ? "Edit company details / research again" : "Company details"}</summary>
       <div className="business-intake">
         <div className="business-fields">
           <label>
@@ -471,6 +475,7 @@ export function BusinessProfilePanel({
           </p>
         )}
       </div>
+      </details>
       <ErrorBox error={error} />
       {notice && <p role="status">{notice}</p>}
       {briefJob && (
@@ -485,11 +490,10 @@ export function BusinessProfilePanel({
             (k) => briefJob.input[k] !== intake[k as keyof typeof intake],
           )}
           busy={busy}
-          prepare={() =>
-            document
-              .getElementById("business-stream-review")
-              ?.scrollIntoView({ behavior: "smooth", block: "start" })
-          }
+          prepare={() => {
+            const section = document.getElementById("business-stream-review") as HTMLDetailsElement | null;
+            if (section) { section.open = true; section.scrollIntoView({ behavior: "smooth", block: "start" }); }
+          }}
         />
       )}
       {!briefJob && !!profile.streams.length && (
@@ -500,11 +504,12 @@ export function BusinessProfilePanel({
         </p>
       )}
       {!!profile.streams.length && (
-        <section
+        <details open={dirty || !briefJob}
           id="business-stream-review"
           className="business-recommendation"
           aria-label="Suggested business profile"
         >
+          <summary>Review or change business streams</summary>
           <div className="eyebrow">
             {dirty
               ? "Suggested profile · ready to review"
@@ -657,6 +662,7 @@ export function BusinessProfilePanel({
               disabled={busy}
               onClick={async () => {
                 if (dirty && !(await save("proposed"))) return;
+                if (contactComplete) { setNotice("Business streams saved. Your returned preparation remains available above."); return; }
                 document
                   .getElementById("journey-draft")
                   ?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -666,7 +672,7 @@ export function BusinessProfilePanel({
               }}
             >
               {dirty ? <ArrowRight size={15} /> : <Check size={15} />}
-              {`Confirm ${profile.streams.length > 1 ? `${profile.streams.length} streams` : "stream"} & prepare kickoff request`}
+              {contactComplete ? "Save business streams" : `Confirm ${profile.streams.length > 1 ? `${profile.streams.length} streams` : "stream"} & prepare kickoff request`}
             </Button>
           </div>
           <p className="subtle">
@@ -674,7 +680,7 @@ export function BusinessProfilePanel({
             starting focus. This saves your selection and opens email
             preparation. It does not run more research or send an email.
           </p>
-        </section>
+        </details>
       )}
       <BusinessTypeCatalog
         selectedIds={profile.streams.map((s) => s.templateId)}

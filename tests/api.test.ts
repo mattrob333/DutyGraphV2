@@ -1581,7 +1581,8 @@ test("Resend invitation calls once, keeps tokens out of receipts and opens parti
   assert.equal(emailMessages.length, before + 1);
   const message = emailMessages.at(-1).message;
   assert.deepEqual(message.to, [f.p.data.email]);
-  assert.ok(message.html.includes("What do you do?"));
+  assert.ok(message.html.includes("Open my questions"));
+  assert.ok(!message.html.includes("What do you do?")); // Full questions stay on the private page.
   const preview = await request(
     c,
     prefix(c) + "/requests/" + r.id + "/email-preview",
@@ -1594,7 +1595,12 @@ test("Resend invitation calls once, keeps tokens out of receipts and opens parti
     404,
   );
   const token = message.text.match(/invite\/([a-f0-9]{64})/)[1];
-  assert.equal((await request(null, "/api/invitations/" + token)).status, 200);
+  const publicInfo = await request(null, "/api/invitations/" + token);
+  assert.equal(publicInfo.status, 200);
+  assert.equal(publicInfo.data.passwordlessTeam, true);
+  const publicWork = await request(null, "/api/invitations/" + token + "/team");
+  assert.equal(publicWork.status, 200);
+  assert.ok(publicWork.data.questions.includes("What do you do?"));
   const jobs = await request(c, prefix(c) + "/requests/" + r.id + "/emails");
   assert.ok(!JSON.stringify(jobs.data).includes(token));
   const stored = await tx(

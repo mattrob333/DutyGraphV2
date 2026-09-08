@@ -1,3 +1,5 @@
+import { KickoffSnapshot } from "./KickoffSnapshot.tsx";
+import "./kickoff-link.css";
 import {
   briefCategories,
   type BusinessBrief as Brief,
@@ -56,78 +58,16 @@ export function BusinessBrief({
       aria-label="Business briefing"
       tabIndex={-1}
     >
-      <header>
-        <div className="eyebrow">
-          COMPANY PROFILE · {new Date(job.created_at).toLocaleDateString()}
-        </div>
-        <div className="brief-identity">
-          <span className="brief-monogram" aria-hidden="true">
-            {job.input.name
-              .split(/\s+/)
-              .slice(0, 2)
-              .map((s: string) => s[0])
-              .join("")}
-          </span>
-          <div>
-            <h2>{job.input.name}</h2>
-            <p>{review?.industry || job.result.draft.industry}</p>
-          </div>
-        </div>
-        <p className="brief-summary">
-          {review?.summary || job.result.draft.summary}
-        </p>
-        <div className="brief-links">
-          {job.input.website && (
-            <a href={job.input.website} target="_blank" rel="noreferrer">
-              Visit company website ↗
-            </a>
-          )}
-          {socials.map((link) => (
-            <a
-              key={link.url}
-              href={link.url}
-              target="_blank"
-              rel="noreferrer"
-              title={`Linked from ${link.sourceUrl}`}
-            >
-              {link.label} ↗
-            </a>
-          ))}
-        </div>
-        <div className="brief-highlights">
-          {["scale", "footprint"].map((category) => {
-            const fact = brief.facts.find((f) => f.category === category);
-            return (
-              <div key={category}>
-                <small>
-                  {category === "scale" ? "Team size" : "Market & location"}
-                </small>
-                <strong>{fact?.value || "Not established"}</strong>
-                <small>
-                  {fact?.basis}
-                  {fact?.asOf ? ` · ${fact.asOf}` : ""}
-                </small>
-              </div>
-            );
-          })}
-        </div>
-        {changed && (
-          <p className="notice">
-            Saved research for {job.input.name}. The input above has changed;
-            run research again to update this profile. It has not been silently
-            rewritten.
-          </p>
-        )}
-        <p className="subtle">
-          {job.result.draft.industry} · {supported} cited findings ·{" "}
-          {brief.facts.length - supported} open gaps
-        </p>
-        <small>
-          AI research draft. “Reported” means a source states it; it is not
-          independent verification. Confirm estimates and open questions at
-          kickoff.
-        </small>
-      </header>
+      <KickoffSnapshot context={{
+        name: job.input.name, website: job.input.website, asOf: job.created_at,
+        summary: review?.summary || job.result.draft.summary,
+        industry: review?.industry || job.result.draft.industry,
+        streams: company.settings.businessProfile?.streams || [],
+        facts: brief.facts.map(f => ({ ...f, citations: f.citations.map(c => {
+          const source = sources.find(s => s.id === c.sourceId);
+          return { title: source?.title || "Provided description", url: source?.url || "", quote: c.quote };
+        }) })),
+      }} />
       <div className="brief-meeting">
         <div className="actions">
           <Button
@@ -253,64 +193,6 @@ export function BusinessBrief({
             </div>
           </div>
         )}
-      </div>
-      <div className="brief-grid">
-        {Object.entries(briefCategories).map(([category, title]) => (
-          <article key={category}>
-            <h3>{title}</h3>
-            {brief.facts
-              .filter((f) => f.category === category)
-              .map((fact, i) => (
-                <div className="brief-fact" key={i}>
-                  <div className="brief-fact-heading">
-                    <strong>{fact.label}</strong>
-                    <span
-                      className={`brief-basis ${fact.basis === "Not established" ? "missing" : ""}`}
-                    >
-                      {fact.basis}
-                    </span>
-                  </div>
-                  <p>{fact.value}</p>
-                  {fact.asOf && <small>As of {fact.asOf}</small>}
-                  {!!fact.citations.length && (
-                    <details>
-                      <summary>
-                        Evidence · {fact.citations.length}{" "}
-                        {fact.citations.length === 1 ? "source" : "sources"}
-                      </summary>
-                      {fact.citations.map((c, j) => {
-                        const source = sources.find((s) => s.id === c.sourceId);
-                        return (
-                          <div className="brief-evidence" key={j}>
-                            {source ? (
-                              <a
-                                href={source.url}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                {source.title} ↗
-                              </a>
-                            ) : (
-                              <strong>Advisor-provided description</strong>
-                            )}
-                            <blockquote>{c.quote}</blockquote>
-                            {source?.retrievedAt && (
-                              <small>
-                                Retrieved{" "}
-                                {new Date(
-                                  source.retrievedAt,
-                                ).toLocaleDateString()}
-                              </small>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </details>
-                  )}
-                </div>
-              ))}
-          </article>
-        ))}
       </div>
       <div className="brief-meeting">
         <h3>What to resolve in the first meeting</h3>

@@ -1,3 +1,4 @@
+import { TeamQuestionDelivery } from "./TeamQuestionDelivery.tsx";
 import { KickoffReturns } from "./KickoffReturns.tsx";
 import { kickoffTimeboxes } from "../../shared/kickoff-preparation.ts";
 import { BusinessProfilePanel } from "./BusinessProfilePanel.tsx";
@@ -85,6 +86,7 @@ export function DiscoveryJourney({
   prepareConfirmation: () => void;
   settings: () => void;
 }) {
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [industryOpen, setIndustryOpen] = useState(false);
   const [researchVersion, setResearchVersion] = useState(0);
   const [stage, setStage] = useState<DiscoveryStage>(initialStage),
@@ -138,6 +140,21 @@ export function DiscoveryJourney({
       setContact(job.input.contact);
   }, [job?.id, job?.state, !!job?.result?.applied, stage]);
   const working = busy || job?.state === "running";
+  useEffect(() => {
+    if (!busy && job?.state !== "running") return;
+    let active = true, checking = false;
+    const timer = window.setInterval(async () => {
+      if (checking || document.visibilityState !== "visible") return;
+      checking = true;
+      try {
+        const result = await api(base);
+        if (active) { setJobs(result.jobs); setConfigured(result.configured); }
+      } catch { /* Keep the last known state; never repeat a paid request. */ }
+      finally { checking = false; }
+    }, 4000);
+    return () => { active = false; window.clearInterval(timer); };
+  }, [base, busy, job?.state]);
+
   const perform = async (fn: () => Promise<void>) => {
     setBusy(true);
     setError("");
@@ -154,12 +171,16 @@ export function DiscoveryJourney({
   };
   const generate = () =>
     perform(async () => {
-      await api(base + "/draft", "POST", {
-        stage,
-        ...(stage === "contact" ? { contact } : {}),
-        consent: true,
-      });
-      await load();
+      try {
+        await api(base + "/draft", "POST", {
+          stage,
+          ...(stage === "contact" ? { contact } : {}),
+          consent: true,
+        });
+      } finally {
+        // Read the saved outcome even when the network loses the POST response.
+        await load();
+      }
     });
   const [showSend, setShowSend] = useState(false);
   const apply = () =>
@@ -372,6 +393,7 @@ export function DiscoveryJourney({
               company={company.id}
               record={r}
               recipient={person?.data.email || ""}
+              recipientName={person?.title}
               refresh={refresh}
             />
           )}
@@ -423,7 +445,7 @@ export function DiscoveryJourney({
           );
       }
       setNotice(
-        "Invitation attempts are complete. Delivery receipts are available in each person's request.",
+        "Email attempts are complete. Check each person’s delivery status below.",
       );
     });
   return (
@@ -459,9 +481,33 @@ export function DiscoveryJourney({
           {notice}
         </div>
       )}
+      {contactResponse && ["contact", "agenda"].includes(stage) && (
+        <section className="journey-arrival" aria-label="Response received">
+          <div><span className="eyebrow">RESPONSE RECEIVED</span>
+            <h2>Your contact has sent the kickoff preparation</h2>
+            <p>Review their answers and team list. Then prepare the leadership meeting.</p></div>
+          <Button primary onClick={() => document.getElementById("returned-kickoff")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Review response <ArrowRight size={16} /></Button>
+        </section>
+      )}
+      {["contact", "agenda"].includes(stage) && (
+        <div id="returned-kickoff"><KickoffReturns companyId={company.id} records={records} refresh={refresh} agenda={() => { setStage("agenda"); window.scrollTo({top: 0, behavior: "smooth"}); }} /></div>
+      )}
+      {stage !== "contact" && !!company.settings.businessProfile?.streams?.length && (
+        <section className="journey-value-chain" aria-label="Business value chain">
+          <span className="eyebrow">HOW THE BUSINESS DELIVERS VALUE</span>
+          {company.settings.businessProfile.streams.map((stream, index) => (
+            <details key={stream.id} open={index === 0}>
+              <summary><strong>{stream.name}</strong> · {index === 0 ? "Primary stream" : "Supporting stream"}</summary>
+              <ol>{stream.stages.map((step, i) => <li key={step.id}><span>{i + 1}</span>{step.name}</li>)}</ol>
+            </details>
+          ))}
+          <p>Connect each person's duties and tasks to these stages. Reporting lines show who they report to; handoffs show where the work goes next.</p>
+        </section>
+      )}
       {stage === "contact" && (
         <BusinessProfilePanel
           key={company.id + stage}
+          contactComplete={contactResponse}
           company={company}
           refresh={refresh}
           openIndustry={() => setIndustryOpen(true)}
@@ -497,14 +543,6 @@ export function DiscoveryJourney({
             </Button>
           </Panel>
         </details>
-      )}
-      {["contact", "agenda"].includes(stage) && (
-        <KickoffReturns
-          companyId={company.id}
-          records={records}
-          refresh={refresh}
-          agenda={() => setStage("agenda")}
-        />
       )}
       {industryOpen && (
         <FrameworkWorkspace
@@ -649,7 +687,8 @@ export function DiscoveryJourney({
           open={open}
         />
       )}
-      <div id="journey-draft">
+      {stage === "contact" && contactResponse && <button className="journey-history-toggle" onClick={() => setHistoryOpen(!historyOpen)}>{historyOpen ? "Hide" : "View"} completed kickoff email and request</button>}
+      <div id="journey-draft" hidden={stage === "contact" && contactResponse && !historyOpen}>
         <Panel
           title={
             stage === "contact"
@@ -734,7 +773,8 @@ export function DiscoveryJourney({
                           : "Draft contact email"}
             </Button>
           </div>
-          {job && (
+          {working && <p className="notice" role="status">Preparing your draft. This can take up to two minutes. We check the saved result automatically; you do not need to click again.</p>}
+          {job && !busy && (
             <div className="journey-run">
               <State value={job.state} />
               <span>{job.input.sourceCount} sources carried forward</span>
@@ -752,7 +792,7 @@ export function DiscoveryJourney({
               )}
             </div>
           )}
-          {job && job.state !== "complete" && (
+          {job && !working && job.state !== "complete" && (
             <p role="status">{job.message}</p>
           )}
           {job?.stale && !applied && (
@@ -1291,7 +1331,7 @@ export function DiscoveryJourney({
         </Panel>
       </div>
       {stage === "contact" && contactRequests.length > 0 && (
-        <div id="kickoff-contact-requests">
+        <div id="kickoff-contact-requests" hidden={contactResponse && !historyOpen}>
           <Panel
             title="Preview & send kickoff request"
             subtitle="Preview the message, then send the private response link to your contact."
@@ -1482,32 +1522,7 @@ export function DiscoveryJourney({
         </Panel>
       )}
       {stage === "interviews" && currentTeamRequests.length > 0 && (
-        <Panel
-          title="Invitations and responses"
-          subtitle="Send the prepared questions to the team. Each person gets their own private page."
-        >
-          <div className="journey-row">
-            <p>
-              {currentTeamRequests.filter(responseFor).length} of{" "}
-              {currentTeamRequests.length} responses received
-            </p>
-            <Button
-              primary
-              disabled={busy || (!!draft && !applied)}
-              onClick={() => void sendAll()}
-            >
-              <Mail size={16} />
-              {busy ? "Sending…" : "Send pending team invitations"}
-            </Button>
-          </div>
-          {!!draft && !applied && (
-            <p className="notice amber">
-              Save the new question sets above before sending. Earlier requests
-              remain listed below.
-            </p>
-          )}
-          {requestRows(currentTeamRequests, false)}
-        </Panel>
+        <TeamQuestionDelivery requests={currentTeamRequests} people={people} responseFor={responseFor} open={open} send={sendAll} busy={busy} blocked={!!draft && !applied} results={emailResults} />
       )}
     </div>
   );

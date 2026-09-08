@@ -1,4 +1,3 @@
-import { kickoffPublicContext } from "./kickoff-context.ts";
 import express from "express";
 import { providerConfig } from "./providers.ts";
 import {
@@ -18,17 +17,12 @@ import {
   audit,
 } from "./db.ts";
 import { publicUser } from "./auth.ts";
-import {
-  kickoffPreparationSchema,
-  validateKickoffPreparation,
-  kickoffPreparationText,
-} from "../shared/kickoff-preparation.ts";
 
-export function kickoffLinkRouter(
+export function teamLinkRouter(
   transcription: TranscriptionProvider = transcribeAudio,
 ) {
   const router = Router();
-  // Possession grants access only to this kickoff request, never an account/session.
+  // Possession grants access only to this work interview, never an account/session.
   async function access(
     token: string,
     submit: boolean,
@@ -70,13 +64,14 @@ export function kickoffLinkRouter(
       );
       if (
         r.kind !== "request" ||
-        r.data.type !== "leadership" ||
-        !String(r.data.questionPlanVersion || "").startsWith(
-          "discovery-contact:",
-        ) ||
+        r.data.type !== "work" ||
         r.data.personId !== invitation.person_id
       )
-        fail(403, "KICKOFF_ONLY", "This link does not grant kickoff access.");
+        fail(
+          403,
+          "WORK_ONLY",
+          "This link does not grant access to a work interview.",
+        );
       if (
         r.state !== "sent" ||
         Date.now() > new Date(r.data.dueDate + "T23:59:59Z").getTime()
@@ -126,7 +121,7 @@ export function kickoffLinkRouter(
           db,
           publicUser(sponsor),
           invitation.company_id,
-          "kickoff.transcription_requested",
+          "team.transcription_requested",
           r.id,
           { personId: invitation.person_id },
         );
@@ -139,9 +134,6 @@ export function kickoffLinkRouter(
           title: r.title,
           questions: r.data.questions || [],
           notice: r.data.notice,
-          publicContext:
-            r.data.kickoffPublicContext ||
-            (await kickoffPublicContext(db, invitation.company_id)),
           voiceConfigured:
             (await providerConfig(invitation.tenant_id, "openai", db))
               .configured || transcription !== transcribeAudio,
@@ -150,7 +142,13 @@ export function kickoffLinkRouter(
         .object({
           expectedVersion: z.number().int(),
           acknowledged: z.literal(true),
-          kickoffPreparation: kickoffPreparationSchema,
+          text: z
+            .string()
+            .max(100000)
+            .refine(
+              (text) => !!text.trim(),
+              "Add your response before sending.",
+            ),
         })
         .strict()
         .parse(body);
@@ -160,11 +158,6 @@ export function kickoffLinkRouter(
           "VERSION_CONFLICT",
           "The request changed. Reload before submitting.",
         );
-      try {
-        validateKickoffPreparation(d.kickoffPreparation);
-      } catch (e) {
-        fail(422, "KICKOFF_INVALID", (e as Error).message);
-      }
       // Record versions require an account FK. Attribute the write to the request's
       // sponsoring account, explicitly recording the external submitter separately.
       const sponsor = (
@@ -189,12 +182,11 @@ export function kickoffLinkRouter(
         {
           requestId: r.id,
           personId: invitation.person_id,
-          text: kickoffPreparationText(d.kickoffPreparation),
+          text: d.text,
           assetId: "",
           decisions: {},
           note: "",
           taskCards: [],
-          kickoffPreparation: d.kickoffPreparation,
           submissionIdentity: {
             method: "private_link",
             personId: invitation.person_id,
@@ -203,7 +195,7 @@ export function kickoffLinkRouter(
         },
         "returned",
         undefined,
-        "External kickoff contact submitted via private link; sponsoring account records the write",
+        "External team member submitted via private link; sponsoring account records the write",
       );
       await setState(
         db,
@@ -217,7 +209,7 @@ export function kickoffLinkRouter(
         db,
         user,
         invitation.company_id,
-        "kickoff.private_link_submitted",
+        "team.private_link_submitted",
         r.id,
         {
           personId: invitation.person_id,
@@ -233,16 +225,16 @@ export function kickoffLinkRouter(
       return { ok: true, responseId: response.id };
     });
   }
-  router.get("/:token/kickoff", async (req, res) => {
+  router.get("/:token/team", async (req, res) => {
     res.setHeader("Cache-Control", "no-store");
     res.json(await access(String(req.params.token), false));
   });
-  router.post("/:token/kickoff", async (req, res) => {
+  router.post("/:token/team", async (req, res) => {
     res.setHeader("Cache-Control", "no-store");
     res.json(await access(String(req.params.token), true, req.body));
   });
   router.post(
-    "/:token/transcribe",
+    "/:token/team/transcribe",
     express.raw({
       type: ["audio/webm", "audio/ogg", "audio/mp4", "audio/wav", "audio/mpeg"],
       limit: "3mb",

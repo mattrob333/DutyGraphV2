@@ -125,6 +125,32 @@ export function validateDiscovery(value: unknown, input: DiscoveryInput) {
     );
   return draft;
 }
+export function discoveryFailure(error: unknown): {
+  state: string;
+  message: string;
+} {
+  if (error instanceof AppError)
+    return { state: "failed", message: error.message };
+  if (error instanceof z.ZodError)
+    return {
+      state: "failed",
+      message:
+        "The AI returned an incomplete or invalid draft. Existing records are unchanged. Prepare the draft again.",
+    };
+  const name = error instanceof Error ? error.name : "";
+  if (name === "TimeoutError" || name === "AbortError")
+    return {
+      state: "unknown",
+      message:
+        "The AI took longer than 105 seconds, so this attempt stopped. No draft was saved or sent. Check provider usage before choosing Prepare a fresh draft; no retry runs automatically.",
+    };
+  return {
+    state: "unknown",
+    message:
+      "The connection to the AI ended before a result could be confirmed. No draft was saved or sent. Check provider usage before choosing Prepare a fresh draft; no retry runs automatically.",
+  };
+}
+
 export const openAiDiscovery: DiscoveryProvider = async (input, key, model) => {
   const schema = z.toJSONSchema(
     input.participantReview
@@ -192,12 +218,27 @@ export const openAiDiscovery: DiscoveryProvider = async (input, key, model) => {
       "DISCOVERY_REFUSED",
       "The AI could not prepare this draft. Review the input material.",
     );
-  return JSON.parse(
+  const generated = JSON.parse(
     content
       .filter((c: any) => c.type === "output_text")
       .map((c: any) => c.text)
       .join(""),
   );
+  if (input.stage === "interviews") {
+    for (const interview of generated.interviews || []) {
+      if (
+        (interview.questions || []).some(
+          (q: string) => !/[.!?]["'’”)]?$/.test(q.trim()),
+        )
+      )
+        throw new AppError(
+          502,
+          "DISCOVERY_QUESTION_FRAGMENT",
+          "The AI returned unfinished questions. No requests were created. Prepare a fresh draft to get complete questions.",
+        );
+    }
+  }
+  return generated;
 };
 
 async function recordsFor(
@@ -666,16 +707,7 @@ export function discoveryRouter(provider: DiscoveryProvider = openAiDiscovery) {
           draft: validateDiscovery(await provider(input, key, model), input),
         };
       } catch (e) {
-        state =
-          e instanceof AppError || e instanceof z.ZodError
-            ? "failed"
-            : "unknown";
-        message =
-          e instanceof AppError
-            ? e.message
-            : e instanceof z.ZodError
-              ? "The AI returned an incomplete or invalid draft. Existing records are unchanged. Prepare the draft again."
-              : "The AI outcome could not be confirmed. Nothing was created or sent. Check provider usage before another run.";
+        ({ state, message } = discoveryFailure(e));
       }
       await tx(actor(req).tenant_id, async (db) => {
         await db.query(

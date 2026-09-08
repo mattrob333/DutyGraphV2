@@ -120,7 +120,7 @@ test("work and leadership emails explain their own private capture and review se
   const work = template("work"),
     leadership = template("leadership"),
     confirmation = template("confirmation");
-  for (const message of [work, leadership]) {
+  for (const message of [leadership]) {
     assert.match(message.text, /Voice is preferred/);
     assert.match(message.text, /Save recording/);
     assert.match(message.text, /If you recorded or uploaded audio/);
@@ -131,11 +131,14 @@ test("work and leadership emails explain their own private capture and review se
       /href="https:\/\/example.test\/invite\/synthetic"/,
     );
   }
-  assert.match(work.text, /Create my task cards/);
-  assert.match(work.text, /Approval records your understanding/);
+  assert.match(work.text, /No account or password is needed/);
+  assert.match(work.text, /Type your answer or use the voice option/);
+  assert.match(work.html, /Your questions are ready/);
+  assert.ok(!work.html.includes("Questions to consider"));
+  assert.ok(!work.html.includes("What do you receive?"));
   assert.ok(!leadership.text.includes("Create my task cards"));
   assert.ok(!confirmation.text.includes("Start recording"));
-  assert.match(work.html, /<p style="[^"]*">If you recorded/);
+  assert.match(leadership.html, /<p style="[^"]*">If you recorded/);
 });
 
 
@@ -147,4 +150,16 @@ test("kickoff email has wider labeled sections, real bullets and no exposed bear
  assert.ok(!result.html.includes(">https://dutygraph.com/invite/synthetic-token<"));
  assert.ok(result.html.includes('href="https://dutygraph.com/invite/synthetic-token"'));
  assert.ok(result.text.includes("https://dutygraph.com/invite/synthetic-token"));
+});
+
+
+test("team email keeps long questions on the private page and states passwordless access", () => {
+ const result = invitationTemplate({company:"Example Team",person:{title:"Test Person",data:{role:"Coordinator"}},request:{title:"Work questions",data:{type:"work",questions:["LONG_QUESTION ".repeat(200)],emailBody:"Please describe your work.\n\nInclude the monthly review."}},url:"https://example.test/invite/fictional"});
+ assert.match(result.html,/max-width:800px/);
+ assert.match(result.html,/Open my questions/);
+ assert.match(result.html,/No account or password is needed/);
+ assert.ok(!result.html.includes("LONG_QUESTION"));
+ assert.ok(result.html.includes("Include the monthly review."));
+ assert.ok(!result.text.includes("LONG_QUESTION"));
+ assert.ok(result.html.length < 9000);
 });

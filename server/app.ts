@@ -1,3 +1,4 @@
+import { teamLinkRouter } from "./team-link.ts";
 import { kickoffLinkRouter } from "./kickoff-link.ts";
 import {
   kickoffPreparationSchema,
@@ -244,6 +245,7 @@ export function createApp({
     res.json({ ok: true });
   });
   app.use("/api/invitations", authLimit, kickoffLinkRouter());
+  app.use("/api/invitations", authLimit, teamLinkRouter());
   app.get("/api/invitations/:token", authLimit, async (req, res) => {
     const { rows } = await pool.query(
       "SELECT * FROM invitations WHERE token_hash=$1 AND used_at IS NULL AND revoked_at IS NULL AND expires_at>now()",
@@ -270,6 +272,7 @@ export function createApp({
         title: r.title,
         notice: r.data.notice,
         name: invite.name,
+        passwordlessTeam: r.data.type === "work",
         passwordless:
           r.data.type === "leadership" &&
           String(r.data.questionPlanVersion || "").startsWith(

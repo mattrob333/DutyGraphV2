@@ -32,8 +32,9 @@ export function KickoffSnapshot({ context: c }: { context: any }) {
             .join("")}
         </div>
         <div>
-          <div className="kickoff-eyebrow">01 / YOUR COMPANY SNAPSHOT</div>
+          <div className="kickoff-eyebrow">COMPANY SNAPSHOT</div>
           <h1>{c?.name || "Your company"}</h1>
+          {c?.industry && <p className="snapshot-label">{c.industry}</p>}
           {c?.website && (
             <a href={c.website} target="_blank" rel="noreferrer">
               {c.website.replace(/^https?:\/\//, "").replace(/\/$/, "")} ↗
@@ -56,6 +57,30 @@ export function KickoffSnapshot({ context: c }: { context: any }) {
           </details>
         )}
       </div>
+      {!!c?.streams?.length && (
+        <div className="snapshot-flows">
+          <div className="snapshot-fact-heading">
+            <h2>How this business delivers value</h2>
+            <span>Proposed stages · confirm with the team</span>
+          </div>
+          {c.streams.map((s: any, i: number) => (
+            <details className="snapshot-flow" key={s.id || i} open={i === 0}>
+              <summary>
+                <strong>{s.name}</strong>
+                <span>{i === 0 ? "Primary stream" : "Supporting stream"}</span>
+              </summary>
+              <ol>
+                {s.stages?.map((stage: any, j: number) => (
+                  <li key={j}>
+                    <span>{j + 1}</span>
+                    {stage.name || stage.label || stage.title}
+                  </li>
+                ))}
+              </ol>
+            </details>
+          ))}
+        </div>
+      )}
       <div className="snapshot-fact-heading">
         <h2>What public sources report</h2>
         <span>
@@ -126,30 +151,7 @@ export function KickoffSnapshot({ context: c }: { context: any }) {
           </ul>
         </details>
       )}
-      {!!c?.streams?.length && (
-        <div className="snapshot-flows">
-          <div className="snapshot-fact-heading">
-            <h2>Does the work flow like this?</h2>
-            <span>Proposed stages — confirm or correct</span>
-          </div>
-          {c.streams.map((s: any, i: number) => (
-            <details className="snapshot-flow" key={s.id || i} open={i === 0}>
-              <summary>
-                <strong>{s.name}</strong>
-                <span>{i === 0 ? "Primary stream" : "Supporting stream"}</span>
-              </summary>
-              <ol>
-                {s.stages?.map((stage: any, j: number) => (
-                  <li key={j}>
-                    <span>{j + 1}</span>
-                    {stage.name || stage.label || stage.title}
-                  </li>
-                ))}
-              </ol>
-            </details>
-          ))}
-        </div>
-      )}
+
     </section>
   );
 }

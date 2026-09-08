@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { Button, ErrorBox } from "./ui.tsx";
 export function KickoffVoice({
   token,
+  endpoint,
   enabled,
   append,
   busy: submitting,
   onPending,
 }: {
   token: string;
+  endpoint?: string;
   enabled: boolean;
   append: (text: string) => void;
   busy: boolean;
@@ -113,11 +115,14 @@ export function KickoffVoice({
         throw new Error(
           "This clip is too large. Download it and record a shorter clip.",
         );
-      const r = await fetch(`/api/invitations/${token}/transcribe`, {
-        method: "POST",
-        headers: { "Content-Type": clip.type },
-        body: clip,
-      });
+      const r = await fetch(
+        endpoint || `/api/invitations/${token}/transcribe`,
+        {
+          method: "POST",
+          headers: { "Content-Type": clip.type },
+          body: clip,
+        },
+      );
       const d = await r.json();
       if (!r.ok)
         throw new Error(

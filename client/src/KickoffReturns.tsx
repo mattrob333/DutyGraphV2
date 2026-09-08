@@ -1,3 +1,4 @@
+import { DuplicatePeopleNotice } from "./DuplicatePeopleNotice.tsx";
 import { useState } from "react";
 import type { RecordRow } from "../../shared/domain.ts";
 import {
@@ -21,7 +22,8 @@ export function KickoffReturns({
   agenda: () => void;
 }) {
   const [busy, setBusy] = useState(false),
-    [error, setError] = useState("");
+    [error, setError] = useState(""),
+    [imported, setImported] = useState(false);
   const responses = records.filter(
     (r) => r.kind === "response" && r.data.kickoffPreparation,
   );
@@ -32,6 +34,8 @@ export function KickoffReturns({
       subtitle="Review the people and leadership context, import the checked roster, then prepare the two-hour agenda."
     >
       <ErrorBox error={error} />
+      <DuplicatePeopleNotice records={records} />
+      {imported && <div className="journey-arrival" role="status"><div><h2>Team roster added to the org chart</h2><p>Your next step is to prepare the two-hour kickoff agenda.</p></div><Button primary onClick={agenda}>Prepare meeting agenda →</Button></div>}
       {responses.map((r) => {
         const parsed = kickoffPreparationSchema.safeParse(
           r.data.kickoffPreparation,
@@ -101,7 +105,8 @@ export function KickoffReturns({
             )}
             <details>
               <summary>Review leadership context</summary>
-              {kickoffFields.map((f) => (
+              {p.responseText && <section><h4>Contact’s response</h4><p style={{whiteSpace: "pre-wrap"}}>{p.responseText}</p></section>}
+              {kickoffFields.filter(f => p.answers[f.id]).map((f) => (
                 <section key={f.id}>
                   <h4>{f.title}</h4>
                   <p style={{ whiteSpace: "pre-wrap" }}>
@@ -124,6 +129,8 @@ export function KickoffReturns({
                         { expectedVersion: r.version },
                       );
                       await refresh();
+                      setImported(true);
+                      document.getElementById("returned-kickoff")?.scrollIntoView({behavior: "smooth", block: "start"});
                     } catch (e) {
                       setError((e as Error).message);
                     } finally {

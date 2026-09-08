@@ -74,3 +74,10 @@ Validation: local build and 226 tests passed, including password-free submission
 The contact page now leads with company identity and a short expandable research description. Source-backed reported findings are grouped in compact columns with source/date details on demand; assumptions and missing information remain separately collapsed. Proposed operating stages retain primary/supporting labels. Eight coordinator-friendly prompts cover corrections, customer work, a representative work journey, departments, delays, tools, people and logistics. They guide one typed/dictated answer; the old additional-question list is no longer displayed. Team entry follows the response, with the manual editor opened only when needed. Reading width is bounded at normal zoom and switches to a stacked mobile layout.
 
 Validation: build and all 226 tests passed; dependency audit found zero vulnerabilities. Browser reviewed fictional sourced findings, counted exactly eight prompts, and successfully submitted one freeform response with a roster follow-up. Deployment verification pending. No real emails or provider calls sent.
+
+
+## September 8 flow update
+
+Returned preparation appears at the top of Discovery. Completed research inputs and the kickoff email remain in collapsed history. Company snapshots share the client layout, with the proposed value chain above sourced findings. Importing a roster confirms success and points to the meeting agenda. Contacts with separate personal/work emails are flagged for identity review rather than merged.
+
+Team work interviews now open through scoped private links without an account. In Team interviews, choose Review & preview → Preview response form to try the actual fields without sending. Recipient selection starts empty; select only yourself for a test. New email copy links to the complete questions. New question generation uses short complete prompts; existing saved questions are not overwritten. Original typed/transcribed responses are returned for advisor review and task extraction. Confirmation requests still use their existing authenticated approval path.

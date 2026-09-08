@@ -1,5 +1,7 @@
 # DutyGraph
 
+Discovery now leads with returned preparation, a shared company snapshot and the business value chain. Completed research and kickoff email forms collapse. Work interviews use private links without accounts, typed or transcribed responses, and a no-send form preview. Team emails require explicit recipient selection. New questions use short, complete, plain-language prompts inspired by ASD-STE100; this is not a formal compliance claim. AI timeout results are explicit and the page checks saved job status without retrying paid calls.
+
 Advisor workspaces check for newer saved revisions on tab focus and every 15 seconds while visible, so contact submissions appear without a manual reload. Background failures leave the current screen intact.
 
 Kickoff rosters support preferred full-team CSV upload or manual add/edit/remove rows with name, email, role, department and manager email. Both paths share hierarchy validation and executive/pilot selections. Enrollment account conflicts now link advisors back to the form-preview workflow.

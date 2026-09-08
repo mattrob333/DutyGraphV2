@@ -1,0 +1,61 @@
+.team-link-intro {
+  max-width: 820px;
+  margin-bottom: 32px;
+}
+.team-link-intro h2 {
+  margin-top: 10px;
+}
+.team-link-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: start;
+}
+.team-link-grid section {
+  min-width: 0;
+}
+.team-link-grid textarea {
+  width: 100%;
+  min-height: 380px;
+  line-height: 1.7;
+  padding: 20px;
+  resize: vertical;
+}
+.team-link-questions {
+  padding-left: 24px;
+  margin: 24px 0;
+}
+.team-link-questions li {
+  padding: 0 0 18px 8px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.team-link-questions li::marker {
+  color: #a7cbbb;
+  font-weight: 700;
+}
+.team-link-send {
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.team-link-send > p {
+  max-width: 840px;
+}
+.team-link-send .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 18px 0;
+}
+@media (max-width: 850px) {
+  .team-link-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.team-form-preview { position:fixed; inset:16px; z-index:2100; overflow:auto; border:1px solid var(--line); border-radius:14px; box-shadow:0 0 0 40px #0009; }
+.team-form-preview > button { position:sticky; top:0; z-index:2; margin:0 0 20px; }
+
+.team-form-preview form { max-width:none; width:100%; }

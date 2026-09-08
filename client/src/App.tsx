@@ -1,3 +1,4 @@
+import { TeamLink } from "./TeamLink.tsx";
 import { KickoffLink } from "./KickoffLink.tsx";
 import { OrgChartCanvas } from "./OrgChartCanvas.tsx";
 import { AgentRequests, TeamAgentPortal } from "./AgentRequests.tsx";
@@ -310,6 +311,7 @@ function Invitation({
       .catch((e) => setError(e.message));
   }, [token]);
   const [accountConflict, setAccountConflict] = useState(false);
+  if (info?.passwordlessTeam) return <div className="kickoff-page"><TeamLink token={token} name={info.name} /></div>;
   if (info?.passwordless)
     return (
       <div className="kickoff-page">

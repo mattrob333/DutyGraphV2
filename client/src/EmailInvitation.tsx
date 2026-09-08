@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import type { RecordRow } from "../../shared/domain.ts";
+import { TeamLink } from "./TeamLink.tsx";
 import { api } from "./api.ts";
 import { KickoffPreparation } from "./KickoffPreparation.tsx";
 import { emptyKickoffPreparation } from "../../shared/kickoff-preparation.ts";
@@ -8,11 +9,13 @@ export function EmailInvitation({
   company,
   record,
   recipient,
+  recipientName,
   refresh,
 }: {
   company: string;
   record: RecordRow;
   recipient: string;
+  recipientName?: string;
   refresh: () => Promise<void>;
 }) {
   const [jobs, setJobs] = useState<any[]>([]),
@@ -29,6 +32,7 @@ export function EmailInvitation({
   const kickoff = String(record.data.questionPlanVersion || "").startsWith(
     "discovery-contact:",
   );
+  const work = record.data.type === "work";
   const sendKey = useRef(crypto.randomUUID());
   const load = () =>
     api(`/v1/companies/${company}/requests/${record.id}/emails`).then(setJobs);
@@ -40,11 +44,10 @@ export function EmailInvitation({
   }, [company, record.id, record.version]);
   return (
     <section className="provider-setting">
-      <h3>Email this invitation</h3>
+      <h3>Send this person their questions</h3>
       <p>
         Send a private seven-day link to <strong>{recipient}</strong>. A
-        replacement invitation revokes earlier unused links. Configure Resend
-        and your verified sender in Workspace settings.
+        replacement email replaces earlier unused links.
       </p>
       <ErrorBox error={error} />
       {latest && (
@@ -75,7 +78,7 @@ export function EmailInvitation({
           <small>{new Date(latest.created_at).toLocaleString()}</small>
         </div>
       )}
-      {kickoff && (
+      {(kickoff || work) && (
         <Button
           onClick={() => {
             setSample(emptyKickoffPreparation());
@@ -85,7 +88,25 @@ export function EmailInvitation({
           Preview response form
         </Button>
       )}
-      {formPreview && (
+      {formPreview && work && (
+        <section aria-label="Work response preview" role="dialog" aria-modal="true" className="team-form-preview kickoff-page">
+          <Button onClick={() => setFormPreview(false)}>
+            Close form preview
+          </Button>
+          <TeamLink
+            name={recipientName || "there"}
+            previewRequest={{
+              id: record.id,
+              version: record.version,
+              title: record.title,
+              questions: record.data.questions || [],
+              notice: record.data.notice,
+              voiceConfigured: false,
+            }}
+          />
+        </section>
+      )}
+      {formPreview && kickoff && (
         <section aria-label="Kickoff form preview" className="notice">
           <h2>Kickoff form preview</h2>
           <p>
@@ -203,10 +224,10 @@ export function EmailInvitation({
           }}
         >
           {busy
-            ? "Sending invitation…"
+            ? "Sending questions…"
             : accepted
-              ? "Send replacement invitation"
-              : "Send invitation email"}
+              ? "Send replacement email"
+              : "Send questions to this person"}
         </Button>
       )}
       {jobs.length > 1 && (

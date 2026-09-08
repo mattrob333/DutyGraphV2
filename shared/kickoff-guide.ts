@@ -1,6 +1,6 @@
 import { businessProfileSchema, businessTemplates } from "./business-types.ts";
 
-export const discoveryPromptVersion = "discovery-context-v4";
+export const discoveryPromptVersion = "discovery-context-v5";
 const groupProbes: Record<string, string> = {
   General:
     "Identify the customer or beneficiary, the unit of work, the promise made and how completion is recognized.",

@@ -639,6 +639,7 @@ export function Detail({
           <EmailInvitation
             company={company}
             record={r}
+            recipientName={records.find((p) => p.id === r.data.personId)?.title}
             recipient={
               records.find((p) => p.id === r.data.personId)?.data.email || ""
             }
