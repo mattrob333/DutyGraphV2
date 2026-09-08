@@ -24,7 +24,7 @@ export function KickoffPreparation({
 }) {
   const editorRef = useRef<HTMLElement>(null);
   const [error, setError] = useState("");
-  const [manual, setManual] = useState(rosterOnly);
+  const [manual, setManual] = useState(false);
   const [person, setPerson] = useState(emptyManualPerson);
   const [editIndex, setEditIndex] = useState<number | undefined>();
   const [executive, setExecutive] = useState(false),
@@ -86,12 +86,20 @@ export function KickoffPreparation({
   }
   return (
     <Panel
-      title="Prepare our two-hour executive kickoff"
+      title={
+        rosterOnly
+          ? "Team & attendees"
+          : "Prepare our two-hour executive kickoff"
+      }
       subtitle="Upload the team list, choose who should participate, and share the leadership context. Your advisor reviews this package before importing people."
     >
       <div className="kickoff-package">
         <section>
-          <h3>1. Bring the team into view</h3>
+          <h3>
+            {rosterOnly
+              ? "Upload a roster or add people"
+              : "1. Bring the team into view"}
+          </h3>
           <p>
             Preferred: upload a CSV of everyone participating in discovery,
             including their managers, to build the reporting org chart. Columns:

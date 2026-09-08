@@ -156,3 +156,9 @@ OpenAI gpt-4o-transcribe reuses the advisor account configuration. Contacts expl
 Validation: local build and 226 tests passed, including password-free submission, expiry/revocation and a synthetic transcription provider with quota enforcement. Browser checked research layout, primary stages, manual roster, saved text draft and successful single-response submission. Real microphone/provider transcription and mobile-device acceptance were not exercised; no real emails or paid provider calls were made.
 
 Release verification: `9dd225c` passed CI run `34175360718` and deployed READY as `dpl_5anrg72AE5AGWC4JMKMRXud666H7`. The live dutygraph.com bundle includes the research review, single response and transcription controls. This confirms deployment, not real microphone/provider acceptance.
+
+## 2026-09-07 — Scannable kickoff snapshot and eight focused prompts
+
+The contact page now leads with company identity and a short expandable research description. Source-backed reported findings are grouped in compact columns with source/date details on demand; assumptions and missing information remain separately collapsed. Proposed operating stages retain primary/supporting labels. Eight coordinator-friendly prompts cover corrections, customer work, a representative work journey, departments, delays, tools, people and logistics. They guide one typed/dictated answer; the old additional-question list is no longer displayed. Team entry follows the response, with the manual editor opened only when needed. Reading width is bounded at normal zoom and switches to a stacked mobile layout.
+
+Validation: build and all 226 tests passed; dependency audit found zero vulnerabilities. Browser reviewed fictional sourced findings, counted exactly eight prompts, and successfully submitted one freeform response with a roster follow-up. Deployment verification pending. No real emails or provider calls sent.
