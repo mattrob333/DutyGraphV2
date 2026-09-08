@@ -11,3 +11,5 @@ Download company profile exports a self-contained HTML deliverable with dates, r
 Comparable companies need evidence of overlapping offers and buyers. Size similarity requires evidence for both companies; otherwise the model must state comparison is unconfirmed. A stronger prompt does not guarantee that public sources disclose headcount or useful peers. Real-provider research quality remains an acceptance check. Automatic logo/branding extraction is deferred.
 
 Save & continue to send persists the reviewed kickoff request and opens Preview & send kickoff request. Send invitation email is the actual delivery action and requires configured Resend/sender settings. No email is sent by saving a profile or request.
+
+The shared snapshot shows concise fact bullets and equally sized value streams. Potential competitors link to matching saved company sources when available. Expand “Research details & sources” for original wording, qualifications and citations. Later Discovery steps focus on their current task rather than repeating the stream diagram.

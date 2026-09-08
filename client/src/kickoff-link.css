@@ -608,21 +608,31 @@
 }
 
 /* Give the primary value stream the full row, with clear direction between stages. */
-.snapshot-flow[data-primary="true"] > summary { font-size:20px; padding:16px 0; }
-.snapshot-flow[data-primary="true"] > summary > span { font-size:12px; }
-.snapshot-flow[data-primary="true"] > ol,
-.journey-value-chain details:first-of-type > ol { display:flex; flex-wrap:nowrap; gap:26px; margin:14px 0 26px; padding:0; }
-.snapshot-flow[data-primary="true"] > ol > li,
-.journey-value-chain details:first-of-type > ol > li { flex:1 1 0; min-width:0; position:relative; display:block; padding:20px 14px; min-height:92px; border:1px solid #62615e; background:var(--surface, #303133); border-radius:8px; font-size:16px; font-weight:600; line-height:1.4; overflow-wrap:anywhere; }
-.snapshot-flow[data-primary="true"] > ol > li > span,
-.journey-value-chain details:first-of-type > ol > li > span { display:block; margin-bottom:10px; font-size:11px; color:var(--muted); font-weight:400; }
-.snapshot-flow[data-primary="true"] > ol > li:not(:last-child)::after,
-.journey-value-chain details:first-of-type > ol > li:not(:last-child)::after { content:"\2192"; position:absolute; right:-24px; top:50%; transform:translateY(-50%); color:#c7c2b6; font-size:23px; font-weight:400; }
+.snapshot-flow > summary { font-size:20px; padding:16px 0; }
+.snapshot-flow > summary > span { font-size:12px; }
+.snapshot-flow > ol,
+.journey-value-chain details > ol { display:flex; flex-wrap:nowrap; gap:26px; margin:14px 0 26px; padding:0; }
+.snapshot-flow > ol > li,
+.journey-value-chain details > ol > li { flex:1 1 0; min-width:0; position:relative; display:block; padding:20px 14px; min-height:92px; border:1px solid #62615e; background:var(--surface, #303133); border-radius:8px; font-size:16px; font-weight:600; line-height:1.4; overflow-wrap:anywhere; }
+.snapshot-flow > ol > li > span,
+.journey-value-chain details > ol > li > span { display:block; margin-bottom:10px; font-size:11px; color:var(--muted); font-weight:400; }
+.snapshot-flow > ol > li:not(:last-child)::after,
+.journey-value-chain details > ol > li:not(:last-child)::after { content:"\2192"; position:absolute; right:-24px; top:50%; transform:translateY(-50%); color:#c7c2b6; font-size:23px; font-weight:400; }
 @media(max-width:760px) {
- .snapshot-flow[data-primary="true"] > ol,
- .journey-value-chain details:first-of-type > ol { flex-direction:column; gap:25px; }
- .snapshot-flow[data-primary="true"] > ol > li,
- .journey-value-chain details:first-of-type > ol > li { min-height:0; padding:15px 18px; }
- .snapshot-flow[data-primary="true"] > ol > li:not(:last-child)::after,
- .journey-value-chain details:first-of-type > ol > li:not(:last-child)::after { content:"\2193"; top:auto; bottom:-26px; left:50%; right:auto; transform:translateX(-50%); }
+ .snapshot-flow > ol,
+ .journey-value-chain details > ol { flex-direction:column; gap:25px; }
+ .snapshot-flow > ol > li,
+ .journey-value-chain details > ol > li { min-height:0; padding:15px 18px; }
+ .snapshot-flow > ol > li:not(:last-child)::after,
+ .journey-value-chain details > ol > li:not(:last-child)::after { content:"\2193"; top:auto; bottom:-26px; left:50%; right:auto; transform:translateX(-50%); }
 }
+
+.snapshot-fact-grid { columns:auto; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:24px; }
+.snapshot-fact-group ul { margin:0; padding-left:18px; }
+.snapshot-fact-group li { padding:8px 0; font-size:15px; line-height:1.5; }
+.snapshot-fact-group li small { color:var(--muted); font-size:11px; margin-left:6px; }
+.snapshot-evidence { margin-top:24px; border-top:1px solid var(--line); padding-top:16px; }
+.snapshot-evidence article { padding:14px 0; border-bottom:1px solid var(--line); }
+.snapshot-evidence article p { margin:6px 0; }
+@media(max-width:900px) { .snapshot-fact-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media(max-width:560px) { .snapshot-fact-grid { grid-template-columns:1fr; } }

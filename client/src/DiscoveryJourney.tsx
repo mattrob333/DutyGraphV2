@@ -481,7 +481,7 @@ export function DiscoveryJourney({
           {notice}
         </div>
       )}
-      {contactResponse && ["contact", "agenda"].includes(stage) && (
+      {contactResponse && stage === "contact" && (
         <section className="journey-arrival" aria-label="Response received">
           <div><span className="eyebrow">RESPONSE RECEIVED</span>
             <h2>Your contact has sent the kickoff preparation</h2>
@@ -490,19 +490,7 @@ export function DiscoveryJourney({
         </section>
       )}
       {["contact", "agenda"].includes(stage) && (
-        <div id="returned-kickoff"><KickoffReturns companyId={company.id} records={records} refresh={refresh} agenda={() => { setStage("agenda"); window.scrollTo({top: 0, behavior: "smooth"}); }} /></div>
-      )}
-      {stage !== "contact" && !!company.settings.businessProfile?.streams?.length && (
-        <section className="journey-value-chain" aria-label="Business value chain">
-          <span className="eyebrow">HOW THE BUSINESS DELIVERS VALUE</span>
-          {company.settings.businessProfile.streams.map((stream, index) => (
-            <details key={stream.id} open={index === 0}>
-              <summary><strong>{stream.name}</strong> · {index === 0 ? "Primary stream" : "Supporting stream"}</summary>
-              <ol>{stream.stages.map((step, i) => <li key={step.id}><span>{i + 1}</span>{step.name}</li>)}</ol>
-            </details>
-          ))}
-          <p>Connect each person's duties and tasks to these stages. Reporting lines show who they report to; handoffs show where the work goes next.</p>
-        </section>
+        <details id="returned-kickoff" open={stage === "contact"}><summary>Contact response & team roster</summary><KickoffReturns companyId={company.id} records={records} refresh={refresh} agenda={() => { setStage("agenda"); window.scrollTo({top: 0, behavior: "smooth"}); }} /></details>
       )}
       {stage === "contact" && (
         <BusinessProfilePanel
@@ -754,7 +742,7 @@ export function DiscoveryJourney({
               charges apply. Review the result before saving or sending.
             </p>
             <Button
-              primary
+              primary={!draft}
               disabled={!configured || working || !ready}
               onClick={() => void generate()}
             >
@@ -767,7 +755,7 @@ export function DiscoveryJourney({
                     : stage === "tasks"
                       ? "Draft task cards"
                       : stage === "roster"
-                        ? "Build team dossiers"
+                        ? "Prepare team review"
                         : stage === "agenda"
                           ? "Prepare meeting guide"
                           : "Draft contact email"}

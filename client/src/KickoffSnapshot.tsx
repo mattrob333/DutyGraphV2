@@ -1,17 +1,15 @@
+import { snapshotFactText, snapshotCompanyLink } from "../../shared/snapshot-display.ts";
 import { briefCategories } from "../../shared/business-brief.ts";
 export function KickoffSnapshot({ context: c }: { context: any }) {
   const facts = c?.facts || [],
     reported = facts.filter(
       (f: any) => f.basis === "Reported" && f.citations?.length,
-    ),
-    uncertain = facts.filter(
-      (f: any) => f.basis !== "Reported" || !f.citations?.length,
     );
   const groups = Object.entries(briefCategories)
     .map(([key, label]) => ({
       key,
       label,
-      facts: reported.filter((f: any) => f.category === key),
+      facts: (key === "competitors" ? facts.filter((f: any) => f.basis !== "Not established" && f.citations?.length) : reported).filter((f: any) => f.category === key),
     }))
     .filter((g) => g.facts.length);
   const description =
@@ -82,76 +80,38 @@ export function KickoffSnapshot({ context: c }: { context: any }) {
         </div>
       )}
       <div className="snapshot-fact-heading">
-        <h2>What public sources report</h2>
-        <span>
-          {reported.length} sourced findings · open a source to inspect it
-        </span>
+        <h2>Company facts</h2>
+        <span>Public research · please confirm</span>
       </div>
       {groups.length ? (
         <div className="snapshot-fact-grid">
           {groups.map((g) => (
             <section key={g.key} className="snapshot-fact-group">
-              <h3>{g.label}</h3>
-              <dl>
-                {g.facts.map((f: any, i: number) => (
-                  <div className="snapshot-fact" key={i}>
-                    <dt>{f.label}</dt>
-                    <dd>
-                      {f.value}
-
-                      <details>
-                        <summary>
-                          {f.citations.length === 1 ? "Source" : "Sources"}
-                        </summary>
-                        {f.asOf && <small>As of {f.asOf}</small>}
-                        {f.citations.map((source: any, j: number) => (
-                          <div className="snapshot-citation" key={j}>
-                            {source.url ? (
-                              <a
-                                href={source.url}
-                                target="_blank"
-                                rel="noreferrer"
-                              >
-                                {source.title}
-                              </a>
-                            ) : (
-                              <span>{source.title}</span>
-                            )}
-                            <blockquote>{source.quote}</blockquote>
-                          </div>
-                        ))}
-                      </details>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
+              <h3>{g.key === "competitors" ? "Potential competitors" : g.label}</h3>
+              <ul>
+                {g.facts.map((f: any, i: number) => {
+                  const link = g.key === "competitors" ? snapshotCompanyLink(f) : undefined;
+                  return <li key={i}>
+                    {link ? <a href={link} target="_blank" rel="noreferrer">{f.label} ↗</a> : snapshotFactText(f)}
+                    {g.key === "scale" && <small>{f.asOf || "Reported"}</small>}
+                  </li>;
+                })}
+              </ul>
             </section>
           ))}
         </div>
-      ) : (
-        <p className="snapshot-empty">
-          We do not yet have source-backed findings to show here. Your
-          description and corrections will help us prepare.
-        </p>
-      )}
-      {uncertain.length > 0 && (
-        <details className="snapshot-uncertain">
-          <summary>
-            {uncertain.length} assumptions or gaps to check{" "}
-            <span>Optional detail</span>
-          </summary>
-          <ul>
-            {uncertain.map((f: any, i: number) => (
-              <li key={i}>
-                <strong>{f.label}</strong>
-                <span className="snapshot-label">{f.basis}</span>
-                <p>{f.value}</p>
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
-
+      ) : <p className="snapshot-empty">No public facts recorded yet.</p>}
+      <details className="snapshot-evidence">
+        <summary>Research details & sources</summary>
+        {facts.map((f: any, i: number) => <article key={i}>
+          <strong>{f.label}</strong> <span className="snapshot-label">{f.basis}{f.asOf ? ` · ${f.asOf}` : ""}</span>
+          <p>{f.value}</p>
+          {f.citations?.map((source: any, j: number) => <div className="snapshot-citation" key={j}>
+            {/^(https?):\/\//i.test(source.url || "") ? <a href={source.url} target="_blank" rel="noreferrer">{source.title}</a> : <span>{source.title}</span>}
+            <blockquote>{source.quote}</blockquote>
+          </div>)}
+        </article>)}
+      </details>
     </section>
   );
 }

@@ -147,3 +147,8 @@ Validation: all 230 tests and build pass; contracts pass and dependency audit re
 ## 2026-09-08 — Restore neutral discovery styling
 
 Removed sage accents that came from the reused client snapshot stylesheet, including profile borders, monogram, labels, response controls and arrival indicator. Expanded primary stages across the row with directional arrows and larger labels; narrow screens stack the flow vertically. Supporting streams remain collapsed by default. CSS and presentation only. Validation: build and all 230 tests passed; contracts regenerated; dependency audit found zero vulnerabilities. Browser checked with a fictional company fixture.
+
+
+## 2026-09-08 — Focus Discovery on the current task
+
+Both streams use full-width stages and arrows. Removed repeated value-chain banners from later Discovery steps. Meeting preparation keeps returned contact material collapsed; existing drafts make regeneration secondary to review/save. Company facts use short bullets with reported counts, places, offer names and potential competitor links from saved sources. Original qualifications and citations remain in one expandable evidence section; no saved research is rewritten. Validation: build and 233 tests passed; contracts passed; audit found zero vulnerabilities. Browser checked the actual snapshot component with synthetic facts, a linked potential competitor and both expanded streams. Reviewed rendering and action conditions across all five Discovery steps; no real client data or provider calls were used.
