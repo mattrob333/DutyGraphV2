@@ -1,5 +1,9 @@
 # DutyGraph development log
 
+## 2026-09-08 - Neutral selected business stage
+
+Replaced the washed-out ivory selected-stage fill with charcoal, light text and a thin top marker. Stage selection and recorded work links are unchanged.
+
 ## 2026-09-08 - Stable stage-info hover
 
 Removed duplicate button/stage hover listeners and cancel the prior close timer before scheduling another. The delayed close checks whether the pointer is still on the stage or popup. Measured placement chooses space above or below the button, with bounded height, instead of moving the popup over its own trigger near the viewport edge.
@@ -182,3 +186,5 @@ Both streams use full-width stages and arrows. Removed repeated value-chain bann
 Validation: build, all 255 tests and 92-route contract generation passed; production dependency audit found zero vulnerabilities. Local browser verification confirmed the stage explanation opens without changing the Work Map selection. Template counts and existing saved assignments remain unchanged.
 
 Full build and 255 tests passed; 92-route contracts passed and production dependency audit found zero vulnerabilities.
+
+Validation: selected-stage browser check confirmed charcoal fill, light text and marker; full build, 255 tests and contracts passed. Dependency audit found zero vulnerabilities.
