@@ -1,6 +1,6 @@
 # Implemented API reference
 
-Release 0.3. This inventory is generated from server route declarations. It describes 97 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
+Release 0.3. This inventory is generated from server route declarations. It describes 103 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
 
 ## Transport and authentication
 
@@ -23,6 +23,9 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | GET | /api/health | server/app.ts |
 | GET | /api/invitations/{token} | server/app.ts |
 | POST | /api/invitations/{token}/enroll | server/app.ts |
+| GET | /api/invitations/{token}/team | server/team-link.ts |
+| POST | /api/invitations/{token}/team | server/team-link.ts |
+| POST | /api/invitations/{token}/team/transcribe | server/team-link.ts |
 | GET | /api/maintenance | server/app.ts |
 | POST | /api/newsletter-interest | server/app.ts |
 | POST | /api/pilot-applications | server/app.ts |
@@ -99,6 +102,9 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | POST | /api/v1/companies/{companyId}/team-analysis | server/team-analysis.ts |
 | POST | /api/v1/companies/{companyId}/team-analysis/{runId}/review | server/team-analysis.ts |
 | GET | /api/v1/companies/{companyId}/team-analysis/{runId}/sources | server/team-analysis.ts |
+| GET | /api/v1/companies/{companyId}/work-gaps | server/work-gaps.ts |
+| POST | /api/v1/companies/{companyId}/work-gaps/policy | server/work-gaps.ts |
+| POST | /api/v1/companies/{companyId}/work-gaps/run | server/work-gaps.ts |
 | GET | /api/v1/companies/{companyId}/work-links | server/work-links.ts |
 | POST | /api/v1/companies/{companyId}/work-links | server/work-links.ts |
 | POST | /api/v1/companies/{companyId}/workflows/{workflowId}/cases | server/workflows.ts |

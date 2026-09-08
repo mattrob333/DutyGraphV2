@@ -124,6 +124,92 @@ export async function sendResend(
     .object({ id: z.string().min(1).max(200) })
     .parse(JSON.parse(payload));
 }
+
+/** Reserve once inside the caller's transaction. Bearer links remain in memory. */
+export async function reserveRequestEmail(
+  db: pg.PoolClient,
+  u: User,
+  company: any,
+  r: RecordRow,
+  expectedVersion: number,
+) {
+  const config = await providerConfig(u.tenant_id, "resend", db);
+  if (!config.configured || !config.config.from)
+    fail(
+      503,
+      "EMAIL_NOT_CONFIGURED",
+      "Add a Resend key and verified sender in Workspace settings.",
+    );
+  const count = await db.query(
+    "SELECT count(*)::int AS n FROM provider_jobs WHERE kind='invitation_email' AND created_at>now()-interval '24 hours'",
+  );
+  if (count.rows[0].n >= 50)
+    fail(
+      429,
+      "EMAIL_LIMIT",
+      "This account reached its limit of 50 email attempts in 24 hours.",
+    );
+  const invite = await issueInvitation(
+    db,
+    u,
+    company.id,
+    r,
+    expectedVersion,
+    "email",
+  );
+  const id = randomUUID();
+  const message: InvitationMessage = {
+    from: config.config.from,
+    to: [invite.email],
+    ...invitationTemplate({
+      company: company.name,
+      person: await getRecord(db, company.id, r.data.personId),
+      request: r,
+      url: invite.url,
+    }),
+  };
+  await db.query(
+    "INSERT INTO provider_jobs(id,tenant_id,company_id,kind,state,input) VALUES($1,$2,$3,'invitation_email','running',$4)",
+    [id, u.tenant_id, company.id, { requestId: r.id, recipient: invite.email }],
+  );
+  await audit(db, u, company.id, "email.attempt_reserved", r.id, { jobId: id });
+  return { id, message, key: config.key };
+}
+
+/** Never retry an unknown delivery. A successful provider receipt is not inbox delivery. */
+export async function deliverRequestEmail(
+  u: User,
+  company: string,
+  requestId: string,
+  reserved: Awaited<ReturnType<typeof reserveRequestEmail>>,
+  provider: EmailProvider = sendResend,
+) {
+  let state = "accepted",
+    result: any = null,
+    message = "Accepted by Resend. Inbox delivery is not yet tracked.";
+  try {
+    result = await provider(reserved.message, reserved.key, reserved.id);
+  } catch (error) {
+    state =
+      error instanceof AppError && error.code !== "EMAIL_UNKNOWN"
+        ? "failed"
+        : "unknown";
+    message =
+      error instanceof AppError
+        ? error.message
+        : "Send outcome unknown. Check your Resend dashboard before sending again; no automatic retry was made.";
+  }
+  await tx(u.tenant_id, async (db) => {
+    await db.query(
+      "UPDATE provider_jobs SET state=$2,result=$3,message=$4,finished_at=now() WHERE id=$1",
+      [reserved.id, state, result, message],
+    );
+    await audit(db, u, company, `email.${state}`, requestId, {
+      jobId: reserved.id,
+    });
+  });
+  return { id: reserved.id, state, result, message };
+}
 export function invitationsRouter(provider: EmailProvider = sendResend) {
   const router = Router({ mergeParams: true });
   router.use(advisor);

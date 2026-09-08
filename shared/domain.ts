@@ -1,6 +1,7 @@
 import type { BusinessProfile } from "./business-types.ts";
 import type { CompanyProfileReview } from "./company-profile.ts";
 import { z } from "zod";
+import { gapContextSchema } from "./work-gaps.ts";
 import {
   businessStageLinksSchema,
   stageInferenceSchema,
@@ -109,6 +110,7 @@ export const schemas = {
       questionIds: z.array(z.string().max(100)).max(10).default([]),
       emailSubject: z.string().max(200).default(""),
       emailBody: z.string().max(12000).default(""),
+      gapContext: gapContextSchema.optional(),
       taskIds: ids,
       dueDate: z.iso.date(),
       notice: text,

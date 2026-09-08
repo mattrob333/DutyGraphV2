@@ -7,10 +7,12 @@ export function KickoffVoice({
   append,
   busy: submitting,
   onPending,
+  brief = false,
 }: {
   token: string;
   endpoint?: string;
   enabled: boolean;
+  brief?: boolean;
   append: (text: string) => void;
   busy: boolean;
   onPending: (pending: boolean) => void;
@@ -154,7 +156,13 @@ export function KickoffVoice({
             disabled={busy || submitting}
             onClick={() => void transcribe()}
           >
-            {busy ? "Transcribing…" : "Transcribe into my response"}
+            {busy
+              ? brief
+                ? "Writing your words…"
+                : "Transcribing…"
+              : brief
+                ? "Add recording to my answer"
+                : "Transcribe into my response"}
           </Button>
         )}
       </div>
@@ -162,7 +170,9 @@ export function KickoffVoice({
         {recording
           ? "Recording — stops automatically after 3 minutes. You can add more clips."
           : enabled
-            ? "Record, stop, then transcribe with OpenAI. Review the editable text before sending. Audio is sent only when you choose Transcribe."
+            ? brief
+              ? "Record your answer, then add it to the text box. Review the words before sending."
+              : "Record, stop, then transcribe with OpenAI. Review the editable text before sending. Audio is sent only when you choose Transcribe."
             : "Your advisor has not enabled transcription. You can type or use Wispr Flow / device dictation in the response box."}
       </p>
       {clip && (
@@ -188,11 +198,22 @@ export function KickoffVoice({
           </div>
         </div>
       )}
-      <small>
-        Audio is held in this page until transcribed or discarded; saving text
-        progress does not save recordings. Up to 10 clips per request per day.
-        Transcription uses your advisor's configured service.
-      </small>
+      {brief ? (
+        <details>
+          <summary>About voice recording</summary>
+          <small>
+            Audio goes to OpenAI when you add the recording to your answer.
+            Recordings stay on this page until added or discarded. Saving a text
+            draft does not save audio. You can add up to 10 clips each day.
+          </small>
+        </details>
+      ) : (
+        <small>
+          Audio is held in this page until transcribed or discarded; saving text
+          progress does not save recordings. Up to 10 clips per request per day.
+          Transcription uses your advisor's configured service.
+        </small>
+      )}
       <ErrorBox error={error} />
     </div>
   );

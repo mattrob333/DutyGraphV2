@@ -1,4 +1,5 @@
 import { businessTemplates } from "./business-types.ts";
+import type { StageProvenance } from "./stage-provenance.ts";
 
 // Authored educational examples, not research findings or employee assignments.
 const guides: Record<string, [string, string[]]> = {
@@ -137,11 +138,18 @@ export type GuidedStage = {
   name?: string;
   description?: string;
   functionIds?: readonly string[];
+  provenance?: StageProvenance;
 };
 export function stageGuidance(
   stage: GuidedStage,
   stream: { templateId?: string; id?: string; name?: string; label?: string },
 ) {
+  if (stage.provenance)
+    return {
+      summary: stage.description?.trim() || stage.provenance.rationale,
+      examples: [],
+      label: "AI-suggested stage · draft",
+    };
   if (stage.description?.trim())
     return {
       summary: stage.description.trim(),

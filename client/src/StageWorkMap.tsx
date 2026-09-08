@@ -5,8 +5,10 @@ import { schemas, type RecordRow } from "../../shared/domain.ts";
 import type { BusinessProfile } from "../../shared/business-types.ts";
 import { cobaltStageExample } from "../../shared/stage-work-map-example.ts";
 import { stageWorkMap, selectStageWork } from "../../shared/stage-work-map.ts";
+import { assessWorkGaps } from "../../shared/work-gaps.ts";
 import { OrgChartCanvas } from "./OrgChartCanvas.tsx";
 import { CompanyWorkMap } from "./CompanyWorkMap.tsx";
+import { WorkGapPanel } from "./WorkGapPanel.tsx";
 import { Button, ErrorBox, Modal } from "./ui.tsx";
 import { api } from "./api.ts";
 import "./stage-work-map.css";
@@ -46,6 +48,10 @@ export function StageWorkMap({
   );
   const model = useMemo(
     () => stageWorkMap(example.records, example.profile),
+    [example],
+  );
+  const detailGaps = useMemo(
+    () => assessWorkGaps(example.records, example.profile),
     [example],
   );
   const exploreRef = useRef<HTMLDivElement>(null);
@@ -247,6 +253,21 @@ export function StageWorkMap({
             ? "Owns work"
             : "Part of this duty"}
       </small>
+      {(t.data.purpose || t.data.instructions) && (
+        <p className="swm-task-detail">
+          {t.data.purpose && (
+            <>
+              <strong>Purpose:</strong> {t.data.purpose}
+            </>
+          )}
+          {t.data.purpose && t.data.instructions && " "}
+          {t.data.instructions && (
+            <>
+              <strong>How:</strong> {t.data.instructions}
+            </>
+          )}
+        </p>
+      )}
       {!!stream && canAssign && (
         <button className="swm-text" onClick={() => startEdit(t)}>
           Assign stages
@@ -309,6 +330,24 @@ export function StageWorkMap({
                     {s.people.length}{" "}
                     {s.people.length === 1 ? "person" : "people"} ·{" "}
                     {s.tasks.length} {s.tasks.length === 1 ? "task" : "tasks"}
+                    {detailGaps.some(
+                      (g) => g.streamId === stream.id && g.stageId === s.id,
+                    ) && (
+                      <span
+                        className="swm-needs-detail"
+                        title={
+                          s.tasks.length || s.duties.length
+                            ? "Work details to fill in"
+                            : "Stage still to confirm"
+                        }
+                      >
+                        <span className="sr-only">
+                          {s.tasks.length || s.duties.length
+                            ? "Work details to fill in"
+                            : "Stage still to confirm"}
+                        </span>
+                      </span>
+                    )}
                   </small>
                 </button>
                 <StageHelp
@@ -649,31 +688,50 @@ export function StageWorkMap({
           )}
         </details>
       )}
-      <section className="swm-flows">
-        <div>
-          <p className="eyebrow">FOLLOW THE WORK</p>
-          <h3>Task flows{stage ? ` in ${stage.name}` : ""}</h3>
-          <p>These connections show how work passes between people.</p>
-        </div>
-        {scope.flows.length ? (
-          <div className="swm-flow-list">
-            {scope.flows.map((f) => (
-              <button
-                key={f.workflow.id}
-                onClick={() => openFlow(f.workflow.id)}
-              >
-                <strong>{f.workflow.title}</strong>
-                <span>{f.taskIds.length} tasks in this view</span>
-                <span>
-                  Open full flow <ArrowRight size={14} />
-                </span>
-              </button>
-            ))}
+      {scope.flows.length > 0 && (
+        <section className="swm-flows">
+          <div>
+            <p className="eyebrow">FOLLOW THE WORK</p>
+            <h3>Task flows{stage ? ` in ${stage.name}` : ""}</h3>
+            <p>These connections show how work passes between people.</p>
           </div>
-        ) : (
-          <p>No recorded task flows for this selection yet.</p>
-        )}
-      </section>
+          {scope.flows.length ? (
+            <div className="swm-flow-list">
+              {scope.flows.map((f) => (
+                <button
+                  key={f.workflow.id}
+                  onClick={() => openFlow(f.workflow.id)}
+                >
+                  <strong>{f.workflow.title}</strong>
+                  <span>
+                    {f.taskIds.length}{" "}
+                    {f.taskIds.length === 1 ? "task" : "tasks"} in this view
+                  </span>
+                  <span>
+                    Open full flow <ArrowRight size={14} />
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </section>
+      )}
+      <WorkGapPanel
+        openFollowup={(requestId) => {
+          const record =
+            records.find(
+              (r) => r.kind === "response" && r.data.requestId === requestId,
+            ) || records.find((r) => r.id === requestId);
+          if (record) open(record);
+        }}
+        companyId={companyId}
+        revisionKey={records
+          .map((r) => `${r.id}:${r.version}:${r.state}`)
+          .join("|")}
+        streamId={stream?.id}
+        stageId={stage?.id}
+        refresh={refresh}
+      />
       <details className="swm-legacy">
         <summary>Detailed task map, gaps & AI opportunities</summary>
         <CompanyWorkMap records={records} open={open} />

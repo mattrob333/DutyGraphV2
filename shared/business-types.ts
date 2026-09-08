@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { stageProvenanceSchema } from "./stage-provenance.ts";
 export const backbone = [
   { id: "get", label: "Get work" },
   { id: "shape", label: "Shape work" },
@@ -2077,6 +2078,7 @@ export const businessProfileSchema = z
                       .max(100),
                     name: z.string().trim().min(1).max(100),
                     description: z.string().trim().max(600).optional(),
+                    provenance: stageProvenanceSchema.optional(),
                     functionIds: z.array(functionSchema).min(1).max(6),
                   })
                   .strict(),

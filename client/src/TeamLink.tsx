@@ -12,6 +12,8 @@ export type TeamRequest = {
   questions: string[];
   notice?: string;
   voiceConfigured?: boolean;
+  gapFollowup?: boolean;
+  stageLabel?: string;
 };
 
 // The preview uses the same fields, but cannot read a link, save a draft, or submit.
@@ -25,14 +27,16 @@ export function TeamLink({
   previewRequest?: TeamRequest;
 }) {
   const preview = !!previewRequest;
-  const [request, setRequest] = useState<TeamRequest | null>(
+  const [loadedRequest, setRequest] = useState<TeamRequest | null>(
     previewRequest || null,
   );
+  const request = previewRequest || loadedRequest;
   const [text, setText] = useState("");
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
+  const [processing, setProcessing] = useState(false);
   const [pendingAudio, setPendingAudio] = useState(false);
   useEffect(() => {
     if (preview || !token) return;
@@ -56,10 +60,17 @@ export function TeamLink({
   }, [token, preview]);
   if (done)
     return (
-      <Panel title="Your response has been sent">
+      <Panel
+        title={
+          processing
+            ? "Your response has been saved"
+            : "Your response has been sent"
+        }
+      >
         <p>
-          Thank you, {name}. Your advisor can now review your notes about your
-          work.
+          {processing
+            ? "Thanks. Your answer is saved. We’re adding the details to the work map."
+            : `Thank you, ${name}. Your advisor can now review your notes about your work.`}
         </p>
         <p>
           Your response does not change your duties or give anyone permission to
@@ -73,9 +84,9 @@ export function TeamLink({
         <span className="kickoff-eyebrow">YOUR WORK, IN YOUR WORDS</span>
         <h2>Hello, {name}.</h2>
         <p>
-          Help your advisor understand what you do and where work slows down.
-          Use a recent example. Tell us what happens, even when it differs from
-          the usual process.
+          {request?.gapFollowup
+            ? `Your advisor needs a few details about ${request.stageLabel || "this work"}. Answer what you know from a recent example.`
+            : "Help your advisor understand what you do and where work slows down. Use a recent example. Tell us what happens, even when it differs from the usual process."}
         </p>
         <p>
           {preview
@@ -93,11 +104,12 @@ export function TeamLink({
             setBusy(true);
             setError("");
             try {
-              await api(`/invitations/${token}/team`, "POST", {
+              const result = await api(`/invitations/${token}/team`, "POST", {
                 expectedVersion: request.version,
                 acknowledged: true,
                 text,
               });
+              setProcessing(!!result.processing);
               setDone(true);
               try {
                 localStorage.removeItem(`dg-team-link-${request.id}`);
@@ -111,13 +123,21 @@ export function TeamLink({
             }
           }}
         >
-          <div className="team-link-grid">
+          <div
+            className={`team-link-grid${request.gapFollowup ? " team-link-brief" : ""}`}
+          >
             <section aria-label="Your questions">
-              <h2>Use these questions as a guide</h2>
-              <p>
-                Answer what you know. Say “I do not know” where needed. Keep
-                separate types of work separate. You can answer in any order.
-              </p>
+              <h2>
+                {request.gapFollowup
+                  ? "A few brief questions"
+                  : "Use these questions as a guide"}
+              </h2>
+              {!request.gapFollowup && (
+                <p>
+                  Answer what you know. Say “I do not know” where needed. Keep
+                  separate types of work separate. You can answer in any order.
+                </p>
+              )}
               <ol className="team-link-questions">
                 {request.questions.map((question, i) => (
                   <li key={i}>{question}</li>
@@ -134,7 +154,7 @@ export function TeamLink({
               </p>
               <textarea
                 id="team-response"
-                rows={18}
+                rows={request.gapFollowup ? 7 : 18}
                 required
                 maxLength={100000}
                 value={text}
@@ -143,6 +163,7 @@ export function TeamLink({
               />
               {!preview && token && (
                 <KickoffVoice
+                  brief={request.gapFollowup}
                   token={token}
                   endpoint={`/api/invitations/${token}/team/transcribe`}
                   enabled={!!request.voiceConfigured}
@@ -167,15 +188,30 @@ export function TeamLink({
             </section>
           </div>
           <div className="team-link-send">
-            <p>
-              Only share information approved for this work. Leave out
-              passwords, access keys and private customer details. Your advisor
-              reviews your response before using it to describe tasks.
-            </p>
-            <label className="check">
-              <input type="checkbox" required disabled={preview} />I am the
-              intended person. I agree to share these notes with my advisor.
-            </label>
+            {request.gapFollowup ? (
+              <p>
+                Your answer is saved, then AI adds proposed details to the work
+                map. Leave out private customer details, passwords and access
+                keys.
+              </p>
+            ) : (
+              <p>
+                Only share information approved for this work. Leave out
+                passwords, access keys and private customer details. Your
+                advisor reviews your response before using it to describe tasks.
+              </p>
+            )}
+            {request.gapFollowup ? (
+              <small>
+                By sending, you confirm this private link is for you and agree
+                to share your answer with your advisor.
+              </small>
+            ) : (
+              <label className="check">
+                <input type="checkbox" required disabled={preview} />I am the
+                intended person. I agree to share these notes with my advisor.
+              </label>
+            )}
             <div className="actions">
               <Button
                 type="button"

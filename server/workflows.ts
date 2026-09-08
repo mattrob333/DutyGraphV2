@@ -10,6 +10,12 @@ import {
   type CaseStep,
 } from "../shared/workflow.ts";
 export async function checkWorkflow(db: any, company: string, flow: any) {
+  if (flow.data.documentationOnly)
+    fail(
+      409,
+      "WORKFLOW_DOCUMENTATION_ONLY",
+      "This records reported work only. Configure and review the execution settings before starting a case.",
+    );
   if (flow.kind !== "workflow" || flow.state !== "reviewed")
     fail(
       409,
@@ -21,6 +27,12 @@ export async function checkWorkflow(db: any, company: string, flow: any) {
     ...flow.data.handoffBindings,
   ]) {
     const r = await getRecord(db, company, binding.id);
+    if (r.kind === "handoff" && r.data.documentationOnly)
+      fail(
+        409,
+        "HANDOFF_DOCUMENTATION_ONLY",
+        "Configure and review each documented handoff before using it in a case.",
+      );
     if (
       r.version !== binding.version ||
       r.hash !== binding.hash ||

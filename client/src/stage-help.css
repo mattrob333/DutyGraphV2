@@ -79,3 +79,34 @@ button.stage-help-trigger,
   color: var(--muted);
   font-size: 11px;
 }
+.stage-help-evidence {
+  border-top: 1px solid var(--line);
+  margin-top: 12px;
+  padding-top: 10px;
+}
+.stage-help-evidence h4 {
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+.stage-help-evidence article {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+.stage-help-evidence b {
+  font-weight: 600;
+}
+.stage-help-evidence blockquote {
+  margin: 8px 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--muted);
+  color: var(--ink);
+}
+.stage-help-evidence a {
+  color: var(--ink);
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+.stage-help-evidence small {
+  margin: 5px 0;
+  overflow-wrap: anywhere;
+}

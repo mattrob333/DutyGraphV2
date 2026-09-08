@@ -17,9 +17,16 @@ import {
   audit,
 } from "./db.ts";
 import { publicUser } from "./auth.ts";
+import { waitUntil } from "@vercel/functions";
+import {
+  enqueueGapReply,
+  processGapReply,
+  type GapReplyProvider,
+} from "./gap-replies.ts";
 
 export function teamLinkRouter(
   transcription: TranscriptionProvider = transcribeAudio,
+  gapReplyProvider?: GapReplyProvider,
 ) {
   const router = Router();
   // Possession grants access only to this work interview, never an account/session.
@@ -44,6 +51,10 @@ export function teamLinkRouter(
         "This link is unavailable. Ask your advisor for a new link.",
       );
     return tx(first.rows[0].tenant_id, async (db) => {
+      if (submit)
+        await db.query("SELECT pg_advisory_xact_lock(hashtextextended($1,0))", [
+          "tenant-command:" + first.rows[0].tenant_id,
+        ]);
       const invitation = (
         await db.query(
           "SELECT * FROM invitations WHERE token_hash=$1 AND used_at IS NULL AND revoked_at IS NULL AND expires_at>now() FOR UPDATE",
@@ -134,6 +145,8 @@ export function teamLinkRouter(
           title: r.title,
           questions: r.data.questions || [],
           notice: r.data.notice,
+          gapFollowup: r.data.questionPlanVersion === "work-gap:v1",
+          stageLabel: r.data.gapContext?.stageLabel || "",
           voiceConfigured:
             (await providerConfig(invitation.tenant_id, "openai", db))
               .configured || transcription !== transcribeAudio,
@@ -222,7 +235,19 @@ export function teamLinkRouter(
         "UPDATE invitations SET used_at=now() WHERE token_hash=$1",
         [digest],
       );
-      return { ok: true, responseId: response.id };
+      const job = await enqueueGapReply(
+        db,
+        user,
+        invitation.company_id,
+        r,
+        response,
+      );
+      return {
+        ok: true,
+        responseId: response.id,
+        processing: !!job,
+        ...(job ? { gapJobId: job.id, gapTenantId: invitation.tenant_id } : {}),
+      };
     });
   }
   router.get("/:token/team", async (req, res) => {
@@ -231,7 +256,30 @@ export function teamLinkRouter(
   });
   router.post("/:token/team", async (req, res) => {
     res.setHeader("Cache-Control", "no-store");
-    res.json(await access(String(req.params.token), true, req.body));
+    const result = (await access(String(req.params.token), true, req.body)) as {
+      ok: boolean;
+      responseId: string;
+      processing: boolean;
+      gapJobId?: string;
+      gapTenantId?: string;
+    };
+    // Submission and queue insertion have committed before any provider call.
+    if (result.gapJobId && result.gapTenantId) {
+      const work = processGapReply(
+        result.gapTenantId,
+        result.gapJobId,
+        gapReplyProvider,
+      ).catch(() => {
+        /* Durable queued/running state is recovered by maintenance. */
+      });
+      if (process.env.VERCEL) waitUntil(work);
+      else void work;
+    }
+    res.json({
+      ok: result.ok,
+      responseId: result.responseId,
+      processing: result.processing,
+    });
   });
   router.post(
     "/:token/team/transcribe",

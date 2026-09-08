@@ -2,8 +2,9 @@ import { z } from "zod";
 export const workflowSchema = z
   .object({
     title: z.string().trim().min(3).max(200),
+    documentationOnly: z.boolean().default(false),
     purpose: z.string().trim().min(5).max(12000),
-    ownerId: z.uuid(),
+    ownerId: z.union([z.uuid(), z.literal("")]),
     taskIds: z.array(z.uuid()).min(1).max(40),
     handoffIds: z.array(z.uuid()).max(100),
     joinPolicy: z.enum(["all", "any"]),
@@ -11,7 +12,11 @@ export const workflowSchema = z
     maxAttempts: z.number().int().min(1).max(10),
     reason: z.string().trim().min(3).max(500),
   })
-  .strict();
+  .strict()
+  .refine((data) => data.documentationOnly || !!data.ownerId, {
+    message: "An executable workflow requires an owner.",
+    path: ["ownerId"],
+  });
 export type FlowLink = {
   id: string;
   from: string;

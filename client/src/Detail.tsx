@@ -238,6 +238,16 @@ export function Detail({
         r.kind,
       ) && (
         <>
+          {["workflow", "handoff"].includes(r.kind) &&
+            r.data.documentationOnly && (
+              <div className="notice">
+                <strong>Work description</strong>
+                <p>
+                  This records how work is described. Execution rules have not
+                  been configured.
+                </p>
+              </div>
+            )}
           <dl className="details">
             {fieldSets[r.kind]
               .filter(
@@ -259,7 +269,15 @@ export function Detail({
                   <div key={f.key}>
                     <dt>{f.label}</dt>
                     <dd>
-                      {f.key === "joinPolicy" ? (
+                      {r.data.documentationOnly &&
+                      [
+                        "joinPolicy",
+                        "timeoutHours",
+                        "maxAttempts",
+                        "maxRetries",
+                      ].includes(f.key) ? (
+                        "Not configured"
+                      ) : f.key === "joinPolicy" ? (
                         value === "all" ? (
                           "All required incoming steps must finish."
                         ) : (

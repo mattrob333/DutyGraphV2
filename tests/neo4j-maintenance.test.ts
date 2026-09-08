@@ -85,6 +85,12 @@ test("retention and auth cleanup complete before projection failures", async () 
   const steps: string[] = [];
   await assert.rejects(
     runMaintenance({
+      gapFollowups: async () => {},
+      gapReplies: async () => ({
+        inspectedTenants: 0,
+        processed: 0,
+        results: [],
+      }),
       retention: async () => {
         steps.push("retention");
       },

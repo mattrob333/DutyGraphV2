@@ -6,6 +6,8 @@ Open **Company Work Map** in the sidebar. The default path is simple: choose a b
 
 ## Follow the work
 
+Open a stage's info button for **Why this stage?** New research proposes a useful grouping from company evidence and, when available, documented practices at comparable businesses. The help shows the rationale, exact passages, source links and dates, and what remains unknown. **Company-reported evidence**, **Peer example** and **AI-suggested stage** mean different things. A peer practice is not a client fact, a task assignment or proof of success. Older template stages show authored guidance instead. Existing custom stages survive later research.
+
 1. Select a stream. The first saved stream is marked **Primary**; the others are **Supporting**.
 2. Select a stage, or choose **All company work**. Stage names come from the saved business profile.
 3. Select a person in the highlighted organization. The person’s labels distinguish **Owns work** from **Does the work**.
@@ -30,3 +32,15 @@ The former **Connected**, **Work flow**, **Org & duties** and **Agents & control
 ## Get the first connected map
 
 Discovery saves proposed stage links with AI-created duties and task cards. Open Company Work Map to explore the result, then correct the work or its stage assignments. For older unassigned work, select the unassigned-work count above the chart, then choose **Connect existing work with AI**. This action also appears under **Assign work to business stages** below the chart. Open a duty or task to inspect the inference basis and confidence. These links do not grant authority or count as a person confirming the work.
+
+## Ask about missing details
+
+The map can flag an unexplained stage, a duty without tasks, missing task details or people, and work whose sequence is not recorded. These are gaps in what we know, not proof that people work badly. A stage may not apply; a task may stand alone.
+
+Choose a stage, then **Ask about this work**. Preview up to three questions and select the relevant people using their displayed, stored email addresses. Selection is deliberate: the whole roster is not enrolled. An unlinked person is not assigned questions just because of their job title. With continuing checks left on, this selection also authorizes later gap questions to those people. Turn it off for a single round.
+
+Use **Pause** to stop queued automatic follow-ups and future checks; use **Resume** to continue for the saved selection. A send already in progress may finish. Only one work request stays open per person, new gap requests are spaced at least a week apart, and the same gap is not asked again automatically. An unanswered or unclear gap can still need advisor attention.
+
+The private link lets the person speak or type, review the text, and submit. The answer is saved first. AI then proposes new work or fills missing details in eligible proposed records. Original evidence remains available; reviewed work, changed sources and conflicting accounts are held for advisor review. Delivery and processing status appear in the request history. A saved reply does not mean its AI update succeeded.
+
+Sample workspaces allow question previews and send no emails. Real follow-ups need email and AI configured in Workspace settings. Replies may describe actual task flows, but automatically captured flows are documentation only. They cannot start cases until an advisor configures and reviews them through the normal workflow controls.

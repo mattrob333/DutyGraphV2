@@ -141,13 +141,14 @@ export const workSchemas = {
   handoff: z
     .object({
       title: short,
+      documentationOnly: z.boolean().default(false),
       sourceTaskId: z.uuid(),
       targetTaskId: z.uuid(),
       condition: text,
       outputMapping: text,
       requiredInput: text,
       acceptanceCheck: text,
-      exceptionOwnerId: z.uuid(),
+      exceptionOwnerId: z.union([z.uuid(), z.literal("")]),
       timeoutHours: z.number().positive().max(8760),
       maxRetries: z.number().int().min(0).max(10),
       failureAction: text,
@@ -155,6 +156,10 @@ export const workSchemas = {
       reason: short,
     })
     .strict()
+    .refine((d) => d.documentationOnly || !!d.exceptionOwnerId, {
+      message: "An executable handoff requires an exception owner",
+      path: ["exceptionOwnerId"],
+    })
     .refine((d) => d.sourceTaskId !== d.targetTaskId, {
       message: "A handoff must connect two different tasks",
       path: ["targetTaskId"],

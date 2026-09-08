@@ -43,13 +43,14 @@ Generated from the same runtime schemas that validate saved records. Required fi
 | Field | Required | Shape and limits |
 | --- | --- | --- |
 | title | Yes | string; min 1 characters; max 200 characters |
+| documentationOnly | No | boolean; default false |
 | sourceTaskId | Yes | string; uuid |
 | targetTaskId | Yes | string; uuid |
 | condition | Yes | string; min 1 characters; max 20000 characters |
 | outputMapping | Yes | string; min 1 characters; max 20000 characters |
 | requiredInput | Yes | string; min 1 characters; max 20000 characters |
 | acceptanceCheck | Yes | string; min 1 characters; max 20000 characters |
-| exceptionOwnerId | Yes | string; uuid |
+| exceptionOwnerId | Yes | union; see API schema |
 | timeoutHours | Yes | number; maximum 8760 |
 | maxRetries | Yes | integer; minimum 0; maximum 10 |
 | failureAction | Yes | string; min 1 characters; max 20000 characters |
@@ -77,8 +78,9 @@ Generated from the same runtime schemas that validate saved records. Required fi
 | Field | Required | Shape and limits |
 | --- | --- | --- |
 | title | Yes | string; min 3 characters; max 200 characters |
+| documentationOnly | No | boolean; default false |
 | purpose | Yes | string; min 5 characters; max 12000 characters |
-| ownerId | Yes | string; uuid |
+| ownerId | Yes | union; see API schema |
 | taskIds | Yes | array; max 40 items |
 | handoffIds | Yes | array; max 100 items |
 | joinPolicy | Yes | all, any |
@@ -155,6 +157,7 @@ Generated from the same runtime schemas that validate saved records. Required fi
 | questionIds | No | array; max 10 items; default [] |
 | emailSubject | No | string; max 200 characters; default "" |
 | emailBody | No | string; max 12000 characters; default "" |
+| gapContext | No | object |
 | taskIds | No | array; max 150 items; default [] |
 | dueDate | Yes | string; date |
 | notice | Yes | string; min 1 characters; max 20000 characters |

@@ -66,6 +66,35 @@ before(async () => {
             sourceIds: input.description
               ? ["description"]
               : [input.sources[0].id],
+            ...(input.description.startsWith("Synthetic stage evidence")
+              ? {
+                  stages: [
+                    {
+                      name: "Understand client needs",
+                      description: "A proposed discovery grouping.",
+                      functionIds: ["get", "shape"],
+                      provenance: {
+                        status: "proposed",
+                        rationale:
+                          "The supplied description reports client advisory work.",
+                        unknowns: [
+                          "No documented peer process is available in this description-only run.",
+                        ],
+                        citations: [
+                          {
+                            kind: "company_reported",
+                            sourceId: "description",
+                            quote: input.description,
+                            subject: input.name,
+                            relevance:
+                              "Client advisory work suggests a discovery grouping to confirm.",
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                }
+              : {}),
           },
         ],
       };
@@ -491,4 +520,53 @@ test("company profile survives newer incomplete jobs and advisor updates are iso
   );
   const reloaded = await request(c, path(c));
   assert.equal(reloaded.data.latestBrief.result.draft.summary, draft.summary);
+});
+
+test("stage evidence survives profile save/reload and later classification preserves existing custom stages", async () => {
+  const c = await account();
+  const intake = body(c, {
+    description:
+      "Synthetic stage evidence: We advise clients on improving business operations.",
+  });
+  assert.equal((await request(c, path(c), "POST", intake)).status, 200);
+  const job = (await request(c, path(c))).data.jobs[0];
+  assert.equal(job.state, "complete", JSON.stringify(job));
+  const profile = profileFromClassification(job.result.draft);
+  assert.equal(profile.streams[0].stages.length, 1);
+  profile.streams[0].stages.push({
+    id: "custom-permit",
+    name: "Renew a permit",
+    functionIds: ["do"],
+    description: "Advisor-created company stage.",
+  });
+  const saved = await request(
+    c,
+    `/api/v1/companies/${c.company}/business-profile`,
+    "PUT",
+    {
+      expectedRevision: c.revision,
+      profile,
+      intake: {
+        name: intake.name,
+        website: intake.website,
+        description: intake.description,
+      },
+    },
+  );
+  assert.equal(saved.status, 200, JSON.stringify(saved.data));
+  c.revision = saved.data.revision;
+  assert.equal((await request(c, path(c), "POST", body(c))).status, 200);
+  const companies = (await request(c, "/api/v1/companies")).data;
+  const loaded = companies.find((company: any) => company.id === c.company)
+    .settings.businessProfile;
+  assert.deepEqual(loaded, profile);
+  assert.ok(loaded.streams[0].stages[0].provenance);
+  assert.equal(
+    loaded.streams[0].stages[0].provenance.citations[0].quote,
+    intake.description,
+  );
+  assert.equal(
+    loaded.streams[0].stages[0].provenance.citations[0].title,
+    "Supplied company description",
+  );
 });

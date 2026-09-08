@@ -124,7 +124,7 @@ export async function createOrEdit(
   const hasStageLinks = kind === "task" || kind === "duty";
   // Older edit forms do not know this field. Omission preserves saved links;
   // an explicit empty array clears them. New records still default to [].
-  const normalizedInput =
+  let normalizedInput =
     hasStageLinks &&
     existing &&
     input &&
@@ -133,6 +133,13 @@ export async function createOrEdit(
     !("businessStageLinks" in input)
       ? { ...input, businessStageLinks: existing.data.businessStageLinks || [] }
       : input;
+  if (
+    existing?.data.documentationOnly &&
+    normalizedInput &&
+    typeof normalizedInput === "object" &&
+    !("documentationOnly" in normalizedInput)
+  )
+    normalizedInput = { ...normalizedInput, documentationOnly: true };
   const d: any = schemas[kind as keyof typeof schemas].parse(normalizedInput);
   // Internal fixture identity survives normal edits, including title changes.
   // It is copied only from the existing server record, never accepted as input.

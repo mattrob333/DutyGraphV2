@@ -42,7 +42,11 @@ export function StageHelp({
           trigger.current?.closest(
             ".snapshot-flow li, .swm-stage-picker li, .business-flow-preview > span",
           ) || trigger.current;
-        if (node?.matches(":hover") || tip.current?.matches(":hover")) return;
+        if (
+          node?.matches(":hover, :focus-within") ||
+          tip.current?.matches(":hover, :focus-within")
+        )
+          return;
         setOpen(false);
       }, 200);
   };
@@ -123,7 +127,8 @@ export function StageHelp({
         className="stage-help-trigger"
         aria-label={`About ${stage.name || "this business stage"}`}
         aria-expanded={open}
-        aria-describedby={open ? id : undefined}
+        aria-haspopup="dialog"
+        aria-controls={open ? id : undefined}
         onFocus={show}
         onBlur={leave}
         onClick={(e) => {
@@ -142,15 +147,78 @@ export function StageHelp({
           <div
             ref={tip}
             id={id}
-            role="tooltip"
+            role="dialog"
+            aria-label={`Why this stage? ${stage.name || "Business stage"}`}
             className="stage-help-popover"
             style={position}
             onMouseEnter={cancel}
             onMouseLeave={leave}
+            onFocus={cancel}
+            onBlur={leave}
           >
             <small>{guide.label}</small>
             <strong>{stage.name}</strong>
             <p>{guide.summary}</p>
+            {stage.provenance && (
+              <section className="stage-help-evidence">
+                <h4>Why this stage?</h4>
+                <p>{stage.provenance.rationale}</p>
+                {!stage.provenance.citations.some(
+                  (citation) => citation.kind === "company_reported",
+                ) && <p>Company practice is unconfirmed for this stage.</p>}
+                {!stage.provenance.citations.some(
+                  (citation) => citation.kind === "peer_example",
+                ) && (
+                  <p>No documented peer example was captured for this stage.</p>
+                )}
+                {stage.provenance.citations.map((citation, index) => (
+                  <article key={`${citation.sourceId}-${index}`}>
+                    <small>
+                      {citation.kind === "company_reported"
+                        ? "Company-reported evidence"
+                        : "Peer example · company practice unconfirmed"}
+                    </small>
+                    <b>{citation.subject}</b>
+                    <p>{citation.relevance}</p>
+                    <blockquote>{citation.quote}</blockquote>
+                    {citation.url ? (
+                      <a
+                        href={citation.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {citation.title || citation.sourceId}
+                      </a>
+                    ) : (
+                      <span>
+                        {citation.title || "Supplied company description"}
+                      </span>
+                    )}
+                    <small>Source: {citation.sourceId}</small>
+                    <small>
+                      Published: {citation.publishedDate || "Date not stated"} ·
+                      Retrieved: {citation.retrievedAt || "Date not recorded"}
+                    </small>
+                  </article>
+                ))}
+                {!stage.provenance.citations.length && (
+                  <p>
+                    No supporting stage source was captured. This grouping is an
+                    AI suggestion to confirm.
+                  </p>
+                )}
+                {!!stage.provenance.unknowns.length && (
+                  <>
+                    <h4>Still to confirm</h4>
+                    <ul>
+                      {stage.provenance.unknowns.map((unknown) => (
+                        <li key={unknown}>{unknown}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </section>
+            )}
             {!!guide.examples.length && (
               <ul>
                 {guide.examples.map((example) => (
@@ -159,8 +227,9 @@ export function StageHelp({
               </ul>
             )}
             <footer>
-              A stage groups duties across roles. These examples do not assign
-              work.
+              {stage.provenance
+                ? "This grouping is proposed. Reported practices and matching passages do not establish success or assign work at this company."
+                : "A stage groups duties across roles. These authored examples do not assign work or establish company practice."}
             </footer>
           </div>,
           document.body,

@@ -10,6 +10,8 @@ Select a person on the chart or in the list to inspect duties and tasks in the c
 
 ## Assigning work
 
+New research proposals expose **Why this stage?** through the stage info button. Saved provenance includes the proposal rationale, company-reported passages, separately labeled peer examples, exact source IDs, links, publication/retrieval dates and unknowns. Peer practices are comparisons, not client facts or proof of success. Current AI runs propose 1-16 stages per stream instead of copying a fixed template; old jobs retain their authored fallback. Later research preserves existing custom stages.
+
 Use **Assign stages** on a duty or task. A duty may belong to multiple stages and streams. Its tasks inherit those assignments through explicit task IDs; a task with its own stage assignments overrides that inheritance. Clearing a task’s assignments restores inheritance. No matching by name, department, reporting line or task-level value stage occurs.
 
 Saving uses normal record versions and review rules. Unchanged selections do not save. Work with no owner, no stage, or references to removed stages remains accessible for repair. Missing people/stages do not create guessed links. Old clients that omit stage links preserve current assignments; sending an explicit empty list clears them.
@@ -33,3 +35,9 @@ Select the unassigned-work count above the chart, or open **Assign work to busin
 Onboarding can save the first AI result immediately. Duties carry proposed stage links and recorded owners; tasks carry proposed stage links, owners/performers and explicit duty membership. Open a record to read the AI rationale and confidence. Use Assign stages for corrections. A company stage is a category of work, never approval authority.
 
 For previously collected work, Connect existing work with AI fills missing stage assignments from the saved profile and internal work records. Existing assignments remain unchanged. A task can inherit its duty stages. Changed or withdrawn inputs abort an in-flight update instead of reviving older work. A new version may require renewed review; automation never confirms work on someone's behalf. Missing or ambiguous data stays visible for correction.
+
+## Follow up on missing knowledge
+
+**Ask about this work** previews a small question set for a selected stage and lets the advisor choose relevant people by stored email address. Continuing checks default on for that selected group, with pause/resume controls. The system permits one open work request per person, spaces new gap requests at least a week apart, and does not automatically ask the same gap again. Sample workspaces preview questions without sending emails.
+
+Private voice or typed replies are saved before AI proposes additions or fills eligible missing details. Original evidence and current edits are preserved; contradictions and changed or reviewed work need advisor review. Reported flows are documentation only until separately configured and reviewed for cases. An unexplained stage or sequence is missing knowledge, not proof of poor work. See [work-gap follow-ups](work-gap-followups.md) for provider setup, maintenance, bounds and failure behavior.

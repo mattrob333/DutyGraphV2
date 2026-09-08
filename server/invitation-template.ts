@@ -31,6 +31,23 @@ export function invitationTemplate({
 }) {
   if (url !== "#" && !/^https?:\/\//.test(url))
     throw new Error("Invalid invitation URL");
+  if (request.data.questionPlanVersion === "work-gap:v1") {
+    const stage = request.data.gapContext?.stageLabel || "your work";
+    const subject = header(
+      request.data.emailSubject || `A quick question about ${stage}`,
+    );
+    const questions = (request.data.questions || []).slice(0, 3).map(String);
+    const intro = `We have a few details to fill in about ${stage}. One recent example will help. Tell us if this work belongs elsewhere.`;
+    const how =
+      "Open your private page. Speak or type your answer, check it, then send. No account or password is needed.";
+    const footer =
+      "This link is just for you and lasts 7 days. Your answer adds proposed details to the work map; it does not approve actions or change company policy.";
+    return {
+      subject,
+      text: `Hello ${person.title},\n\n${intro}\n\n${questions.map((q: string, i: number) => `${i + 1}. ${q}`).join("\n\n")}\n\n${how}\n\nAnswer these questions: ${url}\n\n${footer}\n\nDutyGraph · ${company}`,
+      html: `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(subject)}</title></head><body style="margin:0;background:#f2f1ed;color:#262728;font:16px/1.65 Arial,Helvetica,sans-serif"><table role="presentation" width="100%" cellspacing="0" cellpadding="0"><tr><td align="center" style="padding:32px 16px"><table role="presentation" width="600" cellspacing="0" cellpadding="0" style="width:100%;max-width:600px;background:#fff;border:1px solid #deddd8;border-radius:10px"><tr><td style="padding:24px 32px;border-bottom:1px solid #e8e7e2;font-size:22px;font-weight:bold">DutyGraph<span style="display:block;font-size:12px;font-weight:normal;color:#68696a">${escape(company)}</span></td></tr><tr><td style="padding:28px 32px"><p style="font-size:11px;letter-spacing:1.5px;color:#73716a">A QUICK FOLLOW-UP</p><h1 style="font-size:25px;line-height:1.25;margin:12px 0 20px">Hello ${escape(person.title)}.</h1><p>${escape(intro)}</p><ol style="padding-left:22px;margin:24px 0">${questions.map((q: string) => `<li style="padding-left:4px;margin:16px 0">${escape(q)}</li>`).join("")}</ol><a href="${escape(url)}" style="display:inline-block;padding:14px 22px;background:#292b2d;color:#fff;border-radius:6px;font-weight:bold;text-decoration:none">Answer these questions →</a><p style="font-size:14px;margin-top:22px">${escape(how)}</p></td></tr><tr><td style="padding:20px 32px;border-top:1px solid #e8e7e2;color:#73716a;font-size:12px">${escape(footer)}<br><a href="${escape(url)}" style="color:#555">Open your private page</a> if the button does not work.</td></tr></table></td></tr></table></body></html>`,
+    };
+  }
   const work = request.data.type === "work";
   const leadership = request.data.type === "leadership";
   const confirmation = request.data.type === "confirmation";
@@ -46,9 +63,10 @@ export function invitationTemplate({
         : "Your work, in your words";
   const subject = header(request.data.emailSubject || `${label} · ${company}`);
   const intro = String(
-    request.data.emailBody || (work
-      ? `Your advisor is learning how work gets done at ${company}. Please describe the work you do and correct anything we got wrong. You do not need to prepare a report.`
-      : "") ||
+    request.data.emailBody ||
+      (work
+        ? `Your advisor is learning how work gets done at ${company}. Please describe the work you do and correct anything we got wrong. You do not need to prepare a report.`
+        : "") ||
       (contact
         ? `We are preparing for our first meeting with ${company}. Please invite the leaders who should contribute. Bring a list of departments, the people in each department, their email addresses, and their main responsibilities. Correct our public research and confirm the meeting logistics. The executive team can supply detailed goals at kickoff.`
         : leadership

@@ -16,6 +16,8 @@ The **Industry Map** is a separate deeper analysis after this initial pass. It u
 
 The snapshot shows short facts about offers, customers, size and competitors. Open the research details to inspect original qualifications and sources. Reported facts have not been independently confirmed. Primary stream sets the starting focus; supporting streams can describe other parts of the business. Use **Make primary** to change that focus. Public research does not establish internal duties or reporting lines.
 
+Open a stage's info button for **Why this stage?** New AI stage proposals retain their company passages, documented peer examples, source links and dates, rationale and unknowns. The number of stages follows the proposed grouping; it is not fixed at six. Peer examples are comparisons to discuss, never client facts, employee assignments or evidence that a practice succeeds. Older saved template stages retain their authored guidance.
+
 Enter the name and email of your point of contact. Add agreed meeting details if available. Choose **Draft contact email**. The draft asks the contact to invite the leaders who should attend, provide the participating people's names, emails and departments, describe responsibilities, and consider the company's goals, vision and problems. It does not assume supplier onboarding or any other internal workflow.
 
 Edit the subject, message and preliminary questions. **Save contact request** creates a private request. Preview the branded email, then choose **Send invitation email**. Saving and sending are separate actions. The contact can speak or type answers on their private page. Their response appears in this discovery journey and the evidence history tools.
@@ -57,3 +59,9 @@ Generated cards are saved as proposed work, without marking advisor review or pa
 A participant's initial check records their understanding. Company-level task confirmation still uses the existing exact-version owner/performer rules. A changed description may need another check. Agent proposals come afterward; this process does not grant access or deploy an agent.
 
 Meeting agenda sections total 120 minutes. Without a returned preparation response, the guide is labeled provisional. Changed duty descriptions are not silently merged by owner and title. Stage links can be inferred by AI or assigned manually; each is saved on the work record. For older unassigned work, use **Connect existing work with AI** on Company Work Map. Open a duty or task to inspect the inference basis and confidence.
+
+## Continue with focused questions
+
+On Company Work Map, **Ask about this work** previews short questions about missing details in the selected stage. Choose relevant people from their stored email addresses. Continuing checks are on by default after this selection; the roster is not enrolled automatically. Pause or resume the saved selection from the map. A person receives at most one new gap request a week, cannot have another open work request, and is not automatically asked the same gap again. Sample workspaces preview questions without sending email.
+
+The person answers by voice or text on the private page. Their reply is saved before AI processes it. Eligible updates remain proposed; changed or reviewed work and contradictions need advisor review. Reported task flows are documentation only until separately configured and reviewed for cases. Missing information does not prove a broken process, and this loop does not guarantee that every gap will be resolved. See [Company Work Map](28-company-work-map.md).

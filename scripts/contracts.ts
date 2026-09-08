@@ -88,6 +88,8 @@ for (const [source, prefix] of [
   ["server/ai.ts", "/api/v1/companies/:companyId/ai"],
   ["server/discovery.ts", "/api/v1/companies/:companyId/discovery"],
   ["server/work-links.ts", "/api/v1/companies/:companyId/work-links"],
+  ["server/work-gaps.ts", "/api/v1/companies/:companyId/work-gaps"],
+  ["server/team-link.ts", "/api/invitations"],
   ["server/pilot-inbox.ts", "/api/v1"],
   ["server/agent-requests.ts", "/api/v1/companies/:companyId/agent-requests"],
   ["server/neo4j.ts", "/api/v1/companies/:companyId/neo4j"],

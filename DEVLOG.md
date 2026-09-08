@@ -1,5 +1,13 @@
 # DutyGraph development log
 
+## 2026-09-08 — Evidence behind stages and automatic work follow-ups
+
+Added stage-specific source passages, rationale and unknowns to saved research proposals and stage help. Company evidence and comparable-business examples are validated and displayed separately; downstream discovery and assignment prompts cannot treat peer practices as client facts. Current research proposes variable stage counts while preserving existing custom stages and legacy drafts.
+
+The Work Map assesses missing task detail, duties without tasks, missing people and undocumented sequences. A short follow-up preview uses exact stored recipients and up to three plain-language questions. Opt-in continuing checks run through the existing maintenance schedule, with per-person spacing, pending-request checks, gap dedupe, pause/resume, sample-data blocking and no retry after uncertain email outcomes. Password-free responses retain voice/type capture and enqueue durable processing atomically. Grounded reply proposals fill missing work, connect supported tasks/duties/flows and retain exact response evidence. Manual, reviewed and changed records are preserved for advisor review. Flows captured without execution rules are documentation only, so case execution remains blocked.
+
+Migration 0012 adds worker cursors and unique reply/outreach indexes. Local migration and focused API tests passed, including email-to-private-reply-to-map assembly, concurrent retries, sample/tenant isolation, changed addresses, pause/resume, stale-job timing and unknown-send protection. Validation: 300 tests passed; production build, type checks, 103-route contracts, synthetic training and encrypted backup recovery passed. Dependency audit found zero vulnerabilities. Browser verification covers private reply to automatic map update, saved-reply review, Cobalt no-send previews, stable hover, light/dark themes and five screen sizes. See [verification](docs/verification/2026-09-08-work-gap-followups.md). Hosted publication is pending. Development uses fictional data and injected providers; no real outreach or paid generation was used.
+
 ## 2026-09-08 — Work Map visual refinement
 
 Compressed the page heading and stage ribbon, removed the duplicate introduction and selected-card top stripe, and combined stage context, reporting chart and person details into one workspace. The chart fits the remaining desktop height, has a compact laptop layout and preserves its camera during stage/person selection. Added Fit team, quieter neutral person cards, and matching light-theme surfaces. Mobile details stack below the chart. Older graph views remain available; the disabled map Register control is omitted.

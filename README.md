@@ -1,5 +1,11 @@
 # DutyGraph
 
+The Work Map now identifies missing task detail, duties without tasks and work whose sequence is not recorded. **Ask about this work** previews up to three questions for selected, stored email addresses. Continuing checks are optional; they allow one open request per person and at most one new gap follow-up per person per week. The same gap is not emailed repeatedly. Private links accept voice or text without an account, and replies automatically add evidence-linked proposals while preserving manual or newer work. Cobalt remains preview-only. See [work follow-ups](docs/work-gap-followups.md).
+
+Stage help now explains **Why this stage?** with saved source passages and links. Current AI research proposes 1–16 stages using the company's evidence and clearly separated peer examples. A comparison is a proposed starting point, not proof of the client's duties or methods. Existing custom stages and legacy templates remain available.
+
+Apply migration `0012-work-gap-followups` before running this version. Email and AI must be configured per account; automatic follow-ups start only after an advisor selects the recipients. Local checks run each minute and hosted checks use the existing five-minute maintenance schedule. Captured flows without execution settings are work descriptions; they cannot start operational cases. Real-provider quality and inbox delivery require separate acceptance checks.
+
 Demo requests now feed a restricted operator inbox. The form collects website, company, team size, contact name/email and role; the goal is optional. **Research this company** creates or reopens its workspace, starts research and carries the contact into kickoff preparation. New research saves proposed stages; existing custom stages are preserved. See [demo inbox setup](docs/demo-requests.md).
 
 Onboarding AI proposes stage links, task-to-duty links and people assignments. Building from kickoff notes saves the team and duties immediately; task extraction saves an editable map without a separate apply step. Inferences remain proposed until reviewed. **Connect existing work with AI** fills stage gaps in older workspaces, preserves existing links and rejects concurrent edits. Repeated extraction reuses identified tasks. Email delivery and authority confirmation stay separate.

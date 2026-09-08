@@ -375,6 +375,20 @@
   font-size: 10px;
   margin: 5px 0;
 }
+.swm-task-detail {
+  margin: 7px 0 0;
+  color: var(--swm-muted);
+  font-size: 10px !important;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.swm-task-detail strong {
+  color: #d5d1c8;
+  font-weight: 600;
+}
 .swm-text {
   font-size: 11px !important;
   background: transparent;
@@ -797,4 +811,15 @@ dialog.swm-assignment::backdrop {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+.swm-needs-detail {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin: 0 0 2px 7px;
+  border-radius: 50%;
+  background: #c3b397;
+}
+[data-theme="light"] .swm-needs-detail {
+  background: #775d39;
 }

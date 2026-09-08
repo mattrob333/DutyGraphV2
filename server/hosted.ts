@@ -4,6 +4,8 @@ import { pool } from "./db.ts";
 import { projectAll } from "./projection.ts";
 import { runRetention } from "./retention.ts";
 import { sendPilotNotifications } from "./pilot-notifications.ts";
+import { runGapFollowups } from "./work-gaps.ts";
+import { processGapReplies } from "./gap-replies.ts";
 export const hostedAuthLimit: RequestHandler = async (req, res, next) => {
   try {
     const secret = process.env.PROVIDER_ENCRYPTION_KEY;
@@ -34,6 +36,8 @@ export const hostedAuthLimit: RequestHandler = async (req, res, next) => {
 export async function runMaintenance({
   retention = runRetention,
   projection = projectAll,
+  gapFollowups = runGapFollowups,
+  gapReplies = processGapReplies,
   cleanup = async () => {
     await pool.query("DELETE FROM auth_attempts WHERE expires_at<now()");
   },
@@ -41,7 +45,12 @@ export async function runMaintenance({
   // Retention must finish before any optional remote database work can time out.
   await retention();
   await cleanup();
-  await projection();
+  const jobs = await Promise.allSettled([
+    projection(),
+    gapFollowups(),
+    gapReplies(),
+  ]);
+  for (const job of jobs) if (job.status === "rejected") throw job.reason;
   await sendPilotNotifications();
 }
 

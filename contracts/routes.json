@@ -49,6 +49,21 @@
     },
     {
       "method": "GET",
+      "path": "/api/invitations/{token}/team",
+      "source": "server/team-link.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/invitations/{token}/team",
+      "source": "server/team-link.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/invitations/{token}/team/transcribe",
+      "source": "server/team-link.ts"
+    },
+    {
+      "method": "GET",
       "path": "/api/maintenance",
       "source": "server/app.ts"
     },
@@ -426,6 +441,21 @@
       "method": "GET",
       "path": "/api/v1/companies/{companyId}/team-analysis/{runId}/sources",
       "source": "server/team-analysis.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/work-gaps",
+      "source": "server/work-gaps.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/work-gaps/policy",
+      "source": "server/work-gaps.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/work-gaps/run",
+      "source": "server/work-gaps.ts"
     },
     {
       "method": "GET",

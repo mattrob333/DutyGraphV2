@@ -5,6 +5,8 @@ import { assetsRouter } from "./assets.ts";
 import { projectAll } from "./projection.ts";
 import { pool } from "./db.ts";
 import { runRetention } from "./retention.ts";
+import { runGapFollowups } from "./work-gaps.ts";
+import { processGapReplies } from "./gap-replies.ts";
 import express from "express";
 import path from "node:path";
 const app = createApp();
@@ -55,12 +57,27 @@ const retention = setInterval(
     runRetention().catch(() => console.error("Audio retention job delayed.")),
   60000,
 );
+let gapWorkerRunning = false;
+const gapWorker = setInterval(async () => {
+  if (gapWorkerRunning) return;
+  gapWorkerRunning = true;
+  try {
+    await Promise.all([runGapFollowups(), processGapReplies()]);
+  } catch {
+    console.error(
+      "Work follow-up check delayed. Saved questions and replies remain available.",
+    );
+  } finally {
+    gapWorkerRunning = false;
+  }
+}, 60000);
 void runRetention().catch(() =>
   console.error("Initial audio retention check delayed."),
 );
 const shutdown = () => {
   clearInterval(worker);
   clearInterval(retention);
+  clearInterval(gapWorker);
   server.close(() => pool.end().then(() => process.exit(0)));
 };
 process.on("SIGTERM", shutdown);

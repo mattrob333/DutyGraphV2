@@ -36,7 +36,7 @@ export function WorkflowDetail({
     return (
       <>
         <ErrorBox error={error} />
-        {r.state === "reviewed" && (
+        {r.state === "reviewed" && !r.data.documentationOnly && (
           <form
             className="workflow-start"
             onSubmit={(e) => {
@@ -73,6 +73,12 @@ export function WorkflowDetail({
               Start case
             </Button>
           </form>
+        )}
+        {r.state === "reviewed" && r.data.documentationOnly && (
+          <div className="notice">
+            <strong>Work description</strong>
+            <p>Set and review execution rules before starting a manual case.</p>
+          </div>
         )}
       </>
     );

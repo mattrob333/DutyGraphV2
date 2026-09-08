@@ -17,6 +17,11 @@ type Def = {
 export const fieldSets: Record<string, Def[]> = {
   workflow: [
     { key: "title", label: "Workflow name" },
+    {
+      key: "documentationOnly",
+      label: "Work description only",
+      type: "checkbox",
+    },
     { key: "purpose", label: "Purpose", type: "textarea" },
     { key: "ownerId", label: "Accountable case owner", type: "person" },
     { key: "taskIds", label: "Task steps", type: "tasks" },
@@ -462,8 +467,9 @@ export function RecordForm({
     }
     if (!record) {
       if (kind === "workflow") {
-        v.timeoutHours = 24;
-        v.maxAttempts = 2;
+        v.joinPolicy = "";
+        v.timeoutHours = "";
+        v.maxAttempts = "";
       }
       if (kind === "engagement") {
         v.retentionDays = 30;
@@ -529,7 +535,30 @@ export function RecordForm({
       <ErrorBox error={error} />
       <div className="form-grid">
         {defs.map((f) => {
-          if (kind === "request" && f.key === "taskIds" && values.type !== "confirmation") return null;
+          if (
+            kind === "request" &&
+            f.key === "taskIds" &&
+            values.type !== "confirmation"
+          )
+            return null;
+          const documentationOnly =
+            kind === "workflow" && !!values.documentationOnly;
+          const executionField = [
+            "ownerId",
+            "handoffIds",
+            "joinPolicy",
+            "timeoutHours",
+            "maxAttempts",
+          ].includes(f.key);
+          if (documentationOnly && executionField) {
+            if (f.key !== "ownerId") return null;
+            return (
+              <div className="notice full" key="documentation-only-note">
+                This is a work description. Execution rules are not configured,
+                and no case can start from it.
+              </div>
+            );
+          }
           const refKinds: Record<string, string> = {
             person: "person",
             personOptional: "person",
@@ -548,9 +577,35 @@ export function RecordForm({
                 <input
                   type="checkbox"
                   checked={!!values[f.key]}
-                  onChange={(e) => change(f.key, e.target.checked)}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    if (
+                      kind === "workflow" &&
+                      f.key === "documentationOnly" &&
+                      !checked
+                    )
+                      setValues((previous: any) => ({
+                        ...previous,
+                        documentationOnly: false,
+                        ownerId: "",
+                        handoffIds: [],
+                        joinPolicy: "",
+                        timeoutHours: "",
+                        maxAttempts: "",
+                      }));
+                    else change(f.key, checked);
+                  }}
                 />
-                {f.label}
+                <span>
+                  {f.label}
+                  {kind === "workflow" && f.key === "documentationOnly" && (
+                    <small>
+                      {values.documentationOnly
+                        ? "Execution rules are kept out of this description."
+                        : "Set execution rules before review."}
+                    </small>
+                  )}
+                </span>
               </label>
             );
           return (
@@ -633,8 +688,12 @@ export function RecordForm({
               ) : f.options ? (
                 <select
                   value={values[f.key]}
+                  required={f.key === "joinPolicy"}
                   onChange={(e) => change(f.key, e.target.value)}
                 >
+                  {f.key === "joinPolicy" && (
+                    <option value="">Choose how paths join</option>
+                  )}
                   {f.options.map((o) => (
                     <option key={o} value={o}>
                       {o.replaceAll("_", " ")}

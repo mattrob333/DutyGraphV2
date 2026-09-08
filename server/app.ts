@@ -1,5 +1,7 @@
 import { registerPilotInboxRoutes } from "./pilot-inbox.ts";
 import { workLinksRouter, type WorkLinkProvider } from "./work-links.ts";
+import { workGapsRouter } from "./work-gaps.ts";
+import type { GapReplyProvider } from "./gap-replies.ts";
 import { teamLinkRouter } from "./team-link.ts";
 import { kickoffLinkRouter } from "./kickoff-link.ts";
 import {
@@ -113,6 +115,7 @@ export function createApp({
   aiProvider,
   discoveryProvider,
   workLinkProvider,
+  gapReplyProvider,
   classificationProvider,
   frameworkProvider,
   teamProvider,
@@ -124,6 +127,7 @@ export function createApp({
   aiProvider?: AiProvider;
   discoveryProvider?: DiscoveryProvider;
   workLinkProvider?: WorkLinkProvider;
+  gapReplyProvider?: GapReplyProvider;
   classificationProvider?: ClassificationProvider;
   frameworkProvider?: FrameworkProvider;
   teamProvider?: TeamProvider;
@@ -249,7 +253,11 @@ export function createApp({
     res.json({ ok: true });
   });
   app.use("/api/invitations", authLimit, kickoffLinkRouter());
-  app.use("/api/invitations", authLimit, teamLinkRouter());
+  app.use(
+    "/api/invitations",
+    authLimit,
+    teamLinkRouter(undefined, gapReplyProvider),
+  );
   app.get("/api/invitations/:token", authLimit, async (req, res) => {
     const { rows } = await pool.query(
       "SELECT * FROM invitations WHERE token_hash=$1 AND used_at IS NULL AND revoked_at IS NULL AND expires_at>now()",
@@ -374,6 +382,10 @@ export function createApp({
     });
   });
   app.use("/api/v1", authenticate);
+  app.use(
+    "/api/v1/companies/:companyId/work-gaps",
+    workGapsRouter(emailProvider),
+  );
   const api = express.Router();
   registerPilotInboxRoutes(api);
   api.use(

@@ -17,7 +17,7 @@ import { exaSearch, type ResearchProvider } from "./research.ts";
 import { defaultAiModel, modelGenerationOptions } from "../shared/ai-models.ts";
 import {
   classificationIntake,
-  classificationDraft,
+  classificationGenerationDraft,
   classificationInstructions,
   validateClassification,
   type ClassificationInput,
@@ -33,7 +33,7 @@ export const openAiClassification: ClassificationProvider = async (
   key,
   model,
 ) => {
-  const schema = z.toJSONSchema(classificationDraft);
+  const schema = z.toJSONSchema(classificationGenerationDraft);
   delete schema.$schema;
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
@@ -313,7 +313,7 @@ export function businessClassificationRouter(
           website: body.website,
           description: body.description,
           revision: company.revision,
-          promptVersion: "business-profile-v3",
+          promptVersion: "business-profile-v4-stage-evidence",
           sources: collected,
           websiteRead:
             !!body.website &&
@@ -387,6 +387,9 @@ export function businessClassificationRouter(
                 title: s.title.slice(0, 200),
                 text: s.text.slice(0, 6000),
                 url: s.url,
+                retrievedAt: s.retrievedAt,
+                publishedDate: s.publishedDate,
+                focus: "official company website",
               }));
             input.websiteRead = input.sources.length > 0;
             input.lookupNote = input.websiteRead
@@ -408,8 +411,8 @@ export function businessClassificationRouter(
                     url: s.url,
                     text: s.text,
                     contentHash: hash(s.text),
-                    retrievedAt: new Date().toISOString(),
-                    publishedDate: "",
+                    retrievedAt: s.retrievedAt || new Date().toISOString(),
+                    publishedDate: s.publishedDate || "",
                     excerpted: true,
                   })),
                 ),

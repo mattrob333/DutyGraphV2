@@ -121,6 +121,20 @@ Inspect the ZIP. Locate the HTML report, JSON, CSV and checksums. Confirm that r
 
 **Submit:** approved synthetic client packet and a manual delivery-log entry clearly labeled “training; not sent.”
 
+## Exercise 8: ask without assuming
+
+Use the fictional sandbox for this exercise. On Company Work Map, select a stage and open its info button. Identify whether the explanation is authored guidance or a sourced AI proposal. If company passages or peer examples are absent, record that limitation; do not invent them. For a sourced proposal, explain why a peer example is not a client fact or proof of success.
+
+Open **Ask about this work**, select a relevant fictional person and preview the questions. Do not send real messages. Explain which saved work links support that choice, why an empty stage may not apply, and how a standalone task differs from an unrecorded sequence.
+
+- Which exact stored email would be used in a real workspace?
+- What continuing checks does the selected-recipient option authorize, and how would you pause it?
+- Why can the weekly spacing, open-request rule or already-asked gap prevent another request?
+- What remains saved when AI processing fails or encounters changed work?
+- Why can a documented task flow remain unavailable for case execution?
+
+**Submit:** the sandbox question preview and a brief explanation of the evidence, recipient and review boundaries. No email or provider execution is required for this exercise.
+
 ## Final assessment
 
 Explain the engagement to a fictional sponsor in five minutes. Show the work, the evidence, the strongest remaining uncertainty, and the next decision. Finish by opening a reviewed client report and identifying its audience and coverage limits.
