@@ -38,3 +38,12 @@ Business-type examples are behind a subtle information disclosure. The raw evide
 ## Verification boundary
 
 Covered with fictional API/provider/transport fixtures and local browser review. Real inbox delivery, real-company research quality and full model-generated agenda quality require a pilot run. The changes do not send real messages or authorize AI agents.
+
+
+## Email delivery and testing
+
+The most recent email attempt has a prominent result. Accepted by Resend means the provider accepted the send, not an inbox-delivery receipt. Previous failures are collapsed. Sending a replacement invalidates earlier unused invitation links; use the newest email. Failed configuration or provider sends still require diagnosis, not repeated blind retries.
+
+The HTML email has an 800px responsive maximum, labeled sections, list formatting and labeled fallback links. Its plain-text alternative includes the URL. PUBLIC_APP_ORIGIN optionally sets the link origin; otherwise APP_ORIGIN is used, with the legacy https://dutygraph-v2.vercel.app origin mapped to https://dutygraph.com. This does not change auth/CORS allowlists. Existing emails retain their original URLs.
+
+Preview response form inside the advisor's kickoff request renders the actual team CSV and leadership fields. It holds edits only in memory and cannot submit or enroll. It does not test participant authentication or voice recording. Existing advisor accounts are not converted into participants; use this preview for form review and a separate intended participant identity for enrollment acceptance testing.

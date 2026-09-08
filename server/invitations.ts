@@ -16,6 +16,7 @@ import {
   AppError,
 } from "./db.ts";
 import { providerConfig } from "./providers.ts";
+import { invitationOrigin } from "./origins.ts";
 import { invitationTemplate } from "./invitation-template.ts";
 
 export async function issueInvitation(
@@ -69,8 +70,7 @@ export async function issueInvitation(
       : "request.manual_link_issued",
   );
   return {
-    url:
-      (process.env.APP_ORIGIN || "http://localhost:4317") + "/invite/" + token,
+    url: invitationOrigin() + "/invite/" + token,
     email,
     name: p.title,
   };

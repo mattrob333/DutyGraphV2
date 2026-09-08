@@ -135,5 +135,16 @@ test("work and leadership emails explain their own private capture and review se
   assert.match(work.text, /Approval records your understanding/);
   assert.ok(!leadership.text.includes("Create my task cards"));
   assert.ok(!confirmation.text.includes("Start recording"));
-  assert.match(work.html, /<p style="margin:0 0 14px">If you recorded/);
+  assert.match(work.html, /<p style="[^"]*">If you recorded/);
+});
+
+
+test("kickoff email has wider labeled sections, real bullets and no exposed bearer URL", () => {
+ const result = invitationTemplate({company:"Synthetic",person:{title:"Test",data:{}},request:{title:"Kickoff",data:{questionPlanVersion:"discovery-contact:v1",emailBody:"Meeting context.\n\n- Team roster\n- Goals",questions:["Which leaders?"]}},url:"https://dutygraph.com/invite/synthetic-token"});
+ assert.ok(result.html.includes("max-width:800px"));
+ for (const heading of ["Your kickoff brief", "Questions to consider", "What to prepare", "About your private link"]) assert.ok(result.html.includes(heading));
+ assert.ok(result.html.includes("<ul"));
+ assert.ok(!result.html.includes(">https://dutygraph.com/invite/synthetic-token<"));
+ assert.ok(result.html.includes('href="https://dutygraph.com/invite/synthetic-token"'));
+ assert.ok(result.text.includes("https://dutygraph.com/invite/synthetic-token"));
 });

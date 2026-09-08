@@ -252,7 +252,7 @@ export function createApp({
       fail(
         410,
         "INVITATION_EXPIRED",
-        "This invitation is expired, used, or withdrawn. Sign in if you already enrolled.",
+        "This link is no longer active. If the invitation was resent, open the newest email. If you already enrolled, sign in. Otherwise ask your advisor for a new invitation.",
       );
     const info = await tx(invite.tenant_id, async (db) => {
       const r = await getRecord(db, invite.company_id, invite.request_id);
@@ -297,7 +297,7 @@ export function createApp({
         fail(
           410,
           "INVITATION_EXPIRED",
-          "This invitation is expired, used, or withdrawn.",
+          "This link is no longer active. Use the newest invitation email or sign in if you already enrolled.",
         );
       const request = await getRecord(
         db,
@@ -320,7 +320,7 @@ export function createApp({
           fail(
             409,
             "ACCOUNT_EXISTS",
-            "An account exists. Use its password or ask your advisor to verify the invitation.",
+            "This email already belongs to an account that could not be matched to this participant. Advisors should use Preview response form in their workspace for testing. Existing participants should use their password or ask their advisor to check the assignment.",
           );
       } else
         row = (

@@ -1,5 +1,14 @@
 # DutyGraph development log
 
+## 2026-09-07 — Invitation clarity, email layout and advisor form preview
+
+- Latest send acceptance gets a prominent status; old failures are collapsed. A follow-up refresh failure no longer discards the provider result. Replacements after acceptance require explicit selection and explain earlier-link revocation.
+- Widened email to responsive 800px, labeled brief/questions/preparation/security sections, rendered bullet lists, and removed exposed bearer URL text from the HTML footer. Plain-text fallback retains its usable link.
+- Invitation links use PUBLIC_APP_ORIGIN when configured; the legacy production alias dutygraph-v2.vercel.app maps to dutygraph.com. Local/custom origins remain unchanged. Prior emails cannot be rewritten.
+- Invalid invitation copy explains using the newest email. Advisor-account conflicts explain preview testing; enrollment isolation remains intact. Actual cause of any individual invalid token is not exposed publicly.
+- Added an advisor-only UI preview using the actual KickoffPreparation component; edits remain in component memory with no submission or enrollment. This previews structured fields, not microphone/enrollment behavior.
+- Validation: all 222 tests and production build pass; 91-route contract generation and dependency audit pass (zero vulnerabilities). Browser checked the email layout and actual kickoff form preview under the synthetic advisor account. No real email sends initiated; hosted release pending.
+
 ## 2026-09-07 — Reusable company profile and clearer email handoff
 
 - Added a company identity header, official-site social links, size/market highlights, and sourced HTML profile export including primary/supporting streams. Automatic logo extraction remains deferred; initials provide a placeholder.

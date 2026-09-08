@@ -27,3 +27,22 @@ export function allowedOrigins(
     }),
   );
 }
+
+/** Branded invitation links; never use an untrusted request host. */
+export function invitationOrigin(env: NodeJS.ProcessEnv = process.env) {
+  const configured =
+    env.PUBLIC_APP_ORIGIN || env.APP_ORIGIN || "http://localhost:4317";
+  const url = new URL(configured);
+  if (
+    !["https:", "http:"].includes(url.protocol) ||
+    url.username ||
+    url.password ||
+    url.pathname !== "/" ||
+    url.search ||
+    url.hash
+  )
+    throw new Error("Invalid public app origin");
+  return url.origin === "https://dutygraph-v2.vercel.app"
+    ? "https://dutygraph.com"
+    : url.origin;
+}
