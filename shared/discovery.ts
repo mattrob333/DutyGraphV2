@@ -1,4 +1,10 @@
 import { z } from "zod";
+import { businessStageLinksSchema } from "./work-model.ts";
+const inferredStages = {
+  businessStageLinks: businessStageLinksSchema,
+  stageReason: z.string().max(1000).default(""),
+  stageConfidence: z.enum(["high", "medium", "low"]).default("low"),
+};
 
 const short = z.string().trim().min(1).max(200);
 const optional = z.string().max(3000);
@@ -24,6 +30,7 @@ export const dossierSchema = z
           .object({
             title: short,
             description: optional,
+            ...inferredStages,
             existingDutyId: z.union([z.uuid(), z.literal("")]).default(""),
           })
           .strict(),
@@ -94,6 +101,9 @@ export const discoverySchemas = {
             .object({
               title: short,
               duty: short,
+              existingTaskId: z.union([z.uuid(), z.literal("")]).default(""),
+              dutyId: z.union([z.uuid(), z.literal("")]).default(""),
+              ...inferredStages,
               ownerId: z.union([z.uuid(), z.literal("")]),
               performerId: z.union([z.uuid(), z.literal("")]),
               purpose: optional,
@@ -179,3 +189,11 @@ discoveryInstructions.roster +=
 export const interviewWritingInstructions =
   "Write participant questions in warm, simple English inspired by ASD-STE100. Use active voice, familiar words and one topic per sentence. Aim for at most 20 words per sentence. Speak to the person as you. Keep each question under 200 characters, as a complete question or instruction. NEVER split one sentence across question-array entries to fit the limit. Rewrite it instead. Never begin the next question with a continuation of the previous question. Avoid jargon such as upstream, downstream, artifact, elicitation, event-driven, dependencies and human gate. Say who gives you the information, who gets your work, what starts the task, what you need first, and who approves it. Keep technical product names when useful. Do not list every duty in a question; the page can show their duties separately. Use up to eight prompts covering: corrections to their role and duties; tasks for each duty and how often; what starts each task and what they need; tools and steps; how they check the result; who gets the result; approval and problems; waiting, repeated work and a useful example. Keep each prompt focused and self-contained. Cover all duties through the person's examples rather than a dense paragraph of requirements. Examples: What tasks do you do for each duty? How often do you do them?; What starts each task? What information do you need, and who gives it to you?; What steps do you follow? Which tools do you use?; How do you check your work? Who receives it next?; Who approves the work? What do you do if something goes wrong? Write the email in short paragraphs with a brief purpose and three simple next steps. Do not claim formal STE compliance.";
 discoveryInstructions.interviews += " " + interviewWritingInstructions;
+
+const automaticMappingInstructions =
+  " For each duty or task, infer the best matching businessStageLinks from the supplied saved businessProfile stream and stage IDs. Use the meaning, inputs and outputs of the work, not a person's job title. Shared work may belong to multiple stages. Provide a concise stageReason and stageConfidence. These are editable AI inferences, not confirmed assignments. Never invent a stage ID. Use an empty array with a reason only if no saved stage fits or the profile is missing. For tasks, match dutyId to a supplied dutyRecords ID when it is the same responsibility; never invent a duty ID. Infer the most plausible owner and performer from the internal account and supplied people when not explicit, but leave blank for contradictory or insufficient evidence; no new people or approval authority may be invented.";
+discoveryInstructions.roster += automaticMappingInstructions;
+discoveryInstructions.tasks += automaticMappingInstructions;
+
+discoveryInstructions.tasks +=
+  " Use existingTasks to avoid duplicate work. When the same task already exists, return its existingTaskId. Existing records and human corrections are preserved. Do not merge two tasks solely because they have the same title.";

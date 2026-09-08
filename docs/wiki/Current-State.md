@@ -1,5 +1,7 @@
 # Current state
 
+September 8: public demo requests flow into a provisioned operator inbox and create a company/contact for initial research. Research saves a proposed snapshot; Discovery automatically saves generated team duties, personal requests and task cards with validated AI-inferred links. Existing unassigned work can be linked by a separate AI action. Saved proposals remain editable and do not replace advisor or participant confirmation. See [demo requests](../demo-requests.md) and [the current Discovery guide](../guide/23-discovery-to-confirmed-work.md).
+
 The default Company Work Map now connects saved business stages to highlighted people and scoped duties/tasks. Task cards uses the same stages, with explicit Unassigned work and no title/department inference. Cobalt has an authored fictional wholesale profile and 18 guided business tasks across six stages; safe repeat upgrades preserve edits and confirmations. Help and the training handbook describe the current path. These are implemented behaviors; real-client acceptance remains separate from synthetic checks.
 
 Company research now includes a [reusable profile](../company-profiles.md): source-backed business details, official-site social links, separate advisor updates and an HTML deliverable. Latest completed profiles survive later failed jobs. Actual headcount/peer coverage depends on public evidence; logo extraction is deferred.

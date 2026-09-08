@@ -352,6 +352,21 @@ export function Detail({
           )}
         </>
       )}
+      {r.data.stageInference && (
+        <details className="notice">
+          <summary>
+            AI-inferred stage assignment · {r.data.stageInference.confidence}{" "}
+            confidence
+          </summary>
+          <p>
+            {r.data.stageInference.reason ||
+              "AI matched this work to the saved business stages."}
+          </p>
+          <p>
+            Change the assignment from Company Work Map using Assign stages.
+          </p>
+        </details>
+      )}
       {r.kind === "task" && (
         <>
           <div

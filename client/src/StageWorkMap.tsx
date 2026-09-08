@@ -130,7 +130,7 @@ export function StageWorkMap({
       );
       await api(`/v1/companies/${companyId}/records/${editing.id}`, "PATCH", {
         expectedVersion: editing.version,
-        data: { ...data, businessStageLinks: links },
+        data: { ...data, businessStageLinks: links, stageInference: undefined },
       });
       await refresh?.();
       setEditing(null);
@@ -141,6 +141,63 @@ export function StageWorkMap({
       setBusy(false);
     }
   };
+  const [linkJob, setLinkJob] = useState<any>(null);
+  useEffect(() => {
+    let active = true;
+    void api(`/v1/companies/${companyId}/work-links`)
+      .then((j) => {
+        if (active) setLinkJob(j);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, [companyId]);
+  const connectWork = async () => {
+    setBusy(true);
+    setError("");
+    setNotice("Connecting work with AI. You can edit the result afterward.");
+    try {
+      const result = await api(
+        `/v1/companies/${companyId}/work-links`,
+        "POST",
+        { consent: true },
+      );
+      setLinkJob(result);
+      if (result.state !== "complete")
+        throw new Error(
+          result.message ||
+            "The work map is still being prepared. Check its result shortly.",
+        );
+      await refresh?.();
+      setNotice(
+        `${result.result.linked} work records connected. ${result.result.unresolved.length} still need more detail.`,
+      );
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setBusy(false);
+    }
+  };
+  useEffect(() => {
+    let active = true;
+    const check = () =>
+      api(`/v1/companies/${companyId}/work-links`)
+        .then((j) => {
+          if (active) {
+            setLinkJob(j);
+            if (j?.state === "complete") void refresh?.();
+          }
+        })
+        .catch(() => {});
+    if (linkJob?.state !== "running") return;
+    const timer = setInterval(() => void check(), 5000);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
+  }, [companyId, linkJob?.state]);
+  const inferredCount = records.filter((r) => r.data.stageInference).length;
   const taskRow = (t: RecordRow) => (
     <li key={t.id} className="swm-task">
       <button onClick={() => open(records.find((r) => r.id === t.id) || t)}>
@@ -163,6 +220,35 @@ export function StageWorkMap({
   );
   return (
     <section className="stage-work-map" aria-label="Work stages and people">
+      <ErrorBox error={error} />
+      {canAssign &&
+        model.streams.length > 0 &&
+        model.unmapped.duties.length + model.unmapped.tasks.length > 0 && (
+          <div className="swm-notice">
+            <div>
+              <strong>Connect the work already collected</strong>
+              <p>
+                AI can place duties and tasks into these stages. Existing
+                assignments stay in place. Uses your configured AI provider.
+              </p>
+            </div>
+            <Button
+              primary
+              disabled={busy || linkJob?.state === "running"}
+              onClick={() => void connectWork()}
+            >
+              {busy ? "Connecting…" : "Connect existing work with AI"}
+            </Button>
+          </div>
+        )}
+      {!!inferredCount && (
+        <p className="subtle">
+          {inferredCount} work{" "}
+          {inferredCount === 1 ? "record has" : "records have"} AI-inferred
+          stage links. Open a duty or task to inspect the basis; use Assign
+          stages to correct a link.
+        </p>
+      )}
       <header className="swm-intro">
         <div>
           <p className="eyebrow">FROM BUSINESS STAGES TO PEOPLE</p>
@@ -223,7 +309,18 @@ export function StageWorkMap({
                     {s.tasks.length} {s.tasks.length === 1 ? "task" : "tasks"}
                   </small>
                 </button>
-                <StageHelp stage={example.profile?.streams.find((item) => item.id === stream.id)?.stages.find((item) => item.id === s.id) || s} stream={example.profile?.streams.find((item) => item.id === stream.id) || stream} />
+                <StageHelp
+                  stage={
+                    example.profile?.streams
+                      .find((item) => item.id === stream.id)
+                      ?.stages.find((item) => item.id === s.id) || s
+                  }
+                  stream={
+                    example.profile?.streams.find(
+                      (item) => item.id === stream.id,
+                    ) || stream
+                  }
+                />
               </li>
             ))}
           </ol>

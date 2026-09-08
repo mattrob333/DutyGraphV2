@@ -1,3 +1,5 @@
+import { registerPilotInboxRoutes } from "./pilot-inbox.ts";
+import { workLinksRouter, type WorkLinkProvider } from "./work-links.ts";
 import { teamLinkRouter } from "./team-link.ts";
 import { kickoffLinkRouter } from "./kickoff-link.ts";
 import {
@@ -110,6 +112,7 @@ export function createApp({
   emailProvider,
   aiProvider,
   discoveryProvider,
+  workLinkProvider,
   classificationProvider,
   frameworkProvider,
   teamProvider,
@@ -120,6 +123,7 @@ export function createApp({
   emailProvider?: EmailProvider;
   aiProvider?: AiProvider;
   discoveryProvider?: DiscoveryProvider;
+  workLinkProvider?: WorkLinkProvider;
   classificationProvider?: ClassificationProvider;
   frameworkProvider?: FrameworkProvider;
   teamProvider?: TeamProvider;
@@ -371,6 +375,11 @@ export function createApp({
   });
   app.use("/api/v1", authenticate);
   const api = express.Router();
+  registerPilotInboxRoutes(api);
+  api.use(
+    "/companies/:companyId/work-links",
+    workLinksRouter(workLinkProvider),
+  );
   api.post("/sample-company", advisor, async (req, res) =>
     res.json(
       await run(req, async (db: import("pg").PoolClient) => {

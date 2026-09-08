@@ -264,6 +264,28 @@
                               "additionalProperties": false
                             }
                           },
+                          "stageInference": {
+                            "type": "object",
+                            "properties": {
+                              "reason": {
+                                "type": "string",
+                                "maxLength": 1000
+                              },
+                              "confidence": {
+                                "type": "string",
+                                "enum": [
+                                  "high",
+                                  "medium",
+                                  "low"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "reason",
+                              "confidence"
+                            ],
+                            "additionalProperties": false
+                          },
                           "evidenceIds": {
                             "default": [],
                             "maxItems": 150,
@@ -879,6 +901,28 @@
                               ],
                               "additionalProperties": false
                             }
+                          },
+                          "stageInference": {
+                            "type": "object",
+                            "properties": {
+                              "reason": {
+                                "type": "string",
+                                "maxLength": 1000
+                              },
+                              "confidence": {
+                                "type": "string",
+                                "enum": [
+                                  "high",
+                                  "medium",
+                                  "low"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "reason",
+                              "confidence"
+                            ],
+                            "additionalProperties": false
                           },
                           "output": {
                             "type": "string",
@@ -1693,6 +1737,28 @@
               "additionalProperties": false
             }
           },
+          "stageInference": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "confidence": {
+                "type": "string",
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              }
+            },
+            "required": [
+              "reason",
+              "confidence"
+            ],
+            "additionalProperties": false
+          },
           "evidenceIds": {
             "default": [],
             "maxItems": 150,
@@ -2230,6 +2296,28 @@
               ],
               "additionalProperties": false
             }
+          },
+          "stageInference": {
+            "type": "object",
+            "properties": {
+              "reason": {
+                "type": "string",
+                "maxLength": 1000
+              },
+              "confidence": {
+                "type": "string",
+                "enum": [
+                  "high",
+                  "medium",
+                  "low"
+                ]
+              }
+            },
+            "required": [
+              "reason",
+              "confidence"
+            ],
+            "additionalProperties": false
           },
           "output": {
             "type": "string",

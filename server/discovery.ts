@@ -8,7 +8,7 @@ import { Router } from "express";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import type pg from "pg";
-import type { RecordRow, User } from "../shared/domain.ts";
+import { schemas, type RecordRow, type User } from "../shared/domain.ts";
 import {
   discoverySchemas,
   discoveryGenerationSchemas,
@@ -55,6 +55,7 @@ export type DiscoveryInput = {
   captureGuide?: ReturnType<typeof kickoffGuide>;
   contact?: { name: string; email: string; meetingAt: string };
   sources: DiscoverySource[];
+  existingTasks?: { id: string; title: string; data: any; version: number }[];
   people: {
     id: string;
     name: string;
@@ -62,6 +63,12 @@ export type DiscoveryInput = {
     role: string;
     department: string;
     duties: string[];
+    dutyRecords?: {
+      id: string;
+      title: string;
+      purpose: string;
+      businessStageLinks: unknown[];
+    }[];
   }[];
   fingerprint: string;
   omitted: number;
@@ -123,6 +130,48 @@ export function validateDiscovery(value: unknown, input: DiscoveryInput) {
       "DISCOVERY_PERSON",
       "The draft named a person outside the reviewed team.",
     );
+  const profile = input.businessProfile as any;
+  for (const item of [
+    ...(draft.people || []).flatMap((p: any) => p.duties),
+    ...(draft.tasks || []),
+  ]) {
+    if (
+      item.businessStageLinks.some(
+        (link: any) =>
+          !profile?.streams?.some(
+            (stream: any) =>
+              stream.id === link.streamId &&
+              stream.stages.some((stage: any) => stage.id === link.stageId),
+          ),
+      )
+    )
+      fail(
+        502,
+        "DISCOVERY_STAGE",
+        "The AI linked work to a stage outside this company's saved profile.",
+      );
+    if (
+      item.dutyId &&
+      !input.people.some((p) =>
+        p.dutyRecords?.some((d) => d.id === item.dutyId),
+      )
+    )
+      fail(
+        502,
+        "DISCOVERY_DUTY",
+        "The AI linked a task to a duty outside the supplied team.",
+      );
+  }
+  for (const task of draft.tasks || [])
+    if (
+      task.existingTaskId &&
+      !input.existingTasks?.some((t) => t.id === task.existingTaskId)
+    )
+      fail(
+        502,
+        "DISCOVERY_TASK",
+        "The AI named an existing task outside this company's supplied work.",
+      );
   return draft;
 }
 export function discoveryFailure(error: unknown): {
@@ -468,6 +517,19 @@ export async function discoveryContext(
       email: r.data.email,
       role: r.data.role,
       department: r.data.team,
+      dutyRecords: records
+        .filter(
+          (d) =>
+            d.kind === "duty" &&
+            d.data.ownerId === r.id &&
+            !["stale", "retracted"].includes(d.state),
+        )
+        .map((d) => ({
+          id: d.id,
+          title: d.title,
+          purpose: d.data.purpose,
+          businessStageLinks: d.data.businessStageLinks || [],
+        })),
       duties: records
         .filter(
           (d) =>
@@ -495,7 +557,23 @@ export async function discoveryContext(
     ...internal.filter((s) => s.origin !== "meeting"),
     ...sources.filter((s) => !internalIds.has(s.id)),
   ].slice(0, limit);
+  const existingTasks =
+    stage === "tasks"
+      ? records
+          .filter(
+            (r) =>
+              r.kind === "task" &&
+              !["retracted", "withdrawn", "stale"].includes(r.state),
+          )
+          .map((r) => ({
+            id: r.id,
+            title: r.title,
+            data: r.data,
+            version: r.version,
+          }))
+      : [];
   const fingerprint = hash({
+    existingTasks,
     promptVersion: discoveryPromptVersion,
     stage,
     company: company.name,
@@ -509,6 +587,7 @@ export async function discoveryContext(
   });
   return {
     stage,
+    existingTasks,
     company: company.name,
     businessProfile: company.settings?.businessProfile || null,
     contact,
@@ -563,7 +642,9 @@ export function discoveryRouter(provider: DiscoveryProvider = openAiDiscovery) {
             );
             contexts.set(contextKey, context);
           }
-          job.stale = context.fingerprint !== job.input.fingerprint;
+          job.stale =
+            !job.result?.applied &&
+            context.fingerprint !== job.input.fingerprint;
           job.input = {
             stage: job.input.stage,
             contact: job.input.contact,
@@ -594,6 +675,7 @@ export function discoveryRouter(provider: DiscoveryProvider = openAiDiscovery) {
           })
           .optional(),
         consent: z.literal(true),
+        autoCompile: z.boolean().default(false),
       })
       .strict()
       .parse(req.body);
@@ -716,6 +798,37 @@ export function discoveryRouter(provider: DiscoveryProvider = openAiDiscovery) {
         );
       });
     }
+    if (d.autoCompile && ["roster", "tasks", "interviews"].includes(d.stage)) {
+      try {
+        await tx(actor(req).tenant_id, async (db) => {
+          const saved = (
+            await db.query(
+              "SELECT result,state FROM provider_jobs WHERE id=$1",
+              [job.id],
+            )
+          ).rows[0];
+          if (saved?.state === "complete")
+            await assembleDiscovery(
+              db,
+              actor(req),
+              companyId(req),
+              job.id,
+              { reviewed: false, draft: saved.result.draft },
+              true,
+            );
+        });
+      } catch (error) {
+        await tx(actor(req).tenant_id, (db) =>
+          db.query(
+            "UPDATE provider_jobs SET message=$2,result=jsonb_set(result,'{assemblyError}',to_jsonb($2::text)) WHERE id=$1",
+            [
+              job.id,
+              `The draft is ready, but could not be assembled: ${error instanceof AppError ? error.message : "Review the draft and try saving it."}`,
+            ],
+          ),
+        );
+      }
+    }
     res.json(job);
   });
   router.post("/meeting", async (req, res) =>
@@ -754,452 +867,529 @@ export function discoveryRouter(provider: DiscoveryProvider = openAiDiscovery) {
   router.post("/:jobId/apply", async (req, res) =>
     res.json(
       await run(req, async (db: pg.PoolClient) => {
-        const c = await companyCheck(db, actor(req), companyId(req)),
-          u = actor(req);
-        await db.query("SELECT id FROM companies WHERE id=$1 FOR UPDATE", [
-          c.id,
-        ]);
-        const job = (
-          await db.query(
-            "SELECT * FROM provider_jobs WHERE id=$1 AND company_id=$2 AND kind LIKE 'discovery_%' FOR UPDATE",
-            [z.uuid().parse(req.params.jobId), c.id],
-          )
-        ).rows[0];
-        if (!job || job.state !== "complete")
-          fail(
-            409,
-            "DRAFT_NOT_READY",
-            "Open a completed discovery draft first.",
-          );
-        if (job.result.applied) return job.result.applied;
-        const stage = job.input.stage as DiscoveryStage;
-        const d = z
-          .object({
-            reviewed: z.literal(true),
-            draft: z.unknown(),
-            dueDate: z.iso.date().optional(),
-          })
-          .strict()
-          .parse(req.body);
-        if (d.dueDate && d.dueDate < new Date().toISOString().slice(0, 10))
-          fail(422, "DUE_DATE_PAST", "Choose today or a future response date.");
-        const draft: any = validateDiscovery(d.draft, job.input);
-        const context = await discoveryContext(db, c, stage, job.input.contact);
-        if (context.fingerprint !== job.input.fingerprint)
-          fail(
-            409,
-            "DISCOVERY_STALE",
-            "The inputs changed. Prepare a fresh draft before creating records.",
-          );
-        const all = await recordsFor(db, c.id),
-          applied: any = {
-            recordIds: [],
-            personIds: [],
-            requestIds: [],
-            dutyIds: [],
-            appliedAt: new Date().toISOString(),
-          };
-        const save = async (kind: string, data: any, existing?: RecordRow) => {
-          const r = await createOrEdit(db, u, c.id, kind, data, existing);
-          const index = all.findIndex((item) => item.id === r.id);
-          if (index < 0) all.push(r);
-          else all[index] = r;
-          if (!applied.recordIds.includes(r.id)) applied.recordIds.push(r.id);
-          return r;
-        };
-        const evidenceIds = async (ids: string[]) => {
-          const result: string[] = [];
-          for (const id of ids) {
-            const source = all.find((r) => r.id === id);
-            if (!source)
-              throw new AppError(
-                422,
-                "SOURCE_MISSING",
-                "A source is no longer available.",
-              );
-            if (source.kind === "evidence" && source.state === "accepted") {
-              result.push(source.id);
-              continue;
-            }
-            if (
-              source.kind !== "response" ||
-              !["returned", "accepted"].includes(source.state)
-            )
-              fail(
-                422,
-                "SOURCE_REVIEW",
-                "This suggestion needs a current response or accepted meeting note.",
-              );
-            let e = [...all]
-              .reverse()
-              .find(
-                (r) =>
-                  r.kind === "evidence" &&
-                  r.data.originId === source.id &&
-                  r.state === "accepted" &&
-                  (source.data.text
-                    ? r.data.responseHash === source.hash ||
-                      (r.data.text === source.data.text &&
-                        (r.data.assetId || "") === (source.data.assetId || ""))
-                    : r.data.transcriptionJobId &&
-                      r.data.responseHash === source.hash),
-              );
-            if (!e) {
-              const request = all.find((r) => r.id === source.data.requestId)!;
-              e = await putRecord(
-                db,
-                u,
-                c.id,
-                "evidence",
-                `${request.title} — participant response`,
-                {
-                  title: request.title,
-                  type:
-                    request.data.type === "leadership"
-                      ? "Leadership account"
-                      : "Employee account",
-                  text: source.data.text,
-                  responseHash: source.hash,
-                  responseVersion: source.version,
-                  originId: source.id,
-                  personId: request.data.personId,
-                  bucket:
-                    request.data.type === "leadership" ? "leadership" : "org",
-                  locator: `Participant response ${source.id}`,
-                  classification: "Known",
-                  assetId: source.data.assetId || "",
-                  sourceDate: source.created_at,
-                },
-                "accepted",
-              );
-              all.push(e);
-            }
-            result.push(e.id);
-            if (source.state !== "accepted") {
-              await setState(
-                db,
-                u,
-                c.id,
-                source,
-                "accepted",
-                "response.accepted",
-              );
-              source.state = "accepted";
-            }
-            const sourceRequest = all.find(
-              (r) => r.id === source.data.requestId,
-            );
-            if (sourceRequest && sourceRequest.state !== "accepted") {
-              await setState(
-                db,
-                u,
-                c.id,
-                sourceRequest,
-                "accepted",
-                "request.accepted",
-              );
-              sourceRequest.state = "accepted";
-            }
-          }
-          return result;
-        };
-        if (stage === "contact") {
-          const contact = job.input.contact;
-          let person = all.find(
-            (r) =>
-              r.kind === "person" &&
-              r.data.email.toLowerCase() === contact.email,
-          );
-          if (!person)
-            person = await save("person", {
-              name: contact.name,
-              email: contact.email,
-              role: "Engagement contact",
-              team: "Not yet provided",
-              managerId: "",
-              externalId: "",
-            });
-          const r = await save("request", {
-            title: "Prepare for our executive kickoff",
-            personId: person.id,
-            type: "leadership",
-            questions: draft.questions,
-            emailSubject: draft.emailSubject,
-            emailBody: draft.emailBody,
-            questionPlanVersion: `discovery-contact:${job.id}`,
-            questionIds: [],
-            taskIds: [],
-            dueDate: d.dueDate || period(),
-            notice: c.settings.notice,
-          });
-          await putRecord(
-            db,
-            u,
-            c.id,
-            "request",
-            r.title,
-            {
-              ...r.data,
-              kickoffBusinessStreams: (
-                c.settings.businessProfile?.streams || []
-              ).map((s: any, i: number) => ({
-                id: s.id,
-                name: s.name,
-                focus: i === 0 ? "primary" : "supporting",
-              })),
-            },
-            r.state,
-            r,
-            "Snapshot proposed streams for kickoff preparation",
-          );
-          applied.requestIds.push(r.id);
-        } else if (stage === "roster") {
-          if (!draft.people.length)
-            fail(
-              422,
-              "EMPTY_ROSTER",
-              "Add at least one person with an email and role.",
-            );
-          const emails = new Set<string>();
-          const mapped = new Map<string, RecordRow>();
-          for (const p of draft.people) {
-            p.email = z.email().parse(p.email).toLowerCase();
-            if (emails.has(p.email))
-              fail(
-                422,
-                "DUPLICATE_PERSON",
-                "Each roster email must be unique.",
-              );
-            emails.add(p.email);
-            if (!p.role.trim() || !p.department.trim())
-              fail(
-                422,
-                "ROSTER_DETAILS",
-                "Fill each person's role and department before saving the roster.",
-              );
-            let person = all.find(
-              (r) =>
-                r.kind === "person" && r.data.email.toLowerCase() === p.email,
-            );
-            if (person) {
-              const data = {
-                name: p.name,
-                email: p.email,
-                role: p.role,
-                team: p.department,
-                managerId: person.data.managerId || "",
-                externalId: person.data.externalId || "",
-              };
-              if (
-                [person.title, person.data.role, person.data.team].join("|") !==
-                [p.name, p.role, p.department].join("|")
-              )
-                person = await save("person", data, person);
-            } else
-              person = await save("person", {
-                name: p.name,
-                email: p.email,
-                role: p.role,
-                team: p.department,
-                managerId: "",
-                externalId: "",
-              });
-            mapped.set(p.email, person);
-            applied.personIds.push(person.id);
-          }
-          // Clear changed links first so a valid reorganization is not rejected by an old reporting path.
-          for (const p of draft.people) {
-            const person = mapped.get(p.email)!;
-            if (person.data.managerId) {
-              const nextManager =
-                mapped.get(p.managerEmail.trim().toLowerCase()) ||
-                all.find(
-                  (r) =>
-                    r.kind === "person" &&
-                    r.data.email.toLowerCase() ===
-                      p.managerEmail.trim().toLowerCase(),
-                );
-              if (!nextManager || nextManager.id !== person.data.managerId)
-                mapped.set(
-                  p.email,
-                  await save(
-                    "person",
-                    {
-                      name: person.title,
-                      email: person.data.email,
-                      role: person.data.role,
-                      team: person.data.team,
-                      managerId: "",
-                      externalId: person.data.externalId || "",
-                    },
-                    person,
-                  ),
-                );
-            }
-          }
-          for (const p of draft.people) {
-            let person = mapped.get(p.email)!;
-            if (p.managerEmail.trim()) {
-              const manager =
-                mapped.get(p.managerEmail.trim().toLowerCase()) ||
-                all.find(
-                  (r) =>
-                    r.kind === "person" &&
-                    r.data.email.toLowerCase() ===
-                      p.managerEmail.trim().toLowerCase(),
-                );
-              if (!manager)
-                throw new AppError(
-                  422,
-                  "MANAGER_MISSING",
-                  `Add the manager for ${p.name} to the roster or clear the unconfirmed manager email.`,
-                );
-              if (person.data.managerId !== manager.id) {
-                person = await save(
-                  "person",
-                  {
-                    name: person.title,
-                    email: person.data.email,
-                    role: person.data.role,
-                    team: person.data.team,
-                    managerId: manager.id,
-                    externalId: person.data.externalId || "",
-                  },
-                  person,
-                );
-                mapped.set(p.email, person);
-              }
-            }
-            const bound = await evidenceIds(p.sourceIds),
-              titles = new Set<string>(),
-              resolvedDutyIds = new Set<string>();
-            for (const duty of p.duties) {
-              const normalized = duty.title.trim().toLowerCase();
-              if (titles.has(normalized))
-                fail(
-                  422,
-                  "DUPLICATE_DUTY",
-                  `List each duty only once for ${p.name}.`,
-                );
-              titles.add(normalized);
-              const existing = all.find(
-                (r) =>
-                  r.kind === "duty" &&
-                  r.data.ownerId === person.id &&
-                  (duty.existingDutyId
-                    ? r.id === duty.existingDutyId
-                    : r.title.trim().toLowerCase() === normalized) &&
-                  !["retracted", "withdrawn"].includes(r.state),
-              );
-              if (duty.existingDutyId && !existing)
-                fail(
-                  422,
-                  "DUTY_REFERENCE",
-                  "The selected existing duty must belong to this person and company.",
-                );
-              if (
-                existing &&
-                !duty.existingDutyId &&
-                existing.data.purpose.trim().toLowerCase() !==
-                  (duty.description || duty.title).trim().toLowerCase()
-              )
-                fail(
-                  422,
-                  "DUTY_SCOPE_AMBIGUOUS",
-                  `The duty "${duty.title}" already exists for ${p.name} with a different description. Explicitly select the existing duty to confirm a correction, or give a distinct stream-specific duty a clear name. No roster changes were applied.`,
-                );
-              if (existing) {
-                if (resolvedDutyIds.has(existing.id))
-                  fail(
-                    422,
-                    "DUPLICATE_DUTY_REFERENCE",
-                    "Two proposed duties cannot resolve to the same existing duty.",
-                  );
-                resolvedDutyIds.add(existing.id);
-              }
-              // Preserve reviewed work and its links when the dossier repeats an established duty.
-              const record =
-                existing &&
-                !String(existing.data.reason).startsWith(
-                  "Advisor reviewed discovery dossier ",
-                )
-                  ? existing
-                  : await save(
-                      "duty",
-                      {
-                        title: duty.title,
-                        ownerId: person.id,
-                        purpose: duty.description || duty.title,
-                        scope:
-                          "Responsibility described during executive kickoff; confirm details with the person.",
-                        evidenceIds: bound,
-                        taskIds: existing?.data.taskIds || [],
-                        reviewDue: d.dueDate || period(),
-                        reason: `Advisor reviewed discovery dossier ${job.id}`,
-                      },
-                      existing,
-                    );
-              applied.dutyIds.push(record.id);
-            }
-          }
-        } else if (stage === "interviews") {
-          for (const interview of draft.interviews) {
-            const r = await save("request", {
-              title: interview.title,
-              personId: interview.personId,
-              type: "work",
-              questions: interview.questions,
-              emailSubject: interview.emailSubject,
-              emailBody: interview.emailBody,
-              questionPlanVersion: `discovery-team:${job.id}`,
-              questionIds: [],
-              taskIds: [],
-              dueDate: d.dueDate || period(),
-              notice: c.settings.notice,
-            });
-            applied.requestIds.push(r.id);
-          }
-        } else if (stage === "tasks") {
-          for (const task of draft.tasks) {
-            const { sourceIds, ...fields } = task;
-            const bound = await evidenceIds(sourceIds);
-            const savedTask = await save("task", {
-              ...fields,
-              evidenceIds: bound,
-              mode: "human_only",
-              classification: "Inferred",
-              allowed: [],
-              denied: [],
-              reviewDue: d.dueDate || period(),
-              reason: `Advisor reviewed returned team interviews ${job.id}`,
-            });
-            if (
-              savedTask.data.ownerId &&
-              savedTask.data.performerId &&
-              savedTask.data.evidenceIds.length
-            ) {
-              await reviewTask(db, u, c.id, savedTask);
-              (applied.confirmationReadyIds ||= []).push(savedTask.id);
-            } else (applied.needsDetailsIds ||= []).push(savedTask.id);
-          }
-        } else
-          fail(
-            422,
-            "AGENDA_ONLY",
-            "The agenda is for your meeting. Save the meeting notes afterward.",
-          );
-        await db.query(
-          "UPDATE provider_jobs SET result=result||jsonb_build_object('applied',$2::jsonb,'reviewedDraft',$3::jsonb) WHERE id=$1",
-          [job.id, JSON.stringify(applied), JSON.stringify(draft)],
+        return assembleDiscovery(
+          db,
+          actor(req),
+          companyId(req),
+          z.uuid().parse(req.params.jobId),
+          req.body,
         );
-        await audit(db, u, c.id, "discovery.draft_applied", null, {
-          jobId: job.id,
-          stage,
-          recordIds: applied.recordIds,
-        });
-        return applied;
       }),
     ),
   );
   return router;
+}
+
+export async function assembleDiscovery(
+  db: pg.PoolClient,
+  u: User,
+  company: string,
+  jobId: string,
+  body: unknown,
+  automatic = false,
+) {
+  await db.query("SELECT id FROM companies WHERE id=$1 FOR UPDATE", [company]);
+  const c = await companyCheck(db, u, company);
+  const job = (
+    await db.query(
+      "SELECT * FROM provider_jobs WHERE id=$1 AND company_id=$2 AND kind LIKE 'discovery_%' FOR UPDATE",
+      [jobId, c.id],
+    )
+  ).rows[0];
+  if (!job || job.state !== "complete")
+    fail(409, "DRAFT_NOT_READY", "Open a completed discovery draft first.");
+  if (job.result.applied) return job.result.applied;
+  const stage = job.input.stage as DiscoveryStage;
+  const d = z
+    .object({
+      reviewed: automatic ? z.boolean() : z.literal(true),
+      draft: z.unknown(),
+      dueDate: z.iso.date().optional(),
+    })
+    .strict()
+    .parse(body);
+  if (d.dueDate && d.dueDate < new Date().toISOString().slice(0, 10))
+    fail(422, "DUE_DATE_PAST", "Choose today or a future response date.");
+  const draft: any = validateDiscovery(d.draft, job.input);
+  const context = await discoveryContext(db, c, stage, job.input.contact);
+  if (context.fingerprint !== job.input.fingerprint)
+    fail(
+      409,
+      "DISCOVERY_STALE",
+      "The inputs changed. Prepare a fresh draft before creating records.",
+    );
+  const all = await recordsFor(db, c.id),
+    applied: any = {
+      recordIds: [],
+      personIds: [],
+      requestIds: [],
+      dutyIds: [],
+      appliedAt: new Date().toISOString(),
+      automatic,
+    };
+  const save = async (kind: string, data: any, existing?: RecordRow) => {
+    const r = await createOrEdit(db, u, c.id, kind, data, existing);
+    const index = all.findIndex((item) => item.id === r.id);
+    if (index < 0) all.push(r);
+    else all[index] = r;
+    if (!applied.recordIds.includes(r.id)) applied.recordIds.push(r.id);
+    return r;
+  };
+  const evidenceIds = async (ids: string[]) => {
+    const result: string[] = [];
+    for (const id of ids) {
+      const source = all.find((r) => r.id === id);
+      if (!source)
+        throw new AppError(
+          422,
+          "SOURCE_MISSING",
+          "A source is no longer available.",
+        );
+      if (source.kind === "evidence" && source.state === "accepted") {
+        result.push(source.id);
+        continue;
+      }
+      if (
+        source.kind !== "response" ||
+        !["returned", "accepted"].includes(source.state)
+      )
+        fail(
+          422,
+          "SOURCE_REVIEW",
+          "This suggestion needs a current response or accepted meeting note.",
+        );
+      let e = [...all]
+        .reverse()
+        .find(
+          (r) =>
+            r.kind === "evidence" &&
+            r.data.originId === source.id &&
+            r.state === "accepted" &&
+            (source.data.text
+              ? r.data.responseHash === source.hash ||
+                (r.data.text === source.data.text &&
+                  (r.data.assetId || "") === (source.data.assetId || ""))
+              : r.data.transcriptionJobId &&
+                r.data.responseHash === source.hash),
+        );
+      if (!e) {
+        const request = all.find((r) => r.id === source.data.requestId)!;
+        e = await putRecord(
+          db,
+          u,
+          c.id,
+          "evidence",
+          `${request.title} — participant response`,
+          {
+            title: request.title,
+            type:
+              request.data.type === "leadership"
+                ? "Leadership account"
+                : "Employee account",
+            text: source.data.text,
+            responseHash: source.hash,
+            responseVersion: source.version,
+            originId: source.id,
+            personId: request.data.personId,
+            bucket: request.data.type === "leadership" ? "leadership" : "org",
+            locator: `Participant response ${source.id}`,
+            classification: "Known",
+            assetId: source.data.assetId || "",
+            sourceDate: source.created_at,
+          },
+          "accepted",
+        );
+        all.push(e);
+      }
+      result.push(e.id);
+      if (source.state !== "accepted") {
+        await setState(db, u, c.id, source, "accepted", "response.accepted");
+        source.state = "accepted";
+      }
+      const sourceRequest = all.find((r) => r.id === source.data.requestId);
+      if (sourceRequest && sourceRequest.state !== "accepted") {
+        await setState(
+          db,
+          u,
+          c.id,
+          sourceRequest,
+          "accepted",
+          "request.accepted",
+        );
+        sourceRequest.state = "accepted";
+      }
+    }
+    return result;
+  };
+  if (stage === "contact") {
+    const contact = job.input.contact;
+    let person = all.find(
+      (r) =>
+        r.kind === "person" && r.data.email.toLowerCase() === contact.email,
+    );
+    if (!person)
+      person = await save("person", {
+        name: contact.name,
+        email: contact.email,
+        role: "Engagement contact",
+        team: "Not yet provided",
+        managerId: "",
+        externalId: "",
+      });
+    const r = await save("request", {
+      title: "Prepare for our executive kickoff",
+      personId: person.id,
+      type: "leadership",
+      questions: draft.questions,
+      emailSubject: draft.emailSubject,
+      emailBody: draft.emailBody,
+      questionPlanVersion: `discovery-contact:${job.id}`,
+      questionIds: [],
+      taskIds: [],
+      dueDate: d.dueDate || period(),
+      notice: c.settings.notice,
+    });
+    await putRecord(
+      db,
+      u,
+      c.id,
+      "request",
+      r.title,
+      {
+        ...r.data,
+        kickoffBusinessStreams: (c.settings.businessProfile?.streams || []).map(
+          (s: any, i: number) => ({
+            id: s.id,
+            name: s.name,
+            focus: i === 0 ? "primary" : "supporting",
+          }),
+        ),
+      },
+      r.state,
+      r,
+      "Snapshot proposed streams for kickoff preparation",
+    );
+    applied.requestIds.push(r.id);
+  } else if (stage === "roster") {
+    if (!draft.people.length)
+      fail(
+        422,
+        "EMPTY_ROSTER",
+        "Add at least one person with an email and role.",
+      );
+    const emails = new Set<string>();
+    const mapped = new Map<string, RecordRow>();
+    for (const p of draft.people) {
+      p.email = z.email().parse(p.email).toLowerCase();
+      if (emails.has(p.email))
+        fail(422, "DUPLICATE_PERSON", "Each roster email must be unique.");
+      emails.add(p.email);
+      if (!p.role.trim() || !p.department.trim())
+        fail(
+          422,
+          "ROSTER_DETAILS",
+          "Fill each person's role and department before saving the roster.",
+        );
+      let person = all.find(
+        (r) => r.kind === "person" && r.data.email.toLowerCase() === p.email,
+      );
+      if (person) {
+        const data = {
+          name: p.name,
+          email: p.email,
+          role: p.role,
+          team: p.department,
+          managerId: person.data.managerId || "",
+          externalId: person.data.externalId || "",
+        };
+        if (
+          [person.title, person.data.role, person.data.team].join("|") !==
+          [p.name, p.role, p.department].join("|")
+        )
+          person = await save("person", data, person);
+      } else
+        person = await save("person", {
+          name: p.name,
+          email: p.email,
+          role: p.role,
+          team: p.department,
+          managerId: "",
+          externalId: "",
+        });
+      mapped.set(p.email, person);
+      applied.personIds.push(person.id);
+    }
+    // Clear changed links first so a valid reorganization is not rejected by an old reporting path.
+    for (const p of draft.people) {
+      const person = mapped.get(p.email)!;
+      if (person.data.managerId) {
+        const nextManager =
+          mapped.get(p.managerEmail.trim().toLowerCase()) ||
+          all.find(
+            (r) =>
+              r.kind === "person" &&
+              r.data.email.toLowerCase() ===
+                p.managerEmail.trim().toLowerCase(),
+          );
+        if (!nextManager || nextManager.id !== person.data.managerId)
+          mapped.set(
+            p.email,
+            await save(
+              "person",
+              {
+                name: person.title,
+                email: person.data.email,
+                role: person.data.role,
+                team: person.data.team,
+                managerId: "",
+                externalId: person.data.externalId || "",
+              },
+              person,
+            ),
+          );
+      }
+    }
+    for (const p of draft.people) {
+      let person = mapped.get(p.email)!;
+      if (p.managerEmail.trim()) {
+        const manager =
+          mapped.get(p.managerEmail.trim().toLowerCase()) ||
+          all.find(
+            (r) =>
+              r.kind === "person" &&
+              r.data.email.toLowerCase() ===
+                p.managerEmail.trim().toLowerCase(),
+          );
+        if (!manager)
+          throw new AppError(
+            422,
+            "MANAGER_MISSING",
+            `Add the manager for ${p.name} to the roster or clear the unconfirmed manager email.`,
+          );
+        if (person.data.managerId !== manager.id) {
+          person = await save(
+            "person",
+            {
+              name: person.title,
+              email: person.data.email,
+              role: person.data.role,
+              team: person.data.team,
+              managerId: manager.id,
+              externalId: person.data.externalId || "",
+            },
+            person,
+          );
+          mapped.set(p.email, person);
+        }
+      }
+      const bound = await evidenceIds(p.sourceIds),
+        titles = new Set<string>(),
+        resolvedDutyIds = new Set<string>();
+      for (const duty of p.duties) {
+        const normalized = duty.title.trim().toLowerCase();
+        if (titles.has(normalized))
+          fail(
+            422,
+            "DUPLICATE_DUTY",
+            `List each duty only once for ${p.name}.`,
+          );
+        titles.add(normalized);
+        const existing = all.find(
+          (r) =>
+            r.kind === "duty" &&
+            r.data.ownerId === person.id &&
+            (duty.existingDutyId
+              ? r.id === duty.existingDutyId
+              : r.title.trim().toLowerCase() === normalized) &&
+            !["retracted", "withdrawn"].includes(r.state),
+        );
+        if (duty.existingDutyId && !existing)
+          fail(
+            422,
+            "DUTY_REFERENCE",
+            "The selected existing duty must belong to this person and company.",
+          );
+        if (
+          existing &&
+          !duty.existingDutyId &&
+          existing.data.purpose.trim().toLowerCase() !==
+            (duty.description || duty.title).trim().toLowerCase()
+        )
+          fail(
+            422,
+            "DUTY_SCOPE_AMBIGUOUS",
+            `The duty "${duty.title}" already exists for ${p.name} with a different description. Explicitly select the existing duty to confirm a correction, or give a distinct stream-specific duty a clear name. No roster changes were applied.`,
+          );
+        if (existing) {
+          if (resolvedDutyIds.has(existing.id))
+            fail(
+              422,
+              "DUPLICATE_DUTY_REFERENCE",
+              "Two proposed duties cannot resolve to the same existing duty.",
+            );
+          resolvedDutyIds.add(existing.id);
+        }
+        // Preserve reviewed work and its links when the dossier repeats an established duty.
+        const record =
+          existing &&
+          !String(existing.data.reason).startsWith(
+            "Advisor reviewed discovery dossier ",
+          )
+            ? existing
+            : await save(
+                "duty",
+                {
+                  title: duty.title,
+                  ownerId: person.id,
+                  purpose: duty.description || duty.title,
+                  scope:
+                    "Responsibility described during executive kickoff; confirm details with the person.",
+                  evidenceIds: bound,
+                  taskIds: existing?.data.taskIds || [],
+                  reviewDue: d.dueDate || period(),
+                  reason: `${automatic ? "AI assembled" : "Advisor reviewed"} discovery dossier ${job.id}`,
+                  businessStageLinks: existing?.data.businessStageLinks?.length
+                    ? existing.data.businessStageLinks
+                    : duty.businessStageLinks,
+                  stageInference: existing?.data.businessStageLinks?.length
+                    ? existing.data.stageInference
+                    : {
+                        reason: duty.stageReason,
+                        confidence: duty.stageConfidence,
+                      },
+                },
+                existing,
+              );
+        applied.dutyIds.push(record.id);
+      }
+    }
+  } else if (stage === "interviews") {
+    for (const interview of draft.interviews) {
+      const r = await save("request", {
+        title: interview.title,
+        personId: interview.personId,
+        type: "work",
+        questions: interview.questions,
+        emailSubject: interview.emailSubject,
+        emailBody: interview.emailBody,
+        questionPlanVersion: `discovery-team:${job.id}`,
+        questionIds: [],
+        taskIds: [],
+        dueDate: d.dueDate || period(),
+        notice: c.settings.notice,
+      });
+      applied.requestIds.push(r.id);
+    }
+  } else if (stage === "tasks") {
+    for (const task of draft.tasks) {
+      const {
+        sourceIds,
+        dutyId,
+        existingTaskId,
+        stageReason,
+        stageConfidence,
+        ...fields
+      } = task;
+      const prior = existingTaskId
+        ? all.find((r) => r.id === existingTaskId && r.kind === "task")
+        : all.find(
+            (r) =>
+              r.kind === "task" &&
+              !["withdrawn", "retracted"].includes(r.state) &&
+              r.title.trim().toLowerCase() ===
+                task.title.trim().toLowerCase() &&
+              r.data.ownerId === task.ownerId &&
+              r.data.performerId === task.performerId &&
+              r.data.duty === task.duty &&
+              r.data.trigger === task.trigger &&
+              r.data.output === task.output,
+          );
+      if (prior) {
+        applied.recordIds.push(prior.id);
+        (applied.preservedTaskIds ||= []).push(prior.id);
+        continue;
+      }
+      const bound = await evidenceIds(sourceIds);
+      const savedTask = await save("task", {
+        ...fields,
+        stageInference: { reason: stageReason, confidence: stageConfidence },
+        evidenceIds: bound,
+        mode: "human_only",
+        classification: "Inferred",
+        allowed: [],
+        denied: [],
+        reviewDue: d.dueDate || period(),
+        reason: `${automatic ? "AI assembled" : "Advisor reviewed"} returned team interviews ${job.id}`,
+      });
+      let linkedDuty = dutyId
+        ? all.find((r) => r.id === dutyId && r.kind === "duty")
+        : undefined;
+      if (!linkedDuty) {
+        const matches = all.filter(
+          (r) =>
+            r.kind === "duty" &&
+            r.data.ownerId === savedTask.data.ownerId &&
+            r.title.trim().toLowerCase() === task.duty.trim().toLowerCase(),
+        );
+        if (matches.length === 1) linkedDuty = matches[0];
+      }
+      if (!linkedDuty && savedTask.data.ownerId)
+        linkedDuty = await save("duty", {
+          title: task.duty,
+          ownerId: savedTask.data.ownerId,
+          purpose: task.duty,
+          scope:
+            "AI inferred responsibility from a team response. Edit as needed.",
+          evidenceIds: bound,
+          taskIds: [],
+          businessStageLinks: task.businessStageLinks,
+          stageInference: { reason: stageReason, confidence: stageConfidence },
+          reviewDue: d.dueDate || period(),
+          reason: `AI assembled task duty ${job.id}`,
+        });
+      if (linkedDuty) {
+        const data = Object.fromEntries(
+          Object.keys(schemas.duty.shape)
+            .filter((k) => k in linkedDuty!.data)
+            .map((k) => [k, linkedDuty!.data[k]]),
+        );
+        linkedDuty = await save(
+          "duty",
+          {
+            ...data,
+            taskIds: [
+              ...new Set([...(linkedDuty.data.taskIds || []), savedTask.id]),
+            ],
+          },
+          linkedDuty,
+        );
+        if (!applied.dutyIds.includes(linkedDuty.id))
+          applied.dutyIds.push(linkedDuty.id);
+      }
+      if (
+        !automatic &&
+        savedTask.data.ownerId &&
+        savedTask.data.performerId &&
+        savedTask.data.evidenceIds.length
+      ) {
+        await reviewTask(db, u, c.id, savedTask);
+        (applied.confirmationReadyIds ||= []).push(savedTask.id);
+      } else (applied.needsDetailsIds ||= []).push(savedTask.id);
+    }
+  } else
+    fail(
+      422,
+      "AGENDA_ONLY",
+      "The agenda is for your meeting. Save the meeting notes afterward.",
+    );
+  await db.query(
+    "UPDATE provider_jobs SET result=result||jsonb_build_object('applied',$2::jsonb,'reviewedDraft',$3::jsonb) WHERE id=$1",
+    [job.id, JSON.stringify(applied), JSON.stringify(draft)],
+  );
+  await audit(db, u, c.id, "discovery.draft_applied", null, {
+    jobId: job.id,
+    stage,
+    recordIds: applied.recordIds,
+  });
+  return applied;
 }

@@ -14,7 +14,34 @@ export const pilotSchema = z.object({
   company: z.string().trim().min(2).max(160),
   role: z.string().trim().min(2).max(120),
   teamSize: z.enum(["1–10", "11–50", "51–200", "201+"]),
-  goal: z.string().trim().min(10).max(2000),
+  goal: z.string().trim().max(2000).default(""),
+  companyUrl: z
+    .string()
+    .trim()
+    .max(2000)
+    .default("")
+    .transform((value, ctx) => {
+      if (!value) return "";
+      try {
+        const url = new URL(
+          /^https?:\/\//i.test(value) ? value : "https://" + value,
+        );
+        if (
+          !["http:", "https:"].includes(url.protocol) ||
+          url.username ||
+          url.password ||
+          !url.hostname.includes(".")
+        )
+          throw new Error();
+        return url.href;
+      } catch {
+        ctx.addIssue({
+          code: "custom",
+          message: "Enter a company website such as example.com.",
+        });
+        return z.NEVER;
+      }
+    }),
   consent: z.literal(true),
   website: z.string().max(200).optional(),
 });
@@ -25,8 +52,8 @@ export const applyForPilot: RequestHandler = async (req, res) => {
   if (!data.website) {
     try {
       await pool.query(
-        `INSERT INTO pilot_applications(email,name,company,role,team_size,goal,consent_version,inquiry_type)
-       VALUES($1,$2,$3,$4,$5,$6,'commercial-contact-v2',$7)`,
+        `INSERT INTO pilot_applications(email,name,company,role,team_size,goal,consent_version,inquiry_type,company_url)
+       VALUES($1,$2,$3,$4,$5,$6,'commercial-contact-v2',$7,$8)`,
         [
           data.email,
           data.name,
@@ -35,6 +62,7 @@ export const applyForPilot: RequestHandler = async (req, res) => {
           data.teamSize,
           data.goal,
           data.inquiryType,
+          data.companyUrl,
         ],
       );
     } catch (error) {

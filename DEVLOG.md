@@ -1,5 +1,13 @@
 # DutyGraph development log
 
+## 2026-09-08 - Demo intake to discovery and automatic work mapping
+
+Added a URL field and optional goal to public intake, a restricted advisor demo inbox with status/follow-up edits, and idempotent conversion to a company/contact. Research starts from the inbox action; the company snapshot and proposed stages save automatically while existing custom/reviewed stages survive re-research. Contact details carry into kickoff preparation. Migration 0011 uses a provisioned account/tenant mapping plus an email allowlist; ordinary advisor registration cannot read global leads.
+
+AI discovery output now includes validated saved-stage IDs, rationale/confidence, and exact duty references. The UI opts into automatic assembly after generation; kickoff notes lead straight to the team/duty map, and task extraction creates linked proposed cards without pretending advisor or participant review occurred. Existing tasks can be referenced and preserved on later runs. A separate AI action connects previously collected unassigned work. Concurrent profile/record changes abort the whole update, with a recoverable saved job result. No real emails or AI calls were used during development.
+
+Local validation: 263 tests passed, including automatic map assembly, recoverable assembly errors, repeat extraction, stage/duty ID rejection, concurrent content/state preservation, abandoned-run recovery, operator isolation, spam handling and concurrent demo conversion. Full build and 97-route contract generation passed; production dependency audit found zero vulnerabilities. An integrated browser walkthrough submitted fictional public intake, opened the inbox, saved a snapshot automatically, verified contact prefills, saved kickoff notes and opened the linked person/duty in the correct Work Map stage, with no page errors. Providers were synthetic. Migration 0011 is applied locally and on the host; the existing operator account is provisioned and its production allowlist configured. Real-provider quality and email delivery were not exercised. App deployment verification follows publication.
+
 ## 2026-09-08 - Neutral selected business stage
 
 Replaced the washed-out ivory selected-stage fill with charcoal, light text and a thin top marker. Stage selection and recorded work links are unchanged.

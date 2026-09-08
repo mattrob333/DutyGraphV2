@@ -24,3 +24,7 @@ Unassigned work appears under **Work not assigned to a stage**. Work with no rec
 The task flow below the people section uses recorded workflow and handoff links. Branches and nearby cards are layout choices; only an explicit handoff establishes that work passes between tasks. Open **Workflows & cases** to inspect a workflow definition or a manually observed case. Case controls record observations and do not call an external business system.
 
 The former **Connected**, **Work flow**, **Org & duties** and **Agents & controls** views remain available for focused investigations. The detailed task map is still below the new stage map. PostgreSQL is authoritative; Neo4j is a derived projection. The normal Cobalt sample opens with a persisted synthetic business profile and authored stage assignments; those assignments are editable and remain clearly synthetic. If an older or incomplete Cobalt workspace cannot load that profile, the guarded legacy fallback may show illustrative assignments for known fixture keys. It is clearly labeled and read-only, never writes assignments, and never classifies customer work.
+
+## Get the first connected map
+
+Discovery saves proposed stage links with AI-created duties and task cards. Open Company Work Map to explore the result, then correct the work or its stage assignments. For older unassigned work, choose **Connect existing work with AI**. Open a duty or task to inspect the inference basis and confidence. These links do not grant authority or count as a person confirming the work.

@@ -428,6 +428,16 @@
       "source": "server/team-analysis.ts"
     },
     {
+      "method": "GET",
+      "path": "/api/v1/companies/{companyId}/work-links",
+      "source": "server/work-links.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/work-links",
+      "source": "server/work-links.ts"
+    },
+    {
       "method": "POST",
       "path": "/api/v1/companies/{companyId}/workflows/{workflowId}/cases",
       "source": "server/workflows.ts"
@@ -456,6 +466,21 @@
       "method": "POST",
       "path": "/api/v1/participant/requests/{recordId}/task-draft",
       "source": "server/app.ts"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/pilot-inbox",
+      "source": "server/pilot-inbox.ts"
+    },
+    {
+      "method": "PATCH",
+      "path": "/api/v1/pilot-inbox/{id}",
+      "source": "server/pilot-inbox.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/pilot-inbox/{id}/open",
+      "source": "server/pilot-inbox.ts"
     },
     {
       "method": "POST",

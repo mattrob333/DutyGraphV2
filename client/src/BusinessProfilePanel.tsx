@@ -2,7 +2,7 @@ import { StageHelp } from "./StageHelp.tsx";
 import { BusinessBrief } from "./BusinessBrief.tsx";
 import { CobaltCompanyProfile } from "./CobaltCompanyProfile.tsx";
 import { isKnownCobaltSample } from "../../shared/cobalt-company-example.ts";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Sparkles, Check, ArrowRight } from "lucide-react";
 import { profileFromClassification } from "../../shared/business-classification.ts";
 import type { Company, RecordRow } from "../../shared/domain.ts";
@@ -30,6 +30,8 @@ export function BusinessProfilePanel({
   openIndustry,
   researched,
   contactComplete = false,
+  autoStart = false,
+  started,
 }: {
   company: Company;
   records?: RecordRow[];
@@ -37,6 +39,8 @@ export function BusinessProfilePanel({
   openIndustry: () => void;
   researched?: () => void;
   contactComplete?: boolean;
+  autoStart?: boolean;
+  started?: () => void;
 }) {
   const illustrative = isKnownCobaltSample(company.sandbox, records);
   const [plan, setPlan] = useState<ResearchPlan | null>(() =>
@@ -210,7 +214,23 @@ export function BusinessProfilePanel({
       setAnalysis(job);
       setBriefJob(job);
       setBaseRevision(job.input.revision);
-      update(profileFromClassification(job.result.draft));
+      const proposed = company.settings.businessProfile?.streams.length
+        ? company.settings.businessProfile
+        : profileFromClassification(job.result.draft);
+      const saved = await api(
+        `/v1/companies/${company.id}/business-profile`,
+        "PUT",
+        {
+          expectedRevision: job.input.revision,
+          profile: proposed,
+          intake: normalized,
+        },
+      );
+      setProfile(proposed);
+      setDirty(false);
+      setBaseRevision(saved.revision);
+      setAnalysis(null);
+      await refresh();
       requestAnimationFrame(() => {
         document
           .getElementById("business-brief")
@@ -220,7 +240,7 @@ export function BusinessProfilePanel({
           ?.focus({ preventScroll: true });
       });
       setNotice(
-        "Your business brief is ready. Review the findings and confirm the business streams below.",
+        "Your company snapshot and proposed stages are saved. Correct anything needed, then prepare the kickoff request.",
       );
     } catch (e) {
       setError((e as Error).message);
@@ -287,6 +307,13 @@ export function BusinessProfilePanel({
     setDirty(true);
     setNotice("");
   };
+  const autoStarted = useRef(false);
+  useEffect(() => {
+    if (!autoStart || autoStarted.current || !classification) return;
+    autoStarted.current = true;
+    started?.();
+    void suggest();
+  }, [autoStart, classification]);
   const add = (id: string, name?: string) => {
     if (profile.streams.length >= 8) return;
     const t = businessTemplates.find((t) => t.id === id);
@@ -855,9 +882,21 @@ export function BusinessProfilePanel({
                     </label>
                     <label>
                       What happens in this stage?
-                      <textarea value={stage.description || ""} maxLength={600} rows={2}
+                      <textarea
+                        value={stage.description || ""}
+                        maxLength={600}
+                        rows={2}
                         placeholder="Explain the purpose and typical work in plain language."
-                        onChange={(e) => changeStream(i, { stages: stream.stages.map((s, k) => j === k ? { ...s, description: e.target.value } : s) })} />
+                        onChange={(e) =>
+                          changeStream(i, {
+                            stages: stream.stages.map((s, k) =>
+                              j === k
+                                ? { ...s, description: e.target.value }
+                                : s,
+                            ),
+                          })
+                        }
+                      />
                     </label>
                     <label>
                       Common function

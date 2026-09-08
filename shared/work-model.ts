@@ -29,6 +29,13 @@ export const businessStageLinksSchema = z
     });
   })
   .default([]);
+export const stageInferenceSchema = z
+  .object({
+    reason: z.string().max(1000),
+    confidence: z.enum(["high", "medium", "low"]),
+  })
+  .strict()
+  .optional();
 export type BusinessStageLink = z.infer<
   typeof businessStageLinksSchema
 >[number];
@@ -125,6 +132,7 @@ export const workSchemas = {
       scope: text,
       taskIds: ids,
       businessStageLinks: businessStageLinksSchema,
+      stageInference: stageInferenceSchema,
       evidenceIds: ids,
       reviewDue: z.iso.date(),
       reason: short,

@@ -58,16 +58,27 @@ export function BusinessBrief({
       aria-label="Business briefing"
       tabIndex={-1}
     >
-      <KickoffSnapshot context={{
-        name: job.input.name, website: job.input.website, asOf: job.created_at,
-        summary: review?.summary || job.result.draft.summary,
-        industry: review?.industry || job.result.draft.industry,
-        streams: company.settings.businessProfile?.streams || [],
-        facts: brief.facts.map(f => ({ ...f, citations: f.citations.map(c => {
-          const source = sources.find(s => s.id === c.sourceId);
-          return { title: source?.title || "Provided description", url: source?.url || "", quote: c.quote };
-        }) })),
-      }} />
+      <KickoffSnapshot
+        context={{
+          name: job.input.name,
+          website: job.input.website,
+          asOf: job.created_at,
+          summary: review?.summary || job.result.draft.summary,
+          industry: review?.industry || job.result.draft.industry,
+          streams: company.settings.businessProfile?.streams || [],
+          facts: brief.facts.map((f) => ({
+            ...f,
+            citations: f.citations.map((c) => {
+              const source = sources.find((s) => s.id === c.sourceId);
+              return {
+                title: source?.title || "Provided description",
+                url: source?.url || "",
+                quote: c.quote,
+              };
+            }),
+          })),
+        }}
+      />
       <div className="brief-meeting">
         <div className="actions">
           <Button
@@ -202,11 +213,11 @@ export function BusinessBrief({
           ))}
         </ol>
         <Button disabled={busy} onClick={prepare}>
-          Review business streams →
+          Change business streams →
         </Button>
         <small>
-          Next, confirm the primary and supporting streams. The kickoff request
-          uses all retained streams.
+          The kickoff request uses these saved streams. You can adjust them at
+          any time.
         </small>
       </div>
       <details className="brief-monitoring">

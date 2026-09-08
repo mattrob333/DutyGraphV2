@@ -12,7 +12,7 @@ Search or filter the library, preview the stages and add a flow. Rename the flow
 
 Industry Map's **Operating models & business flows** section uses the same template identifiers, cites research, and can suggest several models. Current saved suggestions appear in the profile panel. Selecting a suggestion adds a proposed template; it never overwrites the company's profile automatically. Generate or refresh Industry Map explicitly using configured research and AI providers. No paid research or generation is triggered by browsing templates.
 
-The saved profile is stored per company, version-checked and audited. Discovery uses it as context and asks leadership to validate the fit. Framework context includes the profile; profile changes make dependent analyses stale. Templates do not create duties, tasks, permissions, metrics or measured bottlenecks. The Company Work Map uses the saved stages as columns only after an advisor records explicit duty or task assignments; it does not infer operational chains from the template.
+The saved profile is stored per company, version-checked and audited. Discovery uses it as context and asks leadership to validate the fit. Framework context includes the profile; profile changes make dependent analyses stale. Templates alone do not create duties, tasks, permissions or measured bottlenecks. Discovery AI uses internal accounts to propose work and saves stage links. Advisors can change those links afterward. The map does not infer operational chains from a template's layout.
 
 ## Starter library
 
@@ -68,3 +68,7 @@ The saved profile is stored per company, version-checked and audited. Discovery 
 - **Utilities & infrastructure services** (Production): Forecast need → Plan capacity → Authorize connection → Supply & maintain → Meter bill & collect → Support continuity
 - **Franchisor & network operator** (Commerce): Attract operators → Assess fit → Agree franchise → Launch & support locations → Collect fees → Develop network
 - **Equipment rental & leasing** (Commerce): Find demand → Match asset & term → Reserve or contract → Deliver maintain & return → Bill → Renew or re-rent
+
+## Get the first connected map
+
+Discovery saves proposed stage links with AI-created duties and task cards. Open Company Work Map to explore the result, then correct the work or its stage assignments. For older unassigned work, choose **Connect existing work with AI**. Open a duty or task to inspect the inference basis and confidence. These links do not grant authority or count as a person confirming the work.

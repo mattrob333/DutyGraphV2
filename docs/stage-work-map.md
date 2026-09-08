@@ -23,3 +23,9 @@ The guarded legacy fallback can still show a labeled read-only illustration if n
 ## Task cards
 
 Task cards uses the same projection and saved stages. Choose one or more streams, then filter by workflow, recorded owner/performer, review state, search or operating mode. A task can appear in multiple stages; unique task counts and placements remain distinct. Unassigned work stays visible. The cards show role, duty and task, and the full duty/handoff registers stay available in a disclosure below the board. Horizontal lanes support keyboard scrolling and narrow screens.
+
+## Automatic proposals
+
+Onboarding can save the first AI result immediately. Duties carry proposed stage links and recorded owners; tasks carry proposed stage links, owners/performers and explicit duty membership. Open a record to read the AI rationale and confidence. Use Assign stages for corrections. A company stage is a category of work, never approval authority.
+
+For previously collected work, Connect existing work with AI fills missing stage assignments from the saved profile and internal work records. Existing assignments remain unchanged. A task can inherit its duty stages. Changed or withdrawn inputs abort an in-flight update instead of reviving older work. A new version may require renewed review; automation never confirms work on someone's behalf. Missing or ambiguous data stays visible for correction.

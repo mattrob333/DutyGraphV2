@@ -20,6 +20,8 @@ let server: Server,
   base = "";
 const inputs: DiscoveryInput[] = [],
   emails: any[] = [];
+let mappingCalls = 0;
+let mappingOverride: ((input: any) => Promise<any>) | undefined;
 const overrides = new Map<string, (input: DiscoveryInput) => unknown>();
 let execEmail = "leader@discovery.test.invalid",
   staffEmail = "operations@discovery.test.invalid";
@@ -389,6 +391,26 @@ before(async () => {
   const app = createApp({
     authRequestsPerWindow: 1000,
     hostedRouting: true,
+    workLinkProvider: async (input) => {
+      mappingCalls++;
+      if (mappingOverride) return mappingOverride(input);
+      return {
+        assignments: input.targets.map((r: any) => ({
+          recordId: r.id,
+          businessStageLinks: [
+            {
+              streamId: input.profile.streams[0].id,
+              stageId: input.profile.streams[0].stages[0].id,
+            },
+          ],
+          ownerId: r.data.ownerId || "",
+          performerId: r.data.performerId || "",
+          dutyId: "",
+          reason: "The recorded work fits this stage.",
+          confidence: "medium",
+        })),
+      };
+    },
     discoveryProvider: async (input) => {
       inputs.push(structuredClone(input));
       return fakeDraft(input);
@@ -900,6 +922,32 @@ test("Malformed AI output creates no records and reports a recoverable draft fai
   overrides.delete(co.name + ":contact");
 });
 
+test("automatic assembly errors retain an editable draft and leave records unchanged", async () => {
+  const c = await register();
+  await meeting(c);
+  const job = await draft(c, "roster"),
+    co = await company(c),
+    original = await records(c);
+  const duplicate = structuredClone(job.result.draft);
+  duplicate.people[1].email = duplicate.people[0].email;
+  overrides.set(co.name + ":roster", () => duplicate);
+  const result = await request(c, path(c) + "/draft", "POST", {
+    stage: "roster",
+    consent: true,
+    autoCompile: true,
+  });
+  assert.equal(result.status, 200);
+  const current = (await request(c, path(c))).data.jobs.find(
+    (j: any) => j.id === result.data.id,
+  );
+  assert.equal(current.state, "complete");
+  assert.ok(current.result.draft);
+  assert.match(current.result.assemblyError, /could not be assembled/);
+  assert.equal(current.result.applied, undefined);
+  assert.deepEqual(await records(c), original);
+  overrides.delete(co.name + ":roster");
+});
+
 test("Audio-only response can become reviewed transcript evidence and support Discovery without rewriting the original", async () => {
   const c = await register();
   await reviewedRoster(c);
@@ -1382,4 +1430,376 @@ test("saved kickoff requests are immutable and retain their stream snapshot", as
     saved.data.kickoffBusinessStreams,
     req.data.kickoffBusinessStreams,
   );
+});
+
+test("automatic onboarding assembles stage-linked duties and task ownership before review", async () => {
+  const c = await register(),
+    companyName = (await company(c)).name;
+  const profile = {
+    industry: "Repair services",
+    rationale: "Synthetic test",
+    status: "proposed",
+    streams: [
+      {
+        id: "service",
+        templateId: "custom",
+        name: "Repair service",
+        stages: [
+          { id: "schedule", name: "Schedule work", functionIds: ["shape"] },
+        ],
+      },
+    ],
+  };
+  await tx(c.user.tenant_id, (db) =>
+    db.query("UPDATE companies SET settings=settings||$2::jsonb WHERE id=$1", [
+      c.company,
+      JSON.stringify({ businessProfile: profile }),
+    ]),
+  );
+  await meeting(c);
+  overrides.set(companyName + ":roster", (input) => {
+    overrides.delete(companyName + ":roster");
+    const value = fakeDraft(input);
+    for (const p of value.people)
+      for (const d of p.duties) {
+        d.businessStageLinks = [{ streamId: "service", stageId: "schedule" }];
+        d.stageReason = "This responsibility plans the service work.";
+        d.stageConfidence = "medium";
+      }
+    return value;
+  });
+  const roster = await draft(c, "roster", { autoCompile: true });
+  assert.equal(roster.result.applied?.automatic, true, JSON.stringify(roster));
+  const team = await records(c),
+    duties = team.filter((r) => r.kind === "duty");
+  assert.equal(duties.length, 2);
+  assert.ok(
+    duties.every(
+      (d) =>
+        d.data.businessStageLinks.length === 1 &&
+        d.data.stageInference.confidence === "medium",
+    ),
+  );
+  const interview = await draft(c, "interviews", { autoCompile: true });
+  assert.equal(interview.result.applied.requestIds.length, 2);
+  const all = await records(c),
+    amina = all.find((r) => r.kind === "person" && r.data.email === staffEmail),
+    q = all.find((r) => r.kind === "request" && r.data.personId === amina.id);
+  await enrollAndSubmit(
+    c,
+    q,
+    "I schedule each repair visit. I check customer availability, assign a technician and save the appointment in the service calendar.",
+  );
+  overrides.set(companyName + ":tasks", (input) => {
+    overrides.delete(companyName + ":tasks");
+    const value = fakeDraft(input);
+    for (const t of value.tasks) {
+      t.dutyId = input.people.find(
+        (p) => p.id === t.ownerId,
+      )!.dutyRecords![0].id;
+      t.businessStageLinks = [{ streamId: "service", stageId: "schedule" }];
+      t.stageReason = "The task schedules the service visit.";
+      t.stageConfidence = "high";
+    }
+    return value;
+  });
+  const tasks = await draft(c, "tasks", { autoCompile: true });
+  assert.equal(tasks.result.applied?.automatic, true, JSON.stringify(tasks));
+  const complete = await records(c),
+    task = complete.find((r) => r.kind === "task");
+  assert.ok(task.data.ownerId);
+  assert.ok(task.data.performerId);
+  assert.equal(task.state, "proposed");
+  assert.equal(task.data.businessStageLinks[0].stageId, "schedule");
+  assert.ok(
+    complete.some((r) => r.kind === "duty" && r.data.taskIds.includes(task.id)),
+  );
+  const repeat = await draft(c, "tasks", { autoCompile: true });
+  assert.equal(repeat.result.applied?.preservedTaskIds?.[0], task.id);
+  assert.equal((await records(c)).filter((r) => r.kind === "task").length, 1);
+  const again = await apply(c, tasks);
+  assert.equal(again.status, 200);
+  assert.equal((await records(c)).filter((r) => r.kind === "task").length, 1);
+});
+
+test("AI cannot invent stage and duty IDs while automatically assembling work", () => {
+  const source = randomUUID(),
+    person = randomUUID();
+  const input: any = {
+    stage: "tasks",
+    company: "Synthetic",
+    businessProfile: { streams: [{ id: "s", stages: [{ id: "a" }] }] },
+    people: [{ id: person, dutyRecords: [] }],
+    sources: [{ id: source, origin: "team" }],
+  };
+  const task = {
+    title: "Prepare work",
+    duty: "Plan work",
+    ownerId: person,
+    performerId: person,
+    purpose: "",
+    trigger: "",
+    inputs: "",
+    instructions: "",
+    output: "",
+    systems: [],
+    humanGate: "",
+    sourceIds: [source],
+  };
+  assert.throws(
+    () =>
+      validateDiscovery(
+        {
+          summary: "",
+          tasks: [
+            {
+              ...task,
+              businessStageLinks: [{ streamId: "foreign", stageId: "a" }],
+            },
+          ],
+          gaps: [],
+        },
+        input,
+      ),
+    /stage outside/,
+  );
+  assert.throws(
+    () =>
+      validateDiscovery(
+        { summary: "", tasks: [{ ...task, dutyId: randomUUID() }], gaps: [] },
+        input,
+      ),
+    /duty outside/,
+  );
+});
+
+test("work linking rejects state-only changes without reviving stale records", async () => {
+  const c = await register();
+  await reviewedRoster(c);
+  const profile = {
+    industry: "Repair",
+    rationale: "Synthetic",
+    status: "proposed",
+    streams: [
+      {
+        id: "s",
+        templateId: "custom",
+        name: "Service",
+        stages: [{ id: "a", name: "Plan work", functionIds: ["shape"] }],
+      },
+    ],
+  };
+  await tx(c.user.tenant_id, (db) =>
+    db.query("UPDATE companies SET settings=settings||$2::jsonb WHERE id=$1", [
+      c.company,
+      JSON.stringify({ businessProfile: profile }),
+    ]),
+  );
+  const before = (await records(c)).filter((r) => r.kind === "duty");
+  let changedId = "";
+  mappingOverride = async (input) => {
+    changedId = input.targets[0].id;
+    await tx(c.user.tenant_id, (db) =>
+      db.query(
+        "UPDATE records SET state='stale' WHERE company_id=$1 AND id=$2",
+        [c.company, changedId],
+      ),
+    );
+    return {
+      assignments: input.targets.map((r: any) => ({
+        recordId: r.id,
+        businessStageLinks: [{ streamId: "s", stageId: "a" }],
+        ownerId: "",
+        performerId: "",
+        dutyId: "",
+        reason: "Synthetic stage match",
+        confidence: "low",
+      })),
+    };
+  };
+  try {
+    const result = await request(c, prefix(c) + "/work-links", "POST", {
+      consent: true,
+    });
+    assert.equal(result.data.state, "failed", JSON.stringify(result));
+    assert.match(result.data.message, /changed while/);
+    const after = (await records(c)).filter((r) => r.kind === "duty");
+    for (const old of before) {
+      const current = after.find((r) => r.id === old.id)!;
+      assert.equal(
+        current.version,
+        old.version,
+        "state-only edit did not change content version",
+      );
+      assert.equal(
+        current.hash,
+        old.hash,
+        "state-only edit did not change content hash",
+      );
+      assert.deepEqual(
+        current.data,
+        old.data,
+        "failed linking must preserve every duty and its links",
+      );
+      assert.equal(current.state, old.id === changedId ? "stale" : old.state);
+    }
+  } finally {
+    mappingOverride = undefined;
+  }
+});
+
+test("work-link status recovers abandoned runs without calling the provider", async () => {
+  const c = await register(),
+    other = await register();
+  const oldId = randomUUID(),
+    recentId = randomUUID(),
+    otherId = randomUUID();
+  await tx(c.user.tenant_id, async (db) => {
+    await db.query(
+      "INSERT INTO provider_jobs(id,tenant_id,company_id,kind,state,input,created_at) VALUES($1,$2,$3,'work_links','running','{}',now()-interval '6 minutes'),($4,$2,$3,'work_links','running','{}',now()-interval '1 minute')",
+      [oldId, c.user.tenant_id, c.company, recentId],
+    );
+  });
+  await tx(other.user.tenant_id, (db) =>
+    db.query(
+      "INSERT INTO provider_jobs(id,tenant_id,company_id,kind,state,input,created_at) VALUES($1,$2,$3,'work_links','running','{}',now()-interval '6 minutes')",
+      [otherId, other.user.tenant_id, other.company],
+    ),
+  );
+  const calls = mappingCalls;
+  const result = await request(c, prefix(c) + "/work-links");
+  assert.equal(result.status, 200);
+  assert.equal(result.data.id, recentId);
+  assert.equal(result.data.state, "running");
+  const old = await tx(
+    c.user.tenant_id,
+    async (db) =>
+      (
+        await db.query(
+          "SELECT state,message,finished_at FROM provider_jobs WHERE id=$1",
+          [oldId],
+        )
+      ).rows[0],
+  );
+  assert.equal(old.state, "unknown");
+  assert.match(old.message, /Check provider usage/);
+  assert.ok(old.finished_at);
+  const foreign = await tx(
+    other.user.tenant_id,
+    async (db) =>
+      (await db.query("SELECT state FROM provider_jobs WHERE id=$1", [otherId]))
+        .rows[0],
+  );
+  assert.equal(
+    foreign.state,
+    "running",
+    "GET may only recover the selected tenant/company",
+  );
+  assert.equal(mappingCalls, calls, "recovery must never trigger a paid retry");
+});
+
+test("existing-work linking is tenant scoped, idempotent and preserves edits made during AI", async () => {
+  const c = await register();
+  await reviewedRoster(c);
+  const profile = {
+    industry: "Repair",
+    rationale: "Synthetic",
+    status: "proposed",
+    streams: [
+      {
+        id: "s",
+        templateId: "custom",
+        name: "Service",
+        stages: [{ id: "a", name: "Plan work", functionIds: ["shape"] }],
+      },
+    ],
+  };
+  await tx(c.user.tenant_id, (db) =>
+    db.query("UPDATE companies SET settings=settings||$2::jsonb WHERE id=$1", [
+      c.company,
+      JSON.stringify({ businessProfile: profile }),
+    ]),
+  );
+  const other = await register();
+  assert.equal(
+    (await request(other, prefix(c) + "/work-links", "POST", { consent: true }))
+      .status,
+    404,
+  );
+  const key = randomUUID(),
+    before = mappingCalls;
+  const a = await request(
+    c,
+    prefix(c) + "/work-links",
+    "POST",
+    { consent: true },
+    { "Idempotency-Key": key },
+  );
+  assert.equal(a.data.state, "complete", JSON.stringify(a));
+  assert.equal(a.data.result.linked, 2);
+  await request(
+    c,
+    prefix(c) + "/work-links",
+    "POST",
+    { consent: true },
+    { "Idempotency-Key": key },
+  );
+  assert.equal(mappingCalls, before + 1);
+  const linked = (await records(c)).filter((r) => r.kind === "duty");
+  assert.ok(linked.every((r) => r.data.stageInference && r.data.ownerId));
+  // Leave one record unlinked; concurrently edit it inside the synthetic provider.
+  await tx(c.user.tenant_id, async (db) => {
+    const r = linked[0];
+    await createOrEdit(
+      db,
+      c.user,
+      c.company,
+      "duty",
+      {
+        title: r.title,
+        ownerId: r.data.ownerId,
+        purpose: r.data.purpose,
+        scope: r.data.scope,
+        taskIds: [],
+        evidenceIds: r.data.evidenceIds,
+        businessStageLinks: [],
+        reviewDue: r.data.reviewDue,
+        reason: "Manual correction",
+      },
+      r,
+    );
+  });
+  mappingOverride = async (input) => {
+    await tx(c.user.tenant_id, async (db) => {
+      const r = input.targets[0];
+      await db.query("UPDATE records SET version=version+1 WHERE id=$1", [
+        r.id,
+      ]);
+    });
+    return {
+      assignments: input.targets.map((r: any) => ({
+        recordId: r.id,
+        businessStageLinks: [{ streamId: "s", stageId: "a" }],
+        ownerId: "",
+        performerId: "",
+        dutyId: "",
+        reason: "Test",
+        confidence: "low",
+      })),
+    };
+  };
+  try {
+    const stale = await request(c, prefix(c) + "/work-links", "POST", {
+      consent: true,
+    });
+    assert.equal(stale.data.state, "failed");
+    assert.match(stale.data.message, /changed while/);
+    assert.equal(
+      (await records(c)).find((r) => r.id === linked[0].id).data
+        .businessStageLinks.length,
+      0,
+    );
+  } finally {
+    mappingOverride = undefined;
+  }
 });

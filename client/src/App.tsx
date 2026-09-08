@@ -1,3 +1,4 @@
+import { DemoRequests } from "./DemoRequests.tsx";
 import { createWorkspaceReader } from "./workspace-reader.ts";
 import { isKnownCobaltSample } from "../../shared/cobalt-company-example.ts";
 import { TeamLink } from "./TeamLink.tsx";
@@ -75,6 +76,12 @@ import { Detail } from "./Detail.tsx";
 import { Participant, NetworkMark } from "./capture.tsx";
 import type { Company, RecordRow, User } from "../../shared/domain.ts";
 const nav = [
+  {
+    id: "demo-requests",
+    name: "Demo requests",
+    icon: LayoutGrid,
+    group: "ADVISOR INBOX",
+  },
   { id: "overview", name: "Overview", icon: LayoutGrid, group: "" },
   {
     id: "discovery",
@@ -483,6 +490,30 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
     [theme, setTheme] = useState(
       () => localStorage.getItem("dg-theme") || "dark",
     );
+  const [researchCompany, setResearchCompany] = useState("");
+  const [inboxCount, setInboxCount] = useState<number | null>(null);
+  useEffect(() => {
+    let active = true;
+    const check = () => {
+      if (document.hidden) return;
+      void api<any[]>("/v1/pilot-inbox")
+        .then((rows) => {
+          if (active)
+            setInboxCount(rows.filter((r) => r.stage === "new").length);
+        })
+        .catch((e) => {
+          if (active && e.status === 403) setInboxCount(null);
+        });
+    };
+    check();
+    const timer = setInterval(check, 30000);
+    window.addEventListener("focus", check);
+    return () => {
+      active = false;
+      clearInterval(timer);
+      window.removeEventListener("focus", check);
+    };
+  }, [user.id]);
   const workspaceReader = useRef(
     createWorkspaceReader<any>((id) =>
       api("/v1/companies/" + id + "/workspace"),
@@ -697,6 +728,19 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
   let body: ReactNode;
   if (!company)
     body = <div className="loading">Loading the company record…</div>;
+  else if (page === "demo-requests")
+    body = (
+      <DemoRequests
+        onCount={setInboxCount}
+        onOpen={async (id, startResearch) => {
+          await loadCompanies();
+          setCompanyId(id);
+          setDiscoveryEntry("contact");
+          setResearchCompany(startResearch ? id : "");
+          go("discovery");
+        }}
+      />
+    );
   else if (page === "overview")
     body = (
       <>
@@ -1069,6 +1113,9 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <DiscoveryJourney
           key={company.id}
           initialStage={discoveryEntry}
+          autoResearch={researchCompany === company.id}
+          researchStarted={() => setResearchCompany("")}
+          goMap={() => go("graph")}
           writeFramework={(key) =>
             setModal({ type: "form", kind: "framework", preset: { key } })
           }
@@ -1902,22 +1949,27 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
           </label>
         </div>
         <nav aria-label="Workspace navigation">
-          {nav.map((n) => (
-            <div key={n.id}>
-              {n.group && <div className="nav-group">{n.group}</div>}
-              <button
-                className={"nav-item " + (page === n.id ? "active" : "")}
-                onClick={() => go(n.id)}
-              >
-                <n.icon size={17} />
-                <span>{n.name}</span>
-                {n.id === "discovery" && pending.length > 0 && (
-                  <Badge tone="amber">{pending.length}</Badge>
-                )}
-                {page === n.id && <i />}
-              </button>
-            </div>
-          ))}
+          {nav
+            .filter((n) => n.id !== "demo-requests" || inboxCount !== null)
+            .map((n) => (
+              <div key={n.id}>
+                {n.group && <div className="nav-group">{n.group}</div>}
+                <button
+                  className={"nav-item " + (page === n.id ? "active" : "")}
+                  onClick={() => go(n.id)}
+                >
+                  <n.icon size={17} />
+                  <span>{n.name}</span>
+                  {n.id === "demo-requests" && !!inboxCount && (
+                    <Badge tone="amber">{inboxCount}</Badge>
+                  )}
+                  {n.id === "discovery" && pending.length > 0 && (
+                    <Badge tone="amber">{pending.length}</Badge>
+                  )}
+                  {page === n.id && <i />}
+                </button>
+              </div>
+            ))}
         </nav>
         <div className="sidebar-footer">
           <div className="local-status">

@@ -70,6 +70,9 @@ export function DiscoveryJourney({
   open,
   addSource,
   goTasks,
+  goMap,
+  autoResearch = false,
+  researchStarted,
   prepareConfirmation,
   settings,
   initialStage = "contact",
@@ -83,6 +86,9 @@ export function DiscoveryJourney({
   open: (r: RecordRow) => void;
   addSource: () => void;
   goTasks: () => void;
+  goMap?: () => void;
+  autoResearch?: boolean;
+  researchStarted?: () => void;
   prepareConfirmation: () => void;
   settings: () => void;
 }) {
@@ -98,7 +104,11 @@ export function DiscoveryJourney({
     [notice, setNotice] = useState("");
   const [draftValue, setDraft] = useState<any>(null),
     [draftFor, setDraftFor] = useState(""),
-    [contact, setContact] = useState({ name: "", email: "", meetingAt: "" }),
+    [contact, setContact] = useState({
+      name: company.settings.demoContact?.name || "",
+      email: company.settings.demoContact?.email || "",
+      meetingAt: "",
+    }),
     [dueDate, setDueDate] = useState(
       new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10),
     );
@@ -142,17 +152,27 @@ export function DiscoveryJourney({
   const working = busy || job?.state === "running";
   useEffect(() => {
     if (!busy && job?.state !== "running") return;
-    let active = true, checking = false;
+    let active = true,
+      checking = false;
     const timer = window.setInterval(async () => {
       if (checking || document.visibilityState !== "visible") return;
       checking = true;
       try {
         const result = await api(base);
-        if (active) { setJobs(result.jobs); setConfigured(result.configured); }
-      } catch { /* Keep the last known state; never repeat a paid request. */ }
-      finally { checking = false; }
+        if (active) {
+          setJobs(result.jobs);
+          setConfigured(result.configured);
+        }
+      } catch {
+        /* Keep the last known state; never repeat a paid request. */
+      } finally {
+        checking = false;
+      }
     }, 4000);
-    return () => { active = false; window.clearInterval(timer); };
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+    };
   }, [base, busy, job?.state]);
 
   const perform = async (fn: () => Promise<void>) => {
@@ -176,6 +196,7 @@ export function DiscoveryJourney({
           stage,
           ...(stage === "contact" ? { contact } : {}),
           consent: true,
+          autoCompile: true,
         });
       } finally {
         // Read the saved outcome even when the network loses the POST response.
@@ -483,18 +504,48 @@ export function DiscoveryJourney({
       )}
       {contactResponse && stage === "contact" && (
         <section className="journey-arrival" aria-label="Response received">
-          <div><span className="eyebrow">RESPONSE RECEIVED</span>
+          <div>
+            <span className="eyebrow">RESPONSE RECEIVED</span>
             <h2>Your contact has sent the kickoff preparation</h2>
-            <p>Review their answers and team list. Then prepare the leadership meeting.</p></div>
-          <Button primary onClick={() => document.getElementById("returned-kickoff")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Review response <ArrowRight size={16} /></Button>
+            <p>
+              Review their answers and team list. Then prepare the leadership
+              meeting.
+            </p>
+          </div>
+          <Button
+            primary
+            onClick={() =>
+              document
+                .getElementById("returned-kickoff")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
+          >
+            Review response <ArrowRight size={16} />
+          </Button>
         </section>
       )}
-      {["contact", "agenda"].includes(stage) && records.some((r) => r.kind === "response" && r.data.kickoffPreparation) && (
-        <details id="returned-kickoff" open={stage === "contact"}><summary>Contact response & team roster</summary><KickoffReturns companyId={company.id} records={records} refresh={refresh} agenda={() => { setStage("agenda"); window.scrollTo({top: 0, behavior: "smooth"}); }} /></details>
-      )}
+      {["contact", "agenda"].includes(stage) &&
+        records.some(
+          (r) => r.kind === "response" && r.data.kickoffPreparation,
+        ) && (
+          <details id="returned-kickoff" open={stage === "contact"}>
+            <summary>Contact response & team roster</summary>
+            <KickoffReturns
+              companyId={company.id}
+              records={records}
+              refresh={refresh}
+              agenda={() => {
+                setStage("agenda");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}
+            />
+          </details>
+        )}
       {stage === "contact" && (
         <BusinessProfilePanel
           key={company.id + stage}
+          autoStart={autoResearch}
+          started={researchStarted}
           contactComplete={contactResponse}
           company={company}
           records={records}
@@ -676,8 +727,18 @@ export function DiscoveryJourney({
           open={open}
         />
       )}
-      {stage === "contact" && contactResponse && <button className="journey-history-toggle" onClick={() => setHistoryOpen(!historyOpen)}>{historyOpen ? "Hide" : "View"} completed kickoff email and request</button>}
-      <div id="journey-draft" hidden={stage === "contact" && contactResponse && !historyOpen}>
+      {stage === "contact" && contactResponse && (
+        <button
+          className="journey-history-toggle"
+          onClick={() => setHistoryOpen(!historyOpen)}
+        >
+          {historyOpen ? "Hide" : "View"} completed kickoff email and request
+        </button>
+      )}
+      <div
+        id="journey-draft"
+        hidden={stage === "contact" && contactResponse && !historyOpen}
+      >
         <Panel
           title={
             stage === "contact"
@@ -740,7 +801,9 @@ export function DiscoveryJourney({
           <div className="journey-row">
             <p className="subtle">
               AI uses this company's relevant research and responses. Provider
-              charges apply. Review the result before saving or sending.
+              charges apply. People, duties and tasks are linked and saved as AI
+              proposals. You can edit the result afterward. Emails are sent
+              separately.
             </p>
             <Button
               primary={!draft}
@@ -762,7 +825,12 @@ export function DiscoveryJourney({
                           : "Draft contact email"}
             </Button>
           </div>
-          {working && <p className="notice" role="status">Preparing your draft. This can take up to two minutes. We check the saved result automatically; you do not need to click again.</p>}
+          {working && (
+            <p className="notice" role="status">
+              Preparing your draft. This can take up to two minutes. We check
+              the saved result automatically; you do not need to click again.
+            </p>
+          )}
           {job && !busy && (
             <div className="journey-run">
               <State value={job.state} />
@@ -784,6 +852,9 @@ export function DiscoveryJourney({
           {job && !working && job.state !== "complete" && (
             <p role="status">{job.message}</p>
           )}
+          {!applied && job?.result?.assemblyError && (
+            <ErrorBox error={job.result.assemblyError} />
+          )}
           {job?.stale && !applied && (
             <div className="notice amber">
               The input changed since this draft. Prepare a fresh draft before
@@ -796,8 +867,38 @@ export function DiscoveryJourney({
               goes to the right person.
             </div>
           )}
+          {job?.result?.applied?.automatic && (
+            <div className="notice" role="status" style={{ display: "block" }}>
+              <h3>
+                Your{" "}
+                {stage === "roster"
+                  ? "team and duties are"
+                  : stage === "tasks"
+                    ? "task cards are"
+                    : "questions are"}{" "}
+                ready.
+              </h3>
+              <p>
+                AI linked the work from the supplied information. Open the map
+                to explore and make corrections.
+              </p>
+              <div className="actions">
+                {(stage === "roster" || stage === "tasks") && (
+                  <Button primary onClick={goMap || goTasks}>
+                    Open company work map <ArrowRight size={15} />
+                  </Button>
+                )}
+                {stage === "roster" && (
+                  <Button onClick={next}>Continue to team questions</Button>
+                )}
+              </div>
+            </div>
+          )}
           {draft && (
-            <div className="journey-draft">
+            <details className="journey-draft" open={!applied}>
+              <summary>
+                {applied ? "See the saved result and sources" : "Draft details"}
+              </summary>
               <p className="journey-summary">{draft.summary}</p>
               {draft.gaps?.length > 0 && (
                 <details className="journey-gaps" open>
@@ -1315,12 +1416,15 @@ export function DiscoveryJourney({
                   </p>
                 )}
               </details>
-            </div>
+            </details>
           )}
         </Panel>
       </div>
       {stage === "contact" && contactRequests.length > 0 && (
-        <div id="kickoff-contact-requests" hidden={contactResponse && !historyOpen}>
+        <div
+          id="kickoff-contact-requests"
+          hidden={contactResponse && !historyOpen}
+        >
           <Panel
             title="Preview & send kickoff request"
             subtitle="Preview the message, then send the private response link to your contact."
@@ -1424,14 +1528,26 @@ export function DiscoveryJourney({
                   setMeeting("");
                   setMeetingAnswers({});
                   setNotice(
-                    "Meeting notes saved. Build the team dossiers next.",
+                    configured
+                      ? "Meeting notes saved. Your work map is being prepared."
+                      : "Meeting notes saved. Connect AI in Workspace settings to build the work map.",
                   );
                   setStage("roster");
+                  if (configured) {
+                    await api(base + "/draft", "POST", {
+                      stage: "roster",
+                      consent: true,
+                      autoCompile: true,
+                    });
+                    setNotice("");
+                  }
                 })
               }
             >
               <Mic size={16} />
-              Save reviewed meeting notes
+              {configured
+                ? "Build the work map from these notes"
+                : "Save meeting notes"}
             </Button>
           </div>
           {meetingNotes.map((n) => (
@@ -1455,7 +1571,7 @@ export function DiscoveryJourney({
               <strong>
                 {savedTasks.filter((t) => !t.data.reviewed).length}
               </strong>
-              <span>Cards that still need details</span>
+              <span>Cards awaiting advisor review</span>
             </div>
             <div>
               <strong>{confirmationRequests.filter(responseFor).length}</strong>
@@ -1482,8 +1598,8 @@ export function DiscoveryJourney({
           )}
           {savedTasks.some((t) => !t.data.reviewed) && (
             <p>
-              Some cards still need an owner, performer or current evidence.
-              Open Task cards to complete those details.
+              AI-created cards are ready to explore. Open Task cards to check
+              them, correct any gaps and record advisor review.
             </p>
           )}
           {confirmationRequests.length > 0 && (
@@ -1511,7 +1627,16 @@ export function DiscoveryJourney({
         </Panel>
       )}
       {stage === "interviews" && currentTeamRequests.length > 0 && (
-        <TeamQuestionDelivery requests={currentTeamRequests} people={people} responseFor={responseFor} open={open} send={sendAll} busy={busy} blocked={!!draft && !applied} results={emailResults} />
+        <TeamQuestionDelivery
+          requests={currentTeamRequests}
+          people={people}
+          responseFor={responseFor}
+          open={open}
+          send={sendAll}
+          busy={busy}
+          blocked={!!draft && !applied}
+          results={emailResults}
+        />
       )}
     </div>
   );

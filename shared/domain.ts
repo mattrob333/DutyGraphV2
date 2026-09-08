@@ -1,7 +1,11 @@
 import type { BusinessProfile } from "./business-types.ts";
 import type { CompanyProfileReview } from "./company-profile.ts";
 import { z } from "zod";
-import { businessStageLinksSchema, workSchemas } from "./work-model.ts";
+import {
+  businessStageLinksSchema,
+  stageInferenceSchema,
+  workSchemas,
+} from "./work-model.ts";
 import { workflowSchema } from "./workflow.ts";
 export const evidenceLabels = [
   "Known",
@@ -66,9 +70,13 @@ export const schemas = {
         .enum(["receive", "prepare", "check", "decide", "deliver", "unmapped"])
         .default("unmapped"),
       businessStageLinks: businessStageLinksSchema,
+      stageInference: stageInferenceSchema,
       output: text,
       systems: lines,
-      controlAreas: z.array(z.enum(['Access review', 'Change review', 'Confidential data'])).max(3).default([]),
+      controlAreas: z
+        .array(z.enum(["Access review", "Change review", "Confidential data"]))
+        .max(3)
+        .default([]),
       allowed: lines,
       denied: lines,
       humanGate: text,
@@ -167,7 +175,13 @@ export const schemas = {
     .strict(),
 };
 export type Kind =
-  keyof typeof schemas | "response" | "framework" | "export" | "brief" | "case" | "agent_request";
+  | keyof typeof schemas
+  | "response"
+  | "framework"
+  | "export"
+  | "brief"
+  | "case"
+  | "agent_request";
 export type RecordRow = {
   id: string;
   company_id: string;
@@ -189,6 +203,13 @@ export type Company = {
   settings: {
     businessProfile?: BusinessProfile;
     companyResearchReview?: CompanyProfileReview;
+    demoContact?: {
+      name: string;
+      email: string;
+      role: string;
+      teamSize: string;
+    };
+    demoApplicationId?: string;
     businessIntake?: { name: string; website: string; description: string };
     notice: string;
     retentionDays: number;

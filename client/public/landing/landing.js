@@ -113,7 +113,7 @@ document.querySelector('#pilot-form')?.addEventListener('submit', async event =>
       body: JSON.stringify({...fields, consent:fields.consent === 'on'})
     });
     const body = await response.json();
-    if (!response.ok) throw new Error(body.message || 'We could not save your request. Please try again.');
+    if (!response.ok) throw new Error(body.fieldErrors?.map(field => field.message).join(' ') || body.message || 'We could not save your request. Please try again.');
     result.textContent = body.message;
     if (!fields.website) window.dispatchEvent(new CustomEvent('dutygraph:pilot-receipt', {detail:{inquiryType:fields.inquiryType || 'pilot'}}));
     form.reset();
