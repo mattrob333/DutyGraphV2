@@ -312,7 +312,7 @@ function Invitation({
   const [accountConflict, setAccountConflict] = useState(false);
   if (info?.passwordless)
     return (
-      <div className="invitation-page">
+      <div className="kickoff-page">
         <KickoffLink token={token} name={info.name} />
       </div>
     );

@@ -108,3 +108,11 @@ Kickoff contacts open their private link without an account or password. CSV and
 Validation: targeted PostgreSQL HTTP test passed for repeated GET, same-email advisor preservation, invalid/non-kickoff/revoked/expired links, stale version, consent, submission and replay. Full build and all 226 tests passed. Browser verified direct opening, manual roster entry and successful submission without an account. No real email sent.
 
 Release verification: `4cc5874` deployed READY on Vercel (`dpl_9EcS7Av5DPaAkQxW6XXwQDP8mJvC`); dutygraph.com serves the password-free form bundle. Local build, 226 tests and synthetic browser submission passed. CI run 34174265747 was still running at this check. No real recipient submission or email delivery test was performed.
+
+## 2026-09-07 — Full-page kickoff research review and voice response
+
+The private kickoff page uses approximately 84% desktop width in dark mode, with public-research fact cards, cited sources, separately labeled primary/supporting operating stages, a CSV/manual team sheet with reporting-manager suggestions, and one original-wording response. Coordinator-friendly prompts defer detailed vision/KPIs to the executive team. Public context is frozen when issuing new invitations; older invitations use the current matching public brief. Private advisor notes and raw evidence are excluded.
+
+OpenAI gpt-4o-transcribe reuses the advisor account configuration. Contacts explicitly record, stop and transcribe before reviewing and submitting editable text. Three-minute clips, 3 MB upload limit, ten attempts per request and sixty per tenant per day; attempts are reserved transactionally before provider calls. No raw audio is persisted by this new endpoint; clips remain in page memory for retry/download on failure. Device drafts save text/roster only. Existing signed-in participant voice capture remains available.
+
+Validation: local build and 226 tests passed, including password-free submission, expiry/revocation and a synthetic transcription provider with quota enforcement. Browser checked research layout, primary stages, manual roster, saved text draft and successful single-response submission. Real microphone/provider transcription and mobile-device acceptance were not exercised; no real emails or paid provider calls were made.

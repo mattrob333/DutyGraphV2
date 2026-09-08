@@ -35,6 +35,7 @@ export const kickoffFields = [
 ] as const;
 export const kickoffPreparationSchema = z
   .object({
+    responseText: z.string().trim().max(30000).optional(),
     csv: z.string().max(500000),
     rosterUnavailableReason: z.string().trim().max(2000),
     executiveEmails: z.array(z.email().max(254)).max(500),
@@ -96,7 +97,10 @@ export function validateKickoffPreparation(value: unknown) {
     if (data.executiveEmails.length || data.participantEmails.length)
       throw new Error("Attendee selections require a team CSV.");
   }
-  if (!data.answers.goals || !data.answers.departments || !data.answers.streams)
+  if (
+    !data.responseText &&
+    (!data.answers.goals || !data.answers.departments || !data.answers.streams)
+  )
     throw new Error(
       "Add goals, department responsibilities and business streams, or explicitly describe what is still unknown.",
     );
@@ -106,6 +110,11 @@ export function kickoffPreparationText(data: KickoffPreparation) {
   const rows = data.csv.trim() ? previewRoster(data.csv).rows : [];
   return [
     "Executive kickoff preparation — contact supplied; advisor review pending.",
+    ...(data.responseText
+      ? [
+          `Contact corrections and preparation notes (original wording)\n${data.responseText}`,
+        ]
+      : []),
     ...kickoffFields.map(
       (f) => `${f.title}\n${data.answers[f.id] || "Not yet supplied"}`,
     ),

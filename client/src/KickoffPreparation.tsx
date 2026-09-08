@@ -15,14 +15,16 @@ export function KickoffPreparation({
   value,
   change,
   voiceAvailable = true,
+  rosterOnly = false,
 }: {
   voiceAvailable?: boolean;
+  rosterOnly?: boolean;
   value: Package;
   change: (value: Package) => void;
 }) {
   const editorRef = useRef<HTMLElement>(null);
   const [error, setError] = useState("");
-  const [manual, setManual] = useState(false);
+  const [manual, setManual] = useState(rosterOnly);
   const [person, setPerson] = useState(emptyManualPerson);
   const [editIndex, setEditIndex] = useState<number | undefined>();
   const [executive, setExecutive] = useState(false),
@@ -171,6 +173,9 @@ export function KickoffPreparation({
                   <label key={key}>
                     {label}
                     <input
+                      list={
+                        key === "managerEmail" ? "kickoff-managers" : undefined
+                      }
                       aria-label={`Participant ${label}`}
                       type="text"
                       maxLength={
@@ -184,6 +189,15 @@ export function KickoffPreparation({
                   </label>
                 ))}
               </div>
+              <datalist id="kickoff-managers">
+                {preview?.rows
+                  .filter((r) => r.data.email !== person.email)
+                  .map((r) => (
+                    <option key={r.data.email} value={r.data.email}>
+                      {r.data.name} — {r.data.role}
+                    </option>
+                  ))}
+              </datalist>
               <p className="subtle">
                 Use the manager's email to connect the org chart. Include that
                 manager as a person too. Leave blank only if there is no manager
@@ -316,8 +330,11 @@ export function KickoffPreparation({
               <table>
                 <thead>
                   <tr>
-                    <th>Person / role</th>
-                    <th>Department / reports to</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role / title</th>
+                    <th>Department</th>
+                    <th>Reports to</th>
                     <th>Executive kickoff</th>
                     <th>Pilot discovery</th>
                     <th>Edit roster</th>
@@ -328,22 +345,22 @@ export function KickoffPreparation({
                     <tr key={i}>
                       <td>
                         <strong>{r.data.name}</strong>
-                        <br />
-                        {r.data.role}
-                        <br />
-                        <small>{r.data.email}</small>
+
                         {r.issues.map((issue) => (
                           <p className="notice" key={issue}>
                             Row {r.row}: {issue}
                           </p>
                         ))}
                       </td>
+                      <td>{r.data.email}</td>
+                      <td>{r.data.role}</td>
+                      <td>{r.data.team}</td>
                       <td>
-                        {r.data.team}
-                        <br />
-                        <small>
-                          {r.data.managerEmail || "No manager stated"}
-                        </small>
+                        {preview.rows.find(
+                          (p) => p.data.email === r.data.managerEmail,
+                        )?.data.name ||
+                          r.data.managerEmail ||
+                          "Not stated"}
                       </td>
                       <td>
                         <input
@@ -432,33 +449,35 @@ export function KickoffPreparation({
             </div>
           </section>
         )}
-        <section>
-          <h3>3. Share the leadership context</h3>
-          <p>
-            Short bullets are enough. State “unknown” with a follow-up owner
-            where necessary.{" "}
-            {voiceAvailable && "You can add a voice response below."}
-          </p>
-          <div className="form-grid">
-            {kickoffFields.map((f) => (
-              <Field key={f.id} label={f.title} wide>
-                <p className="subtle">{f.hint}</p>
-                <textarea
-                  aria-label={f.title}
-                  rows={3}
-                  maxLength={6000}
-                  value={value.answers[f.id]}
-                  onChange={(e) =>
-                    change({
-                      ...value,
-                      answers: { ...value.answers, [f.id]: e.target.value },
-                    })
-                  }
-                />
-              </Field>
-            ))}
-          </div>
-        </section>
+        {!rosterOnly && (
+          <section>
+            <h3>3. Share the leadership context</h3>
+            <p>
+              Short bullets are enough. State “unknown” with a follow-up owner
+              where necessary.{" "}
+              {voiceAvailable && "You can add a voice response below."}
+            </p>
+            <div className="form-grid">
+              {kickoffFields.map((f) => (
+                <Field key={f.id} label={f.title} wide>
+                  <p className="subtle">{f.hint}</p>
+                  <textarea
+                    aria-label={f.title}
+                    rows={3}
+                    maxLength={6000}
+                    value={value.answers[f.id]}
+                    onChange={(e) =>
+                      change({
+                        ...value,
+                        answers: { ...value.answers, [f.id]: e.target.value },
+                      })
+                    }
+                  />
+                </Field>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
     </Panel>
   );

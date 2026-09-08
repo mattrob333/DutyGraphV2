@@ -47,7 +47,7 @@ export function invitationTemplate({
   const intro = String(
     request.data.emailBody ||
       (contact
-        ? `We are preparing for our first meeting with ${company}. Please invite the leaders who should contribute. Bring a list of departments, the people in each department, their email addresses, and their main responsibilities. Share your goals for the next month, six months and year, along with the problems you want to address.`
+        ? `We are preparing for our first meeting with ${company}. Please invite the leaders who should contribute. Bring a list of departments, the people in each department, their email addresses, and their main responsibilities. Correct our public research and confirm the meeting logistics. The executive team can supply detailed goals at kickoff.`
         : leadership
           ? `Your perspective will help us understand ${company}'s goals, customers and responsibilities before we map the work. Please use the questions below to prepare.`
           : confirmation
@@ -63,7 +63,7 @@ export function invitationTemplate({
       ? [
           "Open your private kickoff preparation page. Preferably upload a CSV of the full discovery roster: name, email, role, department, manager_email. Include managers to build the reporting chart. If you do not have a CSV, add participants manually with the same details.",
           "Select executive kickoff attendees (sponsor, executives, department heads and relevant board representatives) separately from pilot discovery participants. This does not send invitations to them.",
-          "Share vision and measurable goals, department responsibilities, business streams and shared work, known handoff problems, key systems and meeting logistics. State unknowns and who can resolve them.",
+          "Review the public company profile and proposed operating stages. Tell us what is right, wrong or missing, outline departments and confirm meeting logistics. Answer what you know; leave detailed vision and goals for the executive team. Type or transcribe one response.",
           "Review and send the package. Your advisor checks the roster before it populates the org chart and uses your answers to prepare the two-hour executive kickoff agenda. You can add a voice response.",
         ]
       : [

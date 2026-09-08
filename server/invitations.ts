@@ -1,3 +1,4 @@
+import { kickoffPublicContext } from "./kickoff-context.ts";
 import { Router } from "express";
 import { randomBytes, randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -59,6 +60,11 @@ export async function issueInvitation(
     "INSERT INTO invitations(token_hash,tenant_id,company_id,person_id,email,name,expires_at,request_id) VALUES($1,$2,$3,$4,$5,$6,now()+interval '7 days',$7)",
     [tokenHash(token), user.tenant_id, company, p.id, email, p.title, r.id],
   );
+  if (String(r.data.questionPlanVersion || "").startsWith("discovery-contact:"))
+    r.data = {
+      ...r.data,
+      kickoffPublicContext: await kickoffPublicContext(db, company),
+    };
   await setState(
     db,
     user,

@@ -1,3 +1,4 @@
+import { kickoffLinkRouter } from "../server/kickoff-link.ts";
 import "dotenv/config";
 import test, { after } from "node:test";
 import assert from "node:assert/strict";
@@ -10,6 +11,14 @@ import { emptyKickoffPreparation } from "../shared/kickoff-preparation.ts";
 
 test("private kickoff link is account-free, scoped, scanner-safe and single-submit", async () => {
   const app = createApp();
+  let voiceCalls = 0;
+  app.use(
+    "/test-voice",
+    kickoffLinkRouter(async () => {
+      voiceCalls++;
+      return { text: "We have three departments.", requestId: "synthetic" };
+    }),
+  );
   app.use(errorHandler);
   const server = app.listen(0);
   after(async () => {
@@ -78,6 +87,17 @@ test("private kickoff link is account-free, scoped, scanner-safe and single-subm
   try {
     const token = await invite();
     const first = await call(token);
+    assert.equal(first.data.publicContext.name, "Link test");
+    assert.equal(JSON.stringify(first.data).includes("password_hash"), false);
+    const voice = () =>
+      fetch(base + "/test-voice/" + token + "/transcribe", {
+        method: "POST",
+        headers: { "Content-Type": "audio/webm" },
+        body: Buffer.from("synthetic audio"),
+      });
+    for (let i = 0; i < 10; i++) assert.equal((await voice()).status, 200);
+    assert.equal((await voice()).status, 429);
+    assert.equal(voiceCalls, 10);
     assert.equal(first.status, 200);
     assert.equal(first.cookie, null);
     assert.equal((await call(token)).status, 200); // GET never consumes link
@@ -97,10 +117,8 @@ test("private kickoff link is account-free, scoped, scanner-safe and single-subm
     assert.equal((await call(expired)).status, 410);
     const p = emptyKickoffPreparation();
     p.rosterUnavailableReason = "Roster tomorrow";
-    p.answers.goals =
-      p.answers.departments =
-      p.answers.streams =
-        "Confirm at kickoff";
+    p.responseText =
+      "I coordinate the kickoff. Leadership will confirm goals; we have three departments.";
     const body = {
       expectedVersion: first.data.version,
       acknowledged: true,
@@ -118,6 +136,7 @@ test("private kickoff link is account-free, scoped, scanner-safe and single-subm
     assert.equal(result.status, 200, JSON.stringify(result.data));
     assert.equal(result.cookie, null);
     assert.equal((await call(token, body)).status, 410);
+    assert.equal((await voice()).status, 410);
     const row = (
       await tx(user.tenant_id, (db) =>
         db.query("SELECT * FROM records WHERE id=$1", [result.data.responseId]),

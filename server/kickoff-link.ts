@@ -1,3 +1,10 @@
+import { kickoffPublicContext } from "./kickoff-context.ts";
+import express from "express";
+import { providerConfig } from "./providers.ts";
+import {
+  transcribeAudio,
+  type TranscriptionProvider,
+} from "./transcription.ts";
 import { Router } from "express";
 import { z } from "zod";
 import {
@@ -17,10 +24,17 @@ import {
   kickoffPreparationText,
 } from "../shared/kickoff-preparation.ts";
 
-export function kickoffLinkRouter() {
+export function kickoffLinkRouter(
+  transcription: TranscriptionProvider = transcribeAudio,
+) {
   const router = Router();
   // Possession grants access only to this kickoff request, never an account/session.
-  async function access(token: string, submit: boolean, body?: unknown) {
+  async function access(
+    token: string,
+    submit: boolean,
+    body?: unknown,
+    voice = false,
+  ) {
     z.string()
       .regex(/^[a-f0-9]{64}$/)
       .parse(token);
@@ -72,6 +86,52 @@ export function kickoffLinkRouter() {
           "REQUEST_CLOSED",
           "This request is closed or past its due date. Contact your advisor.",
         );
+      if (voice) {
+        const config = await providerConfig(invitation.tenant_id, "openai", db);
+        if (!config.configured && transcription === transcribeAudio)
+          fail(
+            503,
+            "VOICE_UNAVAILABLE",
+            "Voice transcription is not configured by your advisor. You can still type or use device dictation.",
+          );
+        await db.query("SELECT pg_advisory_xact_lock(hashtext($1))", [
+          invitation.tenant_id + ":kickoff-voice",
+        ]);
+        const count = (
+          await db.query(
+            "SELECT count(*) FROM audit_events WHERE tenant_id=$1 AND type='kickoff.transcription_requested' AND created_at>now()-interval '24 hours'",
+            [invitation.tenant_id],
+          )
+        ).rows[0].count;
+        const perRequest = (
+          await db.query(
+            "SELECT count(*) FROM audit_events WHERE record_id=$1 AND type='kickoff.transcription_requested' AND created_at>now()-interval '24 hours'",
+            [r.id],
+          )
+        ).rows[0].count;
+        if (Number(count) >= 60 || Number(perRequest) >= 10)
+          fail(
+            429,
+            "VOICE_LIMIT",
+            "The daily transcription limit has been reached. Type your remaining notes or use device dictation.",
+          );
+        const sponsor = (
+          await db.query(
+            "SELECT u.* FROM record_versions v JOIN users u ON u.id=v.actor_id WHERE v.record_id=$1 AND v.tenant_id=$2 ORDER BY v.version LIMIT 1",
+            [r.id, invitation.tenant_id],
+          )
+        ).rows[0];
+        if (!sponsor) fail(409, "SPONSOR_UNAVAILABLE", "Contact your advisor.");
+        await audit(
+          db,
+          publicUser(sponsor),
+          invitation.company_id,
+          "kickoff.transcription_requested",
+          r.id,
+          { personId: invitation.person_id },
+        );
+        return { key: config.key };
+      }
       if (!submit)
         return {
           id: r.id,
@@ -79,6 +139,12 @@ export function kickoffLinkRouter() {
           title: r.title,
           questions: r.data.questions || [],
           notice: r.data.notice,
+          publicContext:
+            r.data.kickoffPublicContext ||
+            (await kickoffPublicContext(db, invitation.company_id)),
+          voiceConfigured:
+            (await providerConfig(invitation.tenant_id, "openai", db))
+              .configured || transcription !== transcribeAudio,
         };
       const d = z
         .object({
@@ -175,5 +241,34 @@ export function kickoffLinkRouter() {
     res.setHeader("Cache-Control", "no-store");
     res.json(await access(String(req.params.token), true, req.body));
   });
+  router.post(
+    "/:token/transcribe",
+    express.raw({
+      type: ["audio/webm", "audio/ogg", "audio/mp4", "audio/wav", "audio/mpeg"],
+      limit: "3mb",
+    }),
+    async (req, res) => {
+      res.setHeader("Cache-Control", "no-store");
+      if (!Buffer.isBuffer(req.body) || !req.body.length)
+        fail(
+          422,
+          "AUDIO_REQUIRED",
+          "Record a supported audio clip first (maximum 3 MB).",
+        );
+      const config = (await access(
+        String(req.params.token),
+        false,
+        undefined,
+        true,
+      )) as { key: string };
+      const result = await transcription(
+        { bytes: req.body, mime: req.header("Content-Type") || "" },
+        config.key,
+      );
+      // Recheck revocation/closure after the provider finishes; no workspace session is issued.
+      await access(String(req.params.token), false);
+      res.json({ text: result.text });
+    },
+  );
   return router;
 }
