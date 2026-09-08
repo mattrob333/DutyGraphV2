@@ -47,3 +47,16 @@ The most recent email attempt has a prominent result. Accepted by Resend means t
 The HTML email has an 800px responsive maximum, labeled sections, list formatting and labeled fallback links. Its plain-text alternative includes the URL. PUBLIC_APP_ORIGIN optionally sets the link origin; otherwise APP_ORIGIN is used, with the legacy https://dutygraph-v2.vercel.app origin mapped to https://dutygraph.com. This does not change auth/CORS allowlists. Existing emails retain their original URLs.
 
 Preview response form inside the advisor's kickoff request renders the actual team CSV and leadership fields. It holds edits only in memory and cannot submit or enroll. It does not test participant authentication or voice recording. Existing advisor accounts are not converted into participants; use this preview for form review and a separate intended participant identity for enrollment acceptance testing.
+
+
+## Manual roster alternative
+
+Prefer CSV for the full discovery roster including managers. The form also accepts one person at a time: name, email, role/title, department, and manager email. Executive kickoff and pilot discovery are separate selections beside each person. Add another, edit and remove operate on the same serialized roster used by CSV upload; no new import path or automatic invitation is introduced. Include the manager as another roster row, even if that manager is not in the pilot. Missing managers and cycles must be resolved before submission. Editing or removing a manager does not silently rewrite subordinate reporting lines. Removing a row clears that person's attendee selections. Manual entry preserves recognized external IDs; unknown CSV columns are not part of the roster schema.
+
+An existing advisor identity cannot enroll into a participant identity. On an account-conflict error the page offers a direct advisor-workspace link and directions to Preview response form. A true enrollment test requires an intended participant identity; the preview does not submit data.
+
+## Password-free kickoff preparation (2026-09-07)
+
+Kickoff contacts open their private link without an account or password. CSV and manual roster entry share hierarchy validation. Drafts can be saved on the same device. Submission records invitation-possession assurance and the external contact under the sponsoring account, returns preparation for advisor review, and consumes the link atomically. GET does not consume links. Expired, revoked, closed and non-kickoff links are rejected. Advisor cookies and roles are untouched. Other participant workflows retain authentication. This limited form collects written context and roster data; voice remains in the signed-in participant workflow.
+
+Validation: targeted PostgreSQL HTTP test passed for repeated GET, same-email advisor preservation, invalid/non-kickoff/revoked/expired links, stale version, consent, submission and replay. Full build and all 226 tests passed. Browser verified direct opening, manual roster entry and successful submission without an account. No real email sent.

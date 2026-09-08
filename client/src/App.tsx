@@ -1,3 +1,4 @@
+import { KickoffLink } from "./KickoffLink.tsx";
 import { OrgChartCanvas } from "./OrgChartCanvas.tsx";
 import { AgentRequests, TeamAgentPortal } from "./AgentRequests.tsx";
 import { DiscoveryDemo } from "./DiscoveryDemo.tsx";
@@ -308,6 +309,13 @@ function Invitation({
       .then(setInfo)
       .catch((e) => setError(e.message));
   }, [token]);
+  const [accountConflict, setAccountConflict] = useState(false);
+  if (info?.passwordless)
+    return (
+      <div className="invitation-page">
+        <KickoffLink token={token} name={info.name} />
+      </div>
+    );
   return (
     <div className="invitation-page">
       <div className="brand">
@@ -318,6 +326,20 @@ function Invitation({
       </div>
       <Panel title={info ? "Welcome, " + info.name : "Your private invitation"}>
         <ErrorBox error={error} />
+        {accountConflict && (
+          <div className="notice">
+            <strong>Testing this form as the advisor?</strong>
+            <p>
+              Your advisor account stays separate from participant enrollment.
+              Open your workspace, go to Discovery → Preview &amp; send kickoff
+              request, and choose Preview response form. No new email or
+              participant login is needed.
+            </p>
+            <a href="/login#discovery">
+              Open advisor workspace to preview the form →
+            </a>
+          </div>
+        )}
         {info && (
           <>
             <p>
@@ -345,6 +367,9 @@ function Invitation({
                   onLogin(result);
                 } catch (e) {
                   setError((e as Error).message);
+                  setAccountConflict(
+                    (e as Error & { code?: string }).code === "ACCOUNT_EXISTS",
+                  );
                 } finally {
                   setBusy(false);
                 }

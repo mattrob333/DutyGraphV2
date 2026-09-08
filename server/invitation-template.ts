@@ -61,7 +61,7 @@ export function invitationTemplate({
   const how = (
     contact
       ? [
-          "Open your private kickoff preparation page. Upload the team CSV using the downloadable template: name, email, role, department, manager_email.",
+          "Open your private kickoff preparation page. Preferably upload a CSV of the full discovery roster: name, email, role, department, manager_email. Include managers to build the reporting chart. If you do not have a CSV, add participants manually with the same details.",
           "Select executive kickoff attendees (sponsor, executives, department heads and relevant board representatives) separately from pilot discovery participants. This does not send invitations to them.",
           "Share vision and measurable goals, department responsibilities, business streams and shared work, known handoff problems, key systems and meeting logistics. State unknowns and who can resolve them.",
           "Review and send the package. Your advisor checks the roster before it populates the org chart and uses your answers to prepare the two-hour executive kickoff agenda. You can add a voice response.",
@@ -73,9 +73,12 @@ export function invitationTemplate({
         ]
   ).join("\n\n");
   const security =
-    "Your private link expires in 7 days. On your first visit, create a password to protect your responses. If you already have an account, sign in. Do not forward this link. Your assigned advisor will review your response.";
+    "Your private link expires in 7 days. For kickoff preparation, no account or password is needed. Other participant requests may require sign-in. Do not forward this link. Your assigned advisor will review your response.";
   const context = [person.data.role, person.data.team]
-    .filter(value => value && value !== "Not yet provided" && value !== "Engagement contact")
+    .filter(
+      (value) =>
+        value && value !== "Not yet provided" && value !== "Engagement contact",
+    )
     .join(" · ");
   const text = `Hello ${person.title},\n\n${intro}\n\n${request.title}\n${due}\n\n${questions.map((q: string, i: number) => `${i + 1}. ${q}`).join("\n\n")}\n\n${how}\n\nOpen your private page: ${url}\n\n${security}\n\nIf you were not expecting this invitation, contact your advisor before continuing.\n\nDutyGraph · ${company}`;
   const paragraphs = intro.split(/\n\s*\n/).filter(Boolean);
@@ -98,7 +101,7 @@ export function invitationTemplate({
     .split(/\n\s*\n/)
     .map(
       (step, i) =>
-        `<div style="padding:16px 20px;margin:12px 0;background:#f6f6f3;border-left:3px solid #94b8a4"><strong>${contact ? ["1. Upload your team", "2. Choose attendees", "3. Share leadership context", "4. Review and submit"][i] : `Step ${i + 1}`}</strong><p style="margin:8px 0 0">${escape(step)}</p></div>`,
+        `<div style="padding:16px 20px;margin:12px 0;background:#f6f6f3;border-left:3px solid #94b8a4"><strong>${contact ? ["1. Add your team", "2. Choose attendees", "3. Share leadership context", "4. Review and submit"][i] : `Step ${i + 1}`}</strong><p style="margin:8px 0 0">${escape(step)}</p></div>`,
     )
     .join("")}
 <p style="margin:28px 0">${action}</p><h2 style="font-size:17px;margin-top:30px">About your private link</h2><p style="font-size:13px;color:#656b6d">${escape(security)} If you receive a replacement invitation, use the newest email; previous unused links stop working.</p><p style="font-size:13px;color:#656b6d">If you were not expecting this invitation, contact your advisor before continuing.</p></td></tr>

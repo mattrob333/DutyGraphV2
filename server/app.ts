@@ -1,3 +1,4 @@
+import { kickoffLinkRouter } from "./kickoff-link.ts";
 import {
   kickoffPreparationSchema,
   validateKickoffPreparation,
@@ -242,6 +243,7 @@ export function createApp({
     res.clearCookie("dg_session", { path: "/" });
     res.json({ ok: true });
   });
+  app.use("/api/invitations", authLimit, kickoffLinkRouter());
   app.get("/api/invitations/:token", authLimit, async (req, res) => {
     const { rows } = await pool.query(
       "SELECT * FROM invitations WHERE token_hash=$1 AND used_at IS NULL AND revoked_at IS NULL AND expires_at>now()",
@@ -268,6 +270,11 @@ export function createApp({
         title: r.title,
         notice: r.data.notice,
         name: invite.name,
+        passwordless:
+          r.data.type === "leadership" &&
+          String(r.data.questionPlanVersion || "").startsWith(
+            "discovery-contact:",
+          ),
       };
     });
     res.json(info);

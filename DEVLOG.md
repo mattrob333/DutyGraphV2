@@ -1,5 +1,12 @@
 # DutyGraph development log
 
+## 2026-09-07 — Manual kickoff roster entry
+
+- Added manual participant rows with name/email/role/department/reports-to, executive/pilot checkboxes, repeat add, edit and remove. CSV remains the preferred full discovery-roster path.
+- Manual rows serialize to the existing package CSV, preserving external IDs and quoted fields. Existing server validation/import handles duplicate identities, missing managers, cycles, row/byte limits and final attendee scope. Manager removal deliberately leaves affected reporting links flagged rather than inventing a new manager.
+- Updated invitation preparation copy and added an advisor workspace link on account-enrollment conflicts. No role conversion or authentication bypass. Executive selection nominates attendees; it does not send invitations.
+- Validation: full build and 226 tests passed; no real emails sent.
+
 ## 2026-09-07 — Invitation clarity, email layout and advisor form preview
 
 - Latest send acceptance gets a prominent status; old failures are collapsed. A follow-up refresh failure no longer discards the provider result. Replacements after acceptance require explicit selection and explain earlier-link revocation.
@@ -93,3 +100,9 @@ Release: [`6f2e3b3`](https://github.com/mattrob333/DutyGraphV2/commit/6f2e3b3e3b
 - **Validation:** Build and all 185 tests passed for that release. The then-current sitemap contained 190 public pages. See [dated SEO verification](docs/verification/2026-09-07-programmatic-seo.md).
 - **Publication:** CI succeeded and the matching Vercel release was verified READY. Production public routes were checked after publication.
 - **Remaining work:** Crawlable pages and a sitemap do not establish search indexing or ranking. Product claims retain their source research dates; the new templates did not independently revalidate every vendor.
+
+## Password-free kickoff preparation (2026-09-07)
+
+Kickoff contacts open their private link without an account or password. CSV and manual roster entry share hierarchy validation. Drafts can be saved on the same device. Submission records invitation-possession assurance and the external contact under the sponsoring account, returns preparation for advisor review, and consumes the link atomically. GET does not consume links. Expired, revoked, closed and non-kickoff links are rejected. Advisor cookies and roles are untouched. Other participant workflows retain authentication. This limited form collects written context and roster data; voice remains in the signed-in participant workflow.
+
+Validation: targeted PostgreSQL HTTP test passed for repeated GET, same-email advisor preservation, invalid/non-kickoff/revoked/expired links, stale version, consent, submission and replay. Full build and all 226 tests passed. Browser verified direct opening, manual roster entry and successful submission without an account. No real email sent.

@@ -1,21 +1,75 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   kickoffFields,
   type KickoffPreparation as Package,
 } from "../../shared/kickoff-preparation.ts";
 import { previewRoster } from "../../shared/roster.ts";
-import { Panel, Field, ErrorBox } from "./ui.tsx";
+import {
+  emptyManualPerson,
+  writeManualRoster,
+} from "../../shared/manual-roster.ts";
+import { Button, Panel, Field, ErrorBox } from "./ui.tsx";
 import "./kickoff-preparation.css";
 
 export function KickoffPreparation({
   value,
   change,
+  voiceAvailable = true,
 }: {
+  voiceAvailable?: boolean;
   value: Package;
   change: (value: Package) => void;
 }) {
+  const editorRef = useRef<HTMLElement>(null);
   const [error, setError] = useState("");
+  const [manual, setManual] = useState(false);
+  const [person, setPerson] = useState(emptyManualPerson);
+  const [editIndex, setEditIndex] = useState<number | undefined>();
+  const [executive, setExecutive] = useState(false),
+    [pilot, setPilot] = useState(true);
+  const [added, setAdded] = useState(false);
   const preview = value.csv.trim() ? previewRoster(value.csv) : null;
+  function resetEditor() {
+    setPerson(emptyManualPerson());
+    setEditIndex(undefined);
+    setExecutive(false);
+    setPilot(true);
+  }
+  function savePerson() {
+    try {
+      const csv = writeManualRoster(
+        value.csv,
+        {
+          ...person,
+          email: person.email.trim(),
+          managerEmail: person.managerEmail.trim(),
+        },
+        editIndex,
+      );
+      const oldEmail =
+        editIndex === undefined ? "" : preview?.rows[editIndex]?.data.email;
+      const email = person.email.trim().toLowerCase();
+      change({
+        ...value,
+        csv,
+        executiveEmails: [
+          ...value.executiveEmails.filter((e) => e !== oldEmail && e !== email),
+          ...(executive ? [email] : []),
+        ],
+        participantEmails: [
+          ...value.participantEmails.filter(
+            (e) => e !== oldEmail && e !== email,
+          ),
+          ...(pilot ? [email] : []),
+        ],
+      });
+      resetEditor();
+      setError("");
+      setAdded(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Check the person's fields.");
+    }
+  }
   function select(
     key: "executiveEmails" | "participantEmails",
     email: string,
@@ -37,7 +91,9 @@ export function KickoffPreparation({
         <section>
           <h3>1. Bring the team into view</h3>
           <p>
-            CSV columns: name, email, role, department, manager_email. Leave
+            Preferred: upload a CSV of everyone participating in discovery,
+            including their managers, to build the reporting org chart. Columns:
+            name, email, role or title, department, manager_email. Leave
             manager_email blank when no manager is recorded. Include managers in
             the file. Maximum 500 people / 500 KB.
           </p>
@@ -63,6 +119,8 @@ export function KickoffPreparation({
                   if (file.size > 500000)
                     throw new Error("Choose a CSV smaller than 500 KB.");
                   const csv = await file.text();
+                  resetEditor();
+                  setManual(false);
                   change({
                     ...value,
                     csv,
@@ -76,6 +134,113 @@ export function KickoffPreparation({
               }}
             />
           </Field>
+          <p>
+            No CSV? Add people one at a time with the same reporting
+            information.
+          </p>
+          <Button
+            onClick={() => {
+              setManual(true);
+              resetEditor();
+              setAdded(false);
+            }}
+          >
+            Add participants manually
+          </Button>
+          {manual && (
+            <section
+              className="manual-roster-editor"
+              aria-label="Add or edit participant"
+              ref={editorRef}
+            >
+              <h4>
+                {editIndex === undefined
+                  ? "Add a participant"
+                  : "Edit participant"}
+              </h4>
+              <div className="manual-roster-fields">
+                {(
+                  [
+                    ["name", "Full name"],
+                    ["email", "Email"],
+                    ["role", "Role / title"],
+                    ["team", "Department"],
+                    ["managerEmail", "Reports to (manager email)"],
+                  ] as const
+                ).map(([key, label]) => (
+                  <label key={key}>
+                    {label}
+                    <input
+                      aria-label={`Participant ${label}`}
+                      type="text"
+                      maxLength={
+                        key === "email" || key === "managerEmail" ? 254 : 200
+                      }
+                      value={person[key]}
+                      onChange={(e) =>
+                        setPerson({ ...person, [key]: e.target.value })
+                      }
+                    />
+                  </label>
+                ))}
+              </div>
+              <p className="subtle">
+                Use the manager's email to connect the org chart. Include that
+                manager as a person too. Leave blank only if there is no manager
+                to record.
+              </p>
+              <label className="check-line">
+                <input
+                  type="checkbox"
+                  checked={executive}
+                  onChange={(e) => setExecutive(e.target.checked)}
+                />{" "}
+                Include in the executive kickoff attendee list
+              </label>
+              <label className="check-line">
+                <input
+                  type="checkbox"
+                  checked={pilot}
+                  onChange={(e) => setPilot(e.target.checked)}
+                />{" "}
+                Include in pilot discovery
+              </label>
+              <p className="subtle">
+                These selections prepare the attendee list for advisor review.
+                They do not send invitations.
+              </p>
+              <div className="actions">
+                <Button onClick={savePerson}>
+                  {editIndex === undefined
+                    ? "Add participant"
+                    : "Save participant"}
+                </Button>
+                <Button
+                  onClick={() => {
+                    resetEditor();
+                    setManual(false);
+                  }}
+                >
+                  Close manual entry
+                </Button>
+              </div>
+              {added && (
+                <p role="status">
+                  Participant added. Enter the next person above, or{" "}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      resetEditor();
+                      setAdded(false);
+                    }}
+                  >
+                    Add another
+                  </button>
+                  .
+                </p>
+              )}
+            </section>
+          )}
           <details>
             <summary>Paste CSV instead</summary>
             <Field label="Team CSV text">
@@ -84,14 +249,16 @@ export function KickoffPreparation({
                 rows={5}
                 maxLength={500000}
                 value={value.csv}
-                onChange={(e) =>
+                onChange={(e) => {
+                  resetEditor();
+                  setManual(false);
                   change({
                     ...value,
                     csv: e.target.value,
                     executiveEmails: [],
                     participantEmails: [],
-                  })
-                }
+                  });
+                }}
               />
             </Field>
           </details>
@@ -108,16 +275,18 @@ export function KickoffPreparation({
               ))}
               <button
                 type="button"
-                onClick={() =>
+                onClick={() => {
+                  resetEditor();
+                  setError("");
                   change({
                     ...value,
                     csv: "",
                     executiveEmails: [],
                     participantEmails: [],
-                  })
-                }
+                  });
+                }}
               >
-                Remove uploaded CSV
+                Clear roster
               </button>
             </>
           )}
@@ -151,6 +320,7 @@ export function KickoffPreparation({
                     <th>Department / reports to</th>
                     <th>Executive kickoff</th>
                     <th>Pilot discovery</th>
+                    <th>Edit roster</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -207,6 +377,54 @@ export function KickoffPreparation({
                           }
                         />
                       </td>
+                      <td>
+                        <Button
+                          onClick={() => {
+                            setPerson(r.data);
+                            setEditIndex(i);
+                            setExecutive(
+                              value.executiveEmails.includes(r.data.email),
+                            );
+                            setPilot(
+                              value.participantEmails.includes(r.data.email),
+                            );
+                            setAdded(false);
+                            setManual(true);
+                            requestAnimationFrame(() =>
+                              editorRef.current?.scrollIntoView({
+                                behavior: "smooth",
+                                block: "center",
+                              }),
+                            );
+                          }}
+                        >
+                          Edit {r.data.name || "person"}
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            try {
+                              const csv = writeManualRoster(value.csv, null, i);
+                              change({
+                                ...value,
+                                csv,
+                                executiveEmails: value.executiveEmails.filter(
+                                  (e) => e !== r.data.email,
+                                ),
+                                participantEmails:
+                                  value.participantEmails.filter(
+                                    (e) => e !== r.data.email,
+                                  ),
+                              });
+                              resetEditor();
+                              setError("");
+                            } catch (e) {
+                              setError((e as Error).message);
+                            }
+                          }}
+                        >
+                          Remove {r.data.name || "person"}
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -218,7 +436,8 @@ export function KickoffPreparation({
           <h3>3. Share the leadership context</h3>
           <p>
             Short bullets are enough. State “unknown” with a follow-up owner
-            where necessary. You can add a voice response below.
+            where necessary.{" "}
+            {voiceAvailable && "You can add a voice response below."}
           </p>
           <div className="form-grid">
             {kickoffFields.map((f) => (

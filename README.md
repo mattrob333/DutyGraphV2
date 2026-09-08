@@ -1,5 +1,7 @@
 # DutyGraph
 
+Kickoff rosters support preferred full-team CSV upload or manual add/edit/remove rows with name, email, role, department and manager email. Both paths share hierarchy validation and executive/pilot selections. Enrollment account conflicts now link advisors back to the form-preview workflow.
+
 Invitation delivery now emphasizes the latest result, collapses historical failures and requires an explicit replacement choice after success. Kickoff emails use an 800px responsive layout with labeled sections and branded links. Advisors can open the actual kickoff fields through **Preview response form**, without enrollment or submission. See [kickoff preparation](docs/kickoff-preparation.md). Release `2d3009c` passed 222 tests and CI, is READY on Vercel, and its preview/status controls are served on dutygraph.com.
 
 Company research now opens a reusable profile with identity, website/social links, scale and market highlights, sourced offers and comparable-company findings. Advisor updates preserve original citations and feed kickoff context; a standalone HTML report includes operating streams. The latest completed profile survives later failed jobs. Email preparation now says “Save & continue to send.” See [company profiles](docs/company-profiles.md). Release `289461f` passed 220 tests and CI, is READY on Vercel, and its profile/review/send controls were verified in the dutygraph.com bundle.
@@ -136,3 +138,9 @@ Read [integrations](docs/INTEGRATIONS.md), [hosting](docs/HOSTING.md), [security
 Start with [CONTRIBUTING.md](CONTRIBUTING.md). **Every change must update this README and [DEVLOG.md](DEVLOG.md) in the same change set**, including documentation-only changes. Keep the README a concise current-state guide; record dated details, reasons, validation and remaining work in the development log. This documentation convention was added September 7, 2026.
 
 Keep changes reviewable, preserve tenant isolation/provenance, and document limitations alongside features. The version-controlled wiki is canonical and reviewed with code; a separate GitHub Wiki should be a mirror, not a second independently edited source of truth.
+
+## Password-free kickoff preparation (2026-09-07)
+
+Kickoff contacts open their private link without an account or password. CSV and manual roster entry share hierarchy validation. Drafts can be saved on the same device. Submission records invitation-possession assurance and the external contact under the sponsoring account, returns preparation for advisor review, and consumes the link atomically. GET does not consume links. Expired, revoked, closed and non-kickoff links are rejected. Advisor cookies and roles are untouched. Other participant workflows retain authentication. This limited form collects written context and roster data; voice remains in the signed-in participant workflow.
+
+Validation: targeted PostgreSQL HTTP test passed for repeated GET, same-email advisor preservation, invalid/non-kickoff/revoked/expired links, stale version, consent, submission and replay. Full build and all 226 tests passed. Browser verified direct opening, manual roster entry and successful submission without an account. No real email sent.

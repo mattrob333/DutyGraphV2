@@ -43,3 +43,34 @@
   display: grid;
   gap: 20px;
 }
+
+.manual-roster-editor {
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.manual-roster-fields {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.manual-roster-fields label {
+  display: grid;
+  gap: 8px;
+  font-size: 12px;
+}
+.manual-roster-fields input {
+  width: 100%;
+  min-width: 0;
+}
+@media (max-width: 1100px) {
+  .manual-roster-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .manual-roster-fields {
+    grid-template-columns: 1fr;
+  }
+}
