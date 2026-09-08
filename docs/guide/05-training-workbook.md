@@ -75,7 +75,7 @@ Revise the denied actions and instructions. Review the new task and issue curren
 
 ## Exercise 4: make the graph useful
 
-Create the remaining two tasks and supplied manager relationships. Open Company Work Map, select a stage and then Jamie. Follow the highlighted organization to Jamie’s duties and tasks, then open a task flow. Open the retained Connected and Org & duties views to compare their focused investigations.
+Create the remaining two tasks and supplied manager relationships. Open Company Work Map's **Work map**, select a stage and then Jamie. Follow the highlighted organization to Jamie’s duties and tasks. Compare **Work flows** for handoffs with **Tasks** for detailed cards and evidence. Open **Client brief** to inspect the same work's coverage without treating a documented task count as a measured business result.
 
 - Which recorded fields make Jamie an owner, and which make Sam a performer?
 - Which view best answers “Who reports to Jamie?”

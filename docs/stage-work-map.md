@@ -18,7 +18,7 @@ Saving uses normal record versions and review rules. Unchanged selections do not
 
 ## Existing views and examples
 
-Relationships, Connected, Work flow, Org & duties, and Agents & controls remain available. The former task map is below the new map in **Detailed task map, gaps & AI opportunities**.
+Three primary views share the same records: **Work map** for stages and people, **Work flows** for explicit handoffs, and **Tasks** for detailed cards, filters and supporting registers. They consolidate the former relationship, organization and control tabs. Open records for evidence and related work; use Agent governance for agent/control work. **Client brief** continues from the map into coverage, findings, commitments and report preparation.
 
 Opening the known Cobalt sandbox upgrades untouched legacy examples to a saved fictional wholesale profile. Eighteen guided tasks cover Develop accounts, Quote availability, Confirm order, Source & fulfill, Invoice & collect and Replenish accounts. Separate control examples remain Unassigned. Edited, reviewed or confirmed records and custom profiles are preserved. This uses a scoped advisor POST, not a mutating workspace GET; repeat upgrades are idempotent. No research providers or messages are used.
 

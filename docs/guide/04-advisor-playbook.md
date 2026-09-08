@@ -50,7 +50,7 @@ For each task, name one accountable owner and the performer, describe inputs/ins
 
 Group tasks with a duty label. Create an explicit duty record when responsibility for that continuing area needs review. Define each handoff’s receiving condition, input/output mapping, exception owner and failure handling. A receiving check is more useful than an unlabeled arrow.
 
-Inspect the Company Work Map. Select a stream and stage, follow the highlighted organization to a person, then inspect that person’s duties, tasks and flows. Use Connected for evidence relationships, By team for work grouping and Reporting chart for recorded managers. Do not infer a stage link, manager, owner or performer from seniority, job title or task ownership.
+Inspect Company Work Map's three views: Work map for stages, recorded people and duties; Work flows for handoffs; Tasks for detailed cards and evidence links. The Work map reporting chart uses recorded managers. Do not infer a stage link, manager, owner or performer from seniority, job title or task ownership. Continue into Client brief to discuss coverage, priorities and the next review.
 
 **Exit evidence:** reviewed task definitions; an explicit list of remaining conflicts; meaningful receiving checks; no unexplained orphan work.
 

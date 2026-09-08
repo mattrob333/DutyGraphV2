@@ -86,9 +86,9 @@ Try choosing Needs change in a separate practice request. Accepting that respons
 
 ## 7. Inspect the company views
 
-Open **Company Work Map**. Select a business stream and stage, then select Jamie in the highlighted organization. Inspect Jamie’s duties, tasks and task flows. Use **Assign stages** to place a duty or task explicitly; a task’s own assignment overrides inherited duty stages. Open **Connected** for accountability arrows and source links, and **Org & duties** for the reporting chart.
+Open **Company Work Map → Work map**. Select a business stream and stage, then select Jamie in the highlighted organization. Inspect Jamie’s duties and tasks. Use **Assign stages** to place a duty or task explicitly; a task’s own assignment overrides inherited duty stages. Open **Work flows** for recorded handoffs and **Tasks** for detailed cards and source records.
 
-Open Org & duties. By team shows the four people and their responsibilities. Reporting chart places Alex above Jamie and Robin, with Sam under Jamie. These are the roster relationships you entered. They are not inferred from titles. The enriched Cobalt example has a small authored synthetic reporting chart; missing manager relationships remain unlinked.
+The Work map reporting chart places Alex above Jamie and Robin, with Sam under Jamie, using the roster relationships you entered. These are not inferred from titles. Missing manager relationships remain unlinked. Continue to **Client brief** to see coverage and prepare a reviewed report from the saved work.
 
 ## 8. Define the duty and handoffs
 
@@ -120,7 +120,7 @@ Create an intervention for a complete-intake checklist. Preserve the prediction 
 
 Open **Weekly review**. Discuss returned evidence, stale or conflicting work, missing baselines, workflow exceptions, and outstanding commitments. Record Jamie’s next action and due date.
 
-Open **Deliverables**, create an executive client report, and name Alex and Jamie as the fictional audience. Write the purpose, summary, decisions, next steps, and limitations. Select relevant records. Create the frozen draft, open the preview, and inspect every section.
+Open **Client brief**, choose **Prepare client report**, and name Alex and Jamie as the fictional audience. Review and refine the suggested purpose, summary, decisions, next steps, limitations and selected records. Save the frozen draft, open its preview, and inspect every section.
 
 Approve the exact current content and audience with a rationale, then download the ZIP. Open `client-report.html`; print it to PDF if desired. Inspect `record-register.csv` and `checksums.json`. The package omits original response text and recordings. Delivery remains manual.
 

@@ -194,6 +194,16 @@
     },
     {
       "method": "GET",
+      "path": "/api/v1/companies/{companyId}/audit-brief",
+      "source": "server/audit-brief.ts"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/companies/{companyId}/audit-brief/prepare",
+      "source": "server/audit-brief.ts"
+    },
+    {
+      "method": "GET",
       "path": "/api/v1/companies/{companyId}/business-classification",
       "source": "server/business-classification.ts"
     },

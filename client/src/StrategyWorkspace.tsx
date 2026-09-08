@@ -6,6 +6,8 @@ import { frameworkGroups } from "../../shared/framework-guides.ts";
 import { api } from "./api.ts";
 import { Badge, Button, ErrorBox, Modal } from "./ui.tsx";
 import { FrameworkLibrary } from "./StrategyViews.tsx";
+import { StrategyReadiness } from "./StrategyReadiness.tsx";
+import type { FrameworkReadinessList } from "../../shared/strategy-readiness.ts";
 
 export function StrategyWorkspace({
   company,
@@ -15,6 +17,7 @@ export function StrategyWorkspace({
   write,
   scope,
   setScope,
+  onWeeklyReview,
 }: {
   company: string;
   records: RecordRow[];
@@ -23,11 +26,15 @@ export function StrategyWorkspace({
   write: (key: string) => void;
   scope: string | null;
   setScope: (scope: string | null) => void;
+  onWeeklyReview?: () => void;
 }) {
   const [frameworkSource, setFrameworkSource] = useState<{
     key: string;
     id?: string;
   } | null>(null);
+  const [frameworkRuns, setFrameworkRuns] =
+      useState<FrameworkReadinessList | null>(null),
+    [frameworkRevision, setFrameworkRevision] = useState(0);
   const [data, setData] = useState<any>(null),
     [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
@@ -52,7 +59,13 @@ export function StrategyWorkspace({
       alive = false;
       clearInterval(timer);
     };
-  }, [path, records]);
+  }, [path, records, frameworkRevision]);
+  useEffect(() => {
+    setData(null);
+    setFrameworkRuns(null);
+    setFrameworkSource(null);
+    setSelectedId("");
+  }, [company]);
   const copilot = scope === "copilot",
     reportScope = copilot ? "overview" : scope;
   const group = (id: string) => data?.groups.find((g: any) => g.scope === id);
@@ -104,13 +117,22 @@ export function StrategyWorkspace({
           openRecord={open}
           write={write}
           navigate={(key, id) => setFrameworkSource({ key, id })}
-          saved={() => {}}
+          saved={() => setFrameworkRevision((value) => value + 1)}
         />
       )}
+      <StrategyReadiness
+        key={`readiness:${company}`}
+        company={company}
+        records={records}
+        runs={frameworkRuns}
+        openFramework={(key) => setFrameworkSource({ key })}
+        openRecord={open}
+        onWeeklyReview={onWeeklyReview}
+      />
       <section className="strategy-brief-bar" aria-label="Strategy reports">
         <div>
-          <span className="eyebrow">YOUR BUSINESS, EXPLAINED</span>
-          <h2>What changed. What it means. What to do next.</h2>
+          <span className="eyebrow">SYNTHESIZE THE SAVED ANALYSES</span>
+          <h2>Read the strategy together.</h2>
           <p>
             Read the whole-company brief or explore one part of the business.
             Ask the copilot a question using the same evidence.
@@ -122,7 +144,7 @@ export function StrategyWorkspace({
           )}
         </div>
         <div className="actions">
-          <Button primary onClick={() => select("overview")}>
+          <Button onClick={() => select("overview")}>
             <FileText size={16} />
             Executive brief
           </Button>
@@ -134,9 +156,12 @@ export function StrategyWorkspace({
       </section>
       {!scope && <ErrorBox error={error} />}
       <FrameworkLibrary
+        key={`library:${company}`}
         companyId={company}
         registry={registry}
         records={records}
+        onReadiness={setFrameworkRuns}
+        refreshVersion={frameworkRevision}
         open={open}
         write={write}
         report={(id) => select(id)}

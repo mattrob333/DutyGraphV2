@@ -2,8 +2,12 @@ import express from "express";
 import { z } from "zod";
 import JSZip from "jszip";
 import { reportTheme } from "./report-theme.ts";
+import { renderAuditSnapshot } from "./report-audit.ts";
 import { createHash } from "node:crypto";
-import type { RecordRow, Company } from "../shared/domain.ts";
+import type { RecordRow, Company, User } from "../shared/domain.ts";
+import type pg from "pg";
+import { auditText, type AuditBrief } from "../shared/audit-brief.ts";
+import type { AuditSourceBinding } from "./audit-brief.ts";
 import { confirmationStatus } from "../shared/domain.ts";
 import { coverageSummary } from "../shared/work-model.ts";
 import { advisor, type AuthRequest } from "./auth.ts";
@@ -19,7 +23,7 @@ import {
 } from "./db.ts";
 
 export const reportKinds = ["executive", "weekly", "audit"] as const;
-const reportInput = z
+export const reportInput = z
   .object({
     title: z.string().trim().min(3).max(200),
     kind: z.enum(reportKinds),
@@ -47,6 +51,9 @@ const allowedKinds = [
   "review",
   "framework",
 ];
+const inactiveReportStates = new Set(["withdrawn", "retracted", "superseded"]);
+const unavailableForReport = (r: RecordRow) =>
+  inactiveReportStates.has(r.state) || r.state === "stale";
 
 export function reportRecord(r: RecordRow, all: RecordRow[]) {
   const name = (id: string) =>
@@ -121,8 +128,12 @@ export function reportRecord(r: RecordRow, all: RecordRow[]) {
                         "Required input": d.requiredInput,
                         "Receiving check": d.acceptanceCheck,
                         "Exception owner": name(d.exceptionOwnerId),
-                        "Escalation hours": d.timeoutHours,
-                        "Maximum retries": d.maxRetries,
+                        "Escalation hours": d.documentationOnly
+                          ? "Not configured"
+                          : d.timeoutHours,
+                        "Maximum retries": d.documentationOnly
+                          ? "Not configured"
+                          : d.maxRetries,
                         "Failure action": d.failureAction,
                       }
                     : r.kind === "engagement"
@@ -181,11 +192,11 @@ export function renderReport(packet: any, approved = false) {
     `<p>${escape(text).replaceAll("\n", "<br>")}</p>`;
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(packet.title)}</title><style>
   ${reportTheme}
-  </style></head><body><main><header><div class="brand">DutyGraph · ${escape(packet.company.name)}</div><h1>${escape(packet.title)}</h1><p>${escape(packet.purpose)}</p><div class="meta">${approved ? "Reviewed for manual delivery" : "DRAFT — review before delivery"} · ${escape(packet.generatedAt.slice(0, 10))} · Company revision ${packet.sourceRevision}</div><div class="meta">Audience: ${packet.audience.map(escape).join("; ")}</div></header>
+  </style></head><body><main><header><div class="brand"><svg aria-hidden="true" viewBox="0 0 86 83"><path fill="currentColor" d="M24 0H62V24H25V61H8Q0 61 0 53V24Q0 0 24 0Z"/><path fill="currentColor" d="M62 24H78Q86 24 86 32V59Q86 83 62 83H25V61H62Z"/></svg><span>DutyGraph <small>CLIENT BRIEF</small></span></div><h1>${escape(packet.title)}</h1><p>${escape(packet.purpose)}</p><div class="meta">${approved ? "Approved snapshot · delivery eligibility checked on download" : "DRAFT — review before delivery"} · ${escape(packet.generatedAt.slice(0, 10))} · Company revision ${packet.sourceRevision}</div><div class="meta">Audience: ${packet.audience.map(escape).join("; ")}</div></header>
   ${packet.sandbox ? '<div class="notice"><strong>Synthetic training example.</strong> This company and its people, claims and measurements are illustrative. This is not an actual client finding.</div>' : ""}
   <div class="stats"><div><strong>${packet.coverage.participants}</strong>people in the engagement roster</div><div><strong>${packet.coverage.responded} / ${packet.coverage.participants}</strong>people with a returned response</div><div><strong>${packet.coverage.confirmedTasks} / ${packet.coverage.totalTasks}</strong>tasks with current human confirmations</div></div>
-  <h2>Executive summary</h2>${paragraph(packet.summary)}<h2>Decisions for the client</h2>${paragraph(packet.decisions || "No decision recorded.")}<h2>Next steps</h2>${paragraph(packet.nextSteps)}<h2>Scope and limitations</h2>${paragraph(packet.limitations)}<p class="muted">Scope: ${escape(packet.company.scope)}. ${escape(packet.collectionNotice)}</p>
-  <h2>Selected work and findings</h2>${
+  <section id="executive-summary" class="report-section"><div class="section-label">THE EXECUTIVE VIEW</div><h2>Executive summary</h2>${paragraph(packet.summary)}</section>${renderAuditSnapshot(packet.auditBrief)}<h2>Decisions for the client</h2>${paragraph(packet.decisions || "No decision recorded.")}<h2>Next steps</h2>${paragraph(packet.nextSteps)}<h2>Scope and limitations</h2>${paragraph(packet.limitations)}<p class="muted">Scope: ${escape(packet.company.scope)}. ${escape(packet.collectionNotice)}</p>
+  <div class="report-appendix"><div class="section-label">SUPPORTING DETAIL</div><h2>Selected work and findings</h2><p class="muted">The detailed records selected for this audience. Original sources remain in the company workspace.</p>${
     packet.records.length
       ? packet.records
           .map(
@@ -205,7 +216,7 @@ export function renderReport(packet: any, approved = false) {
       : "<p>No detailed records selected.</p>"
   }
   ${packet.auditEvents ? `<h2>Recorded activity</h2><p>${escape(packet.auditCoverage)}</p><table><thead><tr><th>When</th><th>Recorded event</th><th>Record</th></tr></thead><tbody>${packet.auditEvents.map((e: any) => `<tr><td>${escape(e.created_at)}</td><td>${escape(e.type)}</td><td>${escape(e.record_id || "Workspace")}</td></tr>`).join("")}</tbody></table>` : ""}
-  <footer>Frozen review packet. Source text, recordings, passwords and invitation tokens are excluded. Work confirmation, business authority, deployment and observed execution are distinct. This document grants no system permission.</footer></main></body></html>`.replace(
+  </div><footer>Frozen review packet. Source text, recordings, passwords and invitation tokens are excluded. Work confirmation, business authority, deployment and observed execution are distinct. This document grants no system permission.</footer></main></body></html>`.replace(
     /[ \t]+$/gm,
     "",
   );
@@ -244,9 +255,30 @@ export async function reportZip(record: RecordRow) {
   );
   return zip.generateAsync({ type: "nodebuffer" });
 }
-async function checkSources(db: any, company: string, record: RecordRow) {
+async function checkSources(
+  db: any,
+  company: string,
+  record: RecordRow,
+  user: User,
+) {
+  if (record.data.auditSource) {
+    const { auditBriefContext } = await import("./audit-brief.ts");
+    const current = await auditBriefContext(db, user, company);
+    if (current.sources.fingerprint !== record.data.auditSource.fingerprint)
+      fail(
+        409,
+        "REPORT_STALE",
+        "The audit sources or reviewed analysis changed. Prepare and review a fresh report; this frozen snapshot remains unchanged.",
+      );
+  }
   for (const binding of record.data.bindings) {
     const current = await getRecord(db, company, binding.id);
+    if (unavailableForReport(current))
+      fail(
+        409,
+        "REPORT_STALE",
+        "A selected record is no longer active or current. Generate and review a fresh report.",
+      );
     if (current.kind === "task")
       current.state = confirmationStatus(
         current,
@@ -270,6 +302,197 @@ async function checkSources(db: any, company: string, record: RecordRow) {
       );
   }
 }
+function clientSafeValue(value: any): any {
+  if (typeof value === "string") return auditText(value, 20000);
+  if (Array.isArray(value)) return value.map(clientSafeValue);
+  if (value && typeof value === "object")
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [key, clientSafeValue(item)]),
+    );
+  return value;
+}
+
+export async function prepareClientReport(
+  db: pg.PoolClient,
+  u: User,
+  c: Company,
+  body: unknown,
+  auditSource?: AuditSourceBinding,
+  auditBrief?: AuditBrief,
+) {
+  const d = reportInput.parse(body);
+  if (c.revision !== d.expectedRevision)
+    fail(
+      409,
+      "STALE_INPUT",
+      "The workspace changed. Refresh before preparing the report.",
+    );
+  const all = (
+    await db.query(
+      "SELECT * FROM records WHERE company_id=$1 ORDER BY created_at,id",
+      [c.id],
+    )
+  ).rows as RecordRow[];
+  const confirmations = (
+    await db.query("SELECT * FROM confirmations WHERE company_id=$1", [c.id])
+  ).rows;
+  for (const r of all)
+    if (r.kind === "task" && !unavailableForReport(r))
+      r.state = confirmationStatus(r, confirmations);
+  const chosen = [...new Set(d.recordIds)].map(
+    (id) =>
+      all.find((r) => r.id === id) ||
+      fail(404, "NOT_FOUND", "A selected record is outside this workspace."),
+  );
+  if (
+    chosen.some(
+      (r) => !allowedKinds.includes(r.kind) || unavailableForReport(r),
+    )
+  )
+    fail(
+      422,
+      "INVALID_SELECTION",
+      "Choose current work or analysis records. Raw evidence is excluded from client reports.",
+    );
+  const bindings = chosen.map((r) => ({
+    id: r.id,
+    version: r.version,
+    hash: r.hash,
+    state: r.state,
+  }));
+  const requiredEvidence = new Set(
+    chosen.flatMap((r) => r.data.evidenceIds || []),
+  );
+  for (const selected of chosen)
+    for (const pinned of [
+      ...(selected.data.sourceBindings || []),
+      ...(selected.data.upstreamBindings || []),
+    ]) {
+      const source = all.find((r) => r.id === pinned.id);
+      if (
+        !source ||
+        source.version !== pinned.version ||
+        source.hash !== pinned.hash ||
+        unavailableForReport(source)
+      )
+        fail(
+          409,
+          "SOURCE_STALE",
+          "A selected record's saved source or upstream version changed. Refresh its analysis before preparing a report.",
+        );
+    }
+  const sourceIds = new Set(
+    chosen.flatMap((r) => [
+      ...(r.data.evidenceIds || []),
+      ...(r.data.sourceBindings || []).map((b: any) => b.id),
+      ...(r.data.upstreamBindings || []).map((b: any) => b.id),
+    ]),
+  );
+  for (const id of sourceIds) {
+    const source =
+      all.find((r) => r.id === id) ||
+      fail(
+        409,
+        "SOURCE_UNAVAILABLE",
+        "A selected record relies on unavailable evidence.",
+      );
+    if (
+      unavailableForReport(source) ||
+      ((requiredEvidence.has(id) || source.kind === "evidence") &&
+        source.state !== "accepted")
+    )
+      fail(
+        409,
+        "SOURCE_UNAVAILABLE",
+        "A selected record relies on unavailable evidence.",
+      );
+    if (!bindings.some((b) => b.id === id))
+      bindings.push({
+        id: source.id,
+        version: source.version,
+        hash: source.hash,
+        state: source.state,
+      });
+  }
+  const auditEvents =
+    d.kind === "audit"
+      ? (
+          await db.query(
+            "SELECT sequence,type,record_id,created_at FROM audit_events WHERE company_id=$1 ORDER BY sequence DESC LIMIT 500",
+            [c.id],
+          )
+        ).rows
+      : undefined;
+  const { reportProposal: _proposal, ...auditSnapshot } = auditBrief || {};
+  const packet = {
+    auditBrief: auditBrief ? auditSnapshot : undefined,
+    auditSource: auditSource
+      ? {
+          fingerprint: auditSource.fingerprint,
+          sourceRevision: auditSource.sourceRevision,
+          analysis: auditSource.analysis,
+        }
+      : undefined,
+    schemaVersion: "0.2.0",
+    title: d.title,
+    kind: d.kind,
+    audience: d.audience,
+    purpose: d.purpose,
+    summary: d.summary,
+    decisions: d.decisions,
+    nextSteps: d.nextSteps,
+    limitations: d.limitations,
+    company: { id: c.id, name: c.name, scope: c.scope, goal: c.goal },
+    sourceRevision: c.revision,
+    generatedAt: new Date().toISOString(),
+    sandbox: c.sandbox,
+    coverage: auditBrief
+      ? {
+          ...auditBrief.coverage,
+          participants: auditBrief.coverage.people,
+          responded: auditBrief.coverage.respondedPeople,
+          totalTasks: auditBrief.coverage.tasks,
+        }
+      : coverageSummary(
+          all.filter(
+            (r) => r.kind === "person" && !inactiveReportStates.has(r.state),
+          ),
+          all.filter(
+            (r) => r.kind === "task" && !inactiveReportStates.has(r.state),
+          ),
+          all.filter(
+            (r) =>
+              r.kind === "request" &&
+              r.data.type === "work" &&
+              !inactiveReportStates.has(r.state),
+          ),
+        ),
+    collectionNotice:
+      "Coverage concerns this engagement roster. Raw sources and private response content are excluded.",
+    records: chosen.map((r) => reportRecord(r, all)),
+    auditEvents,
+    auditCoverage: auditEvents
+      ? "Latest 500 application events in this company. No external execution logs, provisioning receipts or independently signed ledger checkpoints are available."
+      : undefined,
+  };
+  return putRecord(
+    db,
+    u,
+    c.id,
+    "brief",
+    d.title,
+    {
+      packet: auditSource ? clientSafeValue(packet) : packet,
+      bindings,
+      approval: null,
+      ...(auditSource ? { auditSource } : {}),
+    },
+    "draft",
+    undefined,
+    "Frozen report prepared for an explicit audience",
+  );
+}
+
 export function reportsRouter() {
   const router = express.Router({ mergeParams: true });
   router.use(advisor);
@@ -287,128 +510,7 @@ export function reportsRouter() {
     res.status(201).json(
       await run(req, async (db: any) => {
         const c = await companyCheck(db, user(req), company(req));
-        const d = reportInput.parse(req.body);
-        if (c.revision !== d.expectedRevision)
-          fail(
-            409,
-            "STALE_INPUT",
-            "The workspace changed. Refresh before preparing the report.",
-          );
-        const all = (
-          await db.query(
-            "SELECT * FROM records WHERE company_id=$1 ORDER BY created_at,id",
-            [c.id],
-          )
-        ).rows as RecordRow[];
-        const confirmations = (
-          await db.query("SELECT * FROM confirmations WHERE company_id=$1", [
-            c.id,
-          ])
-        ).rows;
-        for (const r of all)
-          if (r.kind === "task") r.state = confirmationStatus(r, confirmations);
-        const chosen = [...new Set(d.recordIds)].map(
-          (id) =>
-            all.find((r) => r.id === id) ||
-            fail(
-              404,
-              "NOT_FOUND",
-              "A selected record is outside this workspace.",
-            ),
-        );
-        if (
-          chosen.some(
-            (r) =>
-              !allowedKinds.includes(r.kind) ||
-              ["retracted", "stale"].includes(r.state),
-          )
-        )
-          fail(
-            422,
-            "INVALID_SELECTION",
-            "Choose current work or analysis records. Raw evidence is excluded from client reports.",
-          );
-        const bindings = chosen.map((r) => ({
-          id: r.id,
-          version: r.version,
-          hash: r.hash,
-          state: r.state,
-        }));
-        const sourceIds = new Set(
-          chosen.flatMap((r) => [
-            ...(r.data.evidenceIds || []),
-            ...(r.data.sourceBindings || []).map((b: any) => b.id),
-          ]),
-        );
-        for (const id of sourceIds) {
-          const source =
-            all.find((r) => r.id === id) ||
-            fail(
-              409,
-              "SOURCE_UNAVAILABLE",
-              "A selected record relies on unavailable evidence.",
-            );
-          if (source.state !== "accepted")
-            fail(
-              409,
-              "SOURCE_UNAVAILABLE",
-              "A selected record relies on unavailable evidence.",
-            );
-          if (!bindings.some((b) => b.id === id))
-            bindings.push({
-              id: source.id,
-              version: source.version,
-              hash: source.hash,
-              state: source.state,
-            });
-        }
-        const auditEvents =
-          d.kind === "audit"
-            ? (
-                await db.query(
-                  "SELECT sequence,type,record_id,created_at FROM audit_events WHERE company_id=$1 ORDER BY sequence DESC LIMIT 500",
-                  [c.id],
-                )
-              ).rows
-            : undefined;
-        const packet = {
-          schemaVersion: "0.2.0",
-          title: d.title,
-          kind: d.kind,
-          audience: d.audience,
-          purpose: d.purpose,
-          summary: d.summary,
-          decisions: d.decisions,
-          nextSteps: d.nextSteps,
-          limitations: d.limitations,
-          company: { id: c.id, name: c.name, scope: c.scope, goal: c.goal },
-          sourceRevision: c.revision,
-          generatedAt: new Date().toISOString(),
-          sandbox: c.sandbox,
-          coverage: coverageSummary(
-            all.filter((r) => r.kind === "person"),
-            all.filter((r) => r.kind === "task"),
-            all.filter((r) => r.kind === "request"),
-          ),
-          collectionNotice:
-            "Coverage concerns this engagement roster. Raw sources and private response content are excluded.",
-          records: chosen.map((r) => reportRecord(r, all)),
-          auditEvents,
-          auditCoverage: auditEvents
-            ? "Latest 500 application events in this company. No external execution logs, provisioning receipts or independently signed ledger checkpoints are available."
-            : undefined,
-        };
-        return putRecord(
-          db,
-          user(req),
-          c.id,
-          "brief",
-          d.title,
-          { packet, bindings, approval: null },
-          "draft",
-          undefined,
-          "Frozen report prepared for an explicit audience",
-        );
+        return prepareClientReport(db, user(req), c, req.body);
       }),
     ),
   );
@@ -441,7 +543,7 @@ export function reportsRouter() {
         if (d.decision === "approve") {
           if (r.state !== "draft")
             fail(409, "INVALID_STATE", "Only a draft report can be approved.");
-          await checkSources(db, c.id, r);
+          await checkSources(db, c.id, r, user(req));
         }
         await setState(
           db,
@@ -478,7 +580,7 @@ export function reportsRouter() {
           "Review this exact report and audience before delivery.",
         );
       if (format === "download") {
-        await checkSources(db, c.id, r);
+        await checkSources(db, c.id, r, user(req));
         await audit(db, user(req), c.id, "report.downloaded", r.id);
       }
       return r;

@@ -60,7 +60,6 @@ import { RecordForm } from "./forms.tsx";
 import { StandupBrief } from "./StandupBrief.tsx";
 import { WorkflowsOverview } from "./WorkflowsOverview.tsx";
 import { FrameworkInstructions, ConstraintLedger } from "./StrategyViews.tsx";
-import { TaskCards } from "./TaskCards.tsx";
 import { Graph } from "./Graph.tsx";
 import { Engagement } from "./Engagement.tsx";
 import { AiWorkbench } from "./AiWorkbench.tsx";
@@ -69,6 +68,7 @@ import { DiscoveryJourney } from "./DiscoveryJourney.tsx";
 import { ProviderSettings } from "./ProviderSettings.tsx";
 import { Neo4jSettings } from "./Neo4jSettings.tsx";
 import { ClientReports } from "./ClientReports.tsx";
+import { AuditReviewAgenda } from "./AuditBrief.tsx";
 const Help = lazy(() =>
   import("./Help.tsx").then((module) => ({ default: module.Help })),
 );
@@ -90,7 +90,6 @@ const nav = [
     group: "DISCOVER THE BUSINESS",
   },
   { id: "graph", name: "Company Work Map", icon: Network, group: "" },
-  { id: "tasks", name: "Task cards", icon: Layers, group: "" },
   { id: "workflows", name: "Workflows & cases", icon: Network, group: "" },
   {
     id: "strategy",
@@ -110,7 +109,7 @@ const nav = [
     icon: Activity,
     group: "KEEP IT MOVING",
   },
-  { id: "deliverables", name: "Deliverables", icon: FileText, group: "" },
+  { id: "deliverables", name: "Client brief", icon: FileText, group: "" },
   {
     id: "system",
     name: "System & connections",
@@ -1175,92 +1174,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         </div>
       </>
     );
-  } else if (page === "tasks")
-    body = (
-      <>
-        <Heading
-          eyebrow="THE WORK RECORD"
-          title="Meaningful work. Clear accountability."
-          description="Each task binds the work, its evidence, a human owner, and an exact version."
-          actions={
-            <Button primary onClick={() => create("task")}>
-              <Plus size={16} />
-              Create task card
-            </Button>
-          }
-        />
-        <div className="toolbar">
-          <div className="tabs">
-            {[
-              ["all", "All tasks"],
-              ["proposed", "Proposed"],
-              ["confirmed", "Human confirmed"],
-              ["conflicting", "Conflicts"],
-              ["stale", "Needs fresh review"],
-            ].map(([id, label]) => (
-              <button
-                key={id}
-                className={filter === id ? "active" : ""}
-                onClick={() => setFilter(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <label className="search-field">
-            <Search size={16} />
-            <input
-              aria-label="Search task cards"
-              placeholder="Find a task…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </label>
-        </div>
-        <TaskCards
-          key={company.id}
-          profile={company.settings.businessProfile}
-          records={records}
-          filter={filter}
-          query={query}
-          open={open}
-        />
-        {!tasks.length && (
-          <Empty
-            title="Describe one evidence-backed task"
-            detail="Start with an accepted source and named owner and performer."
-            action={
-              <Button onClick={() => go("discovery")}>Open discovery</Button>
-            }
-          />
-        )}
-        <details className="discovery-supporting">
-          <summary>
-            Duties & handoffs · {items("duty").length} duties ·{" "}
-            {items("handoff").length} handoffs
-          </summary>
-          <div className="two-col work-model-panels">
-            <Panel
-              title="Standing duties"
-              subtitle="Record duty accountability separately from individual task confirmations."
-              action={<Button onClick={() => create("duty")}>Add duty</Button>}
-            >
-              {rows(items("duty"))}
-            </Panel>
-            <Panel
-              title="Handoff contracts"
-              subtitle="Define the condition, input, output, receiving check and exception owner between two tasks."
-              action={
-                <Button onClick={() => create("handoff")}>Add handoff</Button>
-              }
-            >
-              {rows(items("handoff"))}
-            </Panel>
-          </div>
-        </details>
-      </>
-    );
-  else if (page === "workflows")
+  } else if (page === "workflows")
     body = (
       <>
         <Heading
@@ -1280,7 +1194,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         </div>
       </>
     );
-  else if (page === "graph")
+  else if (page === "graph" || page === "tasks")
     body = (
       <div className="work-map-page">
         <Heading
@@ -1294,6 +1208,9 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         />
         <Graph
           key={companyId}
+          initialView={page === "tasks" ? "tasks" : "map"}
+          create={create}
+          onClientBrief={() => go("deliverables")}
           company={companyId}
           profile={company.settings.businessProfile}
           sandbox={company.sandbox}
@@ -1398,6 +1315,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               write={(key) => setModal({ type: "framework", key })}
               scope={strategyReport}
               setScope={setStrategyReport}
+              onWeeklyReview={() => go("weekly")}
             />
             <Button
               onClick={() =>
@@ -1535,6 +1453,13 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             </Button>
           }
         />
+        <AuditReviewAgenda
+          key={company.id}
+          company={company}
+          records={records}
+          open={open}
+          onBrief={() => go("deliverables")}
+        />
         <StandupBrief
           records={records}
           prepare={(preset) =>
@@ -1605,65 +1530,65 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
   else if (page === "deliverables")
     body = (
       <>
-        <Heading
-          eyebrow="REVIEWABLE OUTPUTS"
-          title="Share a record you can trace."
-          description="Freeze exact versions, show what is excluded, and keep the audience explicit."
-        />
         <ClientReports
+          key={company.id}
+          navigate={go}
           company={company}
           records={records}
           open={open}
           refresh={refresh}
         />
-        <div className="export-options">
-          <Panel
-            title="Internal workspace snapshot"
-            subtitle="All task descriptions with their current validation state."
-          >
-            <p>
-              Source metadata and named owners are included. Raw source text and
-              recordings are excluded.
-            </p>
-            <Button primary onClick={() => void makeExport("workspace")}>
-              <FileText size={16} />
-              Create snapshot
-            </Button>
-          </Panel>
-          <Panel
-            title="Confirmed work packet"
-            subtitle="Only current, reviewed owner and performer confirmations."
-          >
-            <p>
-              {confirmed.length} of {tasks.length} tasks currently qualify.
-              Every excluded task carries its reason.
-            </p>
-            {confirmed.length === 0 && (
-              <p>
-                Ask the task owners and performers to confirm their task cards
-                first.
-              </p>
-            )}
-            <Button
-              disabled={confirmed.length === 0}
-              onClick={() => void makeExport("confirmed")}
+        <details className="discovery-supporting">
+          <summary>Internal exports & technical handoff</summary>
+          <div className="export-options">
+            <Panel
+              title="Internal workspace snapshot"
+              subtitle="All task descriptions with their current validation state."
             >
-              <ShieldCheck size={16} />
-              Freeze confirmed subset
-            </Button>
+              <p>
+                Source metadata and named owners are included. Raw source text
+                and recordings are excluded.
+              </p>
+              <Button primary onClick={() => void makeExport("workspace")}>
+                <FileText size={16} />
+                Create snapshot
+              </Button>
+            </Panel>
+            <Panel
+              title="Confirmed work packet"
+              subtitle="Only current, reviewed owner and performer confirmations."
+            >
+              <p>
+                {confirmed.length} of {tasks.length} tasks currently qualify.
+                Every excluded task carries its reason.
+              </p>
+              {confirmed.length === 0 && (
+                <p>
+                  Ask the task owners and performers to confirm their task cards
+                  first.
+                </p>
+              )}
+              <Button
+                disabled={confirmed.length === 0}
+                onClick={() => void makeExport("confirmed")}
+              >
+                <ShieldCheck size={16} />
+                Freeze confirmed subset
+              </Button>
+            </Panel>
+          </div>
+          <Panel
+            title="Frozen exports"
+            subtitle="Each ZIP includes structured records, readable instructions, setup requirements, and checksums."
+          >
+            {rows(items("export"))}
           </Panel>
-        </div>
-        <Panel
-          title="Frozen exports"
-          subtitle="Each ZIP includes structured records, readable instructions, setup requirements, and checksums."
-        >
-          {rows(items("export"))}
-        </Panel>
-        <div className="notice">
-          Client reports require review for their named audience. Workspace
-          snapshots and agent packages are internal review artifacts. Downloaded
-          packets are delivered manually.
-        </div>
+          <div className="notice">
+            Client reports require review for their named audience. Workspace
+            snapshots and agent packages are internal review artifacts.
+            Downloaded packets are delivered manually.
+          </div>
+        </details>
       </>
     );
   else if (page === "system")
@@ -1954,7 +1879,12 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
               <div key={n.id}>
                 {n.group && <div className="nav-group">{n.group}</div>}
                 <button
-                  className={"nav-item " + (page === n.id ? "active" : "")}
+                  className={
+                    "nav-item " +
+                    ((page === "tasks" ? "graph" : page) === n.id
+                      ? "active"
+                      : "")
+                  }
                   onClick={() => go(n.id)}
                 >
                   <n.icon size={17} />
@@ -1965,7 +1895,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
                   {n.id === "discovery" && pending.length > 0 && (
                     <Badge tone="amber">{pending.length}</Badge>
                   )}
-                  {page === n.id && <i />}
+                  {(page === "tasks" ? "graph" : page) === n.id && <i />}
                 </button>
               </div>
             ))}
@@ -2004,7 +1934,8 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             <span>{company?.name || "Workspace"}</span>
             <span>/</span>
             <strong>
-              {nav.find((n) => n.id === page)?.name || "Overview"}
+              {nav.find((n) => n.id === (page === "tasks" ? "graph" : page))
+                ?.name || "Overview"}
             </strong>
           </div>
           <div className="actions">

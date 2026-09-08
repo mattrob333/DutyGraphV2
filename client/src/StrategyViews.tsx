@@ -19,6 +19,7 @@ import {
 } from "../../shared/framework-guides.ts";
 import type { RecordRow } from "../../shared/domain.ts";
 import { State, Button, ErrorBox } from "./ui.tsx";
+import type { FrameworkReadinessList } from "../../shared/strategy-readiness.ts";
 export function FrameworkInstructions({
   frameworkKey,
 }: {
@@ -65,8 +66,12 @@ export function FrameworkLibrary({
   report,
   reportStatus,
   companyId,
+  onReadiness,
+  refreshVersion = 0,
 }: {
   companyId?: string;
+  onReadiness?: (value: FrameworkReadinessList | null) => void;
+  refreshVersion?: number;
   registry: any;
   records: RecordRow[];
   open: (r: RecordRow) => void;
@@ -112,7 +117,10 @@ export function FrameworkLibrary({
       if (alive.current && activeCompany.current === companyId)
         setError(e.message);
     });
-  }, [companyId, records]);
+  }, [companyId, records, refreshVersion]);
+  useEffect(() => {
+    onReadiness?.(runs);
+  }, [runs, onReadiness]);
   const status = (key: string) =>
     runs?.frameworks.find((f: any) => f.key === key);
   async function runSequence() {
@@ -185,7 +193,6 @@ export function FrameworkLibrary({
               </Button>
             ) : (
               <Button
-                primary
                 disabled={
                   !runs?.configured ||
                   !runs?.frameworks.some((f: any) => f.ready && !f.current)

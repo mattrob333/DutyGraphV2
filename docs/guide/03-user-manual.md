@@ -21,12 +21,12 @@ The sample entry is available only when the operator enables the demo. It opens 
 | Overview | Scope, progress indicators, recent activity and next steps |
 | Discovery | Requests, responses, sources, people and engagement kickoff |
 | Company Work Map | Business stages, highlighted people, duties, tasks and flows |
-| Task cards | Detailed work descriptions, confirmation state, duties and handoffs |
+| Company Work Map > Tasks | Detailed work descriptions, confirmation state, duties and handoffs |
 | Workflows & cases | Reviewed task sequences and manual case progress |
 | Strategy | Framework analyses, hypotheses, metrics, interventions and outcomes |
 | Agent governance | Version-bound assistance proposals and explicit integration gaps |
 | Weekly review | Current exceptions, decisions, commitments and follow-up |
-| Deliverables | Audience-reviewed client reports and internal export packets |
+| Client brief | Live audit summary, audience-reviewed report snapshots and internal packets |
 | System & connections | Actual integration coverage, projection status and audit events |
 | Workspace settings | Company scope, outcome and collection notice |
 | Help & training | This manual, guided tutorial, workshop and examples |
@@ -151,17 +151,11 @@ The default Company Work Map follows **stage → highlighted organization → pe
 
 Use **Assign stages** on a duty or task to place work in the map. Duties may be assigned to several stages. Tasks inherit a duty’s assignments through the duty’s explicit task IDs, unless the task has its own stage links. A task assignment then overrides inheritance; clearing it restores inheritance. Work with no stage, no owner or a link to a removed stage remains visible for repair. These assignments describe map membership, not approval.
 
-Connected shows responsibility from left to right: People → Duties → Tasks. Explore a duty or task to see its recorded owner and up to three related tasks. A person selection opens one of their duties. To see a task outside this view, select it in Explore. The task card shows its performer, which can differ from the accountable owner. Missing owners and unmapped duties remain visible as gaps. Human, AI, and AI + human review labels describe the recorded work mode; AI modes are proposals, not proof that an agent is running. Select a card for its human checkpoint, evidence, and other connections. The register retains records outside the picture.
+The map has three primary views. **Work map** connects stages, recorded people, duties and tasks, including the reporting chart. **Work flows** shows explicit task-to-task handoffs and their receiving conditions. **Tasks** provides task cards, filters, complete work registers and supporting details. Open an underlying record for evidence, related records, human checkpoints and version history. The former Connected, Org & duties and graph/control tabs are no longer separate primary choices.
 
-Work flow shows the actual handoffs between task cards. It can span several duties and people. A task can contain a human checkpoint in its instructions; DutyGraph does not invent separate substeps from those instructions. The initial zoom keeps cards readable. Pan horizontally to continue along a long workflow, or select Fit to see the whole path.
+In Work flows, choose a workflow to scope its steps. Alternate branches are layout choices, not claims about which path is usual. Select a connection to inspect its handoff condition. Missing handoffs stay missing. Pan and zoom, use Fit for the bounded flow, or Expand for more room. No executable order is invented from a stage or a list of tasks.
 
-Work flow follows actual recorded task-to-task handoffs. Choose a workflow to scope its steps; alternate paths sit below the first path at the same stage. This position is a layout choice, not a claim about which branch is usual. Select a connection label to open its full condition and handoff contract. Dashed connections need review. No execution order is invented where handoffs are absent.
-
-Org & duties opens on a team-to-duty map. Select a team to see work it owns or performs. Task groups are labeled separately from explicit duty records. A complete expandable list sits below the map. By team shows person cards; Reporting chart uses the recorded manager hierarchy. The register is the text alternative to visual navigation.
-
-The default camera frames the focused picture. Fit shows the whole bounded graph and may make a large graph small; Readable restores the default scale. Use plus/minus, Ctrl/Cmd+scroll, and drag-to-pan. Expand gives the canvas more space. Select a card to highlight adjacent arrows and inspect relationship labels. Explore or Focus connections changes the central record; the register remains the broader index.
-
-The API allows a maximum of 150 returned nodes and depth four; the UI uses depth two for focus. It caps the source scan at 5,000 records and reports truncation. A partial graph is not a complete company map. The application falls back to authoritative records while the derived projection catches up, and displays pending events. There is no free-form graph query execution.
+Use **Client brief** to inspect current coverage, gaps, findings, commitments and measures, then prepare an audience-reviewed report. Linked work does not establish complete coverage or a measured result.
 
 Reporting chart uses recorded manager relationships. Missing relationships remain unlinked. Team membership, task accountability, and reporting hierarchy answer different questions. The enriched Cobalt fixture includes a small synthetic reporting chart; it is demonstration data and does not establish a real organization.
 

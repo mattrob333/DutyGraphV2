@@ -2,6 +2,16 @@
 
 The Strategy page connects five steps: collect evidence, record a possible constraint, define a test, try an intervention, and review the outcome. A framework helps ask a question. It does not prove the answer.
 
+## Start from the live work audit
+
+The Strategy entry shows the current audit's evidence coverage, confirmed tasks, respondent coverage and unresolved work inputs. These counts describe the saved record, not business performance. A complete-looking work map does not establish costs, margins, customer demand, competitor results or a measured bottleneck.
+
+Choose a **Strategy question** to see that framework's actual required inputs. **Sources to assess** means matching excerpts are available; read them to decide whether they answer the question. **No matching source** identifies a collection gap. Expand an input to see what it requires. The source inventory shows record versions, review states and excerpts; changed inputs can make a prior analysis out of date.
+
+The suggested starting framework follows the server's dependency order and currentness checks. Missing or outdated upstream analyses appear by name. **Review [framework]** opens the existing canvas to inspect sources and decide whether to generate. Opening it does not call AI. Existing consent, provider charges, input limits and version checks apply when you start a run. A report remains a synthesis of its underlying evidence, not an independent source that proves its own conclusions.
+
+**Bring the next observation back** shows saved measures, missing baselines, interventions, outcomes and returned weekly updates. Open Weekly review to prepare the next conversation. New accepted observations can inform another strategy version, but the application does not run an unattended strategy cycle or treat every gap as resolved.
+
 ## Use the constraint ledger
 
 Each card states the suspected limit, why it is suspected, another explanation, what would change if it were removed, and how to test it. The Cobalt sample has two hypotheses. Neither is a proven constraint. Compare independent accounts and actual work records before selecting a diagnosis.

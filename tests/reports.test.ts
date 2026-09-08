@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { reportRecord, renderReport, reportZip } from "../server/reports.ts";
 import type { RecordRow } from "../shared/domain.ts";
 import JSZip from "jszip";
+import { renderAuditSnapshot } from "../server/report-audit.ts";
 const packet = {
   title: "<script>alert(1)</script>",
   company: { name: "Synthetic company", scope: "Test" },
@@ -43,6 +44,52 @@ test("person report fields omit email and internal identity mapping", () => {
   const output = JSON.stringify(reportRecord(person, [person]));
   assert.ok(!output.includes("private@example.invalid"));
   assert.ok(!output.includes("secret-subject"));
+});
+
+test("frozen audit presentation escapes findings and labels baselines without claiming results", () => {
+  const html = renderAuditSnapshot({
+    coverage: { duties: 1, tasks: 1, stagesWithWork: 1, stages: 1 },
+    stages: [
+      {
+        label: '<img src=x onerror="run()">',
+        duties: 1,
+        tasks: 1,
+        gapCount: 0,
+      },
+    ],
+    priorities: [
+      {
+        title: "<script>run()</script>",
+        detail: "Company account",
+        nextAction: "Ask <owner>",
+        source: "reviewed_analysis",
+      },
+    ],
+    commitments: [
+      {
+        title: "Review & decide",
+        owner: "<team>",
+        action: "Check evidence",
+        dueDate: "2026-09-09",
+      },
+    ],
+    metrics: [
+      {
+        title: "Cycle time",
+        baseline: 12,
+        target: 10,
+        unit: "days",
+        observationCount: 2,
+      },
+    ],
+    omitted: { priorities: 0 },
+  } as any);
+  assert.ok(!html.includes("<script>"));
+  assert.ok(!html.includes("<img src=x"));
+  assert.ok(html.includes("&lt;owner&gt;"));
+  assert.ok(html.includes("Baseline: 12 days"));
+  assert.ok(html.includes("fixed snapshot"));
+  assert.equal(renderAuditSnapshot(), "");
 });
 test("CSV neutralizes formulas even after whitespace", async () => {
   const p = {

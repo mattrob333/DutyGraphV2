@@ -7,7 +7,6 @@ import { cobaltStageExample } from "../../shared/stage-work-map-example.ts";
 import { stageWorkMap, selectStageWork } from "../../shared/stage-work-map.ts";
 import { assessWorkGaps } from "../../shared/work-gaps.ts";
 import { OrgChartCanvas } from "./OrgChartCanvas.tsx";
-import { CompanyWorkMap } from "./CompanyWorkMap.tsx";
 import { WorkGapPanel } from "./WorkGapPanel.tsx";
 import { Button, ErrorBox, Modal } from "./ui.tsx";
 import { api } from "./api.ts";
@@ -732,10 +731,6 @@ export function StageWorkMap({
         stageId={stage?.id}
         refresh={refresh}
       />
-      <details className="swm-legacy">
-        <summary>Detailed task map, gaps & AI opportunities</summary>
-        <CompanyWorkMap records={records} open={open} />
-      </details>
       {editing && (
         <Modal
           title="Assign business stages"

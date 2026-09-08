@@ -28,7 +28,7 @@ Expected progression: proposed card, reviewed card, request returned, accepted o
 
 ## Exercise 4 answers
 
-Company Work Map is appropriate for the stage → highlighted people → duties/tasks → flow path. Connected plus the inspector is appropriate for evidence relationships. Reporting chart is appropriate for manager relationships. Missing stages, owners or managers should remain visible as gaps; team membership and senior titles do not justify invented links. Truncation means the displayed graph is a bounded subset and must not be presented as the whole company.
+Teach the three Company Work Map views together: **Work map** for stage → recorded people → duties/tasks, **Work flows** for explicit handoffs, and **Tasks** for detailed cards and source records. The reporting chart within Work map uses manager relationships. Missing stages, owners or managers remain gaps; team membership and senior titles do not justify invented links. Use Client brief to discuss coverage and next commitments. A bounded map or report must not be presented as the whole company.
 
 Check the record fields with the inspector: an owner is accountable for the task; a performer does the work; a task is supported by evidence. A duty assignment can place its linked tasks in a stage, but an explicit task assignment overrides that inheritance. A selected card can have incoming and outgoing relationships. The text labels should make the direction understandable without guessing from layout.
 

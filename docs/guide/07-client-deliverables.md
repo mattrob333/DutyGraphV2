@@ -2,6 +2,20 @@
 
 The deliverable is a reviewed explanation of the business record and the next decision. A client should be able to understand it without learning the application’s database structure. Keep the structured files available for reviewers who need traceability.
 
+## Start with the living client brief
+
+Open **Client brief** in the sidebar, or use the link from Company Work Map. The page assembles current scope, work coverage, documentation gaps, current advisor-reviewed findings selected for discussion, commitments and measures. It uses the saved company record; opening it does not call AI or send anything to a client. The displayed revision identifies the snapshot you are reading.
+
+Use **Prepare client report** to carry that snapshot into a draft narrative and suggested record selection. Refine the summary, decisions, next steps and limitations, then name the audience. **Save report draft** creates a frozen report for preview and exact-content review. A source change can require a new draft or review. **Write a custom report** remains available for a different audience or purpose.
+
+The living brief is an advisor workspace view, not a client portal. A saved report is a separate snapshot; it does not keep rewriting itself as the work changes. Download and share the approved packet through the channel agreed with the client, and record the recipient, version and delivery date. Preparing a report does not email it, schedule a meeting, activate billing or start a subscription.
+
+## Continue the engagement deliberately
+
+Use the brief's **Open weekly review** action to revisit decisions, owners, dates, missing baselines and observations. Prepare participant updates, review returned accounts, and record the next intervention and how its result will be judged. Use **Review strategy inputs** to see what each framework needs before opening its existing canvas. Work records can inform strategy without supplying all financial, customer or market variables.
+
+A recurring advisory engagement should have an agreed scope, participants, review cadence, responsibilities and deliverables. These are the advisor's working agreement with the client. The application supports that work record and manual sharing; it does not create a commercial retainer, client access or automatic charges. Measured benefit still needs actual observations and appropriate comparison.
+
 ## Package choices
 
 | Package | Intended audience | Typical contents | Review behavior |

@@ -42,17 +42,15 @@ These moves may repeat. Discovery often reveals a missing owner or contradictory
 | Agent proposal | What assistance could be considered for specific work? | Draft a completeness checklist for human review |
 | Client report | What should this named audience receive? | Executive findings and next actions |
 
-## Why there are four company views
+## Three ways to inspect the same work
 
-**Company Work Map** starts with saved business streams and stages. Select a stage to highlight people whose recorded owner or performer fields connect them to that stage, then select a person to see duties, tasks and flows. Stage membership is explicit: duty links flow to their recorded tasks unless a task has its own links. Missing or removed links remain visible for repair. Owners and performers describe responsibility and performance; they are not approvals.
+**Work map** starts with saved business streams and stages. Select a stage to highlight people whose recorded work belongs there, then inspect their duties and tasks. Reporting lines come from the roster. Stage links, responsibility and manager relationships describe different things; none grants approval.
 
-**Connected** follows evidence, people, work, and hypotheses. Select a card to highlight its immediate relationships and read the connection labels. Use Focus connections for a smaller neighborhood. This view helps answer, “What supports this claim, and what depends on it?”
+**Work flows** shows recorded task order and handoff conditions. Choose a workflow and inspect an arrow to read what the next person needs. A nearby card or arrow layout is not evidence of an unrecorded process.
 
-**Work flow** emphasizes recorded task order. Handoff records supply source-to-target connections. A handoff describes the receiving condition; an arrow alone is insufficient to establish it.
+**Tasks** provides the detailed task cards, filters and supporting registers. Open a task or duty to inspect its evidence, human checkpoints, versions and related records. Agent proposals and controls have their own governance tools.
 
-**Org & duties** answers, “Who owns and performs this work?” By team groups the roster and shows responsibilities. Reporting chart shows managers above direct reports only where a manager relationship was recorded. If those relationships are absent, the application explains that instead of inventing an org chart. The roster remains a reported structure, not verified authority.
-
-The graph is a way to inspect the record. It is not the place where truth, authorization, or causation is created. Open the underlying record to inspect its evidence and state.
+These three views replace the separate Connected, Org & duties and graph/control tabs. Use **Client brief** to move from detailed work into coverage, findings, commitments and a report for a named audience. The graph is an inspection tool; it does not create truth, authority or causation.
 
 ## Four distinctions to teach every participant
 

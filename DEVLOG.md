@@ -1,5 +1,15 @@
 # DutyGraph development log
 
+## 2026-09-08 — A focused work map and living client brief
+
+Consolidated the marquee Company Work Map into Work map / Work flows / Tasks. The selected stage/person survives navigation to flows and tasks. Task cards moved into the map with the old route preserved, compact search/status, optional filters and a useful people → duties → tasks view by team. Parked the competing relationship/connected/organization/control views without deleting their underlying implementation or data. The existing Agent governance area remains separate.
+
+Added an advisor-only live audit brief and source-bound executive report preparation. Current scope, stage coverage, documentation gaps, constraint hypotheses, advisor-selected current analysis, active commitments and actual recorded observations assemble automatically. Report preparation keeps an editable narrative, named audience and exact-content approval, then exports a branded, printable frozen overview plus selected supporting detail. It does not send email, create a client portal or establish a commercial retainer. The continuing workflow connects the same commitments to Weekly review and carries evidence into Strategy's actual input/dependency contracts; missing financial/customer/market inputs remain visible.
+
+Fixed report integrity issues found during independent review: inactive tasks cannot be reclassified into a deliverable, coverage excludes inactive work and unrelated response requests, documentation-only handoffs do not report placeholder execution settings as policy, and completed framework selections check exact source/upstream versions. Approved previews explicitly remain snapshots; currentness is checked again for download. Fixed duplicate Strategy component keys reproduced during focus refresh. Updated Help, handbook, API inventory and product documentation.
+
+Validation: 317 local tests pass, production build/typecheck and 105-route contracts pass, dependency audit reports zero vulnerabilities. Fictional browser checks cover responsive map/flow/task navigation, context retention, stable stage help, report preparation/preview/approval/download, observations and completed weekly commitments, and Strategy source/input navigation. No paid provider calls or real emails were used. Encrypted backup recovery and training results are recorded with release evidence in [verification](docs/verification/2026-09-08-marquee-client-brief.md). No migration is added. Hosted and real-client acceptance are reported separately.
+
 ## 2026-09-08 — Evidence behind stages and automatic work follow-ups
 
 Added stage-specific source passages, rationale and unknowns to saved research proposals and stage help. Company evidence and comparable-business examples are validated and displayed separately; downstream discovery and assignment prompts cannot treat peer practices as client facts. Current research proposes variable stage counts while preserving existing custom stages and legacy drafts.

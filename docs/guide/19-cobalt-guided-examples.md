@@ -17,11 +17,11 @@ The intended outcome is a supplier ready for purchasing. Its eight task cards ar
 3. At **Verify bank details**, compare **Bank details match** with **Bank-name mismatch**. A correction must include an independent Finance recheck before the verification result can be recorded.
 4. Inspect **Approve the supplier**. Its owner and performer are intentionally unresolved. Procurement describes verification as approval; Finance disagrees. This is a hypothesis about a source of delay, not a proven throughput constraint.
 5. Click **Authorized approval**. Read the output mapping, required input and acceptance check. A completed bank check does not authorize activation. Elena owns the escalation, not the unresolved approval decision.
-6. Select a person in the highlighted organization to see their duties and tasks. Open **Org & duties** for the retained team view and the complete responsibility list.
+6. Select a person in **Work map** to see their duties and tasks. Use **Tasks** for detailed cards and responsibility records, and **Work flows** for handoffs. Open the **Client brief** to inspect the fictional audit coverage.
 
 ## Customer order fulfilment
 
-Select **Customer order fulfilment** in the workflow picker. Its seven task cards and seven handoffs connect a customer's purchase order to a checked shipment and dispatch confirmation. The sample also includes three account-cycle task cards, for 18 guided business tasks in total. The separate access-review walkthrough has two access-controls task cards, both **Unassigned**, because it is a synthetic control walkthrough rather than part of the wholesale stages. Three additional synthetic control scenarios remain in **Agents & controls** and are likewise outside the wholesale stages.
+Select **Work flows → Customer order fulfilment**. Its seven task cards and seven handoffs connect a customer's purchase order to a checked shipment and dispatch confirmation. The sample also includes three account-cycle task cards, for 18 guided business tasks in total. The separate access-review walkthrough has two access-controls task cards, both **Unassigned**, because it is a synthetic control walkthrough rather than part of the wholesale stages. Additional synthetic control scenarios remain in the saved records and Agent governance tools, outside the wholesale stages.
 
 1. Follow **Check customer purchase order → Check stock and delivery date**.
 2. If stock is available, **Stock reserved** proceeds to pick release.

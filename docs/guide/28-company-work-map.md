@@ -23,11 +23,13 @@ Use **Assign stages** on a duty or task. A duty can belong to more than one stre
 
 Unassigned work appears under **Work not assigned to a stage**. Work with no recorded owner or performer stays visible as a gap. If a profile stage is removed, the old link appears under **Repair assignments to removed stages** so the advisor can choose a current stage. Missing links and missing people remain gaps instead of becoming guessed relationships. Saving an assignment creates a normal record version and follows the usual review rules.
 
-## Flows and older views
+## Three views, one record
 
 The task flow below the people section uses recorded workflow and handoff links. Branches and nearby cards are layout choices; only an explicit handoff establishes that work passes between tasks. Open **Workflows & cases** to inspect a workflow definition or a manually observed case. Case controls record observations and do not call an external business system.
 
-The former **Connected**, **Work flow**, **Org & duties** and **Agents & controls** views remain available for focused investigations. The detailed task map is still below the new stage map. PostgreSQL is authoritative; Neo4j is a derived projection. The normal Cobalt sample opens with a persisted synthetic business profile and authored stage assignments; those assignments are editable and remain clearly synthetic. If an older or incomplete Cobalt workspace cannot load that profile, the guarded legacy fallback may show illustrative assignments for known fixture keys. It is clearly labeled and read-only, never writes assignments, and never classifies customer work.
+Choose **Work map**, **Work flows** or **Tasks**. Work map contains the stage/people/duty path and reporting chart. Work flows shows recorded handoffs. Tasks provides the cards, filters and supporting registers. The former Connected, Org & duties and graph/control tabs are consolidated into these views and the existing record/governance tools. Open **Client brief** from the map to inspect coverage, discuss priorities, prepare a report and continue into Weekly review or Strategy.
+
+PostgreSQL is authoritative; Neo4j is a derived projection. The normal Cobalt sample has a saved synthetic business profile and authored stage assignments. Those assignments remain editable and clearly synthetic. The guarded fallback for an incomplete old sample is illustrative and read-only; it never classifies client work.
 
 ## Get the first connected map
 

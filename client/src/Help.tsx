@@ -47,7 +47,7 @@ export function Help({ go }: { go: (page: string) => void }) {
         <Button onClick={() => setSelected("25-participant-review.md")}>Participant review guide</Button>
         <Button onClick={() => go("graph")}>Open Company Work Map <ArrowRight size={15} /></Button>
         <Button onClick={() => go("deliverables")}>
-          Open Deliverables <ArrowRight size={15} />
+          Open client brief <ArrowRight size={15} />
         </Button>
         <a
           className="btn"

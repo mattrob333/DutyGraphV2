@@ -1,6 +1,6 @@
 # Implemented API reference
 
-Release 0.3. This inventory is generated from server route declarations. It describes 103 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
+Release 0.3. This inventory is generated from server route declarations. It describes 105 implemented method/path declarations, not the larger production target. The report format parameter accepts preview or download. Unknown API routes return a structured 404 from the running server.
 
 ## Transport and authentication
 
@@ -52,6 +52,8 @@ Use expectedVersion for record edits/actions and case progress. Reports/framewor
 | POST | /api/v1/companies/{companyId}/assets/{assetId}/transcribe | server/transcription.ts |
 | GET | /api/v1/companies/{companyId}/assets/{assetId}/transcription | server/transcription.ts |
 | POST | /api/v1/companies/{companyId}/assets/{assetId}/transcription-review | server/transcription.ts |
+| GET | /api/v1/companies/{companyId}/audit-brief | server/audit-brief.ts |
+| POST | /api/v1/companies/{companyId}/audit-brief/prepare | server/audit-brief.ts |
 | GET | /api/v1/companies/{companyId}/business-classification | server/business-classification.ts |
 | POST | /api/v1/companies/{companyId}/business-classification | server/business-classification.ts |
 | PUT | /api/v1/companies/{companyId}/business-classification/review | server/business-classification.ts |

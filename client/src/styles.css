@@ -3879,6 +3879,208 @@ details.capture-notice li {
   max-width: 960px;
   margin: 12px 0 23px;
 }
+.graph-tasks {
+  padding: 14px 0 8px;
+}
+.graph-tasks-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+.graph-tasks-heading h2 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.04em;
+}
+.task-primary-filters,
+.graph-task-actions,
+.task-grouping {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.task-primary-filters input,
+.task-primary-filters select {
+  width: auto;
+  min-height: 36px;
+  padding: 7px 10px;
+  font-size: 12px;
+}
+.task-primary-filters input {
+  min-width: 190px;
+}
+.graph-task-actions {
+  justify-content: flex-end;
+  margin-top: -32px;
+}
+.library-controls {
+  margin-top: 12px;
+}
+.library-advanced-filters {
+  position: relative;
+}
+.library-advanced-filters summary {
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+.library-advanced-filters > div {
+  position: absolute;
+  z-index: 3;
+  top: calc(100% + 8px);
+  right: 0;
+  display: grid;
+  gap: 10px;
+  min-width: 260px;
+  padding: 13px;
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.12);
+}
+.library-advanced-filters label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.library-advanced-filters select {
+  width: 100%;
+  min-width: 0;
+}
+.library-stream-context {
+  margin: 4px 0 -6px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.task-grouping {
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.task-grouping button {
+  padding: 7px 10px;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+}
+.task-grouping button.active {
+  background: var(--raised);
+  color: var(--ink);
+}
+.team-work-board {
+  display: grid;
+  gap: 22px;
+  margin-top: 20px;
+}
+.team-work-group > header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.team-work-group > header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.team-work-people {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+  gap: 10px;
+}
+.team-person-card,
+.team-work-unowned {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+.team-person-card {
+  padding: 13px;
+}
+.team-person-heading {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0 12px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+}
+.team-person-heading strong,
+.team-person-heading small,
+.team-work-section small {
+  display: block;
+}
+.team-person-heading small,
+.team-work-section > span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.team-work-section {
+  display: grid;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.team-work-section > small {
+  color: var(--muted);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+}
+.team-work-section button,
+.graph-task-support button {
+  width: fit-content;
+  padding: 2px 0;
+  color: var(--ink);
+  background: transparent;
+  text-align: left;
+  font-size: 12px;
+}
+.team-work-unowned {
+  padding: 13px;
+}
+.graph-task-support {
+  margin-top: 18px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.graph-task-support > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin-top: 10px;
+}
+.graph-related-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.graph-task-support button small {
+  margin-right: 5px;
+  color: var(--muted);
+  text-transform: capitalize;
+}
+@media (max-width: 760px) {
+  .graph-tasks-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+  .task-primary-filters,
+  .task-primary-filters input,
+  .task-primary-filters select {
+    width: 100%;
+  }
+  .graph-task-actions {
+    justify-content: start;
+    margin-top: 8px;
+  }
+}
 .stream-picker {
   display: flex;
   align-items: center;

@@ -24,6 +24,8 @@ Sources: `shared/industry-map-prompt.ts`, [industry-map reference](../industry-m
 
 ## Framework execution
 
+The Strategy entry connects the live audit to the existing framework run flow. Audit coverage comes from the shared audit aggregation; required variables, source inventories and current upstream dependencies come from the framework endpoints. A positive source count is labeled availability for assessment, never analytical sufficiency. Missing financial, customer or market evidence remains visible even when work coverage is broad. The continuation opens a framework canvas without a provider call. Weekly-review context uses saved metrics, baselines, interventions, outcomes and returned updates; accepted changes can make saved analyses stale without automatically regenerating them.
+
 Sixteen frameworks have explicit specifications and structured outputs. The registry is the source of truth for exact framework names and upstream dependencies: `contracts/framework-registry.json`. Prompt/output logic lives in `shared/framework-specs.ts`, `framework-guides.ts`, `framework-output.ts`, and `server/frameworks.ts`.
 
 A run receives applicable evidence/research and current upstream artifacts. Direct upstream artifacts carry detailed context; other completed artifacts can provide summaries. Missing or stale dependencies must not be cited as completed analysis. Input changes and upstream reruns invalidate downstream currency.

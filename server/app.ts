@@ -72,6 +72,7 @@ import { createExport, exportZip } from "./exports.ts";
 import { linksFor } from "./projection.ts";
 import { readGraph } from "./graph-query.ts";
 import { reportsRouter } from "./reports.ts";
+import { auditBriefRouter } from "./audit-brief.ts";
 import { workflowsRouter, checkWorkflow } from "./workflows.ts";
 import { caseStatus, expireSteps } from "../shared/workflow.ts";
 import { FRAMEWORK_GUIDE_VERSION } from "../shared/framework-guides.ts";
@@ -1678,6 +1679,7 @@ export function createApp({
     }),
   );
   api.use("/companies/:companyId/reports", reportsRouter());
+  api.use("/companies/:companyId/audit-brief", auditBriefRouter());
   api.use("/companies/:companyId/research", researchRouter(researchProvider));
   api.use("/companies/:companyId/providers", authLimit, providersRouter());
   api.use("/companies/:companyId/requests", invitationsRouter(emailProvider));
