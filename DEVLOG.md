@@ -8,6 +8,8 @@ AI discovery output now includes validated saved-stage IDs, rationale/confidence
 
 Local validation: 263 tests passed, including automatic map assembly, recoverable assembly errors, repeat extraction, stage/duty ID rejection, concurrent content/state preservation, abandoned-run recovery, operator isolation, spam handling and concurrent demo conversion. Full build and 97-route contract generation passed; production dependency audit found zero vulnerabilities. An integrated browser walkthrough submitted fictional public intake, opened the inbox, saved a snapshot automatically, verified contact prefills, saved kickoff notes and opened the linked person/duty in the correct Work Map stage, with no page errors. Providers were synthetic. Migration 0011 is applied locally and on the host; the existing operator account is provisioned and its production allowlist configured. Real-provider quality and email delivery were not exercised. App deployment verification follows publication.
 
+Publication: implementation `0c9e8ce` passed CI run `34228366691` and deployed READY as `dpl_G6u327Xmgv7fjmFHbQELqqJV3WGR`. Read-only hosted checks confirmed health, signed-out inbox denial, the company URL/optional-goal form, and the new inbox/mapping controls in the served app bundle. No real applicant submission, email, or AI call was made on the host. The operator inbox is configured for the existing advisor account, but its interactive hosted session was not available in this browser.
+
 ## 2026-09-08 - Neutral selected business stage
 
 Replaced the washed-out ivory selected-stage fill with charcoal, light text and a thin top marker. Stage selection and recorded work links are unchanged.
