@@ -27,4 +27,15 @@ Task-local evidence is under ignored `work/`: `check-workmap-consolidation.json`
 
 ## Publication and boundaries
 
-Publication verification is recorded here after release. No schema migration is required; previous work-gap features still require migration 0012 and configured providers. The client report is manually delivered after audience review. The live brief is currently an advisor workspace view, not a separately authenticated client portal. Ongoing engagement scope and fees are agreed outside this implementation. Source availability does not establish that every strategy input is answered; real audit quality and client outcomes need their own acceptance.
+Implementation `7e9938d0e677795c798cab022cc420ca1a60057c` passed [CI run 34250890607](https://github.com/mattrob333/DutyGraphV2/actions/runs/34250890607). Vercel deployment `dpl_8Sc5z85RhLH5htu6e1KdCuGwubDa` is READY for that exact SHA, with dutygraph.com assigned.
+
+Read-only hosted checks at 2026-09-08 16:27 UTC confirmed:
+
+- `/login`, `/api/health`, JavaScript and CSS return 200.
+- Live `index-DuTC8eD-.css` matches the locally verified build by SHA-256.
+- Live `index-1-80DyeK.js` includes the Work flows, By team, Client brief and Prepare client report controls. JavaScript bytes were not compared across build platforms.
+- Anonymous GET of the company audit brief and POST of its preparation route both return 401. No hosted company record, report or outreach was created during this check.
+
+Task-local evidence is `work/marquee-hosted-check.json`. The existing Superdesign Work Map draft was refreshed with a literal fictional final-page capture; that canvas is a design reference, not an independently functional application.
+
+No schema migration is required; previous work-gap features still require migration 0012 and configured providers. The client report is manually delivered after audience review. The live brief is currently an advisor workspace view, not a separately authenticated client portal. Ongoing engagement scope and fees are agreed outside this implementation. Source availability does not establish that every strategy input is answered; real audit quality and client outcomes need their own acceptance.
