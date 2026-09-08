@@ -1,5 +1,7 @@
 # DutyGraph
 
+Advisor workspaces check for newer saved revisions on tab focus and every 15 seconds while visible, so contact submissions appear without a manual reload. Background failures leave the current screen intact.
+
 Kickoff rosters support preferred full-team CSV upload or manual add/edit/remove rows with name, email, role, department and manager email. Both paths share hierarchy validation and executive/pilot selections. Enrollment account conflicts now link advisors back to the form-preview workflow.
 
 Invitation delivery now emphasizes the latest result, collapses historical failures and requires an explicit replacement choice after success. Kickoff emails use an 800px responsive layout with labeled sections and branded links. Advisors can open the actual kickoff fields through **Preview response form**, without enrollment or submission. See [kickoff preparation](docs/kickoff-preparation.md). Release `2d3009c` passed 222 tests and CI, is READY on Vercel, and its preview/status controls are served on dutygraph.com.

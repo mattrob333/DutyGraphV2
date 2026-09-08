@@ -142,6 +142,18 @@ test("private kickoff link is account-free, scoped, scanner-safe and single-subm
         db.query("SELECT * FROM records WHERE id=$1", [result.data.responseId]),
       )
     ).rows[0];
+    const sessionToken = randomUUID();
+    await pool.query(
+      "INSERT INTO sessions(token_hash,user_id,csrf,expires_at) VALUES($1,$2,$3,now()+interval '1 hour')",
+      [tokenHash(sessionToken), user.id, randomUUID()],
+    );
+    const workspaceResponse = await fetch(base + "/api/v1/companies/" + company + "/workspace", {
+      headers: { Cookie: "dg_session=" + sessionToken },
+    });
+    assert.equal(workspaceResponse.status, 200);
+    const workspace = await workspaceResponse.json();
+    assert.ok(workspace.records.some((r: any) => r.id === row.id && r.state === "returned"));
+    assert.ok(workspace.records.some((r: any) => r.id === row.data.requestId && r.state === "returned"));
     assert.equal(row.state, "returned");
     assert.equal(row.data.submissionIdentity.method, "private_link");
     assert.equal(

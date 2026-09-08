@@ -529,6 +529,34 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
     void refresh();
   }, [companyId]);
   useEffect(() => {
+    if (!companyId) return;
+    let active = true;
+    let loading = false;
+    const syncReturnedResponses = async () => {
+      if (document.visibilityState !== "visible" || loading) return;
+      loading = true;
+      try {
+        const next = await api<any>("/v1/companies/" + companyId + "/workspace");
+        if (active) setData((current: any) =>
+          current?.company?.id === companyId &&
+          next.company.revision > current.company.revision ? next : current);
+      } catch {
+        // A background network failure must not interrupt an advisor's draft.
+      } finally {
+        loading = false;
+      }
+    };
+    window.addEventListener("focus", syncReturnedResponses);
+    document.addEventListener("visibilitychange", syncReturnedResponses);
+    const timer = window.setInterval(syncReturnedResponses, 15000);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+      window.removeEventListener("focus", syncReturnedResponses);
+      document.removeEventListener("visibilitychange", syncReturnedResponses);
+    };
+  }, [companyId]);
+  useEffect(() => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem("dg-theme", theme);
   }, [theme]);

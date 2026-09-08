@@ -126,3 +126,8 @@ The contact page now leads with company identity and a short expandable research
 Validation: build and all 226 tests passed; dependency audit found zero vulnerabilities. Browser reviewed fictional sourced findings, counted exactly eight prompts, and successfully submitted one freeform response with a roster follow-up. Deployment verification pending. No real emails or provider calls sent.
 
 Compact kickoff release: `ddca3f6` passed CI `34176227360`; Vercel deployment `dpl_EDHWRuNoqEJCb3D9siWw25FDXzdu` is READY. The live dutygraph.com bundle contains the company snapshot and eight-prompt flow. Browser submission used fictional data; real microphone acceptance remains separate.
+
+
+## 2026-09-07 — Refresh returned contact responses
+
+Fixed the advisor workspace remaining on an old revision after a separate contact page submits. Visible workspaces check every 15 seconds and on tab focus; only a newer revision replaces data, with cleanup on company switch and no disruptive background error. Read-only hosted investigation confirmed the reported submission was persisted atomically with the returned request; the screenshot showed an older revision. No customer data was modified or resubmitted. Validation: build and all 226 tests passed; the expanded private-link integration test also passed and verifies the advisor workspace endpoint returns both saved records. Contracts passed; dependency audit reported zero vulnerabilities. Publication follows this commit; real submission persistence was verified read-only.
