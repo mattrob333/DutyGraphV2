@@ -6,7 +6,18 @@ import {
   populateCobaltExamples,
   canEnrichOriginalTask,
   canUpgradeV2,
+  canUpgradeCobaltBusiness,
 } from "../server/sample-examples.ts";
+import {
+  cobaltBusinessProfile,
+  cobaltSettingsUpgrade,
+  isKnownCobaltSample,
+  COBALT_STREAM_ID,
+  cobaltCompanyFieldsUpgrade,
+  COBALT_SCOPE,
+} from "../shared/cobalt-company-example.ts";
+import { stageWorkMap } from "../shared/stage-work-map.ts";
+import type { Company } from "../shared/domain.ts";
 import { workflowScene } from "../client/src/graph-scene.ts";
 import {
   advanceCase,
@@ -46,7 +57,7 @@ test("both sample workflows have navigable handoffs, owned exceptions and comple
   const records = await populateCobaltExamples([], write);
   const flows = records.filter((r) => r.kind === "workflow");
   assert.equal(flows.length, 2);
-  assert.equal(records.filter((r) => r.kind === "task").length, 15);
+  assert.equal(records.filter((r) => r.kind === "task").length, 18);
   assert.equal(records.filter((r) => r.kind === "handoff").length, 16);
   for (const flow of flows) {
     assert.deepEqual(validateFlow(flow.data.taskIds, flow.data.links), []);
@@ -197,7 +208,7 @@ test("only untouched original tasks qualify for enrichment", () => {
 
 test("v2 enrichment adds modes, software and stages while preserving edited content and refreshing bindings", async () => {
   const initial = memoryWriter();
-  const records = await populateCobaltExamples([], initial.write);
+  const records = await populateCobaltExamples([], initial.write, false);
   for (const r of records) {
     r.data.sampleVersion = "cobalt-guided-v2";
     if (r.data.reason)
@@ -229,7 +240,7 @@ test("v2 enrichment adds modes, software and stages while preserving edited cont
     ["handoff", "workflow", "duty", "agent"].includes(r.kind),
   ))
     for (const b of r.data.taskBindings || [])
-      assert.equal(b.hash, upgraded.find((t) => t.id === b.id)?.hash);
+      assert.equal(b.hash, upgraded.find((t) => t.id === b.id)?.hash, r.title);
   const before = writer.writes.length;
   await populateCobaltExamples(upgraded, writer.write);
   assert.equal(writer.writes.length, before);
@@ -237,4 +248,162 @@ test("v2 enrichment adds modes, software and stages while preserving edited cont
     canUpgradeV2({ ...packet, has_confirmations: true }, "task", packet.data),
     false,
   );
+});
+
+test("saved Cobalt business stages cover the complete account cycle with role duty task links", async () => {
+  const writer = memoryWriter();
+  const records = await populateCobaltExamples([], writer.write);
+  const map = stageWorkMap(records, cobaltBusinessProfile());
+  assert.equal(map.streams[0].id, COBALT_STREAM_ID);
+  assert.equal(map.streams[0].stages.length, 6);
+  assert.deepEqual(map.invalidStageLinks, []);
+  assert.deepEqual(map.unmapped.taskIds, []);
+  for (const stage of map.streams[0].stages) {
+    assert.ok(stage.taskIds.length > 0, stage.name);
+    assert.ok(stage.dutyIds.length > 0, stage.name);
+    assert.ok(
+      stage.people.some((p) => p.person.data.role),
+      stage.name,
+    );
+  }
+  for (const task of records.filter((r) => r.kind === "task")) {
+    const duties = records.filter(
+      (r) => r.kind === "duty" && r.data.taskIds.includes(task.id),
+    );
+    assert.equal(duties.length, 1, task.title);
+    assert.equal(duties[0].title, task.data.duty);
+    assert.ok(
+      duties[0].data.businessStageLinks.some(
+        (l: any) => l.stageId === task.data.businessStageLinks[0].stageId,
+      ),
+    );
+  }
+  const before = writer.writes.length;
+  await populateCobaltExamples(records, writer.write);
+  assert.equal(writer.writes.length, before);
+});
+
+test("v3 business upgrade preserves edited reviewed confirmed work and refreshes untouched bindings once", async () => {
+  const writer = memoryWriter();
+  const legacy = await populateCobaltExamples([], writer.write, false);
+  const find = (key: string) => legacy.find((r) => r.data.sampleKey === key)!;
+  const edited = find("order-intake");
+  edited.data.instructions =
+    "Preserve my changed process even without a version bump.";
+  const reviewed = find("order-stock");
+  reviewed.data.reviewed = true;
+  const confirmed = find("supplier-verify");
+  (confirmed as any).has_confirmations = true;
+  const customLinks = find("order-notify");
+  customLinks.data.businessStageLinks = [
+    { streamId: "custom-stream", stageId: "custom-stage" },
+  ];
+  const editedDuty = legacy.find(
+    (r) =>
+      r.kind === "duty" && r.data.taskIds.includes(find("supplier-draft").id),
+  )!;
+  editedDuty.data.purpose = "Preserve my duty scope.";
+  const protectedRows = [edited, reviewed, confirmed, customLinks, editedDuty];
+  const upgraded = await populateCobaltExamples(legacy, writer.write);
+  for (const old of protectedRows)
+    assert.equal(
+      upgraded.find((r) => r.id === old.id),
+      old,
+    );
+  const mapped = upgraded.find((r) => r.data.sampleKey === "supplier-draft")!;
+  assert.equal(mapped.data.businessStageLinks[0].streamId, COBALT_STREAM_ID);
+  for (const r of upgraded.filter(
+    (r) =>
+      ["handoff", "workflow", "agent", "duty"].includes(r.kind) &&
+      !protectedRows.includes(r),
+  ))
+    for (const b of r.data.taskBindings || [])
+      assert.equal(b.hash, upgraded.find((t) => t.id === b.id)?.hash);
+  assert.equal(
+    canUpgradeCobaltBusiness({ ...mapped, version: 4 }, "task", mapped.data),
+    false,
+  );
+  const before = writer.writes.length;
+  await populateCobaltExamples(upgraded, writer.write);
+  assert.equal(writer.writes.length, before);
+});
+
+test("Cobalt profile upgrade is sandbox-only idempotent and preserves saved company information", async () => {
+  const writer = memoryWriter();
+  const records = await populateCobaltExamples([], writer.write, false);
+  const settings: Company["settings"] = {
+    notice: "Fixture",
+    retentionDays: 90,
+    reviewCadence: "Quarterly",
+    modules: [],
+  };
+  assert.equal(isKnownCobaltSample(false, records), false);
+  assert.equal(isKnownCobaltSample(true, []), false);
+  assert.equal(
+    cobaltSettingsUpgrade({ sandbox: false, settings }, records),
+    settings,
+  );
+  assert.equal(
+    cobaltSettingsUpgrade({ sandbox: true, settings }, []),
+    settings,
+  );
+  const upgraded = cobaltSettingsUpgrade({ sandbox: true, settings }, records);
+  assert.equal(
+    cobaltCompanyFieldsUpgrade(
+      { sandbox: true, scope: "Supplier onboarding", goal: "My saved goal" },
+      records,
+    ).scope,
+    COBALT_SCOPE,
+  );
+  assert.deepEqual(
+    cobaltCompanyFieldsUpgrade(
+      { sandbox: true, scope: "My saved scope", goal: "My saved goal" },
+      records,
+    ),
+    { scope: "My saved scope", goal: "My saved goal" },
+  );
+  assert.equal(
+    cobaltCompanyFieldsUpgrade(
+      { sandbox: false, scope: "Supplier onboarding", goal: "My saved goal" },
+      records,
+    ).scope,
+    "Supplier onboarding",
+  );
+  assert.deepEqual(upgraded.businessProfile, cobaltBusinessProfile());
+  assert.equal(upgraded.businessIntake?.website, "");
+  assert.equal(
+    cobaltSettingsUpgrade({ sandbox: true, settings: upgraded }, records),
+    upgraded,
+  );
+  for (const saved of [
+    {
+      ...settings,
+      businessProfile: {
+        ...cobaltBusinessProfile(),
+        status: "advisor_reviewed" as const,
+      },
+    },
+    {
+      ...settings,
+      businessIntake: {
+        name: "My company",
+        website: "",
+        description: "My saved intake",
+      },
+    },
+    {
+      ...settings,
+      companyResearchReview: {
+        jobId: randomUUID(),
+        summary: "My saved research",
+        industry: "My sector",
+        updates: "",
+        reviewedAt: "2026-09-07",
+      },
+    },
+  ])
+    assert.equal(
+      cobaltSettingsUpgrade({ sandbox: true, settings: saved }, records),
+      saved,
+    );
 });

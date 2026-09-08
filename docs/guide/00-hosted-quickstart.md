@@ -1,12 +1,12 @@
 # Hosted pilot: start here
 
-Release 0.3 adds Vercel hosting, a private sample company, encrypted account API-key settings, OpenAI discovery drafts and Resend invitation sending. The earlier guides explain the underlying advisor workflow; this chapter supersedes their local-only and manual-email setup notes. This remains a pilot, with the production gaps listed below.
+Release 0.3 provides hosted advisor workspaces, a private synthetic sample, encrypted account API-key settings, discovery drafts and invitation email. The current path begins in Discovery and ends with reviewable work records. This remains a pilot, with the production gaps listed below.
 
 ## First visit
 
 1. Open https://dutygraph-v2.vercel.app and create your advisor account. Choose a strong password and keep it in your password manager; password recovery and email verification are not implemented yet.
-2. Open Workspace settings → Explore a fictional company → Open my sample company. Cobalt is private to your account. Loading it does not send email or call AI/search providers. Reopening returns the same sample, preserving your edits.
-3. Use Company graph to inspect connected evidence, workflow, teams and duties. Reporting lines appear only where recorded. PostgreSQL holds the authoritative records. Optional Neo4j Aura can project the graph, with current PostgreSQL records available when Aura is absent or behind.
+2. Open Workspace settings → Explore a fictional company → Open my sample company. Cobalt is clearly synthetic and private to your account. Loading it does not send email or call AI/search providers. Reopening returns the same sample, preserving your edits.
+3. Open **Company Work Map**. Select a business stream and stage to highlight the recorded organization, then select a person to see their duties, tasks and flows. Work with no stage, no owner or a removed stage remains visible for repair. The map uses explicit assignments; it does not infer membership from a title, department, reporting line or task value stage. PostgreSQL holds the authoritative records. Optional Neo4j Aura can project the graph, with current PostgreSQL records available when Aura is absent or behind.
 4. Use the company selector → New company workspace for your own business. Keep real records separate from the fictional sample.
 
 ## Connect your services
@@ -27,18 +27,20 @@ The separate **Neo4j company graph** section accepts your Aura URI, database use
 
 Open Discovery and follow its five steps: **Research & contact**, **Leadership meeting**, **Review the team**, **Team interviews**, and **Review task cards**. The app carries the relevant sources forward. You do not select evidence checkboxes in this journey.
 
-Start with all four public research areas. Draft the preparation email to your one point of contact. Save and preview it, then send the private response link. Use the contact's reply to prepare the live meeting guide. Save the kickoff notes, review the resulting team dossiers, create the personal interviews, and send them to the reviewed team. Participants can review extracted task descriptions before sending their answers. The advisor then resolves gaps and ownership.
+Start with the shared compact company snapshot and its proposed business streams. Review the public findings, then draft the preparation email to your point of contact. Save and preview it before sending the private link. The contact opens the kickoff preparation page without an account: they can correct the snapshot, upload a CSV or add the roster manually, connect managers, nominate executive attendees and pilot participants, and share leadership context by typing or voice. The advisor reviews the returned package before importing people or preparing the two-hour leadership meeting.
+
+After the meeting, save the guided notes, review the team dossiers, create one tailored work request per selected pilot participant, and choose which recipients to email. The send review lists the exact people and addresses; previewing or saving a request does not send it. Work response links also open without an account. Each recipient can type or record a response, transcribe a short clip when enabled, review the text, and send it. The advisor then reviews the account and task cards, resolves gaps and ownership, and confirms the exact current work when needed.
 
 Read [From business research to confirmed work](23-discovery-to-confirmed-work.md) for each button and handoff. Research has a ten-request allowance per account per day; the guided discovery AI has a separate thirty-run allowance. Provider charges apply. Failed or uncertain attempts count and do not retry automatically.
 
 ## Invite someone to answer questions
 
-1. Add the participant with their correct email address. Use a separate participant address when testing; the current pilot does not let one email hold both advisor and participant accounts. Prepare a work-capture or exact-task confirmation request in Discovery.
-2. Review the questions, recipient, due date and privacy notice. Configure Resend's verified sender in Settings first.
-3. Open the request and click Send invitation email. This is the action that sends email; preparing a request or generating a manual link does not send one.
+1. Add or review the person with their correct email address. Prepare a work-capture or exact-task confirmation request in Discovery.
+2. Review the questions, recipient, due date and privacy notice. For a team batch, select the people explicitly and use the review screen to check the final recipient list. Configure Resend's verified sender in Settings first.
+3. Open the request and click Send invitation email. This is the action that sends email; preparing a request, previewing the response form or generating a manual link does not send one.
 4. A successful API response appears as Accepted by Resend. Inbox delivery, bounce tracking and reminders are not implemented yet. If the outcome is unknown, check the Resend dashboard before sending again. There are at most fifty attempts per account per rolling 24 hours.
-5. The recipient clicks their private seven-day link, creates a participant password (or uses their existing password), reads the notice and opens their assigned questions. They can type answers or record up to 20 minutes. **Save recording** uploads and verifies the clip. If OpenAI is configured, **Create transcript** produces editable text. The participant checks the transcript, adds it to the written answer, then chooses **Create my task cards** for a work interview. They edit and check each description before choosing **Send my response**. If drafting is unavailable, they can explicitly send the answer without cards. The recording remains attached. Text drafts save on the same device. A failed transcription keeps the recording and offers an explicit retry or a typed answer.
-6. After submission, the advisor sees the returned request in Discovery and reviews it. A participant reply alone does not confirm current task ownership; the existing exact-version confirmation and advisor-review rules still apply.
+5. The recipient opens the private seven-day link without an account or password, reads the notice and answers the assigned questions. They can type or record up to three minutes per clip. When enabled, **Transcribe into my response** adds editable text; they review it before sending. The recording stays in the page until it is transcribed or discarded. Text drafts save on the same device. A failed transcription keeps the recording and allows another attempt or a typed answer.
+6. After submission, the advisor sees the returned request in Discovery and reviews it. A response records the person’s account; it does not confirm company ownership, approval or permission to automate. Task cards remain proposed until the advisor reviews them and obtains any required exact-version owner and performer confirmations.
 
 You can also generate a private link and share it yourself. Every replacement link revokes previous unused links for that request. Withdrawing a request revokes unused invitations and blocks new replies. Links are bearer secrets; do not forward them to someone else. Use **Preview email** to inspect the branded HTML invitation before sending. The email includes the company, the recipient's role, the actual request questions, preparation instructions and a private response link. Replies and full task records are not included in invitation emails.
 

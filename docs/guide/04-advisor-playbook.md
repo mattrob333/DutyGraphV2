@@ -12,7 +12,7 @@ For this local build, use synthetic or otherwise approved pilot information. The
 
 Prepare the engagement record and collection notice. Agree what the client will receive, who will see it, the intended review cadence, and the permitted delivery channel. Establish where the final package and distribution log will be stored.
 
-Research public context before the meeting. Use Business research with operator-configured Exa, or capture public pages manually. Start with the official website, then inspect appropriate public sources for the offer, customers, footprint, people and recent changes. Keep source URLs and dates. Do not scrape private interviews into a public search query. Draft a short account with Known, Inferred, Assumed and Missing information distinguished; public leadership listings do not establish internal accountability.
+Research public context before the meeting. In Discovery, enter the business name, official website and optional description once, then review the shared compact snapshot and proposed business streams. Use the configured research areas or add public sources manually. Keep source URLs and dates. Do not scrape private interviews into a public search query. Treat the brief as reported public context: public leadership listings do not establish internal accountability.
 
 Bring that draft to kickoff. Ask the team to correct it explicitly: “Here is what we found publicly. What is wrong, outdated or missing?” Preserve both the original public claim and the team's correction with their own origins. Treat suspected bottlenecks and inferred process steps as questions until evidence supports them. The current release collects sources through Exa but does not generate this synthesis with an AI model.
 
@@ -26,7 +26,7 @@ Suggested opening: “We will first document how this work happens, then ask the
 
 Record the sponsor’s preferred explanation as a hypothesis. Ask what evidence would show that another explanation is stronger. Name the output unit—released orders, accepted jobs, fulfilled requests—so later analysis concerns system results.
 
-Create follow-up requests only where information is missing. Avoid asking every person every possible question. Preserve the exact request and original response. After acceptance, cite the source as an account from that participant, with an exact locator.
+Create follow-up requests only where information is missing. Avoid asking every person every possible question. Preserve the exact request and original response. Kickoff and work-response links open without accounts; select the intended recipients explicitly before sending. After acceptance, cite the source as an account from that participant, with an exact locator.
 
 **Exit evidence:** a recorded kickoff account; explicit output measure or missing-baseline reason; initial flow boundary; competing explanation; prioritized evidence questions.
 
@@ -50,7 +50,7 @@ For each task, name one accountable owner and the performer, describe inputs/ins
 
 Group tasks with a duty label. Create an explicit duty record when responsibility for that continuing area needs review. Define each handoff’s receiving condition, input/output mapping, exception owner and failure handling. A receiving check is more useful than an unlabeled arrow.
 
-Inspect the company graph. Read the selected relationship labels aloud. Use By team to check coverage and Reporting chart to check recorded managers. Do not infer a manager from seniority, job title or task ownership.
+Inspect the Company Work Map. Select a stream and stage, follow the highlighted organization to a person, then inspect that person’s duties, tasks and flows. Use Connected for evidence relationships, By team for work grouping and Reporting chart for recorded managers. Do not infer a stage link, manager, owner or performer from seniority, job title or task ownership.
 
 **Exit evidence:** reviewed task definitions; an explicit list of remaining conflicts; meaningful receiving checks; no unexplained orphan work.
 

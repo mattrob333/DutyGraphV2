@@ -1,3 +1,5 @@
+import { createWorkspaceReader } from "./workspace-reader.ts";
+import { isKnownCobaltSample } from "../../shared/cobalt-company-example.ts";
 import { TeamLink } from "./TeamLink.tsx";
 import { KickoffLink } from "./KickoffLink.tsx";
 import { OrgChartCanvas } from "./OrgChartCanvas.tsx";
@@ -311,7 +313,12 @@ function Invitation({
       .catch((e) => setError(e.message));
   }, [token]);
   const [accountConflict, setAccountConflict] = useState(false);
-  if (info?.passwordlessTeam) return <div className="kickoff-page"><TeamLink token={token} name={info.name} /></div>;
+  if (info?.passwordlessTeam)
+    return (
+      <div className="kickoff-page">
+        <TeamLink token={token} name={info.name} />
+      </div>
+    );
   if (info?.passwordless)
     return (
       <div className="kickoff-page">
@@ -476,8 +483,18 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
     [theme, setTheme] = useState(
       () => localStorage.getItem("dg-theme") || "dark",
     );
-  const records: RecordRow[] = data?.records || [];
-  const company: Company | undefined = data?.company;
+  const workspaceReader = useRef(
+    createWorkspaceReader<any>((id) =>
+      api("/v1/companies/" + id + "/workspace"),
+    ),
+  );
+  workspaceReader.current.select(companyId);
+  const currentData = data?.company?.id === companyId ? data : null;
+  const records: RecordRow[] = currentData?.records || [];
+  const company: Company | undefined = currentData?.company;
+  const sampleUpgrades = useRef(new Set<string>());
+  const [sampleUpgradeRetry, setSampleUpgradeRetry] = useState(0);
+  const knownSample = isKnownCobaltSample(!!company?.sandbox, records);
   const items = (kind: string) => records.filter((r) => r.kind === kind);
   const loadCompanies = async () => {
     const c = await api<Company[]>("/v1/companies");
@@ -487,9 +504,11 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
   const refresh = async () => {
     if (!companyId) return;
     try {
-      const d = await api("/v1/companies/" + companyId + "/workspace");
-      setData(d);
-      setError("");
+      const d = await workspaceReader.current.read(companyId);
+      if (d) {
+        setData(d);
+        setError("");
+      }
     } catch (e) {
       setError((e as Error).message);
     }
@@ -528,8 +547,31 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
   }, []);
   useEffect(() => {
     setData(null);
+    setError("");
+    setModal(null);
+    setQuery("");
+    setFilter("all");
     void refresh();
   }, [companyId]);
+  useEffect(() => {
+    if (!knownSample || sampleUpgrades.current.has(companyId)) return;
+    sampleUpgrades.current.add(companyId);
+    let active = true;
+    void api(`/v1/companies/${companyId}/sample-upgrade`, "POST", {})
+      .then(async () => {
+        if (!active) return;
+        const next = await workspaceReader.current.read(companyId);
+        if (active && next) setData(next);
+      })
+      .catch((e) => {
+        sampleUpgrades.current.delete(companyId);
+        if (active)
+          setError(`Could not refresh the Cobalt example: ${e.message}`);
+      });
+    return () => {
+      active = false;
+    };
+  }, [companyId, knownSample, sampleUpgradeRetry]);
   useEffect(() => {
     if (!companyId) return;
     let active = true;
@@ -538,10 +580,14 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
       if (document.visibilityState !== "visible" || loading) return;
       loading = true;
       try {
-        const next = await api<any>("/v1/companies/" + companyId + "/workspace");
-        if (active) setData((current: any) =>
-          current?.company?.id === companyId &&
-          next.company.revision > current.company.revision ? next : current);
+        const next = await workspaceReader.current.read(companyId);
+        if (active && next)
+          setData((current: any) =>
+            current?.company?.id !== companyId ||
+            next.company.revision > current.company.revision
+              ? next
+              : current,
+          );
       } catch {
         // A background network failure must not interrupt an advisor's draft.
       } finally {
@@ -1126,6 +1172,7 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         </div>
         <TaskCards
           key={company.id}
+          profile={company.settings.businessProfile}
           records={records}
           filter={filter}
           query={query}
@@ -1140,24 +1187,30 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
             }
           />
         )}
-        <div className="two-col work-model-panels">
-          <Panel
-            title="Standing duties"
-            subtitle="Record duty accountability separately from individual task confirmations."
-            action={<Button onClick={() => create("duty")}>Add duty</Button>}
-          >
-            {rows(items("duty"))}
-          </Panel>
-          <Panel
-            title="Handoff contracts"
-            subtitle="Define the condition, input, output, receiving check and exception owner between two tasks."
-            action={
-              <Button onClick={() => create("handoff")}>Add handoff</Button>
-            }
-          >
-            {rows(items("handoff"))}
-          </Panel>
-        </div>
+        <details className="discovery-supporting">
+          <summary>
+            Duties & handoffs · {items("duty").length} duties ·{" "}
+            {items("handoff").length} handoffs
+          </summary>
+          <div className="two-col work-model-panels">
+            <Panel
+              title="Standing duties"
+              subtitle="Record duty accountability separately from individual task confirmations."
+              action={<Button onClick={() => create("duty")}>Add duty</Button>}
+            >
+              {rows(items("duty"))}
+            </Panel>
+            <Panel
+              title="Handoff contracts"
+              subtitle="Define the condition, input, output, receiving check and exception owner between two tasks."
+              action={
+                <Button onClick={() => create("handoff")}>Add handoff</Button>
+              }
+            >
+              {rows(items("handoff"))}
+            </Panel>
+          </div>
+        </details>
       </>
     );
   else if (page === "workflows")
@@ -1930,7 +1983,14 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
         <main id="main" tabIndex={-1}>
           <ErrorBox error={error} />
           {error && (
-            <Button onClick={() => void refresh()}>Retry loading</Button>
+            <Button
+              onClick={() => {
+                void refresh();
+                setSampleUpgradeRetry((n) => n + 1);
+              }}
+            >
+              Retry loading
+            </Button>
           )}
           {body}
         </main>

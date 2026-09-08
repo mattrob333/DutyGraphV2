@@ -1,6 +1,6 @@
-# Review your task cards before sending
+# Answer a work request from your private link
 
-Your advisor wants your best understanding of the work. You do not need a polished explanation.
+Your advisor wants your best understanding of the work. You do not need a polished explanation. A work response is your account of what you do; the advisor reviews it before turning it into task cards.
 
 ## Try it without an account
 
@@ -8,7 +8,7 @@ Open the [five-person walkthrough](/?demo=discovery). Choose a teammate and foll
 
 ## 1. Open your invitation
 
-Use the private link in your email. Check your name and company. Create a password on your first visit, or sign in. Do not forward your link. Read the notice and questions before answering. Once enrolled, the response page keeps its own address so you can refresh or return to your assigned form. If the original invitation has already been used, choose Return to sign in.
+Use the private link in your email. Check your name and company. No account or password is needed for this work response. Do not forward the link. Read the notice and questions before answering. If the link is expired, closed or already used, ask your advisor for help.
 
 ## 2. Describe a real example
 
@@ -26,34 +26,29 @@ Say when something is unclear or different in practice. Your account can differ 
 
 ## 3. Save and check your answer
 
-Choose **Start recording**, speak through your prompts, then **Finish clip** and **Save recording**. You can pause and resume, or upload an existing audio file. If AI transcription is configured, choose **Create transcript**, correct it and choose **Use this text in my response**. You can also write the answer yourself. Keep the original recording attached.
+Type your answer in the notes box, or choose **Record a voice response**. Recording stops automatically after three minutes. Listen to the clip, then choose **Transcribe into my response** when your advisor has enabled transcription. Check the editable text before sending. You can also use device dictation or type everything yourself. Audio stays in the page until it is transcribed or discarded; saving text progress does not save the recording.
 
 Text drafts and card edits save on this device when browser storage is available. Use the same device and browser to return. Do not clear browser storage before submitting. A saved draft is not a submitted response.
 
 ## 4. Create and review your cards
 
-Choose Create my task cards. This sends your answer, personal questions, role, department, recorded duty descriptions and selected business model to the company's configured AI service. The business model guides interpretation; it does not establish unstated procedures. AI can draft several task cards under one duty. There is no required count. Cards preserve the task’s purpose, trigger and stated human checkpoints alongside inputs, actions and results. These checkpoints are your understanding and still need company review. Cards open as readable instructions; use Edit only when needed. Review every description before choosing a response:
-
-- **Approve:** the card describes the work as you understand it.
-- **Edit:** correct the description, save your edits, then approve the card.
-
-Changing a card clears its decision so you can check it again. If you change the original answer, create or review the cards again. This is not approval of company policy or permission for an agent to act.
+The current passwordless work response does not ask you to create task cards. Your notes go to the advisor, who may draft cards for review. Keep separate duties and tasks clear in your answer so the advisor can preserve that structure. A task card describes a bounded unit of work; it does not prove company policy or give anyone permission to act.
 
 ## 5. Send everything together
 
-Choose Send my response. Your original answer and reviewed cards arrive together. Wait for the receipt message before closing the page.
+Choose **Send my response**. Read the notice and confirm that you are the intended person before sending. Wait for the receipt message before closing the page.
 
-If AI is not connected, or a draft cannot be produced, select Send my answer for advisor review without task cards. Your advisor can help with the next step.
+If recording or transcription is unavailable, type your answer and send it. A typed response is complete; your advisor can help with the next step.
 
 ## What the advisor does next
 
-The advisor opens your returned response, checks the original evidence and sees your card decisions. Retained cards are proposed work records. The advisor resolves missing owners and differences between teams. A changed description or company-level confirmation can require a further check. The advisor can run a cross-team review for recorded gaps and AI hypotheses about conflicting accounts or missing handoffs. The team must validate those findings.
+The advisor opens your returned response and preserves your original wording. They may draft task cards, assign the work to a business stream, and resolve missing owners or differences between teams. Your response records your understanding; it does not confirm company ownership, approval or permission for an agent. Any later company confirmation applies to the exact task version under review.
 
-In the public walkthrough, Maya returns six separate tasks. The advisor sees three prepared AI-assistance recommendations, two human tasks, and an approval-ownership gap. Only approved, unchanged candidate descriptions can enter the simulated governance preview. Edited descriptions need a fresh suitability review. This preview lists requested work and checks still needed; it grants no scopes, issues no agent, and does not save a live governance request.
+In the public walkthrough, Maya returns six fictional tasks. The advisor sees prepared assistance recommendations, human tasks and an unresolved approval-owner gap. These examples are synthetic; they are not live analysis, confirmed conflicts or deployed agents.
 
 ## Review the team in the public walkthrough
 
-The advisor inbox starts with people and compact task cards. Select a returned teammate, filter for AI candidates or gaps, and expand a card for its inputs, actions, handoffs and software. The original transcript stays closed until you open it.
+The advisor inbox starts with people and compact task cards. Select a returned teammate, filter for AI candidates or gaps, and expand a card for its inputs, actions, handoffs and software. The original response and any transcript stay closed until you open them.
 
 Choose **Load remaining sample responses** to complete the fictional five-person team without replacing responses you already reviewed. Then choose **Review sample team findings**. Prepared examples highlight an unresolved approval owner, a possible missing handoff account, and a shared-software process worth investigating. These are not results of a live AI analysis, confirmed conflicts, measured bottlenecks, or proof of duplicate software spending. Edited source cards are excluded from prepared findings until a fresh review.
 

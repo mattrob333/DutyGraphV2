@@ -1,6 +1,6 @@
 # From business research to confirmed work
 
-Discovery has five steps. Each step uses the information collected in the preceding steps. You do not select source checkboxes or choose a generic interview template.
+Discovery has five steps. Each step uses the information collected in the preceding steps. You do not select source checkboxes or choose a generic interview template. Start with the compact company snapshot and confirm the business streams before preparing the kickoff request.
 
 ## 1. Research and contact
 
@@ -16,7 +16,7 @@ Enter the name and email of your point of contact. Add agreed meeting details if
 
 Edit the subject, message and preliminary questions. **Save contact request** creates a private request. Preview the branded email, then choose **Send invitation email**. Saving and sending are separate actions. The contact can speak or type answers on their private page. Their response appears in this discovery journey and the evidence history tools.
 
-The contact's private page includes a team CSV template/upload, executive kickoff and pilot participant selections, and structured leadership inputs. Review the returned package, then choose **Confirm roster & populate org chart**. Invalid reporting lines or conflicting existing people block the import without partial changes. Selections do not send invitations. The uploaded organization is separate from the interview roster agreed after kickoff.
+The contact's private page includes a team CSV template/upload, manual add/edit/remove controls, manager links, executive kickoff and pilot participant selections, and structured leadership inputs. Review the returned package, then choose **Confirm roster & populate org chart**. Invalid reporting lines or conflicting existing people block the import without partial changes. Selections do not send invitations. The uploaded organization is separate from the interview roster agreed after kickoff.
 
 Optional evidence and deeper industry mapping are under **Supporting research**. Opening the map does not generate analysis and is not required for the email.
 
@@ -36,13 +36,13 @@ Review each person's dossier. Correct an email or role, add a stated duty, or re
 
 Choose **Create question sets**. AI prepares one tailored interview for every person in the reviewed team. It uses their role, full reviewed duty descriptions, business model and leadership context. Up to eight focused prompts cover all of the person's stated duties, including recurring and exception work. Questions ask about a real example: what starts the work, what is needed, what they do, the tools they use, what they produce, who receives it, and where decisions or delays occur.
 
-Review the questions and email messages, then **Save all personal requests**. **Send pending team invitations** sends each person's private request in sequence. A confirmed email-service receipt is skipped on later batch attempts. An uncertain result stops the batch for review. Open each request to inspect its email preview, delivery attempt and original questions.
+Review the questions and email messages, then **Save all personal requests**. Select the people to contact and choose **Review selected recipients**. The final review lists the exact names and email addresses. **Send questions to the selected people** sends only those requests in sequence. A confirmed email-service receipt is skipped on later batch attempts. An uncertain result stops the batch for review. Open each request to inspect its email preview, delivery attempt and original questions.
 
-The recipient opens the private link and signs in or creates a participant password. Voice is preferred: a real example helps capture steps, exceptions and frustrations. Typing is also available.
+The recipient opens the private link without an account or password. Voice is useful for a real example that captures steps, exceptions and frustrations; typing is always available. The recipient reviews the response before sending it. If transcription is enabled, a short recording can be transcribed into editable text.
 
-After recording, they save the clip, create and check its transcript, and add it to their answer. **Create my task cards** uses the configured AI service to extract their work. They check the input, action, output, destination and software. Choose **Approve** or **Edit** on each card. Approval displays a green check; editing clears the approval until the person checks the revised card. Edits require another check before sending.
+After recording, they stop the clip and choose **Transcribe into my response**, then check the editable text. The advisor uses the returned response and configured AI service to draft task cards. The advisor reviews each card’s input, action, output, destination, software and human decision boundary before saving it as proposed work.
 
-Their original answer and reviewed descriptions arrive together. This is their understanding of the work, not company approval of ownership or agent permissions. If AI is unavailable, they can send the answer without cards for advisor review. See [Review your task cards before sending](25-participant-review.md).
+Their original answer arrives first. This is their understanding of the work, not company approval of ownership or agent permissions. If AI is unavailable, the typed or transcribed answer still gives the advisor useful evidence. When exact task checks are needed later, the advisor prepares a separate confirmation request for the named owner and performer. See [Answer a work request from your private link](25-participant-review.md).
 
 ## 5. Review task cards
 
@@ -52,4 +52,4 @@ Accept the original evidence after reviewing it. Resolve missing owners, overlap
 
 A participant's initial check records their understanding. Company-level task confirmation still uses the existing exact-version owner/performer rules. A changed description may need another check. Agent proposals come afterward; this process does not grant access or deploy an agent.
 
-Meeting agenda sections receive consecutive timeboxes totaling 120 minutes. Without a returned preparation response, the guide is labeled provisional. When reviewing revised duties, explicitly select an existing duty to confirm a correction, or distinguish separate responsibilities by name; changed descriptions no longer silently merge by owner/title.
+Meeting agenda sections receive consecutive timeboxes totaling 120 minutes. Without a returned preparation response, the guide is labeled provisional. When reviewing revised duties, explicitly select an existing duty to confirm a correction, or distinguish separate responsibilities by name; changed descriptions no longer silently merge by owner/title. A saved business stream gives the Company Work Map its stages, but work appears in a stage only after an explicit duty or task assignment.

@@ -10,6 +10,7 @@ import { projectTenant } from "../server/projection.ts";
 import { purgeExpiredAudio } from "../server/retention.ts";
 import JSZip from "jszip";
 import { normalizeResearch } from "../server/research.ts";
+import { populateCobaltExamples } from "../server/sample-examples.ts";
 let researchCalls = 0,
   aiCalls = 0;
 const emailMessages: any[] = [];
@@ -1459,6 +1460,27 @@ test("private sample is isolated, repeatable and does not send email", async () 
     "/api/v1/companies/" + first.data.id + "/workspace",
   );
   assert.equal(workspace.status, 200);
+  assert.equal(
+    workspace.data.company.settings.businessProfile.streams[0].id,
+    "cobalt-wholesale",
+  );
+  assert.equal(
+    workspace.data.company.settings.businessProfile.status,
+    "proposed",
+  );
+  assert.equal(workspace.data.company.settings.businessIntake.website, "");
+  const sampleUpgradePath = `/api/v1/companies/${first.data.id}/sample-upgrade`;
+  assert.equal((await request(b, sampleUpgradePath, "POST", {})).status, 404);
+  assert.equal(
+    (await request(a, prefix(a) + "/sample-upgrade", "POST", {})).status,
+    422,
+  );
+  const upgradedSample = await request(a, sampleUpgradePath, "POST", {});
+  assert.equal(upgradedSample.status, 200, JSON.stringify(upgradedSample.data));
+  assert.deepEqual(
+    upgradedSample.data.company.settings,
+    workspace.data.company.settings,
+  );
   assert.ok(workspace.data.records.length >= 25);
   const flows = workspace.data.records.filter(
     (r: any) => r.kind === "workflow",
@@ -1554,6 +1576,92 @@ test("private sample is isolated, repeatable and does not send email", async () 
   );
   assert.equal(emailMessages.length, before);
 });
+test("scoped Cobalt upgrade saves legacy stages once and preserves task edits and reviewed profiles", async () => {
+  const c = await register();
+  await tx(c.user.tenant_id, async (db) => {
+    await db.query(
+      "UPDATE companies SET sandbox=true,name='Cobalt Industrial Supply' WHERE id=$1",
+      [c.company],
+    );
+    await populateCobaltExamples(
+      [],
+      (kind, title, data, state, existing) =>
+        putRecord(db, c.user, c.company, kind, title, data, state, existing),
+      false,
+    );
+  });
+  const before = (await request(c, prefix(c) + "/workspace")).data;
+  const edited = before.records.find(
+    (r: any) => r.data.sampleKey === "order-intake",
+  );
+  await tx(c.user.tenant_id, async (db) => {
+    await putRecord(
+      db,
+      c.user,
+      c.company,
+      "task",
+      edited.title,
+      {
+        ...edited.data,
+        instructions: "Keep my saved customer intake procedure.",
+      },
+      edited.state,
+      edited,
+    );
+  });
+  const upgraded = await request(c, prefix(c) + "/sample-upgrade", "POST", {});
+  assert.equal(upgraded.status, 200, JSON.stringify(upgraded.data));
+  assert.equal(
+    upgraded.data.company.settings.businessProfile.streams[0].id,
+    "cobalt-wholesale",
+  );
+  const workspace = (await request(c, prefix(c) + "/workspace")).data;
+  const preserved = workspace.records.find((r: any) => r.id === edited.id);
+  assert.equal(
+    preserved.data.instructions,
+    "Keep my saved customer intake procedure.",
+  );
+  assert.equal(preserved.version, edited.version + 1);
+  const packet = workspace.records.find(
+    (r: any) => r.data.sampleKey === "supplier-packet",
+  );
+  assert.deepEqual(packet.data.businessStageLinks, [
+    { streamId: "cobalt-wholesale", stageId: "wholesale-4" },
+  ]);
+  for (const r of workspace.records.filter(
+    (r: any) =>
+      r.data.sampleBusinessVersion &&
+      ["duty", "workflow", "handoff", "agent"].includes(r.kind),
+  ))
+    for (const b of r.data.taskBindings || [])
+      assert.equal(
+        b.hash,
+        workspace.records.find((t: any) => t.id === b.id)?.hash,
+        r.title,
+      );
+  await request(c, prefix(c) + "/sample-upgrade", "POST", {});
+  const again = (await request(c, prefix(c) + "/workspace")).data;
+  assert.equal(again.company.revision, workspace.company.revision);
+  assert.deepEqual(
+    again.records.map((r: any) => [r.id, r.version, r.hash]),
+    workspace.records.map((r: any) => [r.id, r.version, r.hash]),
+  );
+  const custom = {
+    ...again.company.settings.businessProfile,
+    industry: "Advisor's saved classification",
+    status: "advisor_reviewed",
+  };
+  await tx(c.user.tenant_id, async (db) => {
+    await db.query(
+      "UPDATE companies SET settings=jsonb_set(settings,'{businessProfile}',$2::jsonb) WHERE id=$1",
+      [c.company, custom],
+    );
+  });
+  const final = await request(c, prefix(c) + "/sample-upgrade", "POST", {});
+  assert.equal(final.status, 200);
+  assert.deepEqual(final.data.company.settings.businessProfile, custom);
+});
+
 test("Resend invitation calls once, keeps tokens out of receipts and opens participant page", async () => {
   const c = await register(),
     f = await fixture(c),

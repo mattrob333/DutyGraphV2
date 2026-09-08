@@ -1,10 +1,17 @@
 import { randomBytes, randomUUID } from "node:crypto";
-import { pool, tx, putRecord, setState, fail } from "./db.ts";
+import { canonicalize } from "json-canonicalize";
+import { pool, tx, putRecord, setState, fail, audit } from "./db.ts";
 import { passwordHash, publicUser, defaultSettings } from "./auth.ts";
 import { capturePrompts } from "../shared/domain.ts";
 import { populateCobaltExamples } from "./sample-examples.ts";
 import { ensureControlExamples } from "./sample-controls.ts";
 import { sampleCases } from "./sample-cases.ts";
+import {
+  cobaltBusinessProfile,
+  cobaltCompanyFieldsUpgrade,
+  cobaltSettingsUpgrade,
+  isKnownCobaltSample,
+} from "../shared/cobalt-company-example.ts";
 
 export async function ensureCobaltExamples(
   db: import("pg").PoolClient,
@@ -12,9 +19,7 @@ export async function ensureCobaltExamples(
   company: string,
 ) {
   const target = (
-    await db.query("SELECT sandbox FROM companies WHERE id=$1 FOR UPDATE", [
-      company,
-    ])
+    await db.query("SELECT * FROM companies WHERE id=$1 FOR UPDATE", [company])
   ).rows[0];
   if (!target?.sandbox)
     fail(
@@ -26,13 +31,28 @@ export async function ensureCobaltExamples(
     "SELECT r.*, EXISTS(SELECT 1 FROM confirmations c WHERE c.company_id=r.company_id AND c.record_id=r.id) AS has_confirmations FROM records r WHERE r.company_id=$1 ORDER BY r.created_at",
     [company],
   );
-  const knownSample = rows.some(
-    (r) =>
-      r.kind === "evidence" &&
-      r.data.locator === "Synthetic V2 example · full excerpt",
-  );
+  const knownSample = isKnownCobaltSample(target.sandbox, rows);
   if (!knownSample)
     fail(422, "SAMPLE_ONLY", "This workspace is not the Cobalt sample.");
+  const settings = cobaltSettingsUpgrade(target, rows);
+  const fields = cobaltCompanyFieldsUpgrade(target, rows);
+  if (
+    settings !== target.settings ||
+    fields.scope !== target.scope ||
+    fields.goal !== target.goal
+  ) {
+    await db.query(
+      "UPDATE companies SET settings=$2,scope=$3,goal=$4,revision=revision+1 WHERE id=$1",
+      [company, settings, fields.scope, fields.goal],
+    );
+    await audit(db, user, company, "company.synthetic_profile_added", null, {
+      provenance:
+        "Authored fictional Cobalt profile; no research provider was called.",
+    });
+  }
+  const businessStages =
+    canonicalize(settings.businessProfile || null) ===
+    canonicalize(cobaltBusinessProfile());
   const enriched = await populateCobaltExamples(
     rows,
     async (kind, title, data, state, existing) => {
@@ -70,6 +90,7 @@ export async function ensureCobaltExamples(
       }
       return result;
     },
+    businessStages,
   );
   for (const example of sampleCases(enriched))
     enriched.push(
@@ -85,7 +106,10 @@ export async function ensureCobaltExamples(
         "Added a read-only fictional case walkthrough. No work executed.",
       ),
     );
-  await ensureControlExamples(db, user, company);
+  // A renamed sample keeps its custom identity; the separate control fixture
+  // has a stricter name guard and must not prevent this safe upgrade.
+  if (target.name === "Cobalt Industrial Supply")
+    await ensureControlExamples(db, user, company);
   return enriched;
 }
 export async function demoUser() {

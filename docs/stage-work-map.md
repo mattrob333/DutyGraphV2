@@ -14,4 +14,10 @@ Saving uses normal record versions and review rules. Unchanged selections do not
 
 Relationships, Connected, Work flow, Org & duties, and Agents & controls remain available. The former task map is below the new map in **Detailed task map, gaps & AI opportunities**.
 
-The known Cobalt sandbox may show illustrative stage assignments if no business profile has been saved. They use exact fictional fixture keys and never change records. The sample intentionally leaves stages without documented sample tasks empty. Saved profiles always take precedence. Real workspaces need saved business stages and explicit work assignments.
+Opening the known Cobalt sandbox upgrades untouched legacy examples to a saved fictional wholesale profile. Eighteen guided tasks cover Develop accounts, Quote availability, Confirm order, Source & fulfill, Invoice & collect and Replenish accounts. Separate control examples remain Unassigned. Edited, reviewed or confirmed records and custom profiles are preserved. This uses a scoped advisor POST, not a mutating workspace GET; repeat upgrades are idempotent. No research providers or messages are used.
+
+The guarded legacy fallback can still show a labeled read-only illustration if no profile is saved. Normal saved sample assignments can be edited. Real workspaces need saved business stages and explicit work assignments.
+
+## Task cards
+
+Task cards uses the same projection and saved stages. Choose one or more streams, then filter by workflow, recorded owner/performer, review state, search or operating mode. A task can appear in multiple stages; unique task counts and placements remain distinct. Unassigned work stays visible. The cards show role, duty and task, and the full duty/handoff registers stay available in a disclosure below the board. Horizontal lanes support keyboard scrolling and narrow screens.

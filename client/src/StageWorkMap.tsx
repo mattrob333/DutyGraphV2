@@ -217,7 +217,9 @@ export function StageWorkMap({
                   </span>
                   <strong>{s.name}</strong>
                   <small>
-                    {s.people.length} people · {s.tasks.length} tasks
+                    {s.people.length}{" "}
+                    {s.people.length === 1 ? "person" : "people"} ·{" "}
+                    {s.tasks.length} {s.tasks.length === 1 ? "task" : "tasks"}
                   </small>
                 </button>
               </li>
@@ -240,8 +242,11 @@ export function StageWorkMap({
         <div aria-live="polite">
           <h3>{title}</h3>
           <p>
-            {scope.people.length} people involved · {scope.duties.length} duties
-            · {scope.tasks.length} tasks
+            {scope.people.length}{" "}
+            {scope.people.length === 1 ? "person" : "people"} involved ·{" "}
+            {scope.duties.length}{" "}
+            {scope.duties.length === 1 ? "duty" : "duties"}·{" "}
+            {scope.tasks.length} {scope.tasks.length === 1 ? "task" : "tasks"}
           </p>
         </div>
         {(model.unmapped.tasks.length > 0 ||
@@ -254,8 +259,11 @@ export function StageWorkMap({
               setSelected("");
             }}
           >
-            {model.unmapped.tasks.length} tasks / {model.unmapped.duties.length}{" "}
-            duties not assigned <ArrowRight size={14} />
+            {model.unmapped.tasks.length}{" "}
+            {model.unmapped.tasks.length === 1 ? "task" : "tasks"} /{" "}
+            {model.unmapped.duties.length}{" "}
+            {model.unmapped.duties.length === 1 ? "duty" : "duties"} not
+            assigned <ArrowRight size={14} />
           </button>
         )}
       </div>
@@ -317,8 +325,10 @@ export function StageWorkMap({
               {current ? (
                 <>
                   <p className="swm-counts">
-                    {current.dutyIds.length} duties · {current.taskIds.length}{" "}
-                    tasks
+                    {current.dutyIds.length}{" "}
+                    {current.dutyIds.length === 1 ? "duty" : "duties"} ·{" "}
+                    {current.taskIds.length}{" "}
+                    {current.taskIds.length === 1 ? "task" : "tasks"}
                   </p>
                   {scope.duties
                     .filter((d) => current.dutyIds.includes(d.id))
@@ -433,8 +443,11 @@ export function StageWorkMap({
       {(scope.unownedTaskIds.length > 0 || scope.unownedDutyIds.length > 0) && (
         <details className="swm-gaps">
           <summary>
-            {scope.unownedTaskIds.length} tasks / {scope.unownedDutyIds.length}{" "}
-            duties without a recorded owner
+            {scope.unownedTaskIds.length}{" "}
+            {scope.unownedTaskIds.length === 1 ? "task" : "tasks"} /{" "}
+            {scope.unownedDutyIds.length}{" "}
+            {scope.unownedDutyIds.length === 1 ? "duty" : "duties"} without a
+            recorded owner
           </summary>
           {[...scope.tasks, ...scope.duties]
             .filter((r) =>

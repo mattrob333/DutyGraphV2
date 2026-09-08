@@ -1,6 +1,6 @@
 # Full user manual
 
-This manual describes Duty Graph 0.2, the local advisor pilot. It covers the advisor workspace, participant capture, record lifecycle, graph, strategy, workflow observation, reporting, and recovery. The generated record-field reference and operator runbooks accompany it in the portable handbook.
+This manual describes DutyGraph 0.3, the hosted advisor pilot. It covers the current Discovery journey, password-free response links, record lifecycle, Company Work Map, strategy, workflow observation, reporting, and recovery. The generated record-field reference and operator runbooks accompany it in the portable handbook.
 
 ## 1. Accounts and access
 
@@ -20,7 +20,7 @@ The sample entry is available only when the operator enables the demo. It opens 
 | --- | --- |
 | Overview | Scope, progress indicators, recent activity and next steps |
 | Discovery | Requests, responses, sources, people and engagement kickoff |
-| Company graph | Connected relationships, work flow, teams and reporting structure |
+| Company Work Map | Business stages, highlighted people, duties, tasks and flows |
 | Task cards | Detailed work descriptions, confirmation state, duties and handoffs |
 | Workflows & cases | Reviewed task sequences and manual case progress |
 | Strategy | Framework analyses, hypotheses, metrics, interventions and outcomes |
@@ -53,7 +53,7 @@ The kickoff builder offers eight stable question topics. Choose four or five to 
 
 Each person has a name, email, role, team, optional manager, and optional external ID. Names and titles are descriptive. Manager fields drive the reporting chart. A person cannot report to themselves, and edits that introduce a reporting cycle are rejected.
 
-Use **Import roster CSV** to preview before applying. The preview identifies missing values, invalid addresses, duplicates, unresolved managers, and cycles. Invalid rows are quarantined and shown with reasons. Correct the CSV or proceed only with the valid rows the preview identifies. Existing people are not silently merged by a matching display name.
+Use Discovery’s **Team & attendees** panel to upload a team CSV or add, edit and remove people manually. The CSV columns are name, email, role, department and manager_email. The preview identifies missing values, invalid addresses, duplicates, unresolved managers and cycles. Correct all errors before submitting the kickoff package. The contact can nominate executive kickoff attendees and pilot discovery participants from the valid roster; those selections prepare the advisor’s review and do not send invitations. Existing people are not silently merged by a matching display name.
 
 The sample CSV shape is:
 
@@ -75,15 +75,15 @@ Inspect each original link and its captured text before choosing Import as unrev
 
 The application allows ten requests per tenant account across all companies in a rolling 24-hour window. Failed or uncertain requests count. Replaying the same command does not repeat the provider call, and there are no automatic retries. A request left unresolved by a server interruption is marked unknown after five minutes when history is refreshed. Consult the operator before deliberately starting another request if the provider outcome is uncertain.
 
-The guided journey automatically carries research into a contact email and a leadership meeting guide. The contact reply and kickoff notes then supply the reviewed team roster and personalized interviews. Read [the five discovery steps](23-discovery-to-confirmed-work.md) for the current flow. Earlier manual source selection is no longer part of the main discovery journey.
+The guided journey carries the shared compact company snapshot into a contact email and leadership meeting guide. The contact reply and kickoff notes then supply the reviewed team roster and personalized interviews. Read [the five discovery steps](23-discovery-to-confirmed-work.md) for the current flow. Earlier manual source selection is no longer part of the main discovery journey.
 
 ### Request and response workflow
 
 Requests are immutable assignments to one person. Choose Work account, Leadership, or Confirmation. Enter a title, questions, due date, notice, and—when confirming work—the exact reviewed tasks belonging to that person as owner or performer.
 
-Save the draft, review it, then issue a private link. Link issuance changes the displayed state to Link ready. The underlying transport state is `sent`, but **no email has been sent**. The UI returns a manual URL. Give it to the intended person through the engagement’s approved channel. This build does not send reminders.
+Save the draft, review it, then issue a private link. Link issuance changes the displayed state to Link ready. The underlying transport state is `sent`, but **no email has been sent**. The UI returns a manual URL. Give it to the intended person through the engagement’s approved channel, or open the request and use **Preview response form** to inspect the live fields without submitting them.
 
-Invitation links expire after seven days and are single-use for enrollment. Reissuing an open request rotates its unused invitation. Used or expired links do not enroll another person. Once enrolled, a participant signs in to see their assigned requests; they do not need to reuse the original URL.
+Kickoff and work-response links expire after seven days and are intended for the named recipient. They open without an account or password and close after submission. Reissuing an open request rotates its unused invitation. Used, expired or revoked links cannot be submitted; ask the advisor for a replacement.
 
 Request due dates are evaluated through 23:59:59 UTC on the selected date. A request past its due date cannot be submitted. The engagement timezone is descriptive for planning in this release; it does not alter this enforcement or schedule messages. Set dates accordingly and create a fresh request when an extension is required.
 
@@ -91,13 +91,13 @@ If the questions or selected task version change, create a new request. Withdraw
 
 ## 6. Participant capture
 
-The participant opens an invitation, reads the notice, acknowledges it, and creates a password or uses their existing password when applicable. The assigned page shows request questions and, for confirmation, the exact task snapshots.
+Kickoff and team work-response links open without an account or password. The recipient reads the notice, confirms they are the intended person, and sees only the assigned questions. A signed-in participant workflow remains available for older or exact task-confirmation requests; use the request type and page shown by the invitation.
 
-A participant can type an account or record audio. Recording requires the browser’s microphone permission. Use record, pause/resume, stop, and playback to inspect the clip. Upload/resume sends chunks; the server validates the completed size and checksum before submission. If upload is interrupted, keep the local clip and resume from acknowledged chunks. Do not close the browser or clear storage until the response is safely submitted.
+A recipient can type a response or record a short voice clip. Recording requires browser microphone permission. Choose **Record a voice response**, stop the clip, listen to it, and choose **Transcribe into my response** when enabled. Review the editable text before sending. The clip remains in the page until it is transcribed or discarded; text drafts can be saved on the same device. Do not close the page before the response is safely submitted.
 
 Typed and recording drafts may remain in local browser storage until submitted or explicitly discarded. A shared device therefore needs careful sign-out and draft handling. Server audio expires after 30 days under the current local policy; the worker removes stored chunks after expiry. Retained metadata and typed evidence have a different lifecycle. There is no comprehensive erasure or legal-hold workflow in this pilot.
 
-Audio is stored as unscanned local database content. No transcript is automatically created. The advisor can listen to a recording, but must not cite an invented transcript or treat the upload checksum as malware scanning. Use typed responses for training environments without microphone access.
+Audio is held in the page until the recipient chooses transcription. No transcript is created automatically. The advisor must review the returned response and any transcript rather than treating a recording or checksum as proof of a company fact. Use typed responses for training environments without microphone access.
 
 For confirmation requests, every assigned task needs a decision: Correct, Needs change, Not mine, or Unsure. Add an explanatory note for disagreement. Submit only after inspecting the exact text. Submission records the participant decision; advisor acceptance follows separately.
 
@@ -145,6 +145,12 @@ Handoff timeout and retry fields describe the receiving contract. The manual cas
 
 ## 10. Graph and organization views
 
+### Company Work Map
+
+The default Company Work Map follows **stage → highlighted organization → person → duties and tasks → flow**. Select a saved business stream and stage, then select a person to see the work recorded for that stage. The first stream is primary; later streams are supporting. The map uses the saved profile only as the stage vocabulary. It does not infer work from a title, department, reporting line, task name or legacy value-stage field.
+
+Use **Assign stages** on a duty or task to place work in the map. Duties may be assigned to several stages. Tasks inherit a duty’s assignments through the duty’s explicit task IDs, unless the task has its own stage links. A task assignment then overrides inheritance; clearing it restores inheritance. Work with no stage, no owner or a link to a removed stage remains visible for repair. These assignments describe map membership, not approval.
+
 Connected shows responsibility from left to right: People → Duties → Tasks. Explore a duty or task to see its recorded owner and up to three related tasks. A person selection opens one of their duties. To see a task outside this view, select it in Explore. The task card shows its performer, which can differ from the accountable owner. Missing owners and unmapped duties remain visible as gaps. Human, AI, and AI + human review labels describe the recorded work mode; AI modes are proposals, not proof that an agent is running. Select a card for its human checkpoint, evidence, and other connections. The register retains records outside the picture.
 
 Work flow shows the actual handoffs between task cards. It can span several duties and people. A task can contain a human checkpoint in its instructions; DutyGraph does not invent separate substeps from those instructions. The initial zoom keeps cards readable. Pan horizontally to continue along a long workflow, or select Fit to see the whole path.
@@ -157,7 +163,7 @@ The default camera frames the focused picture. Fit shows the whole bounded graph
 
 The API allows a maximum of 150 returned nodes and depth four; the UI uses depth two for focus. It caps the source scan at 5,000 records and reports truncation. A partial graph is not a complete company map. The application falls back to authoritative records while the derived projection catches up, and displays pending events. There is no free-form graph query execution.
 
-Reporting chart uses recorded manager relationships. Missing relationships remain unlinked. Team membership, task accountability, and reporting hierarchy answer different questions. In the original Cobalt scenario, no manager data was supplied, so the chart displays an explanation and the team view remains useful.
+Reporting chart uses recorded manager relationships. Missing relationships remain unlinked. Team membership, task accountability, and reporting hierarchy answer different questions. The enriched Cobalt fixture includes a small synthetic reporting chart; it is demonstration data and does not establish a real organization.
 
 ## 11. Workflows and manual cases
 
@@ -239,7 +245,7 @@ If the application is unavailable, preserve local unsent drafts and ask the oper
 | Save says version conflict | Someone changed the record or company revision | Refresh, compare, and save against the current version |
 | Task cannot be reviewed | Missing owner, performer, accepted source, date or unresolved conflict | Open the task and resolve the named gap |
 | Task stays awaiting confirmation | One required role, acceptance, version or hash does not match | Inspect requests and confirmation history; issue a current request |
-| Invitation no longer works | Used, expired, rotated or withdrawn link | Sign in if enrolled; otherwise ask advisor for a replacement |
+| Invitation no longer works | Used, expired, rotated or withdrawn link | Ask the advisor for a replacement link |
 | Request expired | Due date passed in UTC | Advisor creates a fresh bounded request |
 | Recording cannot start | Permission/device/browser issue | Check microphone permission or use a typed response |
 | Clip upload interrupted | Connection or server interruption | Keep the draft; use Upload / resume |

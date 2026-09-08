@@ -1,5 +1,15 @@
 # DutyGraph development log
 
+## 2026-09-08 — Shared business stages, complete Cobalt context and current training
+
+Task cards now uses the same saved stream/stage projection as Company Work Map, with multiple stream selection, owner/performer filtering, explicit Unassigned work and role → duty → task labels. Duplicate stage placements have separate counts. Secondary duty/handoff registers collapse below the board. Added keyboard scrolling, concise empty states and readable selected-stage counts.
+
+Cobalt has a compact fictional wholesale snapshot and 18 guided business tasks covering all six stages. An advisor-only scoped sample upgrade runs when the known sandbox opens. Exact untouched legacy fixtures can upgrade; edited, reviewed and confirmed content, custom scope/goal and existing profiles are preserved. Upgraded task dependencies follow stale-binding rules. Separate control examples remain outside the wholesale stages. No research is fabricated and no providers or emails are called.
+
+Updated Help, the portable handbook, user guides and training exercises for current Discovery, password-free work links, stage assignment, org exploration and task cards. Removed an empty response section. Fixed late workspace responses after company switches and protected edited company-intake revisions from background refreshes; failed sample refreshes can be retried.
+
+Validation: 253 tests passed, including scoped PostgreSQL sample-upgrade and preservation tests plus workspace-switch race tests. Build, 92-route contract generation and dependency audit passed (zero vulnerabilities). Integrated local browser checks used a fictional advisor workspace: saved Cobalt profile, invoice-stage/Dana drill-down, matching person-filtered task cards, and updated Help. Narrow-screen components were checked in a separate 390px fixture. These checks do not establish real-provider quality, email delivery or enterprise readiness.
+
 ## 2026-09-08 — Stage-based Company Work Map
 
 Added the default stage → people → duties/tasks experience with a stable org canvas, neutral highlights, scoped counts, person detail, and relevant flow links. Preserved all older graph views and the detailed task map. Added explicit task/duty businessStageLinks with server validation, version checks, duty inheritance and task overrides. No title, department, reporting line or task-level valueStage is treated as business-stage membership. Owners and performers are separate; approval rights are not inferred. Assignment UI preserves unchanged records, supports removed-stage repair and orphan work, and uses the shared accessible dialog. Cobalt can show a guarded read-only illustration when it has no saved business profile.

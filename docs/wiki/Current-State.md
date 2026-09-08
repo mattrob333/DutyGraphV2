@@ -1,5 +1,7 @@
 # Current state
 
+The default Company Work Map now connects saved business stages to highlighted people and scoped duties/tasks. Task cards uses the same stages, with explicit Unassigned work and no title/department inference. Cobalt has an authored fictional wholesale profile and 18 guided business tasks across six stages; safe repeat upgrades preserve edits and confirmations. Help and the training handbook describe the current path. These are implemented behaviors; real-client acceptance remains separate from synthetic checks.
+
 Company research now includes a [reusable profile](../company-profiles.md): source-backed business details, official-site social links, separate advisor updates and an HTML deliverable. Latest completed profiles survive later failed jobs. Actual headcount/peer coverage depends on public evidence; logo extraction is deferred.
 
 September 7 update: [pre-kickoff preparation](../kickoff-preparation.md) now connects the business brief and retained streams to a branded contact request, private CSV/attendee/leadership capture, advisor-reviewed org import and a two-hour agenda. Supporting research is optional. Same-title duties with changed descriptions require explicit advisor resolution; task/duty stage membership is now explicit and advisor-editable in the default Company Work Map.

@@ -489,7 +489,7 @@ export function DiscoveryJourney({
           <Button primary onClick={() => document.getElementById("returned-kickoff")?.scrollIntoView({ behavior: "smooth", block: "start" })}>Review response <ArrowRight size={16} /></Button>
         </section>
       )}
-      {["contact", "agenda"].includes(stage) && (
+      {["contact", "agenda"].includes(stage) && records.some((r) => r.kind === "response" && r.data.kickoffPreparation) && (
         <details id="returned-kickoff" open={stage === "contact"}><summary>Contact response & team roster</summary><KickoffReturns companyId={company.id} records={records} refresh={refresh} agenda={() => { setStage("agenda"); window.scrollTo({top: 0, behavior: "smooth"}); }} /></details>
       )}
       {stage === "contact" && (
@@ -497,6 +497,7 @@ export function DiscoveryJourney({
           key={company.id + stage}
           contactComplete={contactResponse}
           company={company}
+          records={records}
           refresh={refresh}
           openIndustry={() => setIndustryOpen(true)}
           researched={() => setResearchVersion((v) => v + 1)}

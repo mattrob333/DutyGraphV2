@@ -401,6 +401,19 @@ export function createApp({
       }),
     ),
   );
+  api.post("/companies/:companyId/sample-upgrade", advisor, async (req, res) =>
+    res.json(
+      await run(req, async (db: import("pg").PoolClient) => {
+        const company = await companyCheck(
+          db,
+          actor(req),
+          param(req, "companyId"),
+        );
+        await ensureCobaltExamples(db, actor(req), company.id);
+        return { company: await companyCheck(db, actor(req), company.id) };
+      }),
+    ),
+  );
   api.get("/companies", async (req, res) =>
     res.json(
       await tx(

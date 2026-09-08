@@ -4,7 +4,7 @@ Allow 60–90 minutes for this walkthrough. A facilitator can extend it into the
 
 ## Before you begin
 
-Open the local application at http://localhost:4317. Choose Open sample workspace if you are inspecting the supplied demonstration. Use the company selector to open Northstar Parts — Advisor Training. If it is absent, ask the operator to run `npm run training` from the repository; that creates a new synthetic company and regenerates the example files. It does not replace Cobalt.
+Open the local application at http://localhost:4317. Choose Open sample workspace if you are inspecting the supplied demonstration. Use the company selector to open the clearly labeled Cobalt sample or the generated Northstar Parts — Advisor Training company. If Northstar is absent, ask the operator to run `npm run training` from the repository; that creates a new synthetic company and regenerates the example files. It does not replace Cobalt.
 
 To practice writing records, create a separate workspace using the company selector. Name it “Northstar practice — your initials.” Do not edit the completed example while a class is using it. In a hosted client engagement, setup, identity assurance, data policy, and deployment acceptance would need to be completed first; this walkthrough uses the local training installation.
 
@@ -39,10 +39,10 @@ Use unique fictional email addresses when practicing enrollment. Local participa
 
 Before collecting the account, open Business research and review its six preparation topics. For this fictional exercise, do not search for Northstar or spend provider credits: use the workbook exhibits as manual sources. For a real authorized engagement, collect and inspect public context first, draft your questions, and ask the sponsor to correct the initial picture during kickoff.
 
-1. On Engagement & kickoff, choose Alex, a due date, and four or five kickoff questions. The default five cover customer value, output, demand, flow, and authority.
-2. Create the request and open it. Review the notice and questions before issuing the private link.
-3. Choose the link-issuance action. No email is sent. Copy the URL only into the approved training participant browser session.
-4. In a separate browser profile, open the link, acknowledge the notice, and set a participant password. Keep the advisor session open in the original profile.
+1. In Discovery, use the saved business snapshot and choose Alex as the contact, with a due date and four or five kickoff questions. The default five cover customer value, output, demand, flow, and authority.
+2. Save the reviewed request and open **Preview response form**. Review the notice and questions before sending.
+3. Choose the link-issuance action. No email is sent by issuing a link. Copy the URL only into the approved training browser session.
+4. Open the link in a separate browser profile. The current kickoff form needs no account or password. Keep the advisor session open in the original profile.
 5. Enter this fictional account: customers value complete orders arriving on time; output is a released standard order; demand is sufficient for the exercise; work sometimes waits for missing fields and a credit-check handoff; exceptions require Jamie’s review.
 6. Submit. Back in the advisor session, refresh Discovery, open the returned response, inspect it, and accept it.
 
@@ -86,9 +86,9 @@ Try choosing Needs change in a separate practice request. Accepting that respons
 
 ## 7. Inspect the company views
 
-Open **Company graph**. In Connected, choose Jamie in Explore and inspect accountability arrows. Select a task and follow its source links. Use Focus connections to center the picture on that record; open Register for the broader record index. Use Readable when Fit makes a large graph too small. Pan to follow cards outside the viewport.
+Open **Company Work Map**. Select a business stream and stage, then select Jamie in the highlighted organization. Inspect Jamie’s duties, tasks and task flows. Use **Assign stages** to place a duty or task explicitly; a task’s own assignment overrides inherited duty stages. Open **Connected** for accountability arrows and source links, and **Org & duties** for the reporting chart.
 
-Open Org & duties. By team shows the four people and their responsibilities. Reporting chart places Alex above Jamie and Robin, with Sam under Jamie. These are the roster relationships you entered. They are not inferred from titles. The original Cobalt example has no recorded managers and therefore explains why it cannot draw a reporting hierarchy.
+Open Org & duties. By team shows the four people and their responsibilities. Reporting chart places Alex above Jamie and Robin, with Sam under Jamie. These are the roster relationships you entered. They are not inferred from titles. The enriched Cobalt example has a small authored synthetic reporting chart; missing manager relationships remain unlinked.
 
 ## 8. Define the duty and handoffs
 

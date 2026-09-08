@@ -1,6 +1,8 @@
 # DutyGraph
 
-The default Company Work Map connects business stages to a stable reporting chart. Select a stage to highlight recorded owners and performers, then a person to see scoped duties/tasks and open related task flows. Advisors can assign duties/tasks to one or more stages; tasks inherit explicit duty links unless given their own. Unassigned, ownerless and removed-stage work remains visible. Existing graph views and the detailed task map remain available. The Cobalt fallback is a labeled read-only illustration; it does not write stage assignments. See [the stage work map](docs/stage-work-map.md).
+The default Company Work Map connects business stages to a stable reporting chart. Select a stage to highlight recorded owners and performers, then a person to see scoped duties/tasks and open related task flows. Task cards uses those same saved business-stage columns, with workflow, person and mode filters and an explicit Unassigned column. Advisors can assign duties/tasks to multiple stages; tasks inherit duty links unless given their own. Existing graph views remain available. See [the stage work map](docs/stage-work-map.md).
+
+Cobalt now has a compact fictional wholesale profile, six saved stages and 18 guided business tasks, plus separate control examples. Opening the known sample upgrades untouched legacy fixtures while preserving edited/reviewed/confirmed content and saved custom profiles. Help, the portable handbook and training exercises cover the current Discovery → Work Map → Task cards path. Workspace refreshes discard obsolete requests after company switches, and company-profile drafts retain their original revision when edited.
 
 Company snapshots and response pages use charcoal and ivory styling. Each value stream fills the available row with larger stages and directional arrows; on phones, stages stack with downward arrows.
 

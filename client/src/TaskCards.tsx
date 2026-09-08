@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   UserRound,
   Bot,
@@ -15,14 +15,12 @@ import {
   siSap,
   siNotion,
 } from "simple-icons";
+import type { BusinessProfile } from "../../shared/business-types.ts";
 import type { RecordRow } from "../../shared/domain.ts";
-import {
-  stages,
-  taskMode,
-  taskStage,
-  selectTasks,
-} from "../../shared/task-presentation.ts";
+import { stageWorkMap } from "../../shared/stage-work-map.ts";
+import { taskMode, selectTasks } from "../../shared/task-presentation.ts";
 import { State } from "./ui.tsx";
+
 const software = [
   { names: ["google sheets", "sheets"], icon: siGooglesheets },
   { names: ["google drive", "drive"], icon: siGoogledrive },
@@ -30,6 +28,8 @@ const software = [
   { names: ["sap", "sap erp"], icon: siSap },
   { names: ["notion"], icon: siNotion },
 ];
+const inactiveStates = new Set(["withdrawn", "retracted", "superseded"]);
+
 export function SoftwareChips({ systems }: { systems: string[] }) {
   return (
     <div className="software-chips">
@@ -41,8 +41,8 @@ export function SoftwareChips({ systems }: { systems: string[] }) {
           return (
             <span
               className="software-chip"
-              key={`${name}-${index}`}
-              title={`${name} · described software; connection not verified`}
+              key={name + "-" + index}
+              title={name + " · described software; connection not verified"}
             >
               {item ? (
                 <svg
@@ -52,7 +52,7 @@ export function SoftwareChips({ systems }: { systems: string[] }) {
                     color:
                       item.icon.hex === "000000"
                         ? "var(--ink)"
-                        : `#${item.icon.hex}`,
+                        : "#" + item.icon.hex,
                   }}
                 >
                   <path fill="currentColor" d={item.icon.path} />
@@ -70,48 +70,151 @@ export function SoftwareChips({ systems }: { systems: string[] }) {
     </div>
   );
 }
+
 export function ModeBadge({ mode }: { mode: string }) {
-  const m = taskMode(mode),
-    Icon =
-      m.id === "human"
-        ? UserRound
-        : m.id === "ai"
-          ? Bot
-          : m.id === "hybrid"
-            ? UsersRound
-            : ShieldAlert;
+  const m = taskMode(mode);
+  const Icon =
+    m.id === "human"
+      ? UserRound
+      : m.id === "ai"
+        ? Bot
+        : m.id === "hybrid"
+          ? UsersRound
+          : ShieldAlert;
   return (
-    <span className={`mode-badge mode-${m.id}`} title={m.detail}>
+    <span className={"mode-badge mode-" + m.id} title={m.detail}>
       <Icon size={14} aria-hidden="true" />
       {m.label}
     </span>
   );
 }
+
+type TaskLane = {
+  id: string;
+  streamName?: string;
+  stageName: string;
+  order?: number;
+  tasks: RecordRow[];
+  unassigned?: boolean;
+};
+
+/**
+ * This library reads saved membership via stageWorkMap. It deliberately does
+ * not organize cards from legacy valueStage, titles, departments, or guesses.
+ */
 export function TaskCards({
   records,
+  profile,
   filter,
   query,
   open,
 }: {
   records: RecordRow[];
+  profile?: BusinessProfile | null;
   filter: string;
   query: string;
   open: (r: RecordRow) => void;
 }) {
-  const [workflow, setWorkflow] = useState("all"),
-    [mode, setMode] = useState("all");
-  const flows = records.filter((r) => r.kind === "workflow");
-  const tasks = selectTasks(records, workflow, filter, query, mode);
-  const person = (id: string) =>
-    records.find((r) => r.kind === "person" && r.id === id)?.title ||
-    "Owner unresolved";
-  const onlyUnmapped =
-    tasks.length > 0 && tasks.every((t) => taskStage(t) === "unmapped");
-  const visibleStages = stages.filter((s) =>
-    onlyUnmapped
-      ? s.id === "unmapped"
-      : s.id !== "unmapped" || tasks.some((t) => taskStage(t) === "unmapped"),
+  const [workflow, setWorkflow] = useState("all");
+  const [mode, setMode] = useState("all");
+  const [personId, setPersonId] = useState("all");
+  const [selectedStreamIds, setSelectedStreamIds] = useState<string[] | null>(
+    null,
   );
+  const currentRecords = useMemo(() => {
+    const latest = new Map<string, RecordRow>();
+    for (const record of records) {
+      const old = latest.get(record.id);
+      if (!old || (record.version || 0) >= (old.version || 0))
+        latest.set(record.id, record);
+    }
+    return [...latest.values()].filter(
+      (record) => !inactiveStates.has(record.state),
+    );
+  }, [records]);
+  const model = useMemo(
+    () => stageWorkMap(currentRecords, profile),
+    [currentRecords, profile],
+  );
+  const flows = currentRecords.filter((r) => r.kind === "workflow");
+  const people = currentRecords.filter((r) => r.kind === "person");
+  const peopleById = useMemo(
+    () => new Map(people.map((person) => [person.id, person])),
+    [people],
+  );
+  const dutiesByTask = useMemo(() => {
+    const result = new Map<string, RecordRow[]>();
+    for (const duty of model.all.duties)
+      for (const taskId of duty.data.taskIds || [])
+        result.set(taskId, [...(result.get(taskId) || []), duty]);
+    return result;
+  }, [model.all.duties]);
+
+  useEffect(() => {
+    const available = model.streams.map((stream) => stream.id);
+    setSelectedStreamIds((current) => {
+      if (current === null) return available.length ? available : null;
+      const retained = current.filter((id) => available.includes(id));
+      return retained;
+    });
+  }, [model.streams]);
+
+  const selectedTaskIds = new Set(
+    selectTasks(currentRecords, workflow, filter, query, mode).map(
+      (task) => task.id,
+    ),
+  );
+  const visibleTasks = model.all.tasks.filter(
+    (task) =>
+      selectedTaskIds.has(task.id) &&
+      (personId === "all" ||
+        task.data.ownerId === personId ||
+        task.data.performerId === personId),
+  );
+  const visibleTaskIds = new Set(visibleTasks.map((task) => task.id));
+  const activeStreams = model.streams.filter(
+    (stream) =>
+      selectedStreamIds === null || selectedStreamIds.includes(stream.id),
+  );
+  const lanes: TaskLane[] = [
+    ...activeStreams.flatMap((stream) =>
+      stream.stages.map((stage, index) => ({
+        id: stream.id + ":" + stage.id,
+        streamName: stream.name,
+        stageName: stage.name,
+        order: index + 1,
+        tasks: stage.tasks.filter((task) => visibleTaskIds.has(task.id)),
+      })),
+    ),
+    {
+      id: "unassigned",
+      stageName: "Unassigned",
+      tasks: model.unmapped.tasks.filter((task) => visibleTaskIds.has(task.id)),
+      unassigned: true,
+    },
+  ];
+  const placementCount = lanes.reduce(
+    (total, lane) => total + lane.tasks.length,
+    0,
+  );
+  const shownTaskCount = new Set(
+    lanes.flatMap((lane) => lane.tasks.map((task) => task.id)),
+  ).size;
+  const hasSavedStreams = model.streams.length > 0;
+  const stageCount = activeStreams.reduce(
+    (total, stream) => total + stream.stages.length,
+    0,
+  );
+  const streamHidden = shownTaskCount < visibleTasks.length;
+  const repeatedAcrossStages = placementCount > shownTaskCount;
+  const filtered =
+    filter !== "all" || query || mode !== "all" || personId !== "all";
+  const person = (id: string) => peopleById.get(id);
+  const dutyLabel = (task: RecordRow) => {
+    const linked = dutiesByTask.get(task.id)?.map((duty) => duty.title) || [];
+    return linked.join(" · ") || task.data.duty || "Duty not recorded";
+  };
+
   return (
     <section className="task-library" aria-label="Task card library">
       <div className="library-controls">
@@ -123,9 +226,24 @@ export function TaskCards({
             onChange={(e) => setWorkflow(e.target.value)}
           >
             <option value="all">All workflows</option>
-            {flows.map((f) => (
-              <option key={f.id} value={f.id}>
-                {f.title}
+            {flows.map((flow) => (
+              <option key={flow.id} value={flow.id}>
+                {flow.title}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Person
+          <select
+            aria-label="Task card person"
+            value={personId}
+            onChange={(e) => setPersonId(e.target.value)}
+          >
+            <option value="all">All recorded people</option>
+            {people.map((person) => (
+              <option key={person.id} value={person.id}>
+                {person.title}
               </option>
             ))}
           </select>
@@ -147,83 +265,154 @@ export function TaskCards({
             </button>
           ))}
         </div>
-        <span className="subtle">
-          {tasks.length} task {tasks.length === 1 ? "card" : "cards"}
-        </span>
       </div>
+
+      {hasSavedStreams && (
+        <div className="stream-picker" aria-label="Business streams to show">
+          <span>Business streams</span>
+          {model.streams.map((stream) => {
+            const selected =
+              selectedStreamIds === null ||
+              selectedStreamIds.includes(stream.id);
+            return (
+              <button
+                key={stream.id}
+                aria-pressed={selected}
+                onClick={() =>
+                  setSelectedStreamIds((current) => {
+                    const currentIds =
+                      current || model.streams.map((item) => item.id);
+                    return selected
+                      ? currentIds.filter((id) => id !== stream.id)
+                      : [...currentIds, stream.id];
+                  })
+                }
+              >
+                {stream.name}
+                {stream.primary && <small>Primary</small>}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
       <p className="library-explainer">
-        {onlyUnmapped ? (
-          "These task cards are ready to review. Open a card to assign its value-chain stage when the work is understood."
-        ) : (
+        {hasSavedStreams ? (
           <>
-            Follow the value from left to right. Categories organize the work;
-            the workflow graph shows the actual handoffs. AI labels describe the
-            proposed role, not a live deployment.
+            {streamHidden ? (
+              <>
+                {shownTaskCount} shown of {visibleTasks.length} matching{" "}
+                {visibleTasks.length === 1 ? "task" : "tasks"}
+              </>
+            ) : (
+              <>
+                {shownTaskCount} task {shownTaskCount === 1 ? "card" : "cards"}{" "}
+                · {stageCount} business {stageCount === 1 ? "stage" : "stages"}
+              </>
+            )}
+            {repeatedAcrossStages && (
+              <>
+                {" · "}
+                <span title="A task is counted once for every saved business-stage assignment.">
+                  {placementCount} placements
+                </span>
+              </>
+            )}
           </>
+        ) : (
+          "No business streams are saved for this company yet. Work stays in Unassigned until an advisor records a business-stage assignment."
         )}
       </p>
+
       <div
-        className={`value-board${onlyUnmapped ? " unmapped-inbox" : ""}`}
+        className="value-board business-stage-board"
         tabIndex={0}
-        aria-label="Value-chain stages; scroll horizontally for more"
+        aria-label="Saved business stages and unassigned task cards; scroll horizontally for more"
+        onKeyDown={(event) => {
+          if (!["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+          event.preventDefault();
+          event.currentTarget.scrollBy({
+            left: event.key === "ArrowRight" ? 300 : -300,
+          });
+        }}
       >
-        {visibleStages.map((stage, index) => (
-          <section className="value-column" key={stage.id}>
+        {lanes.map((lane) => (
+          <section
+            className={
+              "value-column" + (lane.unassigned ? " unassigned-column" : "")
+            }
+            key={lane.id}
+          >
             <header>
               <span className="stage-number">
-                {String(index + 1).padStart(2, "0")}
+                {lane.unassigned ? "—" : String(lane.order).padStart(2, "0")}
               </span>
               <div>
-                <h2>{stage.label}</h2>
-                <p>{stage.description}</p>
+                {lane.streamName && (
+                  <span className="stream-name">{lane.streamName}</span>
+                )}
+                <h2>{lane.stageName}</h2>
+                {lane.unassigned && <p>No saved business-stage assignment</p>}
               </div>
-              <span className="stage-count">
-                {tasks.filter((t) => taskStage(t) === stage.id).length}
+              <span
+                className="stage-count"
+                title="Task placements in this lane"
+              >
+                {lane.tasks.length}
               </span>
             </header>
-            {tasks
-              .filter((t) => taskStage(t) === stage.id)
-              .map((t) => (
+            {lane.tasks.map((task) => {
+              const owner = person(task.data.ownerId);
+              return (
                 <button
-                  key={t.id}
-                  className={`work-card mode-${taskMode(t.data.mode).id}${t.data.conflict ? " has-conflict" : ""}`}
-                  onClick={() => open(t)}
+                  key={task.id}
+                  className={
+                    "work-card mode-" +
+                    taskMode(task.data.mode).id +
+                    (task.data.conflict ? " has-conflict" : "")
+                  }
+                  onClick={() => open(task)}
                 >
                   <div className="card-top">
-                    <ModeBadge mode={t.data.mode} />
-                    <span className="card-version">v{t.version}</span>
+                    <ModeBadge mode={task.data.mode} />
+                    <span className="card-version">v{task.version}</span>
                   </div>
-                  <span className="card-duty">{t.data.duty}</span>
-                  <h3>{t.title}</h3>
+                  <span className="card-role">
+                    Role · {owner?.data.role || "Role not recorded"}
+                  </span>
+                  <span className="card-duty">Duty · {dutyLabel(task)}</span>
+                  <h3>{task.title}</h3>
                   <div className="card-output">
                     <small>DELIVERS</small>
-                    <p>{t.data.output}</p>
+                    <p>{task.data.output}</p>
                   </div>
-                  <SoftwareChips systems={t.data.systems || []} />
+                  <SoftwareChips systems={task.data.systems || []} />
                   <div className="card-person">
                     <UserRound size={14} />
                     <span>
-                      {person(t.data.ownerId)}
+                      {owner?.title || "Owner unresolved"}
                       <small>Accountable human</small>
                     </span>
                   </div>
                   <footer>
-                    <State value={t.state} />
+                    <State value={task.state} />
                     <span>
                       <FileText size={12} />
-                      {t.data.evidenceIds?.length || 0}
+                      {task.data.evidenceIds?.length || 0}
                       <ArrowUpRight size={15} />
                     </span>
                   </footer>
                 </button>
-              ))}
-            {!tasks.some((t) => taskStage(t) === stage.id) && (
+              );
+            })}
+            {!lane.tasks.length && (
               <div className="mapping-space">
-                No tasks mapped here
-                {filter !== "all" || query || mode !== "all"
-                  ? " for these filters"
-                  : ""}
-                .<small>This does not establish that work is missing.</small>
+                {lane.unassigned
+                  ? "No unassigned tasks"
+                  : filtered
+                    ? "No matching tasks"
+                    : "No tasks assigned yet"}
+                .
               </div>
             )}
           </section>

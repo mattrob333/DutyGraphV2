@@ -1,6 +1,6 @@
 # Training workbook
 
-Use this workbook to demonstrate that you can operate the application and reason about its evidence correctly. Complete exercises in a separate practice company. The prebuilt Northstar company is a reference answer, not a blank worksheet. All exercise data is fictional.
+Use this workbook to demonstrate that you can operate the application and reason about its evidence correctly. Complete exercises in a separate practice company, or inspect the clearly labeled Cobalt guided example. The generated Northstar company is a reference answer, not a blank worksheet. All exercise data is fictional.
 
 ## Workshop plan
 
@@ -9,7 +9,7 @@ Use this workbook to demonstrate that you can operate the application and reason
 | Orientation | 20 minutes | Explain the record types and four key distinctions |
 | Scope and discovery | 40 minutes | Create engagement, roster and kickoff |
 | Work and confirmation | 60 minutes | Write tasks, resolve disagreement, obtain current decisions |
-| Relationships and cases | 35 minutes | Inspect org chart, define handoffs, complete and fail cases |
+| Work Map and cases | 35 minutes | Assign stages, inspect the org highlight, define handoffs, complete and fail cases |
 | Measurement and outcomes | 35 minutes | Test the explanation and preserve uncertainty |
 | Client delivery | 30 minutes | Draft, review and inspect a package |
 | Review and discussion | 20 minutes | Compare answers and identify improvement areas |
@@ -51,12 +51,12 @@ Write your answers before proceeding:
 
 ## Exercise 2: preserve an account
 
-Create a kickoff request for Alex using five relevant questions. Issue and open the link in the participant profile. Submit the fictional account, inspect it as advisor, and accept it.
+Create a kickoff request for Alex using five relevant questions. Preview the response form, issue the private link, and open it without creating a participant account. Submit the fictional account, inspect it as advisor, and accept it.
 
 - What proves the source’s origin in the application?
 - Does accepting the response confirm the tasks?
-- Was an email sent?
-- What must you do if the invitation is already used?
+- Was an email sent by issuing the link?
+- What must you do if the invitation is already used or expired?
 
 **Submit:** request, response and resulting source IDs. Do not include the invitation URL or password.
 
@@ -75,14 +75,14 @@ Revise the denied actions and instructions. Review the new task and issue curren
 
 ## Exercise 4: make the graph useful
 
-Create the remaining two tasks and supplied manager relationships. Open Connected and select Jamie. Open Org & duties, compare By team with Reporting chart, and inspect Sam’s responsibilities.
+Create the remaining two tasks and supplied manager relationships. Open Company Work Map, select a stage and then Jamie. Follow the highlighted organization to Jamie’s duties and tasks, then open a task flow. Open the retained Connected and Org & duties views to compare their focused investigations.
 
-- Which view best answers “What evidence supports this task?”
+- Which recorded fields make Jamie an owner, and which make Sam a performer?
 - Which view best answers “Who reports to Jamie?”
-- What should appear when no manager is recorded?
-- What does a truncation notice mean?
+- What should appear when no stage, owner or manager is recorded?
+- When does a task inherit a duty’s stage assignment, and when does its own assignment override it?
 
-**Submit:** a written explanation of two arrows and one reporting relationship. Use the record inspector to verify the relationship direction.
+**Submit:** a written explanation of the stage → person → duty → task path and one reporting relationship. Use the record inspector to verify the relationship direction.
 
 ## Exercise 5: observe a workflow
 

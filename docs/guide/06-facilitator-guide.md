@@ -4,7 +4,7 @@ Use this guide after learners attempt the workbook. Grade the quality of the rea
 
 ## Preparation
 
-Ask the operator to verify the app, database and current build. Run `npm run training` once if the reference Northstar company or example files are missing. Each run creates another clearly named company, so avoid repeated runs during the workshop.
+Ask the operator to verify the app, database and current build. Run `npm run training` once if the reference Northstar company or example files are missing. Each run creates another clearly named synthetic company, so avoid repeated runs during the workshop. The Cobalt guided example is also synthetic and clearly labeled; it is safe for demonstration, not client evidence.
 
 Prepare separate advisor and participant browser profiles. Use fictional addresses unique to each group. Do not give learners a shared real-client account. Provide Exhibit A and Exhibit B from the workbook and set the expectation that they must not infer permissions, causation or coverage beyond the evidence.
 
@@ -16,9 +16,9 @@ Visibility, engagement retention and timezone planning fields record intended po
 
 ## Exercise 2 answers
 
-The response retains the request, person, original content and submission identity; acceptance creates a source linked to that original. Acceptance does not confirm task cards. Issuing a link does not send email. A participant already enrolled should sign in; an unused expired or rotated link needs replacement by the advisor.
+The response retains the request, person, original content and submission identity; acceptance creates a source linked to that original. Acceptance does not confirm task cards. Issuing a link does not send email. Current kickoff and work-response links open without an account or password. An expired, used or rotated link needs replacement by the advisor.
 
-The local session and bearer invitation provide local account assurance only. Do not describe the flow as verified corporate identity or enterprise MFA. A good learner includes the limitation without dismissing the value of preserving exact local responses.
+The bearer invitation provides possession assurance only. It does not verify corporate identity or provide enterprise MFA. A good learner includes the limitation without dismissing the value of preserving the exact response.
 
 ## Exercise 3 answers
 
@@ -28,9 +28,9 @@ Expected progression: proposed card, reviewed card, request returned, accepted o
 
 ## Exercise 4 answers
 
-Connected plus the inspector is appropriate for evidence relationships. Reporting chart is appropriate for manager relationships. Missing managers should remain unlinked with a clear explanation; team membership and senior titles do not justify invented lines. Truncation means the displayed graph is a bounded subset and must not be presented as the whole company.
+Company Work Map is appropriate for the stage → highlighted people → duties/tasks → flow path. Connected plus the inspector is appropriate for evidence relationships. Reporting chart is appropriate for manager relationships. Missing stages, owners or managers should remain visible as gaps; team membership and senior titles do not justify invented links. Truncation means the displayed graph is a bounded subset and must not be presented as the whole company.
 
-Check arrow direction with the inspector: an owner is accountable for the task; a task is supported by evidence. A selected card can have incoming and outgoing relationships. The text labels should make the direction understandable without guessing from layout.
+Check the record fields with the inspector: an owner is accountable for the task; a performer does the work; a task is supported by evidence. A duty assignment can place its linked tasks in a stage, but an explicit task assignment overrides that inheritance. A selected card can have incoming and outgoing relationships. The text labels should make the direction understandable without guessing from layout.
 
 ## Exercise 5 answers
 

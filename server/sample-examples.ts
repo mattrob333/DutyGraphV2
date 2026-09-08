@@ -1,10 +1,17 @@
 import type { RecordRow } from "../shared/domain.ts";
 import { schemas } from "../shared/domain.ts";
 import { validateFlow } from "../shared/workflow.ts";
+import {
+  COBALT_BUSINESS_VERSION,
+  cobaltStageLinks,
+} from "../shared/cobalt-company-example.ts";
 
 export const SAMPLE_VERSION = "cobalt-guided-v3";
 const reason = "Cobalt guided example v3; entirely fictional training data.";
 const stageFor: Record<string, string> = {
+  "account-needs": "receive",
+  "invoice-prepare": "prepare",
+  "account-replenish": "check",
   "supplier-packet": "receive",
   "supplier-draft": "prepare",
   "supplier-legal": "check",
@@ -49,6 +56,7 @@ export function canUpgradeV2(
     reason: "Cobalt guided example v2; entirely fictional training data.",
   };
   delete expected.requestedScope;
+  if (!("reason" in schemas[kind].shape)) delete expected.reason;
   if (kind === "task")
     Object.assign(expected, {
       mode: "human_only",
@@ -74,6 +82,50 @@ type Writer = (
   existing?: RecordRow,
 ) => Promise<RecordRow>;
 
+// All schema fields must still match the old authored fixture. Version and
+// review guards additionally preserve edits to metadata and confirmation state.
+export function canUpgradeCobaltBusiness(
+  r: RecordRow & { has_confirmations?: boolean },
+  kind: keyof typeof schemas,
+  expected: any,
+) {
+  if (
+    r.kind !== kind ||
+    r.data.sampleVersion !== SAMPLE_VERSION ||
+    r.data.sampleBusinessVersion ||
+    r.version > 3 ||
+    r.data.reviewed ||
+    r.has_confirmations ||
+    r.confirmations?.length ||
+    !["proposed", "conflicting", "draft"].includes(r.state) ||
+    !["task", "duty", "handoff", "workflow", "agent"].includes(kind) ||
+    r.title !== expected.title
+  )
+    return false;
+  if (
+    kind === "agent" &&
+    (r.data.runtimeState !== "not_deployed" ||
+      r.data.approvedScope?.length ||
+      r.data.provisionedScope?.length ||
+      r.data.observedScope?.length ||
+      JSON.stringify(r.data.requestedScope) !==
+        JSON.stringify(expected.requestedScope))
+  )
+    return false;
+  const fields = Object.keys(schemas[kind].shape);
+  const select = (data: any) =>
+    Object.fromEntries(
+      fields.filter((k) => k in data).map((k) => [k, data[k]]),
+    );
+  const previous = schemas[kind].safeParse(select(r.data));
+  const next = schemas[kind].safeParse(select(expected));
+  return (
+    previous.success &&
+    next.success &&
+    JSON.stringify(previous.data) === JSON.stringify(next.data)
+  );
+}
+
 // Only the untouched original fixture may be enriched. Reviewed, confirmed,
 // revised, or user-authored records must survive opening the sample again.
 export function canEnrichOriginalTask(
@@ -96,6 +148,7 @@ export function canEnrichOriginalTask(
 export async function populateCobaltExamples(
   existing: RecordRow[],
   write: Writer,
+  businessStages = true,
 ) {
   const all = [...existing];
   const find = (kind: string, title: string) =>
@@ -123,7 +176,8 @@ export async function populateCobaltExamples(
       old &&
       !(kind === "task" && canEnrichOriginalTask(old)) &&
       !originalAgent &&
-      !canUpgradeV2(old, kind, data)
+      !canUpgradeV2(old, kind, data) &&
+      !(businessStages && canUpgradeCobaltBusiness(old, kind, data))
     )
       return old;
     const { requestedScope, ...input } = data;
@@ -139,6 +193,16 @@ export async function populateCobaltExamples(
       sampleKey: key,
       sampleVersion: SAMPLE_VERSION,
     };
+    if (businessStages) {
+      payload.sampleBusinessVersion = COBALT_BUSINESS_VERSION;
+      if (kind === "task") payload.businessStageLinks = cobaltStageLinks([key]);
+      if (kind === "duty")
+        payload.businessStageLinks = cobaltStageLinks(
+          parsed.taskIds.map(
+            (id: string) => all.find((r) => r.id === id)?.data.sampleKey || "",
+          ),
+        );
+    }
     if (kind === "task") payload.reviewed = false;
     if (["task", "duty", "handoff"].includes(kind))
       payload.sourceBindings = bound(parsed.evidenceIds);
@@ -792,12 +856,53 @@ export async function populateCobaltExamples(
     dispatch,
     notify,
   ];
-  for (const title of new Set(
-    [...supplierTasks, ...orderTasks].map((r) => r.data.duty),
-  )) {
-    const work = [...supplierTasks, ...orderTasks].filter(
-      (r) => r.data.duty === title,
+  const accountTasks: RecordRow[] = [];
+  if (businessStages) {
+    const commercial = await evidence(
+      "account-cycle-walkthrough",
+      "Account development and replenishment — fictional",
+      jordan,
+      "Jordan reviews a business customer's maintenance needs and passes a documented product and delivery requirement to Sales. After dispatch, Dana prepares a draft invoice from the accepted order and carrier receipt, flags differences for human review and leaves payment execution outside this example. Alex reviews the account's next replenishment needs with Jordan and drafts a follow-up for approval. No actual outreach, invoice issue or payment takes place in this fixture.",
     );
+    accountTasks.push(
+      await task(
+        "account-needs",
+        "Document a business account's supply needs",
+        "Develop business accounts",
+        jordan,
+        alex,
+        "A fictional account inquiry and stated maintenance needs",
+        "Documented products, quantities and requested delivery window",
+        "Record the customer's stated need. Ask the account owner to resolve missing product or delivery information before requesting an availability quote. Do not promise price or stock.",
+        [commercial],
+      ),
+      await task(
+        "invoice-prepare",
+        "Prepare the customer invoice for review",
+        "Prepare accurate customer invoices",
+        dana,
+        dana,
+        "Accepted order, checked shipment quantities and carrier receipt",
+        "Draft invoice with matching source references or an exception list",
+        "Compare agreed prices and dispatched quantities. Prepare a draft invoice, attach source references and route differences for human review. Do not issue an invoice, collect money or execute a payment in this example.",
+        [commercial, rule],
+      ),
+      await task(
+        "account-replenish",
+        "Review an account's next replenishment need",
+        "Maintain customer replenishment plans",
+        jordan,
+        alex,
+        "Completed order record and the account's stated future needs",
+        "Proposed replenishment follow-up for the account owner",
+        "Review the completed order and customer feedback. Record the next known requirement and draft a follow-up for Jordan to approve. Do not infer repeat demand, promise dates or send messages automatically.",
+        [commercial],
+      ),
+    );
+  }
+  const allWork = [...supplierTasks, ...orderTasks, ...accountTasks];
+  for (const title of new Set(allWork.map((r) => r.data.duty))) {
+    const work = allWork.filter((r) => r.data.duty === title);
     await add(`duty:${title}`, "duty", {
       title,
       ownerId: work[0].data.ownerId,

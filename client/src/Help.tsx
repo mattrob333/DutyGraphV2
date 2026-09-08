@@ -15,7 +15,11 @@ const articles = Object.entries(files)
     text,
   }));
 export function Help({ go }: { go: (page: string) => void }) {
-  const [selected, setSelected] = useState(articles[0]?.id || ""),
+  const [selected, setSelected] = useState(
+      articles.find((a) => a.id === "23-discovery-to-confirmed-work.md")?.id ||
+        articles[0]?.id ||
+        "",
+    ),
     [query, setQuery] = useState("");
   const matches = articles.filter((a) =>
     (a.title + " " + a.text).toLowerCase().includes(query.toLowerCase().trim()),
@@ -26,8 +30,8 @@ export function Help({ go }: { go: (page: string) => void }) {
     <>
       <Heading
         eyebrow="ADVISOR LEARNING CENTER"
-        title="From first conversation to client delivery."
-        description="A guided walkthrough, a complete manual, and practice exercises for the current application."
+        title="Start with Discovery. Follow the work."
+        description="Use the current advisor path, then open the Work Map to connect stages, people, duties and task flows."
         actions={
           <Button onClick={() => window.print()}>
             <Printer size={16} />
@@ -36,11 +40,12 @@ export function Help({ go }: { go: (page: string) => void }) {
         }
       />
       <div className="help-shortcuts">
+        <Button primary onClick={() => go("discovery")}>
+          Start Discovery <ArrowRight size={15} />
+        </Button>
         <a className="btn" href="/?demo=discovery" target="_blank" rel="noopener">Try the participant walkthrough <ArrowRight size={15}/></a>
         <Button onClick={() => setSelected("25-participant-review.md")}>Participant review guide</Button>
-        <Button onClick={() => go("discovery")}>
-          Open Discovery <ArrowRight size={15} />
-        </Button>
+        <Button onClick={() => go("graph")}>Open Company Work Map <ArrowRight size={15} /></Button>
         <Button onClick={() => go("deliverables")}>
           Open Deliverables <ArrowRight size={15} />
         </Button>

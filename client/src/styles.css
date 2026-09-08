@@ -3879,6 +3879,46 @@ details.capture-notice li {
   max-width: 960px;
   margin: 12px 0 23px;
 }
+.stream-picker {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--raised) 58%, transparent);
+}
+.stream-picker > span {
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-right: 4px;
+}
+.stream-picker button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 11px;
+}
+.stream-picker button[aria-pressed="true"] {
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--ink) 48%, var(--line));
+  background: var(--surface);
+}
+.stream-picker small {
+  color: var(--faint);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
 .value-board {
   display: grid;
   grid-auto-flow: column;
@@ -3888,6 +3928,13 @@ details.capture-notice li {
   padding: 0 2px 18px;
   scrollbar-color: var(--line) transparent;
   align-items: start;
+}
+.business-stage-board {
+  grid-auto-columns: minmax(270px, 1fr);
+}
+.business-stage-board:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
 }
 .value-column > header {
   display: flex;
@@ -3907,6 +3954,22 @@ details.capture-notice li {
   font-size: 15px;
   margin: 0 0 3px;
   font-weight: 600;
+}
+.stream-name {
+  display: block;
+  color: var(--faint);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.unassigned-column > header {
+  border-bottom-style: dashed;
+}
+.unassigned-column .stage-number {
+  font-size: 17px;
+  line-height: 1;
 }
 .value-column > header p {
   font-size: 10px;
@@ -3982,6 +4045,18 @@ details.capture-notice li {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
+}
+.card-role {
+  display: block;
+  color: var(--faint);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  margin-bottom: 5px;
 }
 .work-card h3 {
   font-size: 16px;
@@ -4148,8 +4223,17 @@ details.capture-notice li {
   .value-board {
     grid-auto-columns: 260px;
   }
+  .business-stage-board {
+    grid-auto-columns: 280px;
+  }
   .library-controls {
     gap: 12px;
+  }
+  .stream-picker {
+    align-items: flex-start;
+  }
+  .stream-picker > span {
+    width: 100%;
   }
   .task-io {
     grid-template-columns: 1fr;

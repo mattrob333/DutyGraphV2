@@ -1,8 +1,10 @@
 import { BusinessBrief } from "./BusinessBrief.tsx";
+import { CobaltCompanyProfile } from "./CobaltCompanyProfile.tsx";
+import { isKnownCobaltSample } from "../../shared/cobalt-company-example.ts";
 import { useEffect, useState } from "react";
 import { Sparkles, Check, ArrowRight } from "lucide-react";
 import { profileFromClassification } from "../../shared/business-classification.ts";
-import type { Company } from "../../shared/domain.ts";
+import type { Company, RecordRow } from "../../shared/domain.ts";
 import {
   backbone,
   businessTemplates,
@@ -22,17 +24,20 @@ import {
 } from "./initial-research.ts";
 export function BusinessProfilePanel({
   company,
+  records = [],
   refresh,
   openIndustry,
   researched,
   contactComplete = false,
 }: {
   company: Company;
+  records?: RecordRow[];
   refresh: () => Promise<void>;
   openIndustry: () => void;
   researched?: () => void;
   contactComplete?: boolean;
 }) {
+  const illustrative = isKnownCobaltSample(company.sandbox, records);
   const [plan, setPlan] = useState<ResearchPlan | null>(() =>
     readResearchPlan(company.id),
   );
@@ -238,6 +243,23 @@ export function BusinessProfilePanel({
     [notice, setNotice] = useState(""),
     [suggestions, setSuggestions] = useState<any[]>([]);
   useEffect(() => {
+    if (dirty || analysis || plan) return;
+    if (company.settings.businessProfile)
+      setProfile(company.settings.businessProfile);
+    setIntake(
+      company.settings.businessIntake || {
+        name: company.name,
+        website: "",
+        description: "",
+      },
+    );
+    setBaseRevision(company.revision);
+  }, [
+    company.settings.businessProfile,
+    company.settings.businessIntake,
+    company.revision,
+  ]);
+  useEffect(() => {
     let active = true;
     api(`/v1/companies/${company.id}/framework-runs/industrymap`)
       .then((d) => {
@@ -339,145 +361,176 @@ export function BusinessProfilePanel({
   };
   return (
     <Panel
-      title={briefJob ? "Company profile" : "Start with the company. We’ll build the research brief."}
-      subtitle="Enter the company once. Get a sourced business overview, competitive context and the questions to take into your first meeting."
+      title={
+        briefJob || illustrative
+          ? "Company profile"
+          : "Start with the company. We’ll build the research brief."
+      }
+      subtitle={
+        illustrative
+          ? "Explore a fictional wholesale business, its team and the work they do."
+          : "Enter the company once. Get a sourced business overview, competitive context and the questions to take into your first meeting."
+      }
     >
-      <details className="research-intake-disclosure" key={briefJob?.id || "new"} open={!briefJob || !!plan}>
-        <summary>{briefJob ? "Edit company details / research again" : "Company details"}</summary>
-      <div className="business-intake">
-        <div className="business-fields">
-          <label>
-            Company name
-            <input
-              value={intake.name}
-              maxLength={160}
-              disabled={busy || !!plan}
-              onChange={(e) => setIntake({ ...intake, name: e.target.value })}
-            />
-          </label>
-          <label>
-            Website <span className="subtle">optional with a description</span>
-            <input
-              value={intake.website}
-              maxLength={500}
-              disabled={busy || !!plan}
-              placeholder="tier4intelligence.com"
-              onChange={(e) =>
-                setIntake({ ...intake, website: e.target.value })
-              }
-            />
-          </label>
-        </div>
-        <label>
-          What does the company do?
-          <textarea
-            value={intake.description}
-            rows={3}
-            maxLength={4000}
-            disabled={busy || !!plan}
-            placeholder="For example: We help businesses discover where AI can improve their operations, then advise on implementation."
-            onChange={(e) =>
-              setIntake({ ...intake, description: e.target.value })
-            }
-          />
-        </label>
-        <details className="business-research-options">
-          <summary>Research coverage · {focuses.length} areas selected</summary>
-          <p>
-            These are included by default. Uncheck anything outside your
-            engagement.
-          </p>
-          {researchFocuses.map((f) => (
-            <label className="check-line" key={f.id}>
-              <input
-                type="checkbox"
-                checked={focuses.includes(f.id)}
+      {!illustrative && (
+        <details
+          className="research-intake-disclosure"
+          key={briefJob?.id || "new"}
+          open={!briefJob || !!plan}
+        >
+          <summary>
+            {briefJob
+              ? "Edit company details / research again"
+              : "Company details"}
+          </summary>
+          <div className="business-intake">
+            <div className="business-fields">
+              <label>
+                Company name
+                <input
+                  value={intake.name}
+                  maxLength={160}
+                  disabled={busy || !!plan}
+                  onChange={(e) => {
+                    setIntake({ ...intake, name: e.target.value });
+                    setDirty(true);
+                  }}
+                />
+              </label>
+              <label>
+                Website{" "}
+                <span className="subtle">optional with a description</span>
+                <input
+                  value={intake.website}
+                  maxLength={500}
+                  disabled={busy || !!plan}
+                  placeholder="tier4intelligence.com"
+                  onChange={(e) => {
+                    setIntake({ ...intake, website: e.target.value });
+                    setDirty(true);
+                  }}
+                />
+              </label>
+            </div>
+            <label>
+              What does the company do?
+              <textarea
+                value={intake.description}
+                rows={3}
+                maxLength={4000}
                 disabled={busy || !!plan}
-                onChange={(e) =>
-                  setFocuses(
-                    e.target.checked
-                      ? [...focuses, f.id]
-                      : focuses.filter((id) => id !== f.id),
-                  )
-                }
+                placeholder="For example: We help businesses discover where AI can improve their operations, then advise on implementation."
+                onChange={(e) => {
+                  setIntake({ ...intake, description: e.target.value });
+                  setDirty(true);
+                }}
               />
-              {f.label}
             </label>
-          ))}
-          <p className="subtle">
-            Company overview uses the official site when supplied. The other
-            searches cover the wider public web. Up to five sources per search;
-            the deeper Industry Map remains a separate step.
-          </p>
+            <details className="business-research-options">
+              <summary>
+                Research coverage · {focuses.length} areas selected
+              </summary>
+              <p>
+                These are included by default. Uncheck anything outside your
+                engagement.
+              </p>
+              {researchFocuses.map((f) => (
+                <label className="check-line" key={f.id}>
+                  <input
+                    type="checkbox"
+                    checked={focuses.includes(f.id)}
+                    disabled={busy || !!plan}
+                    onChange={(e) =>
+                      setFocuses(
+                        e.target.checked
+                          ? [...focuses, f.id]
+                          : focuses.filter((id) => id !== f.id),
+                      )
+                    }
+                  />
+                  {f.label}
+                </label>
+              ))}
+              <p className="subtle">
+                Company overview uses the official site when supplied. The other
+                searches cover the wider public web. Up to five sources per
+                search; the deeper Industry Map remains a separate step.
+              </p>
+            </details>
+            <div className="actions">
+              <Button
+                primary
+                disabled={
+                  busy ||
+                  !classification ||
+                  (!classification.configured &&
+                    !classification.researchConfigured) ||
+                  intake.name.trim().length < 2 ||
+                  (!intake.description.trim() && !intake.website.trim())
+                }
+                onClick={suggest}
+              >
+                <Sparkles size={16} />
+                {busy
+                  ? plan && plan.index < plan.focuses.length
+                    ? `Researching ${researchFocuses.find((f) => f.id === plan.focuses[plan.index])?.label.toLowerCase()}…`
+                    : "Preparing the business profile…"
+                  : plan
+                    ? plan.failed
+                      ? "Retry unfinished step"
+                      : "Resume research pass"
+                    : classification?.researchConfigured && focuses.length
+                      ? "Research this company"
+                      : "Suggest my business profile"}
+              </Button>
+              {plan && !busy && (
+                <Button
+                  onClick={() => {
+                    checkpoint(null);
+                    setError("");
+                  }}
+                >
+                  End this pass / change details
+                </Button>
+              )}
+              {classification?.jobs?.[0]?.input?.revision ===
+                company.revision && (
+                <Button disabled={busy} onClick={() => void recoverAnalysis()}>
+                  Recover latest suggestion
+                </Button>
+              )}
+            </div>
+            <p className="subtle">
+              By starting, you send the company name, URL, description and
+              selected official-site excerpts to Exa for contextual public
+              research, and the description and collected excerpts to OpenAI for
+              a draft.{" "}
+              {classification?.researchConfigured
+                ? `This pass uses ${focuses.length} searches and one AI analysis when configured. Provider charges apply.`
+                : "Based on your description; enable Exa in Workspace settings to include website research."}{" "}
+              Ten searches and ten business analyses per account per 24 hours.
+              No automatic retries.
+            </p>
+            {busy && (
+              <p role="status">
+                Keep this page open while the sequence runs. Completed searches
+                are saved. You can resume an interrupted pass in this browser.
+              </p>
+            )}
+            {classification?.configured === false && (
+              <p className="notice">
+                Connect OpenAI in Workspace settings to get AI suggestions. You
+                can still choose a business type in the catalog below.
+              </p>
+            )}
+          </div>
         </details>
-        <div className="actions">
-          <Button
-            primary
-            disabled={
-              busy ||
-              !classification ||
-              (!classification.configured &&
-                !classification.researchConfigured) ||
-              intake.name.trim().length < 2 ||
-              (!intake.description.trim() && !intake.website.trim())
-            }
-            onClick={suggest}
-          >
-            <Sparkles size={16} />
-            {busy
-              ? plan && plan.index < plan.focuses.length
-                ? `Researching ${researchFocuses.find((f) => f.id === plan.focuses[plan.index])?.label.toLowerCase()}…`
-                : "Preparing the business profile…"
-              : plan
-                ? plan.failed
-                  ? "Retry unfinished step"
-                  : "Resume research pass"
-                : classification?.researchConfigured && focuses.length
-                  ? "Research this company"
-                  : "Suggest my business profile"}
-          </Button>
-          {plan && !busy && (
-            <Button
-              onClick={() => {
-                checkpoint(null);
-                setError("");
-              }}
-            >
-              End this pass / change details
-            </Button>
-          )}
-          {classification?.jobs?.[0]?.input?.revision === company.revision && (
-            <Button disabled={busy} onClick={() => void recoverAnalysis()}>
-              Recover latest suggestion
-            </Button>
-          )}
-        </div>
-        <p className="subtle">
-          By starting, you send the company name, URL, description and selected
-          official-site excerpts to Exa for contextual public research, and the
-          description and collected excerpts to OpenAI for a draft.{" "}
-          {classification?.researchConfigured
-            ? `This pass uses ${focuses.length} searches and one AI analysis when configured. Provider charges apply.`
-            : "Based on your description; enable Exa in Workspace settings to include website research."}{" "}
-          Ten searches and ten business analyses per account per 24 hours. No
-          automatic retries.
-        </p>
-        {busy && (
-          <p role="status">
-            Keep this page open while the sequence runs. Completed searches are
-            saved. You can resume an interrupted pass in this browser.
-          </p>
-        )}
-        {classification?.configured === false && (
-          <p className="notice">
-            Connect OpenAI in Workspace settings to get AI suggestions. You can
-            still choose a business type in the catalog below.
-          </p>
-        )}
-      </div>
-      </details>
+      )}
       <ErrorBox error={error} />
       {notice && <p role="status">{notice}</p>}
+      {illustrative && (
+        <CobaltCompanyProfile company={company} records={records} />
+      )}
       {briefJob && (
         <BusinessBrief
           key={briefJob.id}
@@ -491,12 +544,17 @@ export function BusinessProfilePanel({
           )}
           busy={busy}
           prepare={() => {
-            const section = document.getElementById("business-stream-review") as HTMLDetailsElement | null;
-            if (section) { section.open = true; section.scrollIntoView({ behavior: "smooth", block: "start" }); }
+            const section = document.getElementById(
+              "business-stream-review",
+            ) as HTMLDetailsElement | null;
+            if (section) {
+              section.open = true;
+              section.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
           }}
         />
       )}
-      {!briefJob && !!profile.streams.length && (
+      {!briefJob && !illustrative && !!profile.streams.length && (
         <p className="notice">
           This saved operating profile has no business research brief yet.
           Select “Research this company” above to build the company overview,
@@ -504,7 +562,8 @@ export function BusinessProfilePanel({
         </p>
       )}
       {!!profile.streams.length && (
-        <details open={dirty || !briefJob}
+        <details
+          open={dirty || (!briefJob && !illustrative)}
           id="business-stream-review"
           className="business-recommendation"
           aria-label="Suggested business profile"
@@ -662,7 +721,12 @@ export function BusinessProfilePanel({
               disabled={busy}
               onClick={async () => {
                 if (dirty && !(await save("proposed"))) return;
-                if (contactComplete) { setNotice("Business streams saved. Your returned preparation remains available above."); return; }
+                if (contactComplete) {
+                  setNotice(
+                    "Business streams saved. Your returned preparation remains available above.",
+                  );
+                  return;
+                }
                 document
                   .getElementById("journey-draft")
                   ?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -672,7 +736,9 @@ export function BusinessProfilePanel({
               }}
             >
               {dirty ? <ArrowRight size={15} /> : <Check size={15} />}
-              {contactComplete ? "Save business streams" : `Confirm ${profile.streams.length > 1 ? `${profile.streams.length} streams` : "stream"} & prepare kickoff request`}
+              {contactComplete
+                ? "Save business streams"
+                : `Confirm ${profile.streams.length > 1 ? `${profile.streams.length} streams` : "stream"} & prepare kickoff request`}
             </Button>
           </div>
           <p className="subtle">

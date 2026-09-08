@@ -1,23 +1,27 @@
-# Explore the Cobalt workflows
+# Explore the Cobalt guided example
 
-Cobalt Industrial Supply is fictional. Its interviews, people, policies and work descriptions are training examples. The examples contain no live agents, sent emails or measured business results.
+Cobalt Industrial Supply is fictional. Its company snapshot, people, policies, stages and work descriptions are authored training examples. The example contains no live agents, sent emails or measured business results. Treat every finding as synthetic.
 
-Open **Workspace settings → Open my sample company**, then **Company graph → Work flow**. Reopening the sample adds the complete examples to an older Cobalt workspace. It enriches untouched original task descriptions, preserves revised or confirmed work, and does not reset your notes.
+Open **Workspace settings → Open my sample company**, then **Company Work Map**. The enriched sample includes a saved wholesale distribution stream and a small synthetic reporting chart. Select a stream and stage, choose a highlighted person, and follow their duties, tasks and flows. Reopening the sample adds the complete examples to an older Cobalt workspace. It enriches untouched original task descriptions, preserves revised or confirmed work, and does not reset your notes.
+
+The saved sample’s stage links are authored synthetic fixture data. They are persisted with the Cobalt business profile and can be edited in **Assign stages**; they illustrate how duties and tasks appear in saved business stream columns. They are not inferred from titles or the order of stages. A task with its own stage links overrides its duty’s stage links.
+
+If an older or incomplete Cobalt workspace cannot load the saved business profile, the guarded legacy fallback may show clearly labeled illustrative assignments. That fallback is read-only and does not change records. The normal saved sample profile and its stage assignments remain editable.
 
 ## Supplier onboarding
 
-The intended outcome is a supplier ready for purchasing. Eight task cards and nine handoffs cover the usual path and two exceptions.
+The intended outcome is a supplier ready for purchasing. Its eight task cards are part of the sample’s 18 guided business task cards; nine handoffs cover the usual path and two exceptions.
 
 1. Start with **Check supplier packet**, then **Create draft supplier record**.
 2. Click **Standard terms** to inspect the direct Finance route. Compare it with **Nonstandard terms**, which requires Legal review before Finance.
 3. At **Verify bank details**, compare **Bank details match** with **Bank-name mismatch**. A correction must include an independent Finance recheck before the verification result can be recorded.
 4. Inspect **Approve the supplier**. Its owner and performer are intentionally unresolved. Procurement describes verification as approval; Finance disagrees. This is a hypothesis about a source of delay, not a proven throughput constraint.
 5. Click **Authorized approval**. Read the output mapping, required input and acceptance check. A completed bank check does not authorize activation. Elena owns the escalation, not the unresolved approval decision.
-6. Open **Org & duties** to see complete records, bank verification, contract review, approval and activation responsibilities grouped around the work.
+6. Select a person in the highlighted organization to see their duties and tasks. Open **Org & duties** for the retained team view and the complete responsibility list.
 
 ## Customer order fulfilment
 
-Select **Customer order fulfilment** in the workflow picker. Seven task cards and seven handoffs connect a customer's purchase order to a checked shipment and dispatch confirmation.
+Select **Customer order fulfilment** in the workflow picker. Its seven task cards and seven handoffs connect a customer's purchase order to a checked shipment and dispatch confirmation. The sample also includes three account-cycle task cards, for 18 guided business tasks in total. The separate access-review walkthrough has two access-controls task cards, both **Unassigned**, because it is a synthetic control walkthrough rather than part of the wholesale stages. Three additional synthetic control scenarios remain in **Agents & controls** and are likewise outside the wholesale stages.
 
 1. Follow **Check customer purchase order → Check stock and delivery date**.
 2. If stock is available, **Stock reserved** proceeds to pick release.
@@ -27,8 +31,10 @@ Select **Customer order fulfilment** in the workflow picker. Seven task cards an
 
 ## What clicking means
 
+- Click a stage, then a person, to narrow the map. **Owns work** comes from an owner field; **Does the work** comes from a performer field. Neither label is an approval.
 - Click a task to inspect it; **Open full record** shows its input, output, performer, owner, duty, boundaries and sources.
 - Click an arrow's label to open the actual handoff record, including acceptance criteria, timeout, retry limit and exception owner. Timeouts describe the proposed contract; they are not measured waiting time or an active agent timer.
+- Unassigned, ownerless and removed-stage work stays visible for repair. The map does not create a relationship from a task title, duty name, department or reporting line.
 - Dashed links are proposed handoffs that still need review. Fictional source acceptance does not imply participant confirmation, authority approval or deployment.
 - **Workflows & cases** opens each workflow definition. A manual case requires reviewed current tasks, handoffs and workflow bindings. The supplier approval conflict deliberately prevents that readiness until it is resolved.
 - **Agent governance** contains two proposals: Supplier Packet Assistant and Order Handoff Assistant. Both have named human owners and bounded drafting purposes. Neither runs tools, schedules jobs, releases business transactions or sends customer messages.
