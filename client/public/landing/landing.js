@@ -14,6 +14,7 @@
   const announcement = document.querySelector('#gallery-announcement');
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
   const captions = [
+    'Select a business stage. See who is involved and the duties they own, while keeping the whole company in view.',
     'Supplier onboarding: follow the usual path, inspect exceptions, and see the approval responsibility that still needs agreement.',
     'The task library: compare Human, AI, and AI + human review roles across the work. Each card keeps its output, tools, and owner in view.',
     'A task in context: open the human checkpoint and its connected records without losing the workflow around it.'
@@ -43,11 +44,11 @@
       panels[i].hidden = !active;
     });
     caption.textContent = captions[current];
-    document.querySelector('#gallery-count').textContent = `0${current + 1} / 03`;
+    document.querySelector('#gallery-count').textContent = `${String(current + 1).padStart(2, '0')} / ${String(tabs.length).padStart(2, '0')}`;
     if (manual) {
       paused = true;
       updatePlay();
-      announcement.textContent = `${current + 1} of 3. ${tabs[current].querySelector('strong').textContent} ${captions[current]}`;
+      announcement.textContent = `${current + 1} of ${tabs.length}. ${tabs[current].querySelector('strong').textContent} ${captions[current]}`;
     }
     schedule();
   }

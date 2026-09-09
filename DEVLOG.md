@@ -1,5 +1,9 @@
 # DutyGraph development log
 
+## 2026-09-08 — Feature the Work Map on the website
+
+Added a fresh 1626×967 PNG capture of the fictional Cobalt Company Work Map as the first public product-gallery image. The selected Quote availability stage highlights its three people and displays their duties while retaining the full chart. Capture excludes the workspace sidebar and account identity. Existing workflow, task-card and checkpoint images remain in a four-view gallery, with matching caption/alt text, dynamic counters and accessible announcements. Mobile uses two tab columns and shows the full map with full-size zoom. Production build/content generators and 21 local browser checks pass, covering all images, four-view navigation, keyboard wrap, zoom, desktop/mobile fitting and page errors. No real client data or outreach is involved.
+
 ## 2026-09-08 — Neutral Work Map depth
 
 Replaced the rejected blue workstream and person fills with neutral surface layering: near-black recessed tray, lighter charcoal cards and small external shadows. Hover borders stay gray; selected/focused borders have a slight steel tint without a top stripe or doubled border. Light mode uses white cards on warm gray. Kept the existing org-chart dot texture rather than adding another patterned surface. A critical dashboard-design reviewer advised on the treatment and reviewed the resulting dark/light captures. Production build/typecheck and 16 fictional responsive browser checks passed with no chart-fit or interaction changes. No real emails or provider calls were made.

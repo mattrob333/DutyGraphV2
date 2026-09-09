@@ -1,5 +1,7 @@
 # DutyGraph
 
+The website product gallery opens with the current Company Work Map: a real capture of the fictional Cobalt sample, followed by workflows, task cards and human checkpoints. Each image opens full size; the map stays fully visible on mobile.
+
 The Work Map separates lighter charcoal stage cards from a recessed dark background using subtle shadows. Fills and hover states stay neutral; only selected borders carry a slight steel tint. Light mode uses white cards on warm gray. Workflow diagrams retain their separate role and handoff colors.
 
 Workflows & cases uses a distinct branching-path sidebar icon. It lists the company's saved workflows and manual cases; it is not a reusable workflow recommendation library. Its sidebar placement remains under product review.
