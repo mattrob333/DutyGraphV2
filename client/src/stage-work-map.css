@@ -2,6 +2,13 @@
   --swm-ivory: #e3dfd5;
   --swm-muted: #aaaab0;
   --swm-line: #3c3e42;
+  --swm-accent: #b3cde3;
+  --swm-stage-surface: #242c35;
+  --swm-stage-card: #2a3541;
+  --swm-stage-border: #52677b;
+  --swm-stage-hover: #303f4e;
+  --swm-stage-selected: #354b60;
+  --swm-stage-selected-border: #a1bfd9;
   color: var(--ink);
   margin-top: 14px;
 }
@@ -32,14 +39,14 @@
   color: var(--swm-muted);
 }
 .swm-streams [aria-pressed="true"] {
-  border-color: #68696c;
-  background: #303236;
+  border-color: var(--swm-stage-border);
+  background: var(--swm-stage-hover);
 }
 .swm-stage-picker {
   border: 1px solid var(--swm-line);
   border-radius: 9px;
   padding: 12px;
-  background: #232528;
+  background: var(--swm-stage-surface);
 }
 .swm-stage-heading {
   display: flex;
@@ -63,6 +70,7 @@
   gap: 5px 12px;
 }
 .swm-workstream-title h2 {
+  color: var(--swm-accent);
   font-size: 16px;
   letter-spacing: -0.25px;
   margin: 0;
@@ -113,7 +121,7 @@
   position: absolute;
   right: -15px;
   top: calc(50% - 10px);
-  color: var(--swm-muted);
+  color: var(--swm-accent);
   pointer-events: none;
 }
 .swm-stage-picker li > button:first-child {
@@ -121,8 +129,8 @@
   min-height: 76px;
   width: 100%;
   padding: 10px 28px 10px 10px;
-  border: 1px solid #44464a;
-  background: #27292c;
+  border: 1px solid var(--swm-stage-border);
+  background: var(--swm-stage-card);
   border-radius: 6px;
   text-align: left;
   display: flex;
@@ -133,13 +141,13 @@
     background 140ms ease;
 }
 .swm-stage-picker li > button:first-child:hover {
-  border-color: #8a8c90;
-  background: #303236;
+  border-color: var(--swm-stage-selected-border);
+  background: var(--swm-stage-hover);
 }
 .swm-stage-picker li > button:first-child[aria-pressed="true"] {
-  background: #373a3e;
+  background: var(--swm-stage-selected);
   color: #f1efeb;
-  border-color: #c3c0b9;
+  border-color: var(--swm-stage-selected-border);
   box-shadow: none;
 }
 .swm-stage-label {
@@ -148,6 +156,7 @@
   gap: 9px;
 }
 .swm-step {
+  color: var(--swm-accent);
   font-size: 10px;
   opacity: 0.7;
   font-variant-numeric: tabular-nums;
@@ -917,13 +926,19 @@ main#main:has(.work-map-page) {
   --swm-ivory: #56534a;
   --swm-muted: #646970;
   --swm-line: #d7d5cf;
+  --swm-accent: #365d7e;
+  --swm-stage-surface: #edf2f6;
+  --swm-stage-card: #f8fafc;
+  --swm-stage-border: #a5b8c9;
+  --swm-stage-hover: #e4edf5;
+  --swm-stage-selected: #d9e7f2;
+  --swm-stage-selected-border: #4e789b;
 }
 [data-theme="light"] .work-map-monogram {
   background: #e8e5dd;
   color: #45423b;
   border-color: #b1aa9b;
 }
-[data-theme="light"] .swm-stage-picker,
 [data-theme="light"] .swm-explore,
 [data-theme="light"] .swm-scope,
 [data-theme="light"] .swm-detail {
@@ -931,20 +946,20 @@ main#main:has(.work-map-page) {
 }
 [data-theme="light"] .swm-stage-picker li > button:first-child {
   color: #353a41;
-  background: #f1f0ec;
-  border-color: #d1cfc9;
+  background: var(--swm-stage-card);
+  border-color: var(--swm-stage-border);
 }
 [data-theme="light"] .swm-stage-picker li > button:first-child:hover,
 [data-theme="light"] .swm-streams [aria-pressed="true"] {
-  background: #eae8e2;
-  border-color: #a9a69e;
+  background: var(--swm-stage-hover);
+  border-color: var(--swm-stage-selected-border);
 }
 [data-theme="light"]
   .swm-stage-picker
   li
   > button:first-child[aria-pressed="true"] {
-  background: #e2e0da;
-  border-color: #6a675e;
+  background: var(--swm-stage-selected);
+  border-color: var(--swm-stage-selected-border);
   color: #20252b;
 }
 [data-theme="light"] .swm-person-list button {
@@ -958,6 +973,29 @@ main#main:has(.work-map-page) {
 [data-theme="light"] .swm-chart .org-caption,
 [data-theme="light"] .swm-task {
   border-color: #dedcd6;
+}
+
+/* One accent connects the selected stage to the people doing its work. */
+.stage-work-map .roster-node.roster-node-match {
+  background: var(--swm-stage-card);
+  border-color: var(--swm-stage-border);
+}
+.stage-work-map .roster-node.roster-node-active {
+  background: var(--swm-stage-selected);
+  border-color: var(--swm-stage-selected-border);
+}
+.stage-work-map .roster-node-neutral.roster-node-active .roster-avatar {
+  background: var(--swm-stage-hover);
+  border-color: var(--swm-stage-selected-border);
+  color: var(--swm-accent);
+}
+.stage-work-map .swm-scope-label,
+.stage-work-map .swm-detail .eyebrow {
+  color: var(--swm-accent);
+}
+.stage-work-map .swm-stage-picker li > button:first-child:focus-visible {
+  outline: 2px solid var(--swm-stage-selected-border);
+  outline-offset: 2px;
 }
 
 dialog.swm-assignment {

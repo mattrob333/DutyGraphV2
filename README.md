@@ -1,5 +1,7 @@
 # DutyGraph
 
+The Work Map uses a restrained blue accent for the workstream and selected people, with coordinated hover, selection and light-theme states. Workflow diagrams retain their separate role and handoff colors.
+
 Workflows & cases uses a distinct branching-path sidebar icon. It lists the company's saved workflows and manual cases; it is not a reusable workflow recommendation library. Its sidebar placement remains under product review.
 
 Company Work Map centers the selected company's name and monogram, with a clear **Workstream → People & duties → Task flows** hierarchy. Actual duty names and purposes explain the work alongside the chart. Its three focused views remain **Work map**, **Work flows**, and **Tasks**; a workflow can cross several duties. Stage/person selections survive a trip into the flow. Tasks includes compact search/status controls and stage or team grouping; former Task cards links remain valid. Relationships, Connected, Org & duties and Agents & controls are parked without deleting their records or implementations.

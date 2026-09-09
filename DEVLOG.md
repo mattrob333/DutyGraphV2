@@ -1,5 +1,9 @@
 # DutyGraph development log
 
+## 2026-09-08 — Subtle Work Map color
+
+Added a muted blue workstream surface, stage cards, arrows and stronger selected state. The same accent connects the stage to matching/selected people and the current scope; workflow diagram role colors and amber gap indicators retain their meanings. Uses a single border, no selected top stripe, and corresponding light-theme colors. Changes are scoped CSS with no geometry or behavior changes. Production build/typecheck and 16 fictional browser checks passed, including stage/person navigation, stable help, full chart fit and responsive dark/light views. No new behavioral tests, provider calls or real emails were needed.
+
 ## 2026-09-08 — Distinguish workflows navigation
 
 Changed Workflows & cases to the branching-path icon already used by its workflow cards, distinguishing it from Company Work Map's organization icon. Inspected both views and the case implementation: workflow definitions overlap; cases add manual progress and evidence tracking against reviewed definitions. No navigation, case behavior or recommendation library was changed. Validation: production build/typecheck; no new test is warranted for this icon-only change.
