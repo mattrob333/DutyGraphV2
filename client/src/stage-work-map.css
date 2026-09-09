@@ -2,13 +2,16 @@
   --swm-ivory: #e3dfd5;
   --swm-muted: #aaaab0;
   --swm-line: #3c3e42;
-  --swm-accent: #b3cde3;
-  --swm-stage-surface: #242c35;
-  --swm-stage-card: #2a3541;
-  --swm-stage-border: #52677b;
-  --swm-stage-hover: #303f4e;
-  --swm-stage-selected: #354b60;
-  --swm-stage-selected-border: #a1bfd9;
+  --swm-accent: #dedbd4;
+  --swm-stage-surface: #1b1c1e;
+  --swm-stage-card: #323335;
+  --swm-stage-border: #565759;
+  --swm-stage-hover: #393a3c;
+  --swm-stage-hover-border: #828386;
+  --swm-stage-selected: #3d3e40;
+  --swm-stage-selected-border: #9eacb8;
+  --swm-card-shadow: 0 2px 4px rgb(0 0 0 / 24%);
+  --swm-tray-shadow: inset 0 1px 4px rgb(0 0 0 / 20%);
   color: var(--ink);
   margin-top: 14px;
 }
@@ -47,6 +50,7 @@
   border-radius: 9px;
   padding: 12px;
   background: var(--swm-stage-surface);
+  box-shadow: var(--swm-tray-shadow);
 }
 .swm-stage-heading {
   display: flex;
@@ -131,6 +135,7 @@
   padding: 10px 28px 10px 10px;
   border: 1px solid var(--swm-stage-border);
   background: var(--swm-stage-card);
+  box-shadow: var(--swm-card-shadow);
   border-radius: 6px;
   text-align: left;
   display: flex;
@@ -141,14 +146,14 @@
     background 140ms ease;
 }
 .swm-stage-picker li > button:first-child:hover {
-  border-color: var(--swm-stage-selected-border);
+  border-color: var(--swm-stage-hover-border);
   background: var(--swm-stage-hover);
 }
 .swm-stage-picker li > button:first-child[aria-pressed="true"] {
   background: var(--swm-stage-selected);
   color: #f1efeb;
   border-color: var(--swm-stage-selected-border);
-  box-shadow: none;
+  box-shadow: var(--swm-card-shadow);
 }
 .swm-stage-label {
   display: flex;
@@ -926,13 +931,16 @@ main#main:has(.work-map-page) {
   --swm-ivory: #56534a;
   --swm-muted: #646970;
   --swm-line: #d7d5cf;
-  --swm-accent: #365d7e;
-  --swm-stage-surface: #edf2f6;
-  --swm-stage-card: #f8fafc;
-  --swm-stage-border: #a5b8c9;
-  --swm-stage-hover: #e4edf5;
-  --swm-stage-selected: #d9e7f2;
-  --swm-stage-selected-border: #4e789b;
+  --swm-accent: #444746;
+  --swm-stage-surface: #eae9e6;
+  --swm-stage-card: #ffffff;
+  --swm-stage-border: #c6c5c1;
+  --swm-stage-hover: #f7f7f5;
+  --swm-stage-hover-border: #949591;
+  --swm-stage-selected: #f4f4f2;
+  --swm-stage-selected-border: #6d7a85;
+  --swm-card-shadow: 0 2px 4px rgb(0 0 0 / 8%);
+  --swm-tray-shadow: inset 0 1px 3px rgb(0 0 0 / 5%);
 }
 [data-theme="light"] .work-map-monogram {
   background: #e8e5dd;
@@ -952,7 +960,7 @@ main#main:has(.work-map-page) {
 [data-theme="light"] .swm-stage-picker li > button:first-child:hover,
 [data-theme="light"] .swm-streams [aria-pressed="true"] {
   background: var(--swm-stage-hover);
-  border-color: var(--swm-stage-selected-border);
+  border-color: var(--swm-stage-hover-border);
 }
 [data-theme="light"]
   .swm-stage-picker
@@ -975,7 +983,7 @@ main#main:has(.work-map-page) {
   border-color: #dedcd6;
 }
 
-/* One accent connects the selected stage to the people doing its work. */
+/* Neutral surfaces carry depth; only selected borders have a slight tint. */
 .stage-work-map .roster-node.roster-node-match {
   background: var(--swm-stage-card);
   border-color: var(--swm-stage-border);

@@ -1,5 +1,9 @@
 # DutyGraph development log
 
+## 2026-09-08 — Neutral Work Map depth
+
+Replaced the rejected blue workstream and person fills with neutral surface layering: near-black recessed tray, lighter charcoal cards and small external shadows. Hover borders stay gray; selected/focused borders have a slight steel tint without a top stripe or doubled border. Light mode uses white cards on warm gray. Kept the existing org-chart dot texture rather than adding another patterned surface. A critical dashboard-design reviewer advised on the treatment and reviewed the resulting dark/light captures. Production build/typecheck and 16 fictional responsive browser checks passed with no chart-fit or interaction changes. No real emails or provider calls were made.
+
 ## 2026-09-08 — Subtle Work Map color
 
 Added a muted blue workstream surface, stage cards, arrows and stronger selected state. The same accent connects the stage to matching/selected people and the current scope; workflow diagram role colors and amber gap indicators retain their meanings. Uses a single border, no selected top stripe, and corresponding light-theme colors. Changes are scoped CSS with no geometry or behavior changes. Production build/typecheck and 16 fictional browser checks passed, including stage/person navigation, stable help, full chart fit and responsive dark/light views. No new behavioral tests, provider calls or real emails were needed.

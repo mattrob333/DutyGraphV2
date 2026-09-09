@@ -1,6 +1,6 @@
 # DutyGraph
 
-The Work Map uses a restrained blue accent for the workstream and selected people, with coordinated hover, selection and light-theme states. Workflow diagrams retain their separate role and handoff colors.
+The Work Map separates lighter charcoal stage cards from a recessed dark background using subtle shadows. Fills and hover states stay neutral; only selected borders carry a slight steel tint. Light mode uses white cards on warm gray. Workflow diagrams retain their separate role and handoff colors.
 
 Workflows & cases uses a distinct branching-path sidebar icon. It lists the company's saved workflows and manual cases; it is not a reusable workflow recommendation library. Its sidebar placement remains under product review.
 
