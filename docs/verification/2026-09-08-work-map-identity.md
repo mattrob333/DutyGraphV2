@@ -22,3 +22,11 @@ Task-local scripts, logs, screenshots and results are under ignored `work/`, inc
 `npm run verify` passes: production build/typecheck and 318 tests. Contracts cover 105 routes, and dependency audit reports zero vulnerabilities. The full suite revealed an existing read-consistency race: a worker could finish between separate work-record and reply-job reads. Both now come from one SQL snapshot. The added deterministic test completes a worker on another connection immediately after the work read, verifying both the earlier coherent snapshot and the subsequent completed state. All four work-gap API tests pass.
 
 Logs: `work/workmap-identity-verify.log`, `work/workmap-identity-gap-tests.log`, `work/workmap-identity-contracts.log`, `work/workmap-identity-audit.json`. No migration or new provider configuration is required.
+
+## Publication
+
+Implementation `e5cd6c0b87a7bff64a099ad3babbe66981c67816` passed [CI 34297232846](https://github.com/mattrob333/DutyGraphV2/actions/runs/34297232846), including the synthetic advisor journey and encrypted backup recovery. Vercel deployment `dpl_JCvqrHTiubbbixUR3DugzgDsqots` is READY for that exact commit and assigned to dutygraph.com.
+
+Read-only production checks returned 200 for app, health, CSS and JavaScript. Deployed CSS `/assets/index-DXt2DCDp.css` matches the verified local build; JavaScript contains the company identity, Workstream explanation, People & duties and responsibility-detail controls. Anonymous audit-brief and work-gap reads return 401. Results are in `work/workmap-identity-hosted-check.json`. The public check does not mutate a client workspace or replace the deferred full hosted audit walkthrough.
+
+The independent designer's final app capture is recorded as Superdesign draft `6dac69e1-23db-4faf-a980-a1688fee1eca`, version 6. Fictional browser providers and continuing follow-ups were disabled, records retained, and only the verified task-owned port-4352 server was stopped.
