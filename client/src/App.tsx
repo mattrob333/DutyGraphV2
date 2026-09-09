@@ -20,6 +20,7 @@ import {
   LayoutGrid,
   Mic,
   Network,
+  GitBranch,
   Layers,
   Compass,
   ShieldCheck,
@@ -90,7 +91,7 @@ const nav = [
     group: "DISCOVER THE BUSINESS",
   },
   { id: "graph", name: "Company Work Map", icon: Network, group: "" },
-  { id: "workflows", name: "Workflows & cases", icon: Network, group: "" },
+  { id: "workflows", name: "Workflows & cases", icon: GitBranch, group: "" },
   {
     id: "strategy",
     name: "Strategy",

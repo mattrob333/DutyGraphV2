@@ -1,5 +1,7 @@
 # DutyGraph
 
+Workflows & cases uses a distinct branching-path sidebar icon. It lists the company's saved workflows and manual cases; it is not a reusable workflow recommendation library. Its sidebar placement remains under product review.
+
 Company Work Map centers the selected company's name and monogram, with a clear **Workstream → People & duties → Task flows** hierarchy. Actual duty names and purposes explain the work alongside the chart. Its three focused views remain **Work map**, **Work flows**, and **Tasks**; a workflow can cross several duties. Stage/person selections survive a trip into the flow. Tasks includes compact search/status controls and stage or team grouping; former Task cards links remain valid. Relationships, Connected, Org & duties and Agents & controls are parked without deleting their records or implementations.
 
 The latest refinement also stabilizes chart fitting during stage selection and reads completed follow-ups with their matching work details. Release `e5cd6c0` passed CI and is deployed READY on dutygraph.com. **318 tests pass**, along with production build/typecheck, 105-route contracts and responsive browser checks. See [company identity and hierarchy verification](docs/verification/2026-09-08-work-map-identity.md) for release evidence and acceptance boundaries.

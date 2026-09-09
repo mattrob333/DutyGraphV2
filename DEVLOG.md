@@ -1,5 +1,9 @@
 # DutyGraph development log
 
+## 2026-09-08 — Distinguish workflows navigation
+
+Changed Workflows & cases to the branching-path icon already used by its workflow cards, distinguishing it from Company Work Map's organization icon. Inspected both views and the case implementation: workflow definitions overlap; cases add manual progress and evidence tracking against reviewed definitions. No navigation, case behavior or recommendation library was changed. Validation: production build/typecheck; no new test is warranted for this icon-only change.
+
 ## 2026-09-08 — Company identity and work hierarchy
 
 Made the company name the primary Work Map heading with a neutral monogram and a smaller Company Work Map descriptor. The compact ribbon explicitly says Workstream, explains how the business delivers value, and retains the saved stream name. People & duties separates the selected scope from the section title. Person summaries show actual scoped duty names; the selected responsibility shows its recorded purpose above a labeled task list. Task flows precede assignment maintenance. The three view tabs retain their concise labels and gain descriptions distinguishing business overview, cross-duty handoffs and task detail. Expanded mode retains the company identity. Logo scraping is not added; the monogram uses the selected company name.
