@@ -2,11 +2,13 @@
 
 Business stages are broader than duties: a stage groups work across roles; a duty is an ongoing responsibility; a task is a specific piece of work. There is no universal stage count. Templates are suggested starting points, and saved streams support 1-16 stages. Hover a stage or focus/tap its info button for an explanation and typical work. Company descriptions take precedence; renamed/custom stages ask for a description instead of inheriting unrelated examples. Edit descriptions in Discovery > Edit the profile and stages.
 
-The default view starts with the saved business stream and its stages. Select a stage to highlight the people whose recorded work belongs there. The chart preserves reporting positions as selections change. Its lines mean “reports to”; the task flows below mean work passes between people.
+The company name identifies the business in both the normal and expanded views, with a monogram beside the main heading. **Workstream** shows how the business delivers value, with the saved operating stream name alongside it. Left to right follows business stages; top to bottom moves through **People & duties** to **Task flows**. Select a stage to highlight the people whose recorded work belongs there. The chart preserves reporting positions as selections change. Its lines mean “reports to”; the task flows below mean work passes between people.
 
 The compact ribbon leaves the remaining desktop height for the chart and person details. Shorter laptop screens use tighter spacing; phones stack the details below the chart. **Fit team** restores the complete organization after panning or zooming. Drag to pan; pinch or use +/− to zoom. Normal wheel scrolling reaches the flows below, including in **Expand**. Stage help opens outside the stage row so it cannot cover a neighboring stage.
 
 Select a person on the chart or in the list to inspect duties and tasks in the current selection. “Owns work” comes from duty/task owner fields; “Does the work” comes from task performer fields. Neither label grants approval or agent authority. Open a task, duty or full flow for its record.
+
+Person summaries show up to two actual duty names in the selected scope, with a count of any additional duties. Selecting the person shows the duty's recorded purpose and the tasks beneath it. A duty is an ongoing responsibility; a workflow can connect tasks across several duties and departments. The three views are useful levels of detail, not a rule that every workflow belongs inside one duty. Task flows appear before assignment maintenance controls. Logo extraction remains deferred; the company mark is a name-based monogram.
 
 ## Assigning work
 

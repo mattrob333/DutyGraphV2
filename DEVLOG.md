@@ -1,5 +1,13 @@
 # DutyGraph development log
 
+## 2026-09-08 — Company identity and work hierarchy
+
+Made the company name the primary Work Map heading with a neutral monogram and a smaller Company Work Map descriptor. The compact ribbon explicitly says Workstream, explains how the business delivers value, and retains the saved stream name. People & duties separates the selected scope from the section title. Person summaries show actual scoped duty names; the selected responsibility shows its recorded purpose above a labeled task list. Task flows precede assignment maintenance. The three view tabs retain their concise labels and gain descriptions distinguishing business overview, cross-duty handoffs and task detail. Expanded mode retains the company identity. Logo scraping is not added; the monogram uses the selected company name.
+
+Independent design review and repeated browser selection exposed a preexisting React Flow integration race: controlled node updates discarded measurements and could leave all chart cards hidden. Neutral cards now supply their existing fixed dimensions. A single fit helper frames their actual bounds against the current canvas size, skips hidden canvases, and powers Fit team; the duplicate library fit control is omitted in this view. No company data, inference, approval or workflow semantics changed. Local and publication evidence is recorded in [verification](docs/verification/2026-09-08-work-map-identity.md).
+
+Full regression testing also exposed a read-consistency race in work-gap status. Work records and reply jobs now use one database snapshot, so a completed reply cannot be paired with older documentation gaps. A deterministic interleaved-completion regression test covers the boundary. All 318 tests, production build/typecheck and 105-route contracts pass; dependency audit reports zero vulnerabilities. Synthetic browser checks cover 16 navigation checks, 21 identity/hierarchy checks, 24 stage/person transitions and five independent fresh loads with the full chart visible. No real emails or paid providers were used.
+
 ## 2026-09-08 — A focused work map and living client brief
 
 Consolidated the marquee Company Work Map into Work map / Work flows / Tasks. The selected stage/person survives navigation to flows and tasks. Task cards moved into the map with the old route preserved, compact search/status, optional filters and a useful people → duties → tasks view by team. Parked the competing relationship/connected/organization/control views without deleting their underlying implementation or data. The existing Agent governance area remains separate.

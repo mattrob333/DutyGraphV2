@@ -4,6 +4,8 @@ Business stages are broader than duties: a stage groups work across roles; a dut
 
 Open **Company Work Map** in the sidebar. The default path is simple: choose a business stream, choose a stage, select a highlighted person, then inspect that person’s duties, tasks and task flows. The map connects the saved business model to recorded work. A business template alone never creates company evidence.
 
+Your company's name anchors the page. **Workstream** labels how it delivers value, with the saved stream name alongside it. Read left to right for the business stages, then down through **People & duties** to **Task flows**. Person summaries show actual duties; select someone to read each duty's purpose and its tasks. **Work map** gives the business overview, **Work flows** follows tasks and handoffs, and **Tasks** opens the detailed work. A workflow may cross several people's duties. Expanded mode keeps the company identity visible.
+
 ## Follow the work
 
 Open a stage's info button for **Why this stage?** New research proposes a useful grouping from company evidence and, when available, documented practices at comparable businesses. The help shows the rationale, exact passages, source links and dates, and what remains unknown. **Company-reported evidence**, **Peer example** and **AI-suggested stage** mean different things. A peer practice is not a client fact, a task assignment or proof of success. Older template stages show authored guidance instead. Existing custom stages survive later research.

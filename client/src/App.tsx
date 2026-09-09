@@ -1197,21 +1197,35 @@ function Workspace({ user, logout }: { user: User; logout: () => void }) {
   else if (page === "graph" || page === "tasks")
     body = (
       <div className="work-map-page">
-        <Heading
-          title="Company Work Map"
-          description="Select a business stage. See the people, duties and tasks behind it."
-          actions={
+        <header className="page-heading work-map-identity">
+          <div className="work-map-company">
+            <span className="work-map-monogram" aria-hidden="true">
+              {company.name
+                .trim()
+                .split(/\s+/)
+                .slice(0, 2)
+                .map((word) => Array.from(word)[0])
+                .join("")
+                .toLocaleUpperCase()}
+            </span>
+            <div className="work-map-company-name">
+              <p className="work-map-descriptor">Company Work Map</p>
+              <h1>{company.name}</h1>
+            </div>
+          </div>
+          <div className="actions">
             <Button onClick={() => setModal({ type: "roster" })}>
               Import people CSV
             </Button>
-          }
-        />
+          </div>
+        </header>
         <Graph
           key={companyId}
           initialView={page === "tasks" ? "tasks" : "map"}
           create={create}
           onClientBrief={() => go("deliverables")}
           company={companyId}
+          companyName={company.name}
           profile={company.settings.businessProfile}
           sandbox={company.sandbox}
           refresh={refresh}

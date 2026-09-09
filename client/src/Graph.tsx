@@ -30,6 +30,7 @@ import {
 const NetworkExplorer = lazy(() => import("./NetworkExplorer.tsx"));
 export function Graph({
   company,
+  companyName,
   profile,
   sandbox,
   refresh,
@@ -44,6 +45,7 @@ export function Graph({
   taskQuery = "",
 }: {
   company: string;
+  companyName?: string;
   profile?: BusinessProfile;
   sandbox?: boolean;
   refresh?: () => Promise<void>;
@@ -247,15 +249,31 @@ export function Graph({
     );
   return (
     <div className={expanded ? "graph-expanded" : "graph-standard"}>
+      {expanded && companyName && (
+        <div className="work-map-expanded-identity">
+          <strong>{companyName}</strong>
+          <span>Company Work Map</span>
+        </div>
+      )}
       <div className="toolbar">
         <div className="tabs">
           {[
-            ["map", "Work map"],
-            ["work", "Work flows"],
-            ["tasks", "Tasks"],
-          ].map(([id, label]) => (
+            ["map", "Work map", "See the business stages, people and duties"],
+            [
+              "work",
+              "Work flows",
+              "Follow tasks and handoffs across responsibilities",
+            ],
+            [
+              "tasks",
+              "Tasks",
+              "Inspect the instructions, inputs and outputs of each task",
+            ],
+          ].map(([id, label, description]) => (
             <button
               key={id}
+              title={description}
+              aria-description={description}
               className={view === id ? "active" : ""}
               onClick={() => {
                 setView(id);

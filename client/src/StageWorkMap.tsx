@@ -284,27 +284,36 @@ export function StageWorkMap({
         </p>
       )}
       {stream ? (
-        <div className="swm-stage-picker">
+        <section
+          className="swm-stage-picker"
+          aria-labelledby="swm-workstream-title"
+        >
           <div className="swm-stage-heading">
-            {model.streams.length > 1 ? (
-              <div className="swm-streams" aria-label="Business streams">
-                {model.streams.map((s, i) => (
-                  <button
-                    key={s.id}
-                    aria-pressed={stream.id === s.id}
-                    onClick={() => {
-                      setStreamId(s.id);
-                      choose("");
-                    }}
-                  >
-                    <strong>{s.name}</strong>
-                    <small>{i === 0 ? "Primary" : "Supporting"}</small>
-                  </button>
-                ))}
+            <div className="swm-workstream-context">
+              <div className="swm-workstream-title">
+                <h2 id="swm-workstream-title">Workstream</h2>
+                <p>How this business delivers value</p>
               </div>
-            ) : (
-              <span className="swm-stream-name">{stream.name}</span>
-            )}
+              {model.streams.length > 1 ? (
+                <div className="swm-streams" aria-label="Business streams">
+                  {model.streams.map((s, i) => (
+                    <button
+                      key={s.id}
+                      aria-pressed={stream.id === s.id}
+                      onClick={() => {
+                        setStreamId(s.id);
+                        choose("");
+                      }}
+                    >
+                      <strong>{s.name}</strong>
+                      <small>{i === 0 ? "Primary" : "Supporting"}</small>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <span className="swm-stream-name">{stream.name}</span>
+              )}
+            </div>
             <button
               aria-pressed={!stage && !unmapped}
               onClick={() => choose("")}
@@ -364,7 +373,7 @@ export function StageWorkMap({
               </li>
             ))}
           </ol>
-        </div>
+        </section>
       ) : (
         <div className="swm-empty">
           <h3>Add your business stages in Discovery</h3>
@@ -386,7 +395,8 @@ export function StageWorkMap({
       <div className="swm-explore" ref={exploreRef}>
         <div className="swm-scope">
           <div aria-live="polite">
-            <h3>{title}</h3>
+            <h2>People &amp; duties</h2>
+            <span className="swm-scope-label">{title}</span>
             <p>
               {scope.people.length}{" "}
               {scope.people.length === 1 ? "person" : "people"} involved ·{" "}
@@ -440,7 +450,7 @@ export function StageWorkMap({
         >
           <div className="swm-detail-heading">
             <p className="eyebrow">
-              {selectedPerson ? "PERSON & WORK" : "EXPLORE THIS STAGE"}
+              {stage ? "DUTIES IN THIS STAGE" : "DUTIES & TASKS"}
             </p>
             {selected && (
               <button
@@ -475,7 +485,11 @@ export function StageWorkMap({
                             ? "Owns this duty"
                             : "Contributes tasks"}
                         </small>
-                        <ul>
+                        {d.data.purpose && (
+                          <p className="swm-duty-purpose">{d.data.purpose}</p>
+                        )}
+                        <p className="swm-task-list-label">Tasks</p>
+                        <ul aria-label={`Tasks in ${d.title}`}>
                           {scope.tasks
                             .filter(
                               (t) =>
@@ -544,12 +558,12 @@ export function StageWorkMap({
             <>
               <h3>
                 {scope.people.length
-                  ? "Select a person"
+                  ? "Explore responsibilities"
                   : "No people linked yet"}
               </h3>
               <p>
                 {scope.people.length
-                  ? "Choose a highlighted person to see their work here."
+                  ? "Select a person to explore their duties and tasks."
                   : "Assign duties or tasks to this stage. People appear from the owners and performers recorded on that work."}
               </p>
               {unmapped && canAssign && model.streams.length > 0 && (
@@ -570,28 +584,86 @@ export function StageWorkMap({
                 </div>
               )}
               <div className="swm-person-list">
-                {scope.people.map((p) => (
-                  <button
-                    key={p.personId}
-                    onClick={() => selectPerson(p.personId)}
-                  >
-                    <span>
-                      {p.person.title}
-                      <small>
-                        {p.dutyIds.length}{" "}
-                        {p.dutyIds.length === 1 ? "duty" : "duties"} ·{" "}
-                        {p.taskIds.length}{" "}
-                        {p.taskIds.length === 1 ? "task" : "tasks"}
-                      </small>
-                    </span>
-                    <ArrowRight size={14} />
-                  </button>
-                ))}
+                {scope.people.map((p) => {
+                  const duties = scope.duties.filter((d) =>
+                    p.dutyIds.includes(d.id),
+                  );
+                  const firstTask = scope.tasks.find((t) =>
+                    p.taskIds.includes(t.id),
+                  );
+                  return (
+                    <button
+                      key={p.personId}
+                      onClick={() => selectPerson(p.personId)}
+                    >
+                      <span className="swm-person-summary">
+                        <strong>{p.person.title}</strong>
+                        {p.person.data.team && (
+                          <span className="swm-person-team">
+                            {p.person.data.team}
+                          </span>
+                        )}
+                        {duties.length ? (
+                          <span className="swm-person-duties">
+                            {duties.slice(0, 2).map((d) => (
+                              <span key={d.id}>{d.title}</span>
+                            ))}
+                            {duties.length > 2 && (
+                              <span className="swm-more-duties">
+                                +{duties.length - 2} more{" "}
+                                {duties.length === 3 ? "duty" : "duties"}
+                              </span>
+                            )}
+                          </span>
+                        ) : firstTask ? (
+                          <span className="swm-person-duties">
+                            <span>Task · {firstTask.title}</span>
+                          </span>
+                        ) : null}
+                        <small>
+                          {p.dutyIds.length}{" "}
+                          {p.dutyIds.length === 1 ? "duty" : "duties"} ·{" "}
+                          {p.taskIds.length}{" "}
+                          {p.taskIds.length === 1 ? "task" : "tasks"}
+                        </small>
+                      </span>
+                      <ArrowRight size={14} />
+                    </button>
+                  );
+                })}
               </div>
             </>
           )}
         </aside>
       </div>
+      {scope.flows.length > 0 && (
+        <section className="swm-flows">
+          <div>
+            <p className="eyebrow">FOLLOW THE WORK</p>
+            <h2>Task flows{stage ? ` in ${stage.name}` : ""}</h2>
+            <p>How tasks and handoffs complete the work.</p>
+          </div>
+          {scope.flows.length ? (
+            <div className="swm-flow-list">
+              {scope.flows.map((f) => (
+                <button
+                  key={f.workflow.id}
+                  onClick={() => openFlow(f.workflow.id)}
+                >
+                  <strong>{f.workflow.title}</strong>
+                  <span>
+                    {f.taskIds.length}{" "}
+                    {f.taskIds.length === 1 ? "task" : "tasks"} in this view
+                  </span>
+                  <span>
+                    Open full flow <ArrowRight size={14} />
+                  </span>
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </section>
+      )}
       {!!inferredCount && (
         <details className="swm-inference">
           <summary>
@@ -686,34 +758,6 @@ export function StageWorkMap({
             },
           )}
         </details>
-      )}
-      {scope.flows.length > 0 && (
-        <section className="swm-flows">
-          <div>
-            <p className="eyebrow">FOLLOW THE WORK</p>
-            <h3>Task flows{stage ? ` in ${stage.name}` : ""}</h3>
-            <p>These connections show how work passes between people.</p>
-          </div>
-          {scope.flows.length ? (
-            <div className="swm-flow-list">
-              {scope.flows.map((f) => (
-                <button
-                  key={f.workflow.id}
-                  onClick={() => openFlow(f.workflow.id)}
-                >
-                  <strong>{f.workflow.title}</strong>
-                  <span>
-                    {f.taskIds.length}{" "}
-                    {f.taskIds.length === 1 ? "task" : "tasks"} in this view
-                  </span>
-                  <span>
-                    Open full flow <ArrowRight size={14} />
-                  </span>
-                </button>
-              ))}
-            </div>
-          ) : null}
-        </section>
       )}
       <WorkGapPanel
         openFollowup={(requestId) => {

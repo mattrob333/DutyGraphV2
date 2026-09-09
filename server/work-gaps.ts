@@ -80,16 +80,25 @@ export async function workGapSnapshot(
   companyId: string,
 ) {
   const company = await companyCheck(db, user, companyId);
-  const records = await companyRecords(db, companyId);
+  // Reply workers commit work and job status together. Read both in one SQL
+  // snapshot so completion cannot be paired with gaps from older records.
+  const snapshot = (
+    await db.query(
+      `SELECT
+        COALESCE((SELECT jsonb_agg(r ORDER BY r.created_at,r.id)
+          FROM records r WHERE r.company_id=$1),'[]'::jsonb) AS records,
+        COALESCE((SELECT jsonb_agg(j ORDER BY j.created_at DESC,j.id DESC)
+          FROM (SELECT id,kind,state,input,result,message,created_at
+            FROM provider_jobs WHERE company_id=$1
+            AND kind IN ('gap_outreach','gap_reply')) j),'[]'::jsonb) AS jobs`,
+      [companyId],
+    )
+  ).rows[0];
+  const records: RecordRow[] = snapshot.records;
+  const jobs: any[] = snapshot.jobs;
   const policy = policyFor(company);
   const email = await providerConfig(user.tenant_id, "resend", db);
   const ai = await providerConfig(user.tenant_id, "openai", db);
-  const jobs = (
-    await db.query(
-      "SELECT id,kind,state,input,result,message FROM provider_jobs WHERE company_id=$1 AND kind IN ('gap_outreach','gap_reply') ORDER BY created_at DESC,id DESC",
-      [companyId],
-    )
-  ).rows;
   return {
     gaps: assessWorkGaps(records, company.settings.businessProfile),
     policy: {

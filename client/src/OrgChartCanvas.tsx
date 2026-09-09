@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Scan, Search } from "lucide-react";
 import {
   ReactFlow,
+  getViewportForBounds,
   ReactFlowProvider,
   MiniMap,
   Controls,
@@ -119,26 +120,6 @@ export function OrgChartCanvas({
   const geometryKey = people
     .map((p) => `${p.id}:${p.data.managerId}`)
     .join("|");
-  useEffect(() => {
-    if (!stableViewport || !instance || !canvasRef.current) return;
-    let frame = 0;
-    const fit = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        frame = requestAnimationFrame(
-          () =>
-            void instance.fitView({ padding: 0.08, maxZoom: 1, duration: 0 }),
-        );
-      });
-    };
-    const observer = new ResizeObserver(fit);
-    observer.observe(canvasRef.current);
-    fit();
-    return () => {
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-    };
-  }, [instance, stableViewport, geometryKey]);
   const model = useMemo(() => {
     const nodeWidth = neutral ? 200 : 224;
     const columnGap = neutral ? 24 : 32;
@@ -196,6 +177,9 @@ export function OrgChartCanvas({
       nodes: people.map((p) => ({
         id: p.id,
         type: "person",
+        // These cards have fixed CSS geometry. Carry it through controlled
+        // updates so a stage change cannot reset dimensions and hide the nodes.
+        ...(neutral ? { width: nodeWidth, height: 150 } : {}),
         position: positions.get(p.id) || { x: 0, y: 0 },
         data: {
           person: p,
@@ -215,6 +199,53 @@ export function OrgChartCanvas({
       warnings,
     };
   }, [people, tasks, neutral]);
+  const fitTeam = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (
+      !instance ||
+      !canvas?.clientWidth ||
+      !canvas.clientHeight ||
+      !model.nodes.length
+    )
+      return;
+    if (!neutral) {
+      void instance.fitView({ padding: 0.08, maxZoom: 1, duration: 0 });
+      return;
+    }
+    // Fixed card geometry lets us frame the actual canvas without waiting for
+    // React Flow's asynchronous node measurements or queued initial fit.
+    const left = Math.min(...model.nodes.map((node) => node.position.x));
+    const top = Math.min(...model.nodes.map((node) => node.position.y));
+    const right = Math.max(...model.nodes.map((node) => node.position.x + 200));
+    const bottom = Math.max(
+      ...model.nodes.map((node) => node.position.y + 150),
+    );
+    const viewport = getViewportForBounds(
+      { x: left, y: top, width: right - left, height: bottom - top },
+      canvas.clientWidth,
+      canvas.clientHeight,
+      0.05,
+      1,
+      0.08,
+    );
+    void instance.setViewport(viewport, { duration: 0 });
+  }, [instance, neutral, model.nodes]);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!stableViewport || !instance || !canvas) return;
+    let frame = 0;
+    const fit = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(fitTeam);
+    };
+    const observer = new ResizeObserver(fit);
+    observer.observe(canvas);
+    fit();
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [instance, stableViewport, geometryKey, fitTeam]);
   const activate = (id: string) => {
     select(id);
     const node = model.nodes.find((node) => node.id === id);
@@ -257,12 +288,7 @@ export function OrgChartCanvas({
           {people.length} people · {model.edges.length} reporting lines
         </span>
         {neutral && (
-          <button
-            className="org-fit"
-            onClick={() =>
-              void instance?.fitView({ padding: 0.08, maxZoom: 1, duration: 0 })
-            }
-          >
+          <button className="org-fit" onClick={fitTeam}>
             <Scan size={14} />
             Fit team
           </button>
@@ -304,7 +330,7 @@ export function OrgChartCanvas({
             autoPanOnSelection={!stableViewport}
             onInit={setInstance}
             onNodeClick={(_, n) => activate(n.id)}
-            fitView
+            fitView={!stableViewport}
             fitViewOptions={{ padding: neutral ? 0.08 : 0.15, maxZoom: 1 }}
             zoomOnScroll={!neutral}
             preventScrolling={!neutral}
@@ -317,7 +343,7 @@ export function OrgChartCanvas({
               gap={neutral ? 24 : 20}
               size={1}
             />
-            <Controls showInteractive={false} />
+            <Controls showInteractive={false} showFitView={!stableViewport} />
             {(!neutral || people.length > 24) && (
               <MiniMap
                 pannable

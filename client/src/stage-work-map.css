@@ -49,9 +49,35 @@
   margin-bottom: 10px;
   font-size: 12px;
 }
+.swm-workstream-context {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  min-width: 0;
+}
+.swm-workstream-title {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 5px 12px;
+}
+.swm-workstream-title h2 {
+  font-size: 16px;
+  letter-spacing: -0.25px;
+  margin: 0;
+}
+.swm-workstream-title p {
+  margin: 0;
+  color: var(--swm-muted);
+  font-size: 11px;
+}
 .swm-stream-name {
-  font-weight: 600;
-  padding-left: 3px;
+  font-weight: 500;
+  color: var(--swm-muted);
+  padding-left: 16px;
+  border-left: 1px solid var(--swm-line);
+  overflow-wrap: anywhere;
 }
 .swm-stage-heading button,
 .swm-scope > button {
@@ -168,10 +194,17 @@
   gap: 14px;
   flex-wrap: wrap;
 }
-.swm-scope h3 {
-  font-size: 17px;
+.swm-scope h2 {
+  font-size: 16px;
   letter-spacing: -0.3px;
   margin: 0;
+}
+.swm-scope-label {
+  color: var(--swm-ivory);
+  font-size: 12px;
+  padding-left: 14px;
+  border-left: 1px solid var(--swm-line);
+  overflow-wrap: anywhere;
 }
 .swm-scope p {
   font-size: 11px;
@@ -314,7 +347,7 @@
 .swm-person-list {
   display: grid;
   gap: 8px;
-  margin-top: 22px;
+  margin-top: 16px;
 }
 .swm-person-list button {
   display: flex;
@@ -334,6 +367,45 @@
   color: var(--swm-muted);
   margin-top: 4px;
 }
+.swm-person-summary {
+  display: block;
+  min-width: 0;
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+.swm-person-summary > strong {
+  font-size: 13px;
+  line-height: 1.4;
+}
+.swm-person-team {
+  display: block;
+  color: var(--swm-muted);
+  font-size: 10px;
+  margin-top: 2px;
+}
+.swm-person-duties {
+  display: grid;
+  gap: 5px;
+  margin: 9px 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.swm-person-duties > span {
+  padding-left: 9px;
+  border-left: 1px solid #77746e;
+}
+.swm-person-duties .swm-more-duties {
+  color: var(--swm-muted);
+  border-left-color: transparent;
+  font-size: 10px;
+}
+.swm-person-list button > svg {
+  flex-shrink: 0;
+  color: var(--swm-muted);
+}
+.swm-person-list button:hover {
+  border-color: #92918b;
+}
 .swm-duty {
   border-top: 1px solid var(--swm-line);
   padding: 15px 0;
@@ -347,6 +419,20 @@
 .swm-duty > small {
   font-size: 11px;
   color: var(--swm-muted);
+}
+.swm-duty .swm-duty-purpose {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 9px 0 12px;
+}
+.swm-duty .swm-task-list-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 12px 0 0;
+}
+.swm-duty .swm-task-list-label + ul {
+  margin-top: 0;
 }
 .swm-duty ul {
   list-style: none;
@@ -460,8 +546,8 @@
 .swm-flows {
   margin: 28px 0;
 }
-.swm-flows h3 {
-  font-size: 21px;
+.swm-flows h2 {
+  font-size: 18px;
   margin: 5px 0;
 }
 .swm-flows p {
@@ -645,6 +731,62 @@ main#main:has(.work-map-page) {
   margin: 5px 0 0;
   font-size: 12px;
 }
+.work-map-company {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+.work-map-monogram {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  border: 1px solid #77736b;
+  border-radius: 10px;
+  background: #303134;
+  color: #e5dfd2;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.7px;
+}
+.work-map-company-name {
+  min-width: 0;
+}
+.work-map-page > .work-map-identity .work-map-descriptor {
+  font-size: 10px;
+  line-height: 1.3;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 5px;
+}
+.work-map-page > .work-map-identity h1 {
+  font-size: 30px;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.work-map-identity > .actions {
+  flex-shrink: 0;
+}
+.work-map-expanded-identity {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-bottom: 12px;
+  overflow-wrap: anywhere;
+}
+.work-map-expanded-identity strong {
+  font-size: 21px;
+  letter-spacing: -0.4px;
+}
+.work-map-expanded-identity span {
+  font-size: 11px;
+  color: var(--muted);
+}
 .work-map-page .graph-standard > .toolbar,
 .work-map-page .graph-expanded > .toolbar {
   margin-bottom: 0;
@@ -710,7 +852,7 @@ main#main:has(.work-map-page) {
   .swm-scope {
     padding: 8px 12px;
   }
-  .swm-scope h3 {
+  .swm-scope h2 {
     font-size: 15px;
   }
   .swm-chart .visual-toolbar {
@@ -734,6 +876,36 @@ main#main:has(.work-map-page) {
   .work-map-page > .page-heading .actions {
     margin: 0;
   }
+  .swm-workstream-context {
+    gap: 8px;
+  }
+  .swm-workstream-title {
+    display: block;
+  }
+  .swm-workstream-title p {
+    margin-top: 4px;
+  }
+  .swm-stream-name {
+    padding-left: 0;
+    border-left: 0;
+    width: 100%;
+  }
+  .swm-scope-label {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .work-map-page > .work-map-identity h1 {
+    font-size: 24px;
+  }
+  .work-map-monogram {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+    font-size: 17px;
+  }
+  .work-map-company {
+    gap: 10px;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .swm-stage-picker li > button:first-child {
@@ -745,6 +917,11 @@ main#main:has(.work-map-page) {
   --swm-ivory: #56534a;
   --swm-muted: #646970;
   --swm-line: #d7d5cf;
+}
+[data-theme="light"] .work-map-monogram {
+  background: #e8e5dd;
+  color: #45423b;
+  border-color: #b1aa9b;
 }
 [data-theme="light"] .swm-stage-picker,
 [data-theme="light"] .swm-explore,

@@ -7,7 +7,11 @@ import { registerAccount } from "../server/auth.ts";
 import { pool, tx, hash } from "../server/db.ts";
 import { createOrEdit } from "../server/records.ts";
 import { sealSecret } from "../server/providers.ts";
-import { sendGapQuestions, runGapFollowups } from "../server/work-gaps.ts";
+import {
+  sendGapQuestions,
+  runGapFollowups,
+  workGapSnapshot,
+} from "../server/work-gaps.ts";
 import type {
   InvitationMessage,
   EmailProvider,
@@ -167,6 +171,75 @@ const runBody = (
   recipients: [{ personId: f.person.id, email: f.person.data.email }],
   automatic,
   profileHash: hash(profile),
+});
+
+test("gap status and work detail come from the same snapshot during reply completion", async () => {
+  const f = await fixture();
+  const jobId = randomUUID();
+  await tx(f.user.tenant_id, async (db) => {
+    const request = await createOrEdit(db, f.user, f.company, "request", {
+      title: "Describe the account work",
+      personId: f.person.id,
+      type: "work",
+      questions: ["How do you record account needs?"],
+      taskIds: [],
+      dueDate: "2099-01-01",
+      notice: "Synthetic consistency check.",
+      questionPlanVersion: "work-gap:v1",
+    });
+    await db.query(
+      "INSERT INTO provider_jobs(id,tenant_id,company_id,kind,state,input) VALUES($1,$2,$3,'gap_reply','queued',$4)",
+      [jobId, f.user.tenant_id, f.company, { requestId: request.id }],
+    );
+  });
+  let completed = false;
+  const before = await tx(f.user.tenant_id, async (db) => {
+    const snapshotDb = Object.create(db);
+    snapshotDb.query = async (sql: string, values: unknown[]) => {
+      const result = await db.query(sql, values);
+      // Complete on a separate connection immediately after the work read.
+      // Separate work/job reads would now return old gaps with a complete job.
+      if (!completed && /FROM records\b/.test(sql)) {
+        completed = true;
+        await tx(f.user.tenant_id, async (worker) => {
+          await worker.query(
+            "UPDATE records SET data=data||$2::jsonb WHERE id=$1",
+            [
+              f.task.id,
+              {
+                trigger: "A prospect asks for supplies",
+                inputs: "The product list",
+                instructions:
+                  "Record each product and quantity in Ledger. Confirm the list with the prospect.",
+                output: "A checked account note",
+                destination: "Ledger for the account coordinator",
+              },
+            ],
+          );
+          await worker.query(
+            "UPDATE provider_jobs SET state='complete' WHERE id=$1",
+            [jobId],
+          );
+        });
+      }
+      return result;
+    };
+    return workGapSnapshot(snapshotDb, f.user, f.company);
+  });
+  assert.equal(completed, true);
+  assert.equal(before.requests[0].replyState, "queued");
+  assert.equal(
+    before.gaps.some((g) => g.code === "task_detail"),
+    true,
+  );
+  const after = await tx(f.user.tenant_id, (db) =>
+    workGapSnapshot(db, f.user, f.company),
+  );
+  assert.equal(after.requests[0].replyState, "complete");
+  assert.equal(
+    after.gaps.some((g) => g.code === "task_detail"),
+    false,
+  );
 });
 
 test("gap email -> password-free reply -> automatic mapped task and standalone flow; reads/replays never resend", async () => {
