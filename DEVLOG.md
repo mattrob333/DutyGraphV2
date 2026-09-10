@@ -1,5 +1,12 @@
 # DutyGraph development log
 
+## 2026-09-09 — Laptop continuation handoff
+
+Added START-HERE with fresh-clone setup and a paste-ready Codex prompt, a prioritized acceptance to-do list, settled Work Map design decisions and a desktop artifact audit. Refreshed stale release/wiki baselines and growth notes so a new session sees current implementation rather than the September 7 inventory. README and repository instructions point to the handoff. Promoted the public gallery browser check to portable optional tooling; preserved local design files while ignoring obsolete tool state. No product behavior changes.
+
+The repository is public: credentials, database archives, private commercial source packs and browser-local drafts stay outside Git. Application changes through acb7b79 were already pushed. A fresh desktop backup could not run because the local Docker/database engine was unavailable; existing September 8 encrypted backups remain untouched. Build and handoff checks are recorded below when completed; earlier release CI and live gallery results are explicitly historical, not new real-client acceptance.
+
+
 ## 2026-09-08 — Feature the Work Map on the website
 
 Added a fresh 1626×967 PNG capture of the fictional Cobalt Company Work Map as the first public product-gallery image. The selected Quote availability stage highlights its three people and displays their duties while retaining the full chart. Capture excludes the workspace sidebar and account identity. Existing workflow, task-card and checkpoint images remain in a four-view gallery, with matching caption/alt text, dynamic counters and accessible announcements. Mobile uses two tab columns and shows the full map with full-size zoom. Production build/content generators and 21 local browser checks pass, covering all images, four-view navigation, keyboard wrap, zoom, desktop/mobile fitting and page errors. No real client data or outreach is involved.

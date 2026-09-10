@@ -1,5 +1,9 @@
 # Documentation index
 
+## Continue the project
+
+[Laptop starting point](../START-HERE.md) · [Current to-do list](NEXT-STEPS.md) · [Work Map design decisions](work-map-design-decisions.md) · [Desktop artifact audit](handoff/2026-09-09-artifact-audit.md)
+
 Start with the [project wiki](wiki/Home.md) and [repository README](../README.md).
 
 The [development log](../DEVLOG.md) records changes, reasons, validation and remaining work. Update it and the repository README with every change.

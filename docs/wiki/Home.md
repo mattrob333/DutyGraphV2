@@ -1,6 +1,6 @@
 # DutyGraph project wiki
 
-This is the canonical, version-controlled project handbook for a new developer, advisor, or product collaborator. Baseline: September 7, 2026, application commit `97335fd`. It consolidates the founder's product direction and the implementation; future plans are explicitly labeled.
+This is the canonical, version-controlled project handbook for a new developer, advisor, or product collaborator. Current handoff: September 9, 2026, product baseline `acb7b79`. Start with [the laptop handoff](../../START-HERE.md) and [current priorities](../NEXT-STEPS.md). It consolidates the founder's product direction and the implementation; future plans are explicitly labeled.
 
 ## Read in this order
 

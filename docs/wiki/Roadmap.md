@@ -1,5 +1,7 @@
 # Roadmap
 
+**Current owner priorities (September 9):** use [NEXT-STEPS.md](../NEXT-STEPS.md) for the concrete acceptance checklist. It supersedes older sequencing: complete a hosted real audit, activate Google measurement/search, validate the client readout and recurring review, decide advisor access, then prove incremental department scope. The broader direction below remains context.
+
 This is a prioritized direction, not a delivery-date commitment. The pilot must prove useful discovery before expansion into autonomous operations.
 
 ## Now: make the pilot repeatable

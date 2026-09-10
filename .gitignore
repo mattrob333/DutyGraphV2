@@ -13,5 +13,4 @@ playwright-report/
 skills-lock.json
 
 .vercel
-.superdesign/init/
-.superdesign/tmp/
+.superdesign/

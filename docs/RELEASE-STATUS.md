@@ -1,32 +1,26 @@
 # Release status
 
-Updated September 7, 2026. Application baseline: `97335fd`, version `0.3.0`.
+Updated September 9, 2026. Product baseline: **acb7b79**, application version **0.3.0**. This handoff adds continuation documents and portable verification tooling; it does not change application behavior.
 
-DutyGraph is a hosted advisor pilot. See the maintained [current-state matrix](wiki/Current-State.md), [roadmap](wiki/Roadmap.md), and [project wiki](wiki/Home.md).
+DutyGraph is a hosted **advisor pilot**. The full real-client audit remains an acceptance task. Start with [START-HERE](../START-HERE.md), [current state](wiki/Current-State.md) and [prioritized next steps](NEXT-STEPS.md).
 
-## Delivered in code
+## Current release
 
-- Programmatic SEO expanded September 7: 12 category buyer guides and worksheets, 190 validated public pages, unified dutygraph.com canonicals and direct root redirect. See [publishing workflow](programmatic-seo.md) and [185-test verification](verification/2026-09-07-programmatic-seo.md). GA4/Search Console connection remains a separate operational step.
+- Company Work Map: company identity, compact workstream, stage-linked people, actual duties and tasks, and recorded flows. Three primary views: Work map / Work flows / Tasks. Neutral layered surfaces replace the rejected blue fills.
+- Website: current fictional Cobalt Work Map is the first of four full-size product screenshots. SEO content, sitemap and consent-gated measurement code exist; GA4/Search Console activation remains pending.
+- Discovery/intake: public requests, provisioned advisor inbox, research and company snapshot, private kickoff/participant capture, AI-generated editable duties/tasks and validated person/stage links.
+- Gap follow-up: documentation coverage and scoped private replies feed evidence-based updates. Actual email/provider delivery must be verified for the configured account.
+- Client brief: living scope/coverage/findings/commitments/measurements, a source-frozen report draft, and connections to Weekly review and 16 Strategy framework contracts. Commercial retainers, billing and a client portal are not implemented by that connection.
+- Earlier graph views are retained behind the simplified navigation. Workflows & cases remains available with a distinct sidebar icon; its placement is still an open product decision.
 
-- Cross-team work analysis added September 7: structural checks, evidence-cited AI hypotheses, durable attempts and advisor review. See [implementation and limits](team-analysis.md) and [183-test verification](verification/2026-09-07-team-analysis.md).
+## Recorded release evidence
 
-- Authenticated company workspaces with PostgreSQL records, versions, tenant isolation and audit/confirmation semantics.
-- Discovery, roster/reporting charts, invitations, audio/text responses, transcription integration, AI task drafting and participant review.
-- Task/duty/handoff records, workflows/cases, a stable company work map and focused relationship exploration.
-- Optional Neo4j Aura projection with encrypted account settings and PostgreSQL fallback.
-- Sixteen strategy framework specifications/runs and business-type profiles with 52 templates.
-- Review/reporting/export surfaces, user help and training.
-- Fictional discovery and authority demonstrations.
-- Public marketing/intake, governance directory and Perspectives article publishing.
+Product commit acb7b79 passed [CI 34299928369](https://github.com/mattrob333/DutyGraphV2/actions/runs/34299928369), deployed to dutygraph.com and passed 21 read-only live gallery checks. The implementation suite has 318 tests; the release workflow includes build, contract checks, synthetic training and recovery verification. Scoped Work Map browser evidence is in the [verification directory](verification/) and [development log](../DEVLOG.md).
 
-## Verification boundary
+A passing pipeline is not proof of real-client extraction accuracy, a complete hosted audit, physical-device usability, production restore acceptance or enterprise security readiness. No such claims are made here. See [the handoff artifact audit](handoff/2026-09-09-artifact-audit.md) for the separate desktop database backup limitation.
 
-Prior work recorded 171 passing unit/database/API tests plus scoped browser checks. Dated evidence lives in [verification](verification/). These results do not establish real-client extraction accuracy, live IAM enforcement, physical-device coverage, or enterprise security acceptance. Documentation updates do not rerun or extend that historical evidence.
+## Next acceptance work
 
-Neo4j connectivity was verified for a configured account in earlier work; that is not a statement that every account is configured. Provider configuration, synthetic provider tests, and actual successful paid/delivery requests are separate facts.
+Run one authorized hosted audit end to end; activate Google measurement/search; validate the client report and recurring review with real stakeholders; settle advisor access/identity; test incremental department scope and larger organizations. The [to-do list](NEXT-STEPS.md) defines completion evidence and separates ideas from implemented work.
 
-## Still open
-
-Real-client discovery validation; cross-team reasoning quality; enterprise identity/access administration; hosted recovery and operating acceptance; comprehensive data lifecycle controls; real HR/IGA provisioning; managed signing and runtime authority enforcement; measured commercial outcomes and advisor scale.
-
-The original [90-requirement matrix](requirements-status.json) preserves the supplied acceptance scope. It is not a current exhaustive feature inventory, and no local feature addition establishes formal production acceptance of every requirement.
+The original [90-requirement matrix](requirements-status.json) preserves the supplied scope. It is historical acceptance context, not a complete current feature inventory or a declaration that every requirement has passed production acceptance.

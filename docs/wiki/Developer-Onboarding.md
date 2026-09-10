@@ -1,5 +1,7 @@
 # Developer onboarding
 
+Moving from the desktop or starting a new Codex session? Read [START-HERE.md](../../START-HERE.md) first for the September 9 handoff, local-versus-hosted data boundaries, and a continuation prompt.
+
 ## First day
 
 1. Read [vision](Product-Vision.md), [current state](Current-State.md), and [decisions](Decisions.md).

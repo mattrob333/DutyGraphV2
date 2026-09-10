@@ -1,5 +1,9 @@
 # Product and engineering decisions
 
+## September 9 handoff: preserve the agreed product
+
+The Company Work Map is the marquee experience. Read [the design decisions](../work-map-design-decisions.md) for the approved neutral surfaces, business identity and macro-to-micro hierarchy. Stages are not duties; workflows can cross duties. Keep the three Work Map views. Workflows & cases remains available pending an owner decision; a reusable recommendation library is still an idea. AI-generated records are editable proposals grounded in evidence, not confirmed company testimony.
+
 These summarize explicit product direction from the project conversation and implementation choices. They are not independently validated market findings.
 
 | Decision | Rationale | Consequence |

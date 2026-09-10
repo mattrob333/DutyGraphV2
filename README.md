@@ -1,5 +1,7 @@
 # DutyGraph
 
+**Continuing on a laptop? Start with [START-HERE.md](START-HERE.md).** It contains setup, the current baseline and a paste-ready Codex prompt. [Next steps](docs/NEXT-STEPS.md) tracks open work; [artifact audit](docs/handoff/2026-09-09-artifact-audit.md) explains what is in Git versus private desktop/runtime state. This September 9 handoff preserves the approved Work Map and website gallery.
+
 The website product gallery opens with the current Company Work Map: a real capture of the fictional Cobalt sample, followed by workflows, task cards and human checkpoints. Each image opens full size; the map stays fully visible on mobile.
 
 The Work Map separates lighter charcoal stage cards from a recessed dark background using subtle shadows. Fills and hover states stay neutral; only selected borders carry a slight steel tint. Light mode uses white cards on warm gray. Workflow diagrams retain their separate role and handoff colors.
