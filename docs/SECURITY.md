@@ -1,6 +1,8 @@
 # Security and data-handling review
 
-This is a developer threat model for release 0.2, not an independent penetration test, compliance certification or owner-approved production data policy. Use it to plan the remaining acceptance work.
+This is the historical developer threat model for release 0.2, not an independent penetration test, compliance certification or owner-approved production data policy. Its remaining-work statements are a baseline, not a complete current implementation inventory. Use [current architecture](https://github.com/mattrob333/DutyGraphV2/blob/main/docs/ARCHITECTURE.md), [hosted controls](https://github.com/mattrob333/DutyGraphV2/blob/main/docs/HOSTING.md), and [release status](https://github.com/mattrob333/DutyGraphV2/blob/main/docs/RELEASE-STATUS.md) alongside it.
+
+Later code adds encrypted per-account providers, durable hosted authentication counters, transcription, and scoped work-gap follow-ups. These additions need inclusion in a refreshed threat assessment; this documentation handoff does not claim that assessment has been performed.
 
 ## Assets and boundaries
 

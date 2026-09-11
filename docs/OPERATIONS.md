@@ -1,6 +1,6 @@
 # Operator runbook
 
-Release 0.2 runs locally with Node.js 24+, npm and Docker Compose. The application listens only on 127.0.0.1:4317; the dedicated PostgreSQL service listens on 127.0.0.1:55437. Use the repository root as the working directory. On Windows, use npm.cmd if PowerShell blocks npm.ps1.
+The local application uses Node.js 24.x, npm and Docker Compose. It listens on 127.0.0.1:4317; the dedicated PostgreSQL service listens on 127.0.0.1:55437. Use the repository root as the working directory. On Windows, use npm.cmd if PowerShell blocks npm.ps1. See [HOSTING](https://github.com/mattrob333/DutyGraphV2/blob/main/docs/HOSTING.md) for the separate Vercel/Neon environment and [release status](https://github.com/mattrob333/DutyGraphV2/blob/main/docs/RELEASE-STATUS.md) for dated verification.
 
 ## Install and start
 
@@ -12,7 +12,7 @@ npm run verify
 npm start
 ```
 
-Open http://localhost:4317 and confirm the Duty Graph title and health endpoint. Setup generates random administrator/runtime credentials in ignored .env only if it is absent, starts Compose project dutygraph-v2, and applies versioned migrations. It does not inspect or change other application databases. A port collision fails instead of choosing another port.
+Open http://localhost:4317/login and check http://localhost:4317/api/health. Setup generates random administrator/runtime credentials in ignored .env only if it is absent, starts the dedicated Compose service, and applies versioned migrations. Existing environment settings are preserved: verify they refer to the dedicated local database before setup or tests. A port collision fails instead of choosing another port.
 
 For hot-reload development use `npm run dev`. For production-mode local review use `npm run build` followed by `npm start`. Both serve UI and API on one origin. The word production here describes the optimized asset build, not acceptance for Internet hosting.
 
@@ -84,13 +84,17 @@ The worker normally processes pending events every two seconds. Authoritative re
 
 ## Retention and limitations
 
-The local audio worker runs every minute. Access is denied immediately after an asset's expiry even if purge is delayed. Device drafts, typed text, histories, reports and metadata have separate lifetimes. Engagement retention/visibility/timezone text is descriptive; it does not implement a new purge schedule, legal hold, source ACL or reminder scheduler.
+The local audio worker runs every minute. Access is denied immediately after an asset's expiry even if purge is delayed. Device drafts, typed text, histories, reports and metadata have separate lifetimes. Engagement retention/visibility/timezone text is descriptive; it does not implement a new purge schedule, legal hold or source ACL.
+
+Work-gap follow-ups have a separate implemented scheduler and reply processor. Local workers check every minute; hosted maintenance runs on the Vercel cron. Delivery depends on configured providers, advisor-selected stored recipients, current settings, and the checks described in [work-gap follow-ups](https://github.com/mattrob333/DutyGraphV2/blob/main/docs/work-gap-followups.md). This is not a general reminder or customer automation service.
 
 The full workspace read is not paginated. Graph reads are bounded to 150 output nodes and a 5,000-record scan. Commands serialize writes per tenant. Backup encryption currently buffers the dump in memory. These choices suit the measured local workload; use larger-data, concurrency and memory tests before changing the supported operating envelope.
 
 ## External services
 
-No live provider credentials are configured in the delivered local instance. Exa source collection is implemented: put EXA_API_KEY in ignored configuration, set ENABLE_EXA_RESEARCH=true and restart. Confirm source/query policy and a provider spending limit before a live request. The app caps ten requests per tenant in 24 hours, retains reservations across restarts and never automatically retries. Read INTEGRATIONS.md for ambiguous-result handling, snapshot retention and live acceptance. Firecrawl, model analysis, transcription, email, enterprise identity and customer runtime still require implementation or service decisions.
+A fresh checkout has no live provider credentials. Account settings support encrypted OpenAI, Exa, and Resend configuration; Neo4j is an optional account projection. These adapters are implemented. Prefer account settings; optional local fallbacks are listed in .env.example. Provider configuration and live acceptance are separate.
+
+Research, model jobs, transcription, invitations, and work-gap follow-ups have their own limits and retry semantics. Read [integrations](https://github.com/mattrob333/DutyGraphV2/blob/main/docs/INTEGRATIONS.md) and the affected feature reference before testing real calls. Set an appropriate spending limit and use authorized recipients. Operator lead notifications use separate configuration from tenant invitations. Firecrawl is not an installed runtime adapter; enterprise identity and customer-system execution remain separate work.
 
 ## Routine operator check
 

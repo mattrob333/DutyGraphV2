@@ -1,5 +1,11 @@
 # Product and engineering decisions
 
+## September 11: portable, tool-agnostic project handoff
+
+**Status: accepted owner direction.** The repository must be understandable and maintainable by any developer or AI agent. START-HERE is the portable context entry point; normal engineering review and evidence determine readiness. No named model, editor, or external AI review service is a prerequisite.
+
+Keep the version-controlled handbook as the source of truth instead of adding an independently edited wiki. Keep release history in DEVLOG and dated verification, with concise current context in README. This documentation change preserves application architecture and the product decisions below.
+
 ## September 9 handoff: preserve the agreed product
 
 The Company Work Map is the marquee experience. Read [the design decisions](../work-map-design-decisions.md) for the approved neutral surfaces, business identity and macro-to-micro hierarchy. Stages are not duties; workflows can cross duties. Keep the three Work Map views. Workflows & cases remains available pending an owner decision; a reusable recommendation library is still an idea. AI-generated records are editable proposals grounded in evidence, not confirmed company testimony.

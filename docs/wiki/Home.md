@@ -1,6 +1,6 @@
 # DutyGraph project wiki
 
-This is the canonical, version-controlled project handbook for a new developer, advisor, or product collaborator. Current handoff: September 9, 2026, product baseline `acb7b79`. Start with [the laptop handoff](../../START-HERE.md) and [current priorities](../NEXT-STEPS.md). It consolidates the founder's product direction and the implementation; future plans are explicitly labeled.
+This is the canonical, version-controlled project handbook for a developer, advisor, or product collaborator. Start with [the portable project context](../../START-HERE.md) and [current priorities](../NEXT-STEPS.md). It records product direction and implementation; future plans are explicitly labeled. No particular development tool or previous conversation is required.
 
 ## Read in this order
 
@@ -16,12 +16,14 @@ This is the canonical, version-controlled project handbook for a new developer, 
 10. [Roadmap](Roadmap.md): next work and acceptance gates.
 11. [Decisions](Decisions.md): rationale behind important choices.
 
+For technical takeover, use the [repository map](../REPOSITORY-MAP.md) and [September 11 assessment](../handoff/2026-09-11-readiness-review.md). For the commercial evidence plan, read [Investment readiness](Investment-Readiness.md).
+
 [All documentation](../README.md) · [Repository README](../../README.md) · [Contribution guide](../../CONTRIBUTING.md)
 
 ## How to maintain this wiki
 
 Update the relevant page in the same PR as a behavior change. Keep technical implementation detail in linked reference documents rather than copying whole specifications. Use dated verification records for what was tested. A feature being implemented is different from a service being configured or a real customer workflow being accepted.
 
-These files are readable on GitHub directly and travel with every clone. GitHub's separate wiki repository was not accessible during this documentation pass; no separate wiki publication is claimed. If it is initialized later, mirror these pages and adapt navigation there. Keep edits here authoritative.
+These files are readable on GitHub and travel with every clone. They are the maintained handbook. If a separate GitHub Wiki is published, mirror these pages and adapt navigation there; keep edits here authoritative.
 
 Do not include customer transcripts, credentials, private introductions, or speculative partnership claims in public documentation.

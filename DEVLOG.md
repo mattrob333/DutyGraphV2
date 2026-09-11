@@ -1,5 +1,13 @@
 # DutyGraph development log
 
+## 2026-09-11 — Tool-agnostic developer handoff
+
+Reorganized README around product purpose, pilot status, the advisor journey, setup, and documentation navigation. Replaced the assistant-specific laptop continuation with portable START-HERE context and expanded vendor-neutral agent instructions. Added a feature/source/generator map, first-day troubleshooting and access expectations, a PR template, a candid technical takeover assessment, and an investment-readiness evidence checklist. The proposed outcome metric is explicitly unapproved/uninstrumented, not a traction claim.
+
+Corrected stale operator statements about provider implementation and follow-up scheduling. Marked older security and verification records as historical, consolidated current-state navigation, and recorded the inspected main commit's successful CI and matching READY deployment. Preserved historical DEVLOG evidence, current product priorities, and the existing README/DEVLOG update convention. No application, schema, provider configuration, or production behavior changes.
+
+Validation: locked install on Node 24.19.0; repository links/anchors and package-script references; 105-route contract generation without drift; production build/typecheck; handbook generation and rendered-reference link checks; 191-page SEO audit; 3 existing handbook/SEO tests; clean whitespace/diff review. Vite retains its large-bundle warning. Database-dependent checks require Docker, which is unavailable in this session, and were not rerun locally. No live provider calls or messages were sent. See [September 11 assessment](docs/handoff/2026-09-11-readiness-review.md) for scope and remaining acceptance. Publication/PR checks are separate from the baseline deployment observations.
+
 ## 2026-09-09 — Laptop continuation handoff
 
 Added START-HERE with fresh-clone setup and a paste-ready Codex prompt, a prioritized acceptance to-do list, settled Work Map design decisions and a desktop artifact audit. Refreshed stale release/wiki baselines and growth notes so a new session sees current implementation rather than the September 7 inventory. README and repository instructions point to the handoff. Promoted the public gallery browser check to portable optional tooling; preserved local design files while ignoring obsolete tool state. No product behavior changes.

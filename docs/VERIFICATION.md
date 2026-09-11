@@ -1,5 +1,7 @@
 # Verification record — release 0.2
 
+**Historical evidence, September 5, 2026.** Counts, behavior, and limitations below describe that release. Start with [RELEASE-STATUS](https://github.com/mattrob333/DutyGraphV2/blob/main/docs/RELEASE-STATUS.md) and [dated verification records](https://github.com/mattrob333/DutyGraphV2/tree/main/docs/verification) for later evidence; do not use this page as today's test count or production acceptance.
+
 Local verification date: September 5, 2026. Node 24, dedicated PostgreSQL 17, forced tenant RLS and the non-superuser runtime role. The published commit and its GitHub Actions result identify the release under test. This record separates automated checks, observed browser behavior and acceptance still needed.
 
 ## Automated verification

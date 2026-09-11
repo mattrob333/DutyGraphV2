@@ -2,11 +2,29 @@
 
 ## Continue the project
 
-[Laptop starting point](../START-HERE.md) · [Current to-do list](NEXT-STEPS.md) · [Work Map design decisions](work-map-design-decisions.md) · [Desktop artifact audit](handoff/2026-09-09-artifact-audit.md)
+[Portable project context](../START-HERE.md) · [Current to-do list](NEXT-STEPS.md) · [Repository map](REPOSITORY-MAP.md) · [Takeover assessment](handoff/2026-09-11-readiness-review.md)
+
+The handoff works for any developer or AI agent. The repository requires no particular AI vendor, editor, or review service.
 
 Start with the [project wiki](wiki/Home.md) and [repository README](../README.md).
 
 The [development log](../DEVLOG.md) records changes, reasons, validation and remaining work. Update it and the repository README with every change.
+
+## Which document owns which information?
+
+| Question | Maintained source |
+| --- | --- |
+| What is this, and how do I start it? | [Root README](../README.md) |
+| What context must travel to the next person? | [START-HERE](../START-HERE.md) |
+| How do people and agents contribute? | [CONTRIBUTING](../CONTRIBUTING.md), [AGENTS](../AGENTS.md) |
+| Where is a feature implemented or generated? | [Repository map](REPOSITORY-MAP.md) |
+| Why are we building it? What commercial proof is missing? | [Vision](wiki/Product-Vision.md), [investment readiness](wiki/Investment-Readiness.md) |
+| What exists, and what should happen next? | [Current state](wiki/Current-State.md), [NEXT-STEPS](NEXT-STEPS.md) |
+| Why was a consequential choice made? | [Decisions](wiki/Decisions.md), [Work Map decisions](work-map-design-decisions.md) |
+| What changed and what was verified? | [DEVLOG](../DEVLOG.md), [release status](RELEASE-STATUS.md), dated verification |
+| What was specific to the original desktop? | [Historical artifact audit](handoff/2026-09-09-artifact-audit.md) |
+
+Link to the responsible document instead of copying its history into several entry points. Product priorities live in NEXT-STEPS; Roadmap supplies the longer-term direction. Historical notes retain their original dates and claims.
 
 ## Maintained project handbook
 

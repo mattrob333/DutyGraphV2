@@ -1,18 +1,8 @@
 # Current state
 
-The current implementation connects Company Work Map to a living **Client brief**, a frozen report draft, Weekly review and Strategy input review. The brief assembles saved scope, work coverage, gaps, current advisor-reviewed findings selected for discussion, commitments and measurements. Preparing a client report carries its source snapshot into the existing audience/content review and manual-download flow. The live workspace view is not a client portal or automatic delivery service; recurring engagement terms, client sharing and billing remain separate.
+DutyGraph is a hosted advisor pilot, package version `0.3.0`. This page is the feature inventory; [release status](../RELEASE-STATUS.md) owns dated CI/deployment observations and [NEXT-STEPS](../NEXT-STEPS.md) owns the acceptance backlog. Documentation reviewed September 11, 2026; application behavior is unchanged from the inspected baseline `5d815bd`.
 
-Company Work Map now has three primary views: **Work map**, **Work flows** and **Tasks**. Work map contains the stage/people/duty path, Work flows shows recorded handoffs, and Tasks provides cards, registers and supporting detail. The former relationship/org/control tabs are consolidated into this path and the existing record/governance tools. Strategy shows actual framework inputs and version-aware upstream dependencies beside audit coverage. Available source counts do not establish financial or market sufficiency, and framework runs remain user-started. These are implementation descriptions; deployment and acceptance evidence are recorded separately.
-
-September 8: public demo requests flow into a provisioned operator inbox and create a company/contact for initial research. Research saves a proposed snapshot; Discovery automatically saves generated team duties, personal requests and task cards with validated AI-inferred links. Existing unassigned work can be linked by a separate AI action. Saved proposals remain editable and do not replace advisor or participant confirmation. See [demo requests](../demo-requests.md) and [the current Discovery guide](../guide/23-discovery-to-confirmed-work.md).
-
-The default Company Work Map now connects saved business stages to highlighted people and scoped duties/tasks. Task cards uses the same stages, with explicit Unassigned work and no title/department inference. Cobalt has an authored fictional wholesale profile and 18 guided business tasks across six stages; safe repeat upgrades preserve edits and confirmations. Help and the training handbook describe the current path. These are implemented behaviors; real-client acceptance remains separate from synthetic checks.
-
-Company research now includes a [reusable profile](../company-profiles.md): source-backed business details, official-site social links, separate advisor updates and an HTML deliverable. Latest completed profiles survive later failed jobs. Actual headcount/peer coverage depends on public evidence; logo extraction is deferred.
-
-September 7 update: [pre-kickoff preparation](../kickoff-preparation.md) now connects the business brief and retained streams to a branded contact request, private CSV/attendee/leadership capture, advisor-reviewed org import and a two-hour agenda. Supporting research is optional. Same-title duties with changed descriptions require explicit advisor resolution; task/duty stage membership is now explicit and advisor-editable in the default Company Work Map.
-
-Updated September 9, 2026; application source through `acb7b79`. See [the laptop handoff](../../START-HERE.md) and [current priorities](../NEXT-STEPS.md). “Implemented” means code exists, not that every provider is configured or the workflow has passed enterprise/customer acceptance.
+The main journey is discovery → reviewed work map → Client brief/report → Weekly review and Strategy. “Implemented” means code exists, not that every provider is configured or the workflow has passed real-client or enterprise acceptance. Start with [project context](../../START-HERE.md) when taking over the repository.
 
 | Area | Present implementation | Boundary |
 | --- | --- | --- |
