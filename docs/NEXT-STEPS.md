@@ -2,6 +2,8 @@
 
 Use with [START-HERE](../START-HERE.md). These are remaining work and product decisions, not claims that all integrations are ready. The owner planned to return to Google activation and a full hosted audit walkthrough after the Work Map polish.
 
+September 11 handoff: this priority sequence is preserved. See the [takeover assessment](handoff/2026-09-11-readiness-review.md) for engineering risks and [investment readiness](wiki/Investment-Readiness.md) for proposed commercial evidence gates. Neither document treats those recommendations as completed work.
+
 ## 1. Rehearse one complete hosted audit
 
 - [ ] Choose an authorized small company or one department and define scope, people, advisor and desired client outcome.

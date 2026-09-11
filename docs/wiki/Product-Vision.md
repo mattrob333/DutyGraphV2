@@ -1,5 +1,11 @@
 # Product vision
 
+## North star
+
+Build a living, trustworthy record of how a company operates, so people can understand the work, make evidence-backed improvements, and eventually delegate bounded work with clear authority. The immediate product is advisor-led discovery and review; autonomous business management is a long-term direction.
+
+The initial users are advisors, leadership, and participating employees. The exact paying buyer, pilot segment, packaging, and sustainable delivery model still need validation. [Investment readiness](Investment-Readiness.md) connects this direction to proposed outcome measures and evidence gates without presenting targets as achieved results.
+
 ## The problem
 
 An org chart shows reporting lines. An identity system shows who someone is. An access system records entitlements. Advisors still need to understand what people actually do: which inputs they receive, what they produce, who depends on them, which systems they use, and where work breaks.

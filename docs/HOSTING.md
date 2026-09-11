@@ -6,7 +6,7 @@ The production project is dutygraph-v2 in the owner's Vercel team. The public do
 
 - APP_DATABASE_URL: TLS-verified pooled Neon connection using dutygraph_app, a non-superuser role without BYPASSRLS. Do not substitute the marketplace owner's DATABASE_URL.
 - PROVIDER_ENCRYPTION_KEY: random 32-byte hex key for AES-256-GCM account credentials. Keep an independent secure recovery copy. Changing it without re-encrypting existing rows makes saved keys unreadable. Never expose it through a VITE variable or browser endpoint.
-- CRON_SECRET: protects GET /api/maintenance. Vercel calls it every five minutes to refresh projections and enforce existing retention. Unauthenticated calls fail closed.
+- CRON_SECRET: protects GET /api/maintenance. Vercel calls it every five minutes for projections, retention, and the bounded work-gap follow-up/reply jobs. Unauthenticated calls fail closed. See [work-gap follow-ups](work-gap-followups.md).
 - ENABLE_DEMO=false: disables the shared local demo account. Authenticated users can create a private fictional sample.
 - APP_ORIGIN: defaults to https://VERCEL_PROJECT_PRODUCTION_URL in the function entry. Set explicitly when moving to a custom domain and redeploy.
 
@@ -24,6 +24,6 @@ Run npm run contracts, npm run verify and npm audit before release. Confirm gene
 
 The existing backup/restore scripts are deliberately restricted to the local dedicated Docker database. They do not back up or restore Neon. Configure and rehearse hosted database recovery and separate encryption-key custody before relying on this pilot for irreplaceable client records. Provider job snapshots persist under tenant RLS; comprehensive deletion and legal-hold handling are not complete.
 
-Audio uploads use small verified chunks; playback supports bounded byte ranges. Physical-microphone and large-file browser acceptance still need evaluation. Production monitoring, alert routing, load/SLO acceptance, password recovery, SSO/MFA, email delivery webhooks and scheduled reminders are not delivered by this deployment. Neo4j Aura is an optional account-configured projection with PostgreSQL/current-record fallback. Connectivity was verified for a configured account in prior work; check the current account status rather than assuming a global connection.
+Audio uploads use small verified chunks; playback supports bounded byte ranges. Physical-microphone and large-file browser acceptance still need evaluation. Production monitoring, alert routing, load/SLO acceptance, password recovery, SSO/MFA, and email delivery webhooks remain open. Work-gap follow-up scheduling is implemented; it is not a general reminder system. Neo4j Aura is an optional account-configured projection with PostgreSQL/current-record fallback. Connectivity was verified for a configured account in prior work; check the current account status rather than assuming a global connection.
 
 Never call a sample-data script against an arbitrary database or import the private source handoff into the public repository. Build and live verification use fictional fixtures. API keys belong in the account settings or the server secret store, never logs, issue comments, source files or test output.
