@@ -50,6 +50,12 @@ Current password/session auth works in code. Do not add a second disconnected lo
 - [ ] Test meaningful workspace sizes and chart/filter performance. Cobalt's 12-person example is not evidence of Amazon-scale readiness.
 - [ ] Design progressive scope navigation if larger pilots require it; avoid attempting an entire huge organization in a single flat chart.
 
+## New build item — Listen Intelligently / Participant Voice Capture V2
+
+- [ ] Build the proposed **Listen Intelligently** participant experience: one Start action, local waveform and live transcript, evidence-linked topic coverage, optional pause-aware prompts, work-card review, and Save & send. Preserve audio/draft recovery, typed responses, authorization, provenance, and participant review.
+
+Added September 12, 2026. **Planned; implementation not started.** Read the [build brief and acceptance checklist](listen-intelligently.md) and the [owner-supplied design/build specification](specs/DutyGraph_Listen_Intelligently_Design_Build_Spec.pdf). The brief records seven implementation phases, existing code entry points, provider/privacy decisions, and the deferred spoken-facilitator experiment. Priority relative to items 1–5 remains to be assigned.
+
 ## Product decisions still open
 
 - **Workflows & cases:** the workflow list overlaps Company Work Map; cases track manual progress through reviewed workflow versions. Recommendation was to park the sidebar entry and keep case access near a workflow. It remains visible; no removal was authorized.
