@@ -30,6 +30,10 @@ Link to the responsible document instead of copying its history into several ent
 
 [Vision](wiki/Product-Vision.md) · [Journeys](wiki/User-Journeys.md) · [Current state](wiki/Current-State.md) · [Onboarding](wiki/Developer-Onboarding.md) · [Architecture](wiki/Architecture-and-Data.md) · [Strategy](wiki/Discovery-and-Strategy.md) · [Governance](wiki/Governance-and-Integrations.md) · [Operations](wiki/Operations-and-Deployment.md) · [Marketing](wiki/Marketing-and-Publishing.md) · [Roadmap](wiki/Roadmap.md) · [Decisions](wiki/Decisions.md)
 
+## Planned builds
+
+[Listen Intelligently — Participant Voice Capture V2](listen-intelligently.md): owner-supplied September 12 specification, implementation phases, preservation requirements, and acceptance checklist. Planned, not implemented; the original PDF is linked from the brief.
+
 ## Detailed references
 
 [Kickoff and capture](kickoff-capture.md): business-specific meeting coverage, full duty context, private invitations and voice-to-card review.

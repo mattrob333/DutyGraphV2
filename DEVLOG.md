@@ -1,5 +1,11 @@
 # DutyGraph development log
 
+## 2026-09-12 — Add Listen Intelligently to the build backlog
+
+Read the owner-supplied 13-page Participant Voice Capture V2 specification and preserved the original PDF under docs/specs. Added a build brief with the Start/listen/review/send journey, seven proposed phases, coverage/provenance requirements, existing code entry points, acceptance checks, and deferred spoken-facilitator experiment. Linked the item from NEXT-STEPS, README, and the documentation index without reprioritizing the existing backlog.
+
+The brief distinguishes source proposals from implemented behavior, including unverified realtime model/API names, draft privacy under background upload, consent/retention, lifecycle limits, and target latency versus measured performance. No application implementation, provider calls, or production changes. Validation: full PDF text review with representative architecture-page render inspection; source-copy checksum and documentation link/diff checks recorded with the PR.
+
 ## 2026-09-11 — Tool-agnostic developer handoff
 
 Reorganized README around product purpose, pilot status, the advisor journey, setup, and documentation navigation. Replaced the assistant-specific laptop continuation with portable START-HERE context and expanded vendor-neutral agent instructions. Added a feature/source/generator map, first-day troubleshooting and access expectations, a PR template, a candid technical takeover assessment, and an investment-readiness evidence checklist. The proposed outcome metric is explicitly unapproved/uninstrumented, not a traction claim.

@@ -38,6 +38,8 @@ Implemented areas include accounts and participant flows, source/task versioning
 - Sample companies and authority/vendor demonstrations are fictional. They do not prove live connectors or customer outcomes.
 - Real-client audit acceptance, hosted recovery, team identity/access, larger-workspace performance, and external runtime enforcement remain open.
 
+Planned participant improvement: [Listen Intelligently — Voice Capture V2](docs/listen-intelligently.md) simplifies capture into Start → listen → review → Save & send, with live transcription and evidence-linked coverage. The source specification and acceptance checklist are recorded as [new backlog work](docs/NEXT-STEPS.md); this feature is not implemented.
+
 ## Run locally
 
 Prerequisites: **Node.js 24.x**, npm, Git, Docker with Compose and Linux containers, and free ports `4317` and `55437`.
